@@ -1,0 +1,574 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <a
+        routerLink="/administration"
+        class="mb-3 inline-flex items-center gap-2 text-[12px] font-semibold text-[#2a64a2] hover:underline"
+        ><i class="ph ph-arrow-left text-[15px]"></i
+        >{{ "sheetConfig.back" | t }}</a
+      >
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "sheetConfig.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+        {{ "sheetConfig.subtitle" | t }}
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="resetDefaults()"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
+      >
+        <i class="ph ph-arrow-counter-clockwise text-[16px]"></i
+        >{{ "sheetConfig.reset" | t }}
+      </button>
+      <button
+        type="button"
+        (click)="openCreate()"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#24598e]"
+      >
+        <i class="ph ph-plus text-[16px]"></i>{{ "sheetConfig.add" | t }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10.5px] font-semibold uppercase text-[#718096]">
+        {{ "sheetConfig.kpi.total" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#172033]">
+        {{ items().length }}
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10.5px] font-semibold uppercase text-[#718096]">
+        {{ "sheetConfig.kpi.active" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#18a547]">
+        {{ activeCount() }}
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10.5px] font-semibold uppercase text-[#718096]">
+        {{ "sheetConfig.kpi.inactive" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#8b5e00]">
+        {{ inactiveCount() }}
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10.5px] font-semibold uppercase text-[#718096]">
+        {{ "sheetConfig.kpi.custom" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#2a64a2]">
+        {{ customCount() }}
+      </p>
+    </article>
+  </div>
+
+  <article
+    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+  >
+    <div class="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr]">
+      <label class="relative block"
+        ><span class="sr-only">{{ "sheetConfig.filters.search" | t }}</span
+        ><i
+          class="ph ph-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#718096]"
+        ></i
+        ><input
+          type="search"
+          [value]="query()"
+          (input)="updateQuery($event)"
+          [placeholder]="'sheetConfig.filters.searchPlaceholder' | t"
+          class="h-[40px] w-full rounded-[12px] border border-[#dce3eb] bg-white pl-10 pr-4 text-[13px] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+      /></label>
+      <label class="relative block"
+        ><span class="sr-only">{{ "sheetConfig.filters.category" | t }}</span
+        ><select
+          [value]="categoryFilter()"
+          (change)="updateCategory($event)"
+          class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm"
+        >
+          <option value="all">
+            {{ "sheetConfig.filters.allCategories" | t }}
+          </option>
+          @for (category of categories; track category) {
+            <option [value]="category">{{ categoryKey(category) | t }}</option>
+          }</select
+        ><i
+          class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+        ></i
+      ></label>
+      <label class="relative block"
+        ><span class="sr-only">{{ "sheetConfig.filters.status" | t }}</span
+        ><select
+          [value]="statusFilter()"
+          (change)="updateStatus($event)"
+          class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm"
+        >
+          <option value="all">
+            {{ "sheetConfig.filters.allStatuses" | t }}
+          </option>
+          <option value="active">{{ "sheetConfig.status.active" | t }}</option>
+          <option value="inactive">
+            {{ "sheetConfig.status.inactive" | t }}
+          </option></select
+        ><i
+          class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+        ></i
+      ></label>
+    </div>
+
+    <div class="mt-4 overflow-x-auto">
+      <table class="w-full min-w-[980px] text-left text-[12.5px]">
+        <thead>
+          <tr
+            class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
+          >
+            <th class="w-[70px] pb-2 pr-3">
+              {{ "sheetConfig.table.number" | t }}
+            </th>
+            <th class="pb-2 pr-4">{{ "sheetConfig.table.title" | t }}</th>
+            <th class="pb-2 pr-4">{{ "sheetConfig.table.category" | t }}</th>
+            <th class="pb-2 pr-4">{{ "sheetConfig.table.duration" | t }}</th>
+            <th class="pb-2 pr-4">{{ "sheetConfig.table.status" | t }}</th>
+            <th class="pb-2 text-right">
+              {{ "sheetConfig.table.actions" | t }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredItems(); track item.id) {
+            <tr
+              class="border-b border-[#edf1f5] last:border-0 hover:bg-[#fbfcfe]"
+            >
+              <td class="py-3 pr-3 font-extrabold text-[#2a64a2]">
+                {{ item.number.toString().padStart(2, "0") }}
+              </td>
+              <td class="py-3 pr-4">
+                <button
+                  type="button"
+                  (click)="openView(item)"
+                  class="text-left font-semibold text-[#172033] hover:text-[#2a64a2] hover:underline"
+                >
+                  {{ titleOf(item) }}
+                </button>
+                <p
+                  class="mt-0.5 max-w-[500px] truncate text-[10.5px] text-[#7b8798]"
+                >
+                  {{ item.reference || ("sheetConfig.table.noReference" | t) }}
+                </p>
+              </td>
+              <td class="py-3 pr-4">
+                <span
+                  [class]="
+                    'inline-flex rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+                    categoryClasses(item.category)
+                  "
+                  >{{ categoryKey(item.category) | t }}</span
+                >
+              </td>
+              <td class="py-3 pr-4 text-[#475569]">
+                {{ item.durationMinutes }} min
+              </td>
+              <td class="py-3 pr-4">
+                <button
+                  type="button"
+                  (click)="toggleActive(item)"
+                  [class]="
+                    item.active
+                      ? 'inline-flex rounded-full bg-[#d8f8df] px-2.5 py-1 text-[10.5px] font-semibold text-[#18a547]'
+                      : 'inline-flex rounded-full bg-[#f1f4f8] px-2.5 py-1 text-[10.5px] font-semibold text-[#687589]'
+                  "
+                >
+                  {{
+                    (item.active
+                      ? "sheetConfig.status.active"
+                      : "sheetConfig.status.inactive"
+                    ) | t
+                  }}
+                </button>
+              </td>
+              <td class="py-3 text-right">
+                <div class="inline-flex items-center gap-1">
+                  <button
+                    type="button"
+                    (click)="openView(item)"
+                    class="grid size-8 place-items-center rounded-[9px] text-[#64748b] hover:bg-[#e6f2ff] hover:text-[#2a64a2]"
+                    [attr.aria-label]="'sheetConfig.actions.view' | t"
+                  >
+                    <i class="ph ph-eye text-[17px]"></i></button
+                  ><button
+                    type="button"
+                    (click)="openEdit(item)"
+                    class="grid size-8 place-items-center rounded-[9px] text-[#64748b] hover:bg-[#e6f2ff] hover:text-[#2a64a2]"
+                    [attr.aria-label]="'sheetConfig.actions.edit' | t"
+                  >
+                    <i class="ph ph-pencil-simple text-[17px]"></i></button
+                  ><button
+                    type="button"
+                    (click)="requestDelete(item)"
+                    class="grid size-8 place-items-center rounded-[9px] text-[#64748b] hover:bg-[#ffe8e4] hover:text-[#d94a3a]"
+                    [attr.aria-label]="'sheetConfig.actions.delete' | t"
+                  >
+                    <i class="ph ph-trash text-[17px]"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td
+                colspan="6"
+                class="py-12 text-center text-[13px] text-[#768295]"
+              >
+                {{ "sheetConfig.empty" | t }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+
+@if (editorOpen()) {
+  <button
+    type="button"
+    class="fixed inset-0 z-40 bg-[#0c1d34]/35 backdrop-blur-[1px]"
+    (click)="closeEditor()"
+    [attr.aria-label]="'sheetConfig.editor.close' | t"
+  ></button>
+  <aside
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-[620px] overflow-y-auto bg-[#f7f9fc] shadow-[-18px_0_50px_rgba(13,34,61,0.18)]"
+  >
+    <div
+      class="sticky top-0 z-10 flex items-center justify-between border-b border-[#dfe5ec] bg-white px-5 py-4"
+    >
+      <div>
+        <p
+          class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#2a64a2]"
+        >
+          {{ "sheetConfig.editor.eyebrow" | t }}
+        </p>
+        <h2 class="mt-0.5 text-[20px] font-extrabold text-[#172033]">
+          {{
+            (editing()
+              ? "sheetConfig.editor.editTitle"
+              : "sheetConfig.editor.addTitle"
+            ) | t
+          }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        (click)="closeEditor()"
+        class="grid size-9 place-items-center rounded-[10px] border border-[#dce3eb] bg-white text-[#64748b]"
+      >
+        <i class="ph ph-x text-[18px]"></i>
+      </button>
+    </div>
+    <div class="p-5">
+      <div
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div class="grid gap-4 sm:grid-cols-[110px_1fr]">
+          <label class="block text-[12px] font-semibold text-[#334155]"
+            >{{ "sheetConfig.editor.number" | t
+            }}<input
+              type="number"
+              min="1"
+              [(ngModel)]="draft.number"
+              class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
+          /></label>
+          <label class="block text-[12px] font-semibold text-[#334155]"
+            >{{ "sheetConfig.editor.sheetTitle" | t
+            }}<input
+              [(ngModel)]="draft.title"
+              [placeholder]="'sheetConfig.editor.titlePlaceholder' | t"
+              class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
+          /></label>
+        </div>
+        @if (duplicateNumber()) {
+          <p class="mt-2 text-[11px] font-semibold text-[#d94a3a]">
+            {{ "sheetConfig.editor.duplicateNumber" | t }}
+          </p>
+        }
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="block text-[12px] font-semibold text-[#334155]"
+            >{{ "sheetConfig.editor.category" | t
+            }}<select
+              [(ngModel)]="draft.category"
+              class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none"
+            >
+              @for (category of categories; track category) {
+                <option [value]="category">
+                  {{ categoryKey(category) | t }}
+                </option>
+              }
+            </select></label
+          >
+          <label class="block text-[12px] font-semibold text-[#334155]"
+            >{{ "sheetConfig.editor.duration" | t }}
+            <div class="relative">
+              <input
+                type="number"
+                min="1"
+                [(ngModel)]="draft.durationMinutes"
+                class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 pr-12 text-[13px] outline-none"
+              /><span
+                class="absolute right-3 top-[14px] text-[11px] text-[#7b8798]"
+                >min</span
+              >
+            </div></label
+          >
+        </div>
+        <label class="mt-4 block text-[12px] font-semibold text-[#334155]"
+          >{{ "sheetConfig.editor.reference" | t
+          }}<input
+            [(ngModel)]="draft.reference"
+            [placeholder]="'sheetConfig.editor.referencePlaceholder' | t"
+            class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none"
+        /></label>
+        <label class="mt-4 block text-[12px] font-semibold text-[#334155]"
+          >{{ "sheetConfig.editor.objective" | t
+          }}<textarea
+            rows="3"
+            [(ngModel)]="draft.objective"
+            [placeholder]="'sheetConfig.editor.objectivePlaceholder' | t"
+            class="mt-1 w-full resize-y rounded-[10px] border border-[#dbe2ea] px-3 py-2.5 text-[13px] outline-none"
+          ></textarea>
+        </label>
+        <label class="mt-4 block text-[12px] font-semibold text-[#334155]"
+          >{{ "sheetConfig.editor.example" | t
+          }}<textarea
+            rows="4"
+            [(ngModel)]="draft.example"
+            [placeholder]="'sheetConfig.editor.examplePlaceholder' | t"
+            class="mt-1 w-full resize-y rounded-[10px] border border-[#dbe2ea] px-3 py-2.5 text-[13px] outline-none"
+          ></textarea>
+        </label>
+        <label class="mt-4 block text-[12px] font-semibold text-[#334155]"
+          >{{ "sheetConfig.editor.correction" | t
+          }}<textarea
+            rows="7"
+            [(ngModel)]="draft.correction"
+            [placeholder]="'sheetConfig.editor.correctionPlaceholder' | t"
+            class="mt-1 w-full resize-y rounded-[10px] border border-[#dbe2ea] px-3 py-2.5 text-[13px] outline-none"
+          ></textarea>
+        </label>
+        <label
+          class="mt-4 flex items-center justify-between rounded-[13px] bg-[#f0f3f7] px-3.5 py-3"
+          ><span
+            ><span class="block text-[12px] font-bold text-[#172033]">{{
+              "sheetConfig.editor.active" | t
+            }}</span
+            ><span class="mt-0.5 block text-[10.5px] text-[#768295]">{{
+              "sheetConfig.editor.activeHint" | t
+            }}</span></span
+          ><input
+            type="checkbox"
+            [(ngModel)]="draft.active"
+            class="size-4 accent-[#2a64a2]"
+        /></label>
+      </div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeEditor()"
+          class="h-[39px] rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold"
+        >
+          {{ "sheetConfig.editor.cancel" | t }}</button
+        ><button
+          type="button"
+          (click)="saveDraft()"
+          class="h-[39px] rounded-[11px] bg-[#2b66a4] px-5 text-[12px] font-semibold text-white"
+        >
+          {{ "sheetConfig.editor.save" | t }}
+        </button>
+      </div>
+    </div>
+  </aside>
+}
+
+@if (viewerOpen() && selected(); as item) {
+  <button
+    type="button"
+    class="fixed inset-0 z-40 bg-[#0c1d34]/35 backdrop-blur-[1px]"
+    (click)="closeView()"
+    [attr.aria-label]="'sheetConfig.viewer.close' | t"
+  ></button>
+  <aside
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-[650px] overflow-y-auto bg-[#f7f9fc] shadow-[-18px_0_50px_rgba(13,34,61,0.18)]"
+  >
+    <div
+      class="sticky top-0 z-10 flex items-center justify-between border-b border-[#dfe5ec] bg-white px-5 py-4"
+    >
+      <div>
+        <p
+          class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#2a64a2]"
+        >
+          {{ "sheetConfig.viewer.eyebrow" | t }}
+          {{ item.number.toString().padStart(2, "0") }}
+        </p>
+        <h2 class="mt-0.5 text-[20px] font-extrabold text-[#172033]">
+          {{ titleOf(item) }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        (click)="closeView()"
+        class="grid size-9 place-items-center rounded-[10px] border border-[#dce3eb] bg-white text-[#64748b]"
+      >
+        <i class="ph ph-x text-[18px]"></i>
+      </button>
+    </div>
+    <div class="space-y-4 p-5">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div class="flex flex-wrap gap-2">
+          <span
+            [class]="
+              'inline-flex rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+              categoryClasses(item.category)
+            "
+            >{{ categoryKey(item.category) | t }}</span
+          ><span
+            class="inline-flex rounded-full bg-[#f0f3f7] px-2.5 py-1 text-[10.5px] font-semibold text-[#64748b]"
+            >{{ item.durationMinutes }} min</span
+          ><span
+            [class]="
+              item.active
+                ? 'inline-flex rounded-full bg-[#d8f8df] px-2.5 py-1 text-[10.5px] font-semibold text-[#18a547]'
+                : 'inline-flex rounded-full bg-[#f1f4f8] px-2.5 py-1 text-[10.5px] font-semibold text-[#687589]'
+            "
+            >{{
+              (item.active
+                ? "sheetConfig.status.active"
+                : "sheetConfig.status.inactive"
+              ) | t
+            }}</span
+          >
+        </div>
+        <dl class="mt-4 grid gap-3 text-[12px]">
+          <div>
+            <dt class="font-semibold text-[#768295]">
+              {{ "sheetConfig.viewer.reference" | t }}
+            </dt>
+            <dd class="mt-1 text-[#172033]">
+              {{ item.reference || ("sheetConfig.table.noReference" | t) }}
+            </dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-[#768295]">
+              {{ "sheetConfig.viewer.objective" | t }}
+            </dt>
+            <dd class="mt-1 leading-[1.55] text-[#172033]">
+              {{ objectiveOf(item) }}
+            </dd>
+          </div>
+        </dl>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div class="flex items-center gap-2">
+          <span
+            class="grid size-8 place-items-center rounded-full bg-[#fff0c9] text-[#8b5e00]"
+            ><i class="ph ph-question text-[16px]"></i
+          ></span>
+          <h3 class="text-[15px] font-bold">
+            {{ "sheetConfig.viewer.exampleTitle" | t }}
+          </h3>
+        </div>
+        <p
+          class="mt-3 whitespace-pre-line text-[12.5px] leading-[1.6] text-[#475569]"
+        >
+          {{ exampleOf(item) }}
+        </p>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div class="flex items-center gap-2">
+          <span
+            class="grid size-8 place-items-center rounded-full bg-[#d8f8df] text-[#18a547]"
+            ><i class="ph ph-check-circle text-[16px]"></i
+          ></span>
+          <h3 class="text-[15px] font-bold">
+            {{ "sheetConfig.viewer.correctionTitle" | t }}
+          </h3>
+        </div>
+        <p
+          class="mt-3 whitespace-pre-line text-[12.5px] leading-[1.65] text-[#475569]"
+        >
+          {{ correctionOf(item) }}
+        </p>
+      </article>
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="requestDelete(item); closeView()"
+          class="h-[39px] rounded-[11px] border border-[#f1c6c1] bg-white px-4 text-[12px] font-semibold text-[#c94738]"
+        >
+          {{ "sheetConfig.actions.delete" | t }}</button
+        ><button
+          type="button"
+          (click)="editFromView()"
+          class="h-[39px] rounded-[11px] bg-[#2b66a4] px-5 text-[12px] font-semibold text-white"
+        >
+          {{ "sheetConfig.actions.edit" | t }}
+        </button>
+      </div>
+    </div>
+  </aside>
+}
+
+@if (deleteOpen() && pendingDelete(); as item) {
+  <div
+    class="fixed inset-0 z-[60] grid place-items-center bg-[#0c1d34]/40 px-4"
+  >
+    <div class="w-full max-w-[430px] rounded-[18px] bg-white p-5 shadow-2xl">
+      <div
+        class="flex size-10 items-center justify-center rounded-full bg-[#ffe8e4] text-[#c94738]"
+      >
+        <i class="ph ph-trash text-[20px]"></i>
+      </div>
+      <h3 class="mt-4 text-[18px] font-extrabold text-[#172033]">
+        {{ "sheetConfig.delete.title" | t }}
+      </h3>
+      <p class="mt-2 text-[13px] leading-[1.5] text-[#687589]">
+        {{
+          "sheetConfig.delete.message"
+            | t: { number: item.number, title: titleOf(item) }
+        }}
+      </p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          class="h-[38px] rounded-[10px] border border-[#d9e0e9] px-4 text-[12px] font-semibold"
+        >
+          {{ "sheetConfig.delete.cancel" | t }}</button
+        ><button
+          type="button"
+          (click)="confirmDelete()"
+          class="h-[38px] rounded-[10px] bg-[#d94a3a] px-4 text-[12px] font-semibold text-white"
+        >
+          {{ "sheetConfig.delete.confirm" | t }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

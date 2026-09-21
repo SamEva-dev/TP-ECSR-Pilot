@@ -1,0 +1,300 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[80]">
+    <button
+      type="button"
+      class="absolute inset-0 cursor-default bg-[#0f2744]/35 backdrop-blur-[1px]"
+      (click)="requestClose()"
+      [attr.aria-label]="'students.drawer.close' | t"
+    ></button>
+
+    <aside
+      class="absolute inset-y-0 right-0 flex w-full max-w-[590px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(16,38,68,0.18)]"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'students.drawer.title' | t"
+    >
+      <header
+        class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="grid size-11 place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
+          >
+            <i class="ph ph-user-plus text-[22px]"></i>
+          </span>
+          <div>
+            <h2
+              class="text-[20px] font-extrabold tracking-[-0.4px] text-[#172033]"
+            >
+              {{ "students.drawer.title" | t }}
+            </h2>
+            <p class="mt-0.5 text-[12px] text-[#718096]">
+              {{ "students.drawer.subtitle" | t }}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="requestClose()"
+          class="grid size-10 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#536277] transition hover:bg-[#f1f5f9]"
+          [attr.aria-label]="'students.drawer.close' | t"
+        >
+          <i class="ph ph-x text-[20px]"></i>
+        </button>
+      </header>
+
+      <form
+        class="flex min-h-0 flex-1 flex-col"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        novalidate
+      >
+        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i
+                class="ph ph-identification-card text-[19px] text-[#2a64a2]"
+              ></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "students.drawer.identity.title" | t }}
+              </h3>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="student-first-name"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "students.drawer.identity.firstName" | t }} *</label
+                >
+                <input
+                  id="student-first-name"
+                  formControlName="firstName"
+                  autocomplete="given-name"
+                  [placeholder]="
+                    'students.drawer.identity.firstNamePlaceholder' | t
+                  "
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+                @if (showRequired("firstName")) {
+                  <p class="mt-1 text-[11px] text-red-600">
+                    {{ "students.drawer.errors.required" | t }}
+                  </p>
+                }
+              </div>
+              <div>
+                <label
+                  for="student-last-name"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "students.drawer.identity.lastName" | t }} *</label
+                >
+                <input
+                  id="student-last-name"
+                  formControlName="lastName"
+                  autocomplete="family-name"
+                  [placeholder]="
+                    'students.drawer.identity.lastNamePlaceholder' | t
+                  "
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+                @if (showRequired("lastName")) {
+                  <p class="mt-1 text-[11px] text-red-600">
+                    {{ "students.drawer.errors.required" | t }}
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label
+                for="student-email"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "students.drawer.identity.email" | t }} *</label
+              >
+              <div class="relative">
+                <i
+                  class="ph ph-envelope-simple absolute left-3.5 top-1/2 -translate-y-1/2 text-[16px] text-[#8a96a8]"
+                ></i>
+                <input
+                  id="student-email"
+                  type="email"
+                  formControlName="email"
+                  autocomplete="email"
+                  [placeholder]="
+                    'students.drawer.identity.emailPlaceholder' | t
+                  "
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white pl-10 pr-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+              </div>
+              @if (showRequired("email")) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ "students.drawer.errors.required" | t }}
+                </p>
+              }
+              @if (showEmailError()) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ "students.drawer.errors.email" | t }}
+                </p>
+              }
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="student-phone"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "students.drawer.identity.phone" | t }}</label
+                >
+                <div class="relative">
+                  <i
+                    class="ph ph-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-[16px] text-[#8a96a8]"
+                  ></i>
+                  <input
+                    id="student-phone"
+                    type="tel"
+                    formControlName="phone"
+                    autocomplete="tel"
+                    [placeholder]="
+                      'students.drawer.identity.phonePlaceholder' | t
+                    "
+                    class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white pl-10 pr-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  for="student-birth-date"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "students.drawer.identity.birthDate" | t }}</label
+                >
+                <input
+                  id="student-birth-date"
+                  type="date"
+                  formControlName="birthDate"
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i class="ph ph-graduation-cap text-[19px] text-[#2a64a2]"></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "students.drawer.training.title" | t }}
+              </h3>
+            </div>
+
+            <div>
+              <label
+                for="student-promotion"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "students.drawer.training.promotion" | t }} *</label
+              >
+              <div class="relative">
+                <select
+                  id="student-promotion"
+                  formControlName="promotionId"
+                  class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                >
+                  @for (promotion of promotions; track promotion.id) {
+                    <option [value]="promotion.id">{{ promotion.name }}</option>
+                  }
+                </select>
+                <i
+                  class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+                ></i>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label
+                for="student-start-date"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "students.drawer.training.startDate" | t }} *</label
+              >
+              <input
+                id="student-start-date"
+                type="date"
+                formControlName="startDate"
+                class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+              />
+              @if (showRequired("startDate")) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ "students.drawer.errors.required" | t }}
+                </p>
+              }
+            </div>
+
+            <div class="mt-4 rounded-[14px] bg-[#eef5fc] p-4">
+              <div class="flex gap-3">
+                <span
+                  class="grid size-9 shrink-0 place-items-center rounded-full bg-white text-[#2a64a2]"
+                  ><i class="ph ph-info text-[18px]"></i
+                ></span>
+                <div>
+                  <p class="text-[12px] font-semibold text-[#2a557f]">
+                    {{ "students.drawer.training.initialStateTitle" | t }}
+                  </p>
+                  <p class="mt-1 text-[11.5px] leading-[1.45] text-[#64748b]">
+                    {{ "students.drawer.training.initialStateHelp" | t }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="flex items-start gap-3">
+              <input
+                id="send-invitation"
+                type="checkbox"
+                formControlName="sendInvitation"
+                class="mt-0.5 size-4 rounded border-[#b8c5d3] text-[#2a64a2] accent-[#2a64a2]"
+              />
+              <label for="send-invitation" class="cursor-pointer">
+                <span class="block text-[13px] font-semibold text-[#172033]">{{
+                  "students.drawer.access.sendInvitation" | t
+                }}</span>
+                <span
+                  class="mt-0.5 block text-[11.5px] leading-[1.45] text-[#718096]"
+                  >{{ "students.drawer.access.sendInvitationHelp" | t }}</span
+                >
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <footer
+          class="flex items-center justify-between gap-3 border-t border-[#dfe5ec] bg-white px-6 py-4"
+        >
+          <p class="hidden text-[11px] text-[#7a8698] sm:block">
+            {{ "students.drawer.requiredHint" | t }}
+          </p>
+          <div class="ml-auto flex gap-2">
+            <button
+              type="button"
+              (click)="requestClose()"
+              class="inline-flex h-[40px] items-center justify-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#475569] shadow-sm transition hover:bg-[#f8fafc]"
+            >
+              {{ "students.drawer.cancel" | t }}
+            </button>
+            <button
+              type="submit"
+              class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f]"
+            >
+              <i class="ph ph-user-plus text-[17px]"></i
+              >{{ "students.drawer.submit" | t }}
+            </button>
+          </div>
+        </footer>
+      </form>
+    </aside>
+  </div>
+}

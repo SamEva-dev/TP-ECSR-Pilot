@@ -1,0 +1,287 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <a
+    [routerLink]="isJury() ? '/jury' : '/certification'"
+    class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#2a64a2]"
+    ><i class="ph ph-arrow-left"></i>{{ "certification.candidate.back" | t }}</a
+  >
+  <div
+    class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+  >
+    <div>
+      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ candidate.firstName }} {{ candidate.lastName }}
+      </h1>
+      <p class="mt-1 text-[13px] text-[#6c788b]">
+        {{ candidate.candidateNumber }} · {{ exam.name }}
+      </p>
+    </div>
+    <span
+      [class]="
+        'inline-flex w-fit rounded-full px-3 py-1 text-[11px] font-semibold ' +
+        (candidate.ready
+          ? 'bg-[#d8f8df] text-[#18a547]'
+          : 'bg-[#fff0c9] text-[#8b5e00]')
+      "
+      >{{
+        (candidate.ready ? "certification.ready" : "certification.incomplete")
+          | t
+      }}</span
+    >
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.table.hours" | t }}
+      </p>
+      <p class="mt-2 text-[21px] font-extrabold">
+        {{ candidate.completedHours }} / {{ candidate.plannedHours }} h
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.table.documents" | t }}
+      </p>
+      <p class="mt-2 text-[21px] font-extrabold">
+        {{ candidate.documentsReady }} / {{ candidate.documentsTotal }}
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">CCP1</p>
+      <p class="mt-2 text-[14px] font-bold">
+        <span
+          [class]="'rounded-full px-2.5 py-1 ' + statusClasses(candidate.ccp1)"
+          >{{ "certification.ccp." + candidate.ccp1 | t }}</span
+        >
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">CCP2</p>
+      <p class="mt-2 text-[14px] font-bold">
+        <span
+          [class]="'rounded-full px-2.5 py-1 ' + statusClasses(candidate.ccp2)"
+          >{{ "certification.ccp." + candidate.ccp2 | t }}</span
+        >
+      </p>
+    </article>
+  </div>
+
+  @if (!candidate.ready && candidate.missingKeys.length) {
+    <article
+      class="mt-4 rounded-[17px] border border-[#f1d89c] bg-[#fff8e8] p-4"
+    >
+      <div class="flex gap-3">
+        <i class="ph ph-warning mt-0.5 text-[19px] text-[#9a6b0e]"></i>
+        <div>
+          <h2 class="text-[13px] font-bold text-[#7a5410]">
+            {{ "certification.candidate.missingTitle" | t }}
+          </h2>
+          <ul class="mt-2 list-disc space-y-1 pl-4 text-[12px] text-[#765d2a]">
+            @for (item of candidate.missingKeys; track item) {
+              <li>{{ item | t }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </article>
+  }
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "certification.candidate.examPath" | t }}
+      </h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">
+        {{ "certification.candidate.examPathSubtitle" | t }}
+      </p>
+      <div class="mt-4 space-y-2">
+        @for (step of candidate.steps; track step.id) {
+          <div
+            class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"
+          >
+            <span
+              [class]="
+                'grid size-[34px] shrink-0 place-items-center rounded-full ' +
+                (step.status === 'done'
+                  ? 'bg-[#d8f8df] text-[#18a547]'
+                  : 'bg-[#e5f2ff] text-[#2a64a2]')
+              "
+              ><i
+                [class]="
+                  'ph ' + (step.status === 'done' ? 'ph-check' : 'ph-clock')
+                "
+              ></i
+            ></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[12.5px] font-bold">
+                {{ step.labelKey | t }}
+              </p>
+              <p class="text-[10.5px] text-[#7b8798]">
+                {{ step.date }} · {{ step.time }} · {{ step.duration }}
+              </p>
+            </div>
+            <span
+              [class]="
+                'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                statusClasses(step.status)
+              "
+              >{{ "certification.stepStatus." + step.status | t }}</span
+            >
+          </div>
+        }
+      </div>
+    </article>
+
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "certification.candidate.readinessTitle" | t }}
+      </h2>
+      <div class="mt-5">
+        <div class="flex items-end justify-between">
+          <span class="text-[12px] text-[#718096]">{{
+            "certification.candidate.trainingHours" | t
+          }}</span
+          ><strong class="text-[24px] text-[#2a64a2]"
+            >{{ readiness() }} %</strong
+          >
+        </div>
+        <app-progress-bar class="mt-2 block" [value]="readiness()" />
+      </div>
+      <dl class="mt-4 text-[12px]">
+        <div class="flex justify-between border-b border-[#e7ecf1] py-2.5">
+          <dt class="text-[#718096]">
+            {{ "certification.candidate.professionalFile" | t }}
+          </dt>
+          <dd
+            class="font-semibold"
+            [class.text-[#18a547]]="
+              candidate.documentsReady === candidate.documentsTotal
+            "
+          >
+            {{
+              candidate.documentsReady === candidate.documentsTotal
+                ? ("certification.complete" | t)
+                : ("certification.incomplete" | t)
+            }}
+          </dd>
+        </div>
+        <div class="flex justify-between border-b border-[#e7ecf1] py-2.5">
+          <dt class="text-[#718096]">
+            {{ "certification.candidate.ccp1Stage" | t }}
+          </dt>
+          <dd class="font-semibold">
+            {{ "certification.ccp." + candidate.ccp1 | t }}
+          </dd>
+        </div>
+        <div class="flex justify-between py-2.5">
+          <dt class="text-[#718096]">
+            {{ "certification.candidate.ccp2Stage" | t }}
+          </dt>
+          <dd class="font-semibold">
+            {{ "certification.ccp." + candidate.ccp2 | t }}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  </div>
+
+  @if (isJury()) {
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-[16px] font-bold">
+            {{ "certification.candidate.juryEvaluation" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12px] text-[#768295]">
+            {{ "certification.candidate.juryEvaluationHelp" | t }}
+          </p>
+        </div>
+        @if (evaluationLocked()) {
+          <span
+            class="inline-flex items-center gap-1 rounded-full bg-[#e5f2ff] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
+            ><i class="ph ph-lock-key"></i
+            >{{ "certification.candidate.locked" | t }}</span
+          >
+        }
+      </div>
+      <div class="mt-4 grid gap-3 md:grid-cols-2">
+        @for (criterion of juryCriteria; track criterion.id) {
+          <div class="rounded-[14px] border border-[#e1e7ee] p-4">
+            <p class="text-[12.5px] font-bold">{{ criterion.labelKey | t }}</p>
+            <div class="mt-3 grid grid-cols-3 gap-2">
+              @for (
+                level of ["satisfactory", "partial", "insufficient"];
+                track level
+              ) {
+                <button
+                  type="button"
+                  [disabled]="evaluationLocked()"
+                  (click)="setLevel(criterion.id, $any(level))"
+                  [class]="
+                    'rounded-[9px] px-2 py-2 text-[10.5px] font-semibold transition ' +
+                    (selected(criterion.id, $any(level))
+                      ? level === 'satisfactory'
+                        ? 'bg-[#d8f8df] text-[#18a547] ring-1 ring-[#8fd9a2]'
+                        : level === 'partial'
+                          ? 'bg-[#fff0c9] text-[#8b5e00] ring-1 ring-[#efd080]'
+                          : 'bg-[#ffe1df] text-[#f22b2b] ring-1 ring-[#f6aaa4]'
+                      : 'bg-[#f1f4f8] text-[#617086]')
+                  "
+                >
+                  {{ "certification.candidate.juryLevels." + level | t }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <label class="mt-4 block text-[12px] font-semibold text-[#334155]"
+        >{{ "certification.candidate.juryNotes" | t
+        }}<textarea
+          [(ngModel)]="juryNotes"
+          [disabled]="evaluationLocked()"
+          rows="4"
+          class="mt-2 w-full resize-none rounded-[12px] border border-[#dbe2ea] bg-white p-3 text-[12px] font-normal outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
+        ></textarea>
+      </label>
+      <div class="mt-4 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          [disabled]="evaluationLocked()"
+          (click)="saveDraft()"
+          class="inline-flex h-[38px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-4 text-[12px] font-semibold shadow-sm disabled:opacity-50"
+        >
+          <i class="ph ph-floppy-disk"></i
+          >{{ "certification.candidate.saveDraft" | t }}</button
+        ><button
+          type="button"
+          [disabled]="evaluationLocked()"
+          (click)="validateEvaluation()"
+          class="inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white disabled:opacity-50"
+        >
+          <i class="ph ph-check-circle"></i
+          >{{ "certification.candidate.validateEvaluation" | t }}
+        </button>
+      </div>
+      @if (evaluationSaved() && !evaluationLocked()) {
+        <p class="mt-3 text-right text-[11px] text-[#18a547]">
+          {{ "certification.candidate.draftSaved" | t }}
+        </p>
+      }
+    </article>
+  }
+</section>

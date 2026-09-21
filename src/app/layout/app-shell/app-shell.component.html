@@ -1,0 +1,150 @@
+<div class="min-h-screen bg-[#f5f8fc] text-[#10182b]">
+  <aside
+    class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#1d497d] px-[18px] py-6 text-white lg:flex"
+  >
+    <a routerLink="/accueil" class="flex items-center gap-3 px-1">
+      <span
+        class="flex size-[38px] items-center justify-center rounded-full bg-[#f8a11a] text-[#13233b]"
+        ><i class="ph ph-car text-[20px]"></i
+      ></span>
+      <span class="text-[19px] font-extrabold tracking-[-0.35px]"
+        >TP ECSR <span class="text-[#f8a11a]">Pilot</span></span
+      >
+    </a>
+    <nav class="mt-7 flex min-h-0 flex-1 flex-col gap-[3px] overflow-y-auto">
+      @for (item of navItems(); track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="!bg-[#2b6099] !text-white font-semibold"
+          [routerLinkActiveOptions]="{ exact: item.path === '/accueil' }"
+          class="flex items-center gap-3 rounded-[13px] px-[13px] py-[11px] text-[14px] font-medium text-white/82 transition hover:bg-[#275989] hover:text-white"
+        >
+          <i [class]="'ph text-[18px] ' + item.icon"></i
+          ><span>{{ item.labelKey | t }}</span>
+        </a>
+      }
+    </nav>
+    @if (sessionService.session(); as user) {
+      <div class="mt-5 rounded-[17px] bg-[#2a5b93] px-3.5 py-3.5">
+        <p class="text-[13px] font-bold">
+          {{ user.firstName }} {{ user.lastName }}
+        </p>
+        <p class="mt-0.5 text-[12px] leading-[1.35] text-white/65">
+          {{ roleLabelKey() | t }}
+        </p>
+        <button
+          type="button"
+          (click)="logout()"
+          class="mt-3 flex items-center gap-2 text-[12px] font-medium text-white/85 hover:text-white"
+        >
+          <i class="ph ph-sign-out text-[16px]"></i>{{ "common.logout" | t }}
+        </button>
+      </div>
+    }
+  </aside>
+
+  @if (mobileOpen()) {
+    <button
+      type="button"
+      class="fixed inset-0 z-40 bg-black/30 lg:hidden"
+      (click)="closeMobile()"
+      [attr.aria-label]="'common.closeMenu' | t"
+    ></button>
+    <aside
+      class="fixed inset-y-0 left-0 z-50 w-[290px] bg-[#1d497d] px-[18px] py-6 text-white shadow-2xl lg:hidden"
+    >
+      <div class="flex items-center justify-between">
+        <a
+          routerLink="/accueil"
+          (click)="closeMobile()"
+          class="flex items-center gap-3"
+          ><span
+            class="flex size-[38px] items-center justify-center rounded-full bg-[#f8a11a] text-[#13233b]"
+            ><i class="ph ph-car text-[20px]"></i></span
+          ><span class="text-[18px] font-extrabold"
+            >TP ECSR <span class="text-[#f8a11a]">Pilot</span></span
+          ></a
+        ><button
+          type="button"
+          (click)="closeMobile()"
+          class="grid size-9 place-items-center rounded-lg bg-white/10"
+        >
+          <i class="ph ph-x text-xl"></i>
+        </button>
+      </div>
+      <nav class="mt-7 flex flex-col gap-1">
+        @for (item of navItems(); track item.path) {
+          <a
+            [routerLink]="item.path"
+            (click)="closeMobile()"
+            routerLinkActive="!bg-[#2b6099] !text-white font-semibold"
+            class="flex items-center gap-3 rounded-[13px] px-[13px] py-[11px] text-[14px] text-white/82"
+            ><i [class]="'ph text-[18px] ' + item.icon"></i
+            >{{ item.labelKey | t }}</a
+          >
+        }
+      </nav>
+    </aside>
+  }
+
+  <div class="min-h-screen lg:pl-[260px]">
+    <header
+      class="sticky top-0 z-30 flex h-[67px] items-center gap-3 border-b border-[#dfe5ec] bg-white/95 px-4 backdrop-blur sm:px-6"
+    >
+      <button
+        type="button"
+        (click)="toggleMobile()"
+        class="grid size-10 shrink-0 place-items-center rounded-xl border border-[#dce3eb] lg:hidden"
+        [attr.aria-label]="'common.openMenu' | t"
+      >
+        <i class="ph ph-list text-xl"></i>
+      </button>
+      <div class="relative hidden w-full max-w-[454px] sm:block">
+        <i
+          class="ph ph-magnifying-glass absolute left-[13px] top-1/2 -translate-y-1/2 text-[17px] text-[#6f7b8e]"
+        ></i
+        ><input
+          type="search"
+          class="h-[40px] w-full rounded-[16px] border border-[#dfe5ec] bg-white pl-[38px] pr-4 text-[14px] text-[#334155] outline-none placeholder:text-[#7d8899] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          [placeholder]="'common.searchPlaceholder' | t"
+        />
+      </div>
+      <div class="ml-auto flex items-center gap-3">
+        <div class="relative hidden sm:block">
+          <select
+            [value]="sessionService.promotionId()"
+            (change)="promotionChanged($event)"
+            class="h-[39px] min-w-[210px] appearance-none rounded-[12px] border border-[#dfe5ec] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-[0_1px_4px_rgba(25,47,77,0.06)]"
+          >
+            @for (p of promotions; track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }</select
+          ><i
+            class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+          ></i>
+        </div>
+        <div
+          class="grid size-[40px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[14px] font-bold text-white"
+        >
+          {{ sessionService.initials() }}
+        </div>
+      </div>
+    </header>
+    <main class="px-4 pb-24 pt-6 sm:px-6 lg:px-6 lg:pb-8 xl:px-[24px]">
+      <router-outlet />
+    </main>
+  </div>
+  <nav
+    class="fixed inset-x-0 bottom-0 z-30 flex border-t border-[#dfe5ec] bg-white lg:hidden"
+  >
+    @for (item of mobileNavItems(); track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="text-[#245c97]"
+        class="flex flex-1 flex-col items-center gap-1 px-1 py-2.5 text-[10px] font-medium text-[#738095]"
+        ><i [class]="'ph text-[20px] ' + item.icon"></i
+        ><span>{{ item.labelKey | t }}</span></a
+      >
+    }
+  </nav>
+</div>

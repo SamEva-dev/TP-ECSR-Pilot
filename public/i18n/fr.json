@@ -1,0 +1,1900 @@
+{
+  "brand": {
+    "name": "TP ECSR Pilot",
+    "tagline": "Le suivi pédagogique ECSR, simplement.",
+    "description": "Fini les feuilles papier, les classeurs et les calculs d'heures sur tableur. Toute la progression de vos stagiaires au même endroit.",
+    "centre": "Centre de formation ECSR Grand Ouest — Nantes"
+  },
+  "benefits": {
+    "hours": "Heures réalisées, restantes et à rattraper calculées automatiquement",
+    "progress": "Progression par compétence et par fiche pédagogique",
+    "driving": "Observations de conduite consultables avant chaque séance",
+    "audit": "Historique complet des modifications"
+  },
+  "auth": {
+    "subtitle": "Connectez-vous à votre espace",
+    "welcome": "Bienvenue",
+    "demoHelp": "Utilisez le compte de démonstration pour tester",
+    "email": "Email",
+    "emailPlaceholder": "email@exemple.com",
+    "continue": "Continuer",
+    "or": "ou",
+    "noAccount": "Pas de compte ?",
+    "createAccount": "Créer un compte",
+    "demoEnabled": "Mode démo activé",
+    "organisation": "Organisation",
+    "organisationPlaceholder": "Nom de votre organisation",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Prénom",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Nom",
+    "phone": "Téléphone",
+    "phonePlaceholder": "+33 6 12 34 56 78",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "alreadyAccount": "Vous avez déjà un compte ?",
+    "signIn": "Se connecter",
+    "errors": {
+      "emailRequired": "Saisissez une adresse e-mail valide.",
+      "required": "Ce champ est obligatoire.",
+      "passwordMin": "Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas."
+    }
+  },
+  "home": {
+    "greeting": "Bonjour {{name}}",
+    "direction": {
+      "selectedPromotion": "Promotion sélectionnée : {{promotion}} · {{start}} → {{end}}",
+      "exportReport": "Exporter un rapport",
+      "newSession": "Nouvelle séance",
+      "kpi": {
+        "students": "Stagiaires",
+        "trainers": "Formateurs",
+        "attendance": "Taux de présence",
+        "completedHours": "Heures réalisées",
+        "catchupHours": "Heures à rattraper",
+        "averageProgress": "Progression moyenne"
+      },
+      "progress": {
+        "title": "Progression de la promotion",
+        "subtitle": "Moyenne des progressions individuelles"
+      },
+      "hours": {
+        "title": "Heures",
+        "subtitle": "Total promotion, toutes catégories",
+        "planned": "Heures prévues",
+        "completed": "Heures réalisées",
+        "remaining": "Heures restantes",
+        "catchup": "Heures à rattraper",
+        "volumeDone": "{{value}} % du volume horaire réalisé"
+      },
+      "alerts": {
+        "title": "Alertes",
+        "subtitle": "À traiter cette semaine",
+        "over10": {
+          "title": "3 stagiaires ont plus de 10 h à rattraper",
+          "detail": "Julie Moreau (14 h), Thomas Roussel (18 h), Léa Perrin (12 h)"
+        },
+        "noEvaluation": {
+          "title": "2 stagiaires sans évaluation depuis plus de 15 jours",
+          "detail": "Thomas Roussel, Sarah Colin"
+        },
+        "sheetsDelay": {
+          "title": "4 stagiaires en retard dans leurs fiches",
+          "detail": "Moins de 25 fiches préparées au 21 septembre"
+        },
+        "unjustified": {
+          "title": "1 absence non justifiée",
+          "detail": "Thomas Roussel — séance du 18 septembre"
+        },
+        "internship": {
+          "title": "1 convention de stage à signer",
+          "detail": "Drive Académie — Thomas Roussel"
+        }
+      },
+      "watch": {
+        "title": "Stagiaires à surveiller",
+        "subtitle": "Classés par heures à rattraper",
+        "allStudents": "Tous les stagiaires",
+        "name": "Nom",
+        "progress": "Progression",
+        "completedHours": "Heures réalisées",
+        "catchup": "À rattraper",
+        "sheets": "Fiches",
+        "status": "Statut"
+      }
+    },
+    "trainer": {
+      "todaySubtitle": "Lundi 21 septembre 2026 · 5 séances aujourd'hui",
+      "actions": {
+        "newSession": "Nouvelle séance",
+        "attendance": "Faire l'appel",
+        "evaluateDriving": "Évaluer conduite",
+        "evaluateSheet": "Évaluer une fiche",
+        "addObservation": "Ajouter observation"
+      },
+      "mySessions": "Mes séances aujourd'hui",
+      "lastObservations": "Dernières observations",
+      "beforeNextSession": "Avant votre prochaine séance",
+      "myStudents": "Mes stagiaires",
+      "studentSummary": "{{progress}} % · {{hours}} h réalisées · {{catchup}} h à rattraper",
+      "agenda": {
+        "virages": "Virages et déclivité",
+        "highway": "Insertion autoroute",
+        "intersections": "Les intersections",
+        "sheet12": "Présentation fiche 12",
+        "catchupSigns": "Rattrapage signalisation"
+      }
+    },
+    "observations": {
+      "virages": {
+        "subject": "Passer des virages et conduire en déclivité",
+        "positive": "Bonne adaptation de l'allure à l'approche des courbes.",
+        "workOn": "Regard trop proche en sortie de virage.",
+        "nextGoal": "Améliorer le regard en sortie de virage."
+      },
+      "highway": {
+        "subject": "Insertion et circulation sur voie rapide",
+        "positive": "Vitesse d'insertion cohérente avec le trafic.",
+        "workOn": "Contrôles rétroviseurs tardifs.",
+        "nextGoal": "Anticiper les contrôles avant insertion."
+      },
+      "lesson": {
+        "subject": "Animer une leçon de conduite",
+        "positive": "Consignes claires et progressives.",
+        "workOn": "Trop d'informations simultanées.",
+        "nextGoal": "Travailler les virages et la déclivité."
+      }
+    },
+    "student": {
+      "subtitle": "TP ECSR 2026–2027 · fin prévue le 30/06/2027",
+      "kpi": {
+        "progress": "Progression globale",
+        "hours": "Heures réalisées",
+        "catchup": "Heures à rattraper",
+        "validatedSheets": "Fiches validées"
+      },
+      "progress": {
+        "title": "Ma progression"
+      },
+      "nextSession": {
+        "title": "Prochaine séance",
+        "firstDate": "Lundi 21 septembre · 08:00 – 12:00",
+        "firstTitle": "Les intersections et les priorités",
+        "firstMeta": "Yanis Morel · Salle 2",
+        "secondDate": "Mardi 22 septembre · 14:00",
+        "secondTitle": "Séance de conduite — regard en sortie de virage",
+        "secondMeta": "Marc Dupont · Clio 5",
+        "seePlanning": "Voir mon planning"
+      },
+      "observations": {
+        "title": "Dernières observations",
+        "subtitle": "Retours de vos formateurs"
+      },
+      "timeline": {
+        "title": "Mon parcours récent",
+        "subtitle": "Séances, absences et présentations",
+        "18sep": "18 septembre",
+        "19sep": "19 septembre",
+        "20sep": "20 septembre",
+        "21sep": "21 septembre",
+        "sheet32": "Présentation fiche 32",
+        "virages": "Les virages et la déclivité",
+        "absence": "Absence",
+        "catchup7": "7 heures à rattraper",
+        "driving": "Séance conduite",
+        "drivingDetail": "Virages et déclivité — regard à travailler",
+        "classroom": "Cours en salle",
+        "classroomDetail": "Les intersections et les priorités",
+        "fullFile": "Voir mon dossier complet"
+      }
+    }
+  },
+  "common": {
+    "logout": "Se déconnecter",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "searchPlaceholder": "Rechercher un stagiaire, une fiche, un document…",
+    "promotion": "Promotion",
+    "open": "Ouvrir",
+    "positive": "Positif",
+    "toWorkOn": "À travailler",
+    "nextGoal": "Prochain objectif",
+    "nextScreenPlaceholder": "Cet écran sera migré fidèlement lors de la prochaine étape.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "roles": {
+      "direction": "Direction / Responsable pédagogique",
+      "formateur": "Formateur",
+      "stagiaire": "Stagiaire",
+      "secretariat": "Secrétariat",
+      "jury": "Jury"
+    },
+    "studentStatus": {
+      "good": "En bonne voie",
+      "warning": "Attention",
+      "late": "En retard"
+    },
+    "sessionType": {
+      "driving": "Conduite",
+      "classroom": "Cours salle",
+      "presentation": "Exposé",
+      "catchup": "Rattrapage"
+    },
+    "close": "Fermer"
+  },
+  "nav": {
+    "home": "Accueil",
+    "planning": "Planning",
+    "students": "Stagiaires",
+    "promotions": "Promotions",
+    "sessions": "Séances",
+    "driving": "Conduite",
+    "sheets": "Fiches / Exposés",
+    "skills": "Compétences",
+    "attendance": "Présences",
+    "internships": "Stages",
+    "documents": "Documents",
+    "reports": "Rapports",
+    "statistics": "Statistiques",
+    "access": "Gestion des accès",
+    "admin": "Administration",
+    "certification": "Certification",
+    "jurySpace": "Espace Jury",
+    "results": "Résultats",
+    "success": "Réussites"
+  },
+  "students": {
+    "title": "Stagiaires",
+    "resultCount": "{{displayed}} stagiaire(s) affiché(s) sur {{total}}",
+    "add": "Ajouter un stagiaire",
+    "filters": {
+      "title": "Filtres",
+      "search": "Recherche",
+      "searchPlaceholder": "Rechercher un nom",
+      "promotion": "Promotion",
+      "allPromotions": "Toutes les promotions",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts"
+    },
+    "status": {
+      "good": "En bonne progression",
+      "warning": "Attention",
+      "late": "En retard"
+    },
+    "card": {
+      "progress": "Progression",
+      "completed": "Réalisées",
+      "catchup": "Rattrapage",
+      "sheets": "Fiches : {{prepared}} préparées · {{presented}} présentées · {{validated}} validées"
+    },
+    "empty": {
+      "title": "Aucun stagiaire trouvé",
+      "subtitle": "Modifiez vos filtres pour afficher d’autres résultats."
+    },
+    "drawer": {
+      "title": "Ajouter un stagiaire",
+      "subtitle": "Créez le dossier pédagogique et rattachez-le à une promotion.",
+      "close": "Fermer le panneau",
+      "identity": {
+        "title": "Informations du stagiaire",
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Ex. Alexandre",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Ex. Martin",
+        "email": "Email",
+        "emailPlaceholder": "prenom.nom@exemple.fr",
+        "phone": "Téléphone",
+        "phonePlaceholder": "+33 6 12 34 56 78",
+        "birthDate": "Date de naissance"
+      },
+      "training": {
+        "title": "Affectation à la formation",
+        "promotion": "Promotion",
+        "startDate": "Date d'entrée en formation",
+        "initialStateTitle": "Dossier initialisé automatiquement",
+        "initialStateHelp": "Le nouveau stagiaire démarre à 0 h, 0 fiche et 0 % de progression. Les compteurs évolueront ensuite avec les séances, présences, stages et évaluations."
+      },
+      "access": {
+        "sendInvitation": "Envoyer une invitation d'accès",
+        "sendInvitationHelp": "Une invitation pourra être envoyée à cette adresse email lorsque le backend et l'authentification seront connectés."
+      },
+      "requiredHint": "* Champs obligatoires",
+      "cancel": "Annuler",
+      "submit": "Ajouter le stagiaire",
+      "created": "{{name}} a été ajouté à la liste.",
+      "errors": {
+        "required": "Ce champ est obligatoire.",
+        "email": "Saisissez une adresse email valide."
+      }
+    }
+  },
+  "planning": {
+    "title": "Planning",
+    "subtitle": "Semaine du 21 au 25 septembre 2026",
+    "add": "Ajouter au planning",
+    "filters": {
+      "title": "Filtres",
+      "promotion": "Promotion",
+      "allPromotions": "Toutes les promotions",
+      "type": "Type",
+      "allTypes": "Tous les types"
+    },
+    "views": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "days": {
+      "monday": "Lundi 21 septembre",
+      "tuesday": "Mardi 22 septembre",
+      "wednesday": "Mercredi 23 septembre",
+      "thursday": "Jeudi 24 septembre",
+      "friday": "Vendredi 25 septembre"
+    },
+    "types": {
+      "classroom": "Cours salle",
+      "driving": "Conduite",
+      "evaluation": "Évaluation",
+      "internship": "Stage",
+      "presentation": "Exposé",
+      "catchup": "Rattrapage",
+      "sensitization": "Sensibilisation",
+      "event": "Événement"
+    },
+    "events": {
+      "intersections": "Les intersections et les priorités",
+      "bends": "Conduite — virages et déclivité",
+      "sheets30to34": "Présentations fiches 30 à 34",
+      "questioningMethod": "La méthode interrogative",
+      "c2Evaluation": "Évaluation intermédiaire C2",
+      "roadRiskAwareness": "Sensibilisation aux risques routiers",
+      "motorwayMerging": "Conduite — insertion autoroute",
+      "signsCatchup": "Rattrapage — la signalisation",
+      "companyInternship": "Stage en entreprise",
+      "educationalCouncil": "Conseil pédagogique"
+    },
+    "people": {
+      "samFokam": "Sam Fokam",
+      "julieMoreau": "Julie Moreau",
+      "karimBenali": "Karim Benali"
+    },
+    "programmed": {
+      "classroomTitle": "Séances en salle programmées",
+      "drivingTitle": "Séances de conduite programmées"
+    },
+    "emptyDay": "Aucune séance avec ces filtres."
+  },
+  "promotions": {
+    "title": "Promotions",
+    "subtitle": "Centre de formation TP ECSR Pilot Grand Ouest — Nantes",
+    "create": "Créer une promotion",
+    "manager": "Responsable",
+    "studentCount": "{{count}} stagiaires",
+    "metrics": {
+      "planned": "Volume horaire",
+      "completed": "Heures réalisées",
+      "remaining": "Heures restantes",
+      "catchup": "À rattraper",
+      "attendance": "Taux de présence"
+    },
+    "averageProgress": "Progression moyenne",
+    "status": {
+      "good": "En bonne progression",
+      "warning": "Attention",
+      "late": "En retard"
+    },
+    "team": {
+      "title": "Équipe pédagogique",
+      "weeklyHours": "{{hours}} h / semaine",
+      "specialties": {
+        "drivingC3": "Conduite · Compétence C3",
+        "pedagogyPresentations": "Pédagogie · Exposés",
+        "regulationClassroom": "Réglementation · Salle",
+        "drivingAssessments": "Conduite · Évaluations",
+        "awarenessInternships": "Sensibilisation · Stages"
+      }
+    },
+    "drawer": {
+      "title": "Créer une promotion",
+      "subtitle": "Ajoutez une nouvelle promotion TP ECSR au centre",
+      "close": "Fermer le panneau",
+      "general": {
+        "title": "Informations générales",
+        "name": "Nom de la promotion",
+        "namePlaceholder": "Ex. TP ECSR 2027–2028",
+        "manager": "Responsable pédagogique"
+      },
+      "schedule": {
+        "title": "Période et volume horaire",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "plannedHours": "Volume horaire prévu"
+      },
+      "initialState": {
+        "title": "Initialisation automatique",
+        "help": "La promotion sera créée vide. Les indicateurs évolueront automatiquement lorsque des stagiaires, séances et présences lui seront rattachés.",
+        "students": "0 stagiaire",
+        "progress": "0 % progression",
+        "hours": "0 h réalisée"
+      },
+      "emptyPromotion": "Aucun stagiaire affecté à cette promotion pour le moment.",
+      "requiredHint": "* Champs obligatoires",
+      "cancel": "Annuler",
+      "submit": "Créer la promotion",
+      "created": "La promotion {{name}} a été créée.",
+      "errors": {
+        "required": "Ce champ est obligatoire.",
+        "dateOrder": "La date de fin doit être postérieure à la date de début.",
+        "hours": "Le volume horaire doit être supérieur à 0."
+      }
+    },
+    "exam": {
+      "finalResults": "Résultats de certification",
+      "presented": "présentés",
+      "graduated": "diplômés",
+      "partial": "partiel",
+      "failed": "non obtenu",
+      "successRate": "Taux de réussite",
+      "details": "Voir les résultats",
+      "upcoming": "Examen final à venir",
+      "scheduled": "Session prévue : {{date}}",
+      "ready": "{{ready}} / {{total}} dossiers prêts",
+      "prepare": "Préparer la certification"
+    }
+  },
+  "sessions": {
+    "title": "Séances",
+    "subtitle": "Séances pédagogiques en salle, exposés, évaluations et rattrapages",
+    "types": {
+      "classroom": "Salle",
+      "presentation": "Exposé",
+      "evaluation": "Évaluation",
+      "sensitization": "Sensibilisation",
+      "catchup": "Rattrapage",
+      "event": "Événement"
+    },
+    "form": {
+      "title": "Nouvelle séance pédagogique",
+      "subtitle": "Formulaire court : l’essentiel en 8 champs",
+      "date": "Date",
+      "start": "Début",
+      "end": "Fin",
+      "trainer": "Formateur",
+      "promotion": "Promotion",
+      "type": "Type de séance",
+      "theme": "Thème",
+      "themePlaceholder": "Ex. Les intersections et les priorités",
+      "objectives": "Objectifs pédagogiques",
+      "objectivesPlaceholder": "Ce que les stagiaires devront savoir faire…",
+      "supports": "Supports utilisés",
+      "supportsPlaceholder": "Diaporama, maquette…",
+      "comments": "Commentaires",
+      "create": "Créer la séance",
+      "createAndAttendance": "Créer puis faire l'appel"
+    },
+    "programmed": {
+      "title": "Séances programmées",
+      "subtitle": "Cliquez sur une séance pour gérer les présences",
+      "supports": "Supports",
+      "noSupports": "Aucun support",
+      "attendance": "{{present}}/{{expected}} présents",
+      "attendanceButton": "Appel",
+      "items": {
+        "intersections": {
+          "title": "Les intersections et les priorités",
+          "objective": "Identifier les règles de priorité, construire une progression pédagogique.",
+          "supports": "Diaporama, maquette routière, fiches REMC"
+        },
+        "sheets30to34": {
+          "title": "Présentations des fiches 30 à 34",
+          "objective": "Évaluer la structure, l’animation et la gestion du temps.",
+          "supports": "Tableau blanc, grille d’évaluation"
+        },
+        "questioningMethod": {
+          "title": "La méthode interrogative",
+          "objective": "Maîtriser le questionnement ouvert en animation de groupe.",
+          "supports": "Jeux de rôle, vidéos"
+        },
+        "c2Evaluation": {
+          "title": "Évaluation intermédiaire compétence C2",
+          "objective": "Vérifier les acquis en animation théorique.",
+          "supports": "Grille d’évaluation nationale"
+        },
+        "roadRisk": {
+          "title": "Sensibilisation aux risques routiers",
+          "objective": "Préparer une action de sensibilisation en entreprise.",
+          "supports": "Cas d’accidents, statistiques ONISR"
+        },
+        "signsCatchup": {
+          "title": "Rattrapage — la signalisation",
+          "objective": "Reprendre les contenus manqués les 18 et 19 septembre.",
+          "supports": "Fiches de synthèse"
+        }
+      }
+    }
+  },
+  "sheets": {
+    "title": "Fiches / Exposés",
+    "subtitle": "{{student}} · 58 fiches au référentiel",
+    "evaluate": "Évaluer un exposé",
+    "kpi": {
+      "prepared": "Préparées",
+      "presented": "Présentées",
+      "validated": "Validées",
+      "rework": "À retravailler"
+    },
+    "progress": {
+      "title": "Avancement"
+    },
+    "status": {
+      "not_started": "Non commencée",
+      "in_progress": "En préparation",
+      "ready": "Prête",
+      "presented": "Présentée",
+      "validated": "Validée",
+      "rework": "À retravailler"
+    },
+    "list": {
+      "title": "Liste des fiches"
+    },
+    "filters": {
+      "search": "Recherche",
+      "searchPlaceholder": "Numéro ou titre",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts",
+      "student": "Stagiaire"
+    },
+    "table": {
+      "number": "N°",
+      "title": "Titre",
+      "prepared": "Préparée",
+      "presented": "Présentée",
+      "duration": "Durée",
+      "evaluator": "Évaluateur",
+      "status": "Statut"
+    },
+    "comments": {
+      "validated": "Bonne animation, méthode interrogative bien utilisée.",
+      "rework": "Structure à revoir : introduction trop longue, RIP incomplet."
+    },
+    "empty": {
+      "title": "Aucune fiche trouvée",
+      "subtitle": "Modifiez les filtres pour afficher d'autres fiches."
+    },
+    "evaluation": {
+      "title": "Évaluation d'un exposé",
+      "sheet": "Fiche",
+      "duration": "Durée de présentation",
+      "commentPlaceholder": "Commentaire du formateur évaluateur…",
+      "save": "Enregistrer l'évaluation",
+      "saved": "Évaluation enregistrée dans la démonstration.",
+      "level": {
+        "acquired": "Acquis",
+        "in_progress": "En cours",
+        "review": "À revoir"
+      },
+      "criteria": {
+        "structure": "Structure",
+        "introduction": "Introduction",
+        "hook": "Accroche",
+        "objectives": "Objectifs",
+        "content": "Contenu",
+        "regulation": "Réglementation",
+        "questioningMethod": "Méthode interrogative",
+        "animation": "Animation",
+        "timeManagement": "Gestion du temps",
+        "rip": "RIP",
+        "review": "Bilan"
+      },
+      "subtitle": "Évaluez la présentation d'une fiche avec une grille complète et conservez une synthèse pédagogique exploitable.",
+      "close": "Fermer le panneau",
+      "contextTitle": "Contexte de l'évaluation",
+      "student": "Stagiaire",
+      "date": "Date de présentation",
+      "evaluator": "Formateur évaluateur",
+      "gridTitle": "Grille d'évaluation détaillée",
+      "gridSubtitle": "Positionnez chaque critère selon le niveau observé pendant l'exposé.",
+      "summary": {
+        "acquired": "acquis",
+        "inProgress": "en cours",
+        "review": "à revoir"
+      },
+      "synthesisTitle": "Synthèse pédagogique",
+      "positivePoints": "Points positifs",
+      "positivePlaceholder": "Ex. Accroche pertinente, progression logique, participation du groupe…",
+      "improvements": "Points à améliorer",
+      "improvementsPlaceholder": "Ex. Réglementation à préciser, RIP incomplet, gestion du temps…",
+      "generalComment": "Commentaire général",
+      "nextObjective": "Prochain objectif",
+      "nextObjectivePlaceholder": "Ex. Reprendre le RIP et reformuler les questions ouvertes avant la prochaine présentation.",
+      "decision": {
+        "title": "Décision pédagogique",
+        "subtitle": "Déterminez le statut de la fiche à l'issue de la présentation.",
+        "validated": "Fiche validée",
+        "rework": "À retravailler"
+      },
+      "cancel": "Annuler"
+    },
+    "titles": {
+      "verticalSigns": "La signalisation verticale",
+      "intersections": "Les intersections",
+      "priorities": "Les priorités",
+      "crossingOvertaking": "Le croisement et le dépassement",
+      "speedLimits": "Les limitations de vitesse",
+      "safetyDistance": "La distance de sécurité",
+      "trafficLights": "Les feux tricolores",
+      "parking": "Le stationnement",
+      "motorway": "L'autoroute",
+      "expressways": "Les voies rapides",
+      "roundabout": "Le rond-point",
+      "reducedVisibility": "La visibilité réduite",
+      "braking": "Le freinage",
+      "tyres": "Les pneumatiques",
+      "vehicleLighting": "L'éclairage du véhicule",
+      "alcohol": "L'alcool au volant",
+      "drugs": "Les stupéfiants",
+      "fatigueVigilance": "La fatigue et la vigilance",
+      "phone": "Le téléphone au volant",
+      "pointsLicence": "Le permis à points",
+      "insurance": "Les assurances",
+      "accidentStatement": "Le constat amiable",
+      "firstAid": "Les premiers secours",
+      "ecoDriving": "L'écoconduite",
+      "seatBelt": "La ceinture de sécurité",
+      "childRestraints": "Les dispositifs de retenue enfants",
+      "sharingRoad": "Le partage de la route",
+      "twoWheelers": "Les deux-roues",
+      "heavyVehiclesBlindSpots": "Les poids lourds et angles morts",
+      "pedestrians": "Les piétons",
+      "cyclists": "Les cyclistes",
+      "nightDriving": "La conduite de nuit",
+      "bendsGradients": "Les virages et la déclivité",
+      "aquaplaning": "L'aquaplanage",
+      "snowDriving": "La conduite sur neige",
+      "technicalInspection": "Le contrôle technique",
+      "vehicleDocuments": "Les documents du véhicule",
+      "vehicleLoading": "Le chargement du véhicule",
+      "towing": "Le remorquage",
+      "accompaniedDriving": "L'apprentissage anticipé de la conduite",
+      "errorPedagogy": "La pédagogie de l'erreur",
+      "questioningMethod": "La méthode interrogative",
+      "learningObjectives": "Les objectifs pédagogiques",
+      "initialAssessment": "L'évaluation de départ",
+      "learningBooklet": "Le livret d'apprentissage",
+      "remc": "Le REMC",
+      "remcC1": "La compétence 1 du REMC",
+      "remcC2": "La compétence 2 du REMC",
+      "remcC3": "La compétence 3 du REMC",
+      "remcC4": "La compétence 4 du REMC",
+      "practicalExam": "L'examen pratique",
+      "theoryExam": "L'examen théorique",
+      "drivingAids": "Les aides à la conduite",
+      "electricVehicle": "Le véhicule électrique",
+      "urbanMobility": "La mobilité urbaine",
+      "occupationalRoadRisk": "Le risque routier professionnel",
+      "pedagogicalCommunication": "La communication pédagogique",
+      "endTrainingReview": "Le bilan de fin de formation"
+    }
+  },
+  "skills": {
+    "title": "Compétences",
+    "subtitle": "Référentiel pédagogique · {{student}}",
+    "studentSelector": "Sélectionner un stagiaire",
+    "level": {
+      "acquired": "Acquis",
+      "in_progress": "En cours",
+      "rework": "À travailler"
+    },
+    "definitions": {
+      "C1": {
+        "title": "Accompagner un élève dans son apprentissage de la conduite",
+        "criteria": {
+          "prepareIndividual": "Préparer une séance individuelle",
+          "leadDrivingLesson": "Animer une leçon de conduite",
+          "assessLearner": "Évaluer les acquis de l'élève",
+          "learningRecord": "Utiliser le livret d'apprentissage"
+        }
+      },
+      "C2": {
+        "title": "Animer des actions de formation théorique",
+        "criteria": {
+          "buildSheet": "Construire une fiche pédagogique",
+          "leadGroup": "Animer un groupe",
+          "questioningMethod": "Utiliser la méthode interrogative",
+          "timeRip": "Gérer le temps et le RIP"
+        }
+      },
+      "C3": {
+        "title": "Maîtriser la conduite et la sécurité routière",
+        "criteria": {
+          "bendsGradients": "Passer des virages et conduire en déclivité",
+          "expressway": "Insertion et circulation sur voie rapide",
+          "urban": "Conduite en environnement urbain dense",
+          "ecoDriving": "Conduite économique et écologique"
+        }
+      },
+      "C4": {
+        "title": "Sensibiliser à la sécurité routière et aux risques",
+        "criteria": {
+          "awarenessAction": "Animer une action de sensibilisation",
+          "accident": "Analyser un accident",
+          "roadRisks": "Présenter les risques routiers",
+          "audience": "Adapter son discours au public"
+        }
+      }
+    },
+    "linkedSessions": {
+      "title": "Séances liées",
+      "subtitle": "Historique et objectifs travaillés",
+      "nextGoal": "Objectif suivant",
+      "empty": "Aucune séance enregistrée sur cette compétence."
+    },
+    "promotion": {
+      "title": "Progression de la promotion par compétence",
+      "student": "Stagiaire"
+    },
+    "sessions": {
+      "c1": {
+        "subject": "Animer une leçon de conduite",
+        "positive": "Consignes claires et progressives.",
+        "workOn": "Trop d'informations simultanées.",
+        "nextGoal": "Travailler les virages et la déclivité."
+      },
+      "c3Sam": {
+        "subject": "Passer des virages et conduire en déclivité",
+        "positive": "Bonne adaptation de l'allure à l'approche des courbes.",
+        "workOn": "Regard trop proche en sortie de virage.",
+        "nextGoal": "Améliorer le regard en sortie de virage."
+      },
+      "c3Julie": {
+        "subject": "Insertion et circulation sur voie rapide",
+        "positive": "Vitesse d'insertion cohérente avec le trafic.",
+        "workOn": "Contrôles rétroviseurs tardifs.",
+        "nextGoal": "Anticiper les contrôles avant insertion."
+      },
+      "c3Karim": {
+        "subject": "Conduite en environnement urbain dense",
+        "positive": "Très bonne gestion des cyclistes.",
+        "workOn": "Anticipation des bus à l'arrêt.",
+        "nextGoal": "Conduite économique en ville."
+      }
+    }
+  },
+  "drivingSession": {
+    "title": "Séance de conduite",
+    "subtitle": "Interface optimisée pour smartphone et tablette",
+    "actions": {
+      "validate": "Valider la séance",
+      "saved": "Séance enregistrée",
+      "history": "Historique"
+    },
+    "lastSession": {
+      "student": "Dernière séance de ce stagiaire",
+      "mine": "Ma dernière séance",
+      "goalReached": "Objectif"
+    },
+    "information": {
+      "title": "Informations de la séance",
+      "student": "Stagiaire",
+      "trainer": "Formateur",
+      "vehicle": "Véhicule",
+      "date": "Date",
+      "start": "Début",
+      "end": "Fin",
+      "duration": "Durée",
+      "competence": "Compétence travaillée",
+      "subSkill": "Sous-compétence",
+      "objective": "Objectif pédagogique"
+    },
+    "competencies": {
+      "c1": {
+        "description": "Accompagner un élève dans son apprentissage de la conduite"
+      },
+      "c2": {
+        "description": "Animer des actions de formation théorique"
+      },
+      "c3": {
+        "description": "Maîtriser la conduite et la sécurité routière"
+      },
+      "c4": {
+        "description": "Sensibiliser à la sécurité routière et aux risques"
+      }
+    },
+    "subSkills": {
+      "c1": {
+        "prepare": "Préparer une séance individuelle",
+        "lesson": "Animer une leçon de conduite",
+        "assess": "Évaluer les acquis de l’élève",
+        "booklet": "Utiliser le livret d’apprentissage"
+      },
+      "c2": {
+        "sheet": "Construire une fiche pédagogique",
+        "group": "Animer un groupe",
+        "questioning": "Utiliser la méthode interrogative",
+        "timing": "Gérer le temps et le RIP"
+      },
+      "c3": {
+        "bends": "Passer des virages et conduire en déclivité",
+        "expressway": "Insertion et circulation sur voie rapide",
+        "urban": "Conduite en environnement urbain dense",
+        "eco": "Conduite économique et écologique"
+      },
+      "c4": {
+        "awareness": "Animer une action de sensibilisation",
+        "accident": "Analyser un accident",
+        "risks": "Présenter les risques routiers",
+        "audience": "Adapter son discours au public"
+      }
+    },
+    "evaluation": {
+      "title": "Évaluation de la conduite",
+      "subtitle": "Trois niveaux par critère"
+    },
+    "criteria": {
+      "information": "Prise d’information",
+      "speed": "Adaptation de l’allure",
+      "position": "Positionnement",
+      "gaze": "Regard",
+      "anticipation": "Anticipation",
+      "communication": "Communication",
+      "autonomy": "Autonomie",
+      "stress": "Gestion du stress"
+    },
+    "levels": {
+      "acquired": "Acquis",
+      "progress": "En cours",
+      "work": "À travailler"
+    },
+    "observations": {
+      "title": "Observations du formateur",
+      "positive": "Points positifs",
+      "difficulties": "Difficultés observées",
+      "errors": "Erreurs fréquentes",
+      "advice": "Conseils",
+      "nextGoal": "Prochain objectif",
+      "free": "Observation libre"
+    },
+    "defaults": {
+      "objective": "Améliorer le regard en sortie de virage",
+      "positive": "Bonne adaptation de l’allure à l’approche des courbes.",
+      "difficulties": "Regard trop proche en sortie de virage.",
+      "errors": "Contrôles rétroviseurs oubliés avant dépassement.",
+      "advice": "Fixer un point de mire lointain avant le point de corde.",
+      "nextGoal": "Travailler le regard lointain et l’anticipation."
+    },
+    "history": {
+      "title": "Historique des séances de conduite",
+      "bends": {
+        "subject": "Passer des virages et conduire en déclivité",
+        "positive": "Bonne adaptation de l’allure à l’approche des courbes.",
+        "difficulty": "Regard trop proche en sortie de virage.",
+        "nextGoal": "Améliorer le regard en sortie de virage."
+      },
+      "expressway": {
+        "subject": "Insertion et circulation sur voie rapide",
+        "positive": "Vitesse d’insertion cohérente avec le trafic.",
+        "difficulty": "Contrôles rétroviseurs tardifs.",
+        "nextGoal": "Anticiper les contrôles avant insertion."
+      },
+      "lesson": {
+        "subject": "Animer une leçon de conduite",
+        "positive": "Consignes claires et progressives.",
+        "difficulty": "Trop d’informations simultanées.",
+        "nextGoal": "Travailler les virages et la déclivité."
+      },
+      "urban": {
+        "subject": "Conduite en environnement urbain dense",
+        "positive": "Très bonne gestion des cyclistes.",
+        "difficulty": "Anticipation des bus à l’arrêt.",
+        "nextGoal": "Conduite économique en ville."
+      }
+    }
+  },
+  "attendance": {
+    "title": "Appel de la séance",
+    "subtitle": "{{date}} · {{start}}–{{end}} · {{promotion}}",
+    "actions": {
+      "save": "Enregistrer l'appel",
+      "saveAdministration": "Enregistrer les présences"
+    },
+    "metrics": {
+      "present": "Présents",
+      "late": "Retards",
+      "absent": "Absents",
+      "missedHours": "Heures manquées",
+      "excusedHint": "dont 1 excusé(s)"
+    },
+    "list": {
+      "title": "Liste des stagiaires",
+      "subtitle": "Touchez un statut, ajustez les horaires si besoin.",
+      "secretariatSubtitle": "Régularisez les statuts, horaires et justificatifs de la séance."
+    },
+    "status": {
+      "present": "Présent",
+      "late": "Retard",
+      "absent": "Absent",
+      "excused": "Excusé"
+    },
+    "studentMeta": "{{catchup}} h à rattraper · {{absences}} absence(s)",
+    "fields": {
+      "arrival": "Arrivée",
+      "departure": "Départ",
+      "actualDuration": "Durée réelle",
+      "comment": "Commentaire",
+      "justification": "Motif / justificatif"
+    },
+    "placeholders": {
+      "comment": "Motif, justificatif…",
+      "justification": "Ajouter le motif ou la référence du justificatif…"
+    },
+    "catchupAdded": "{{hours}} h manquées → ajoutées aux heures à rattraper",
+    "saved": "Appel enregistré",
+    "studentView": {
+      "title": "Ma présence",
+      "subtitle": "Consultez votre présence et vos heures pour cette séance.",
+      "status": "Statut",
+      "completed": "Heures réalisées",
+      "missed": "Heures manquées",
+      "catchup": "À rattraper",
+      "sessionTitle": "Séance du 21 septembre 2026",
+      "readOnlyHint": "Les présences sont renseignées par votre formateur ou le centre. Contactez le secrétariat si une information doit être corrigée."
+    }
+  },
+  "internships": {
+    "title": "Stages en entreprise",
+    "subtitle": "{{count}} périodes de stage suivies",
+    "trainerTitle": "Stages de mes stagiaires",
+    "trainerSubtitle": "{{count}} périodes de stage à suivre",
+    "studentTitle": "Mes stages en entreprise",
+    "studentSubtitle": "{{count}} période(s) de stage dans mon parcours",
+    "newPeriod": "Nouvelle période de stage",
+    "kpi": {
+      "planned": "Heures prévues",
+      "completed": "Heures réalisées",
+      "remaining": "Heures restantes",
+      "incomplete": "Stages incomplets"
+    },
+    "tutorLine": "Tuteur : {{tutor}} · {{start}} → {{end}}",
+    "status": {
+      "completed": "Terminé",
+      "incomplete": "Incomplet",
+      "inProgress": "En cours",
+      "planned": "Planifié"
+    },
+    "card": {
+      "planned": "Heures prévues",
+      "completed": "Heures réalisées",
+      "remaining": "Restantes",
+      "progress": "Avancement"
+    },
+    "activitiesTitle": "Activités réalisées",
+    "observationsTitle": "Observations et évaluation du tuteur",
+    "activityStatus": {
+      "done": "Fait",
+      "pending": "À faire"
+    },
+    "activities": {
+      "observeDrivingLessons": "Observation de leçons de conduite",
+      "leadTheorySession": "Animation d'une séance de code",
+      "pedagogicalAppointment": "Accompagnement en rendez-vous pédagogique",
+      "lessonPlan": "Préparation d'un plan de leçon",
+      "studentInitialAssessment": "Accueil et évaluation de départ d'un élève"
+    },
+    "observations": {
+      "sam": "Très bonne intégration, autonomie sur les leçons de niveau 2.",
+      "julie": "Bonne implication. Les objectifs de stage sont en partie atteints ; plusieurs activités restent à finaliser.",
+      "karim": "Progression régulière et bonne posture professionnelle. Poursuivre la prise en charge autonome des séances.",
+      "notStarted": "Le stage n'a pas encore commencé."
+    },
+    "documents": {
+      "agreement": "Convention de stage",
+      "attendanceCertificate": "Attestation de présence",
+      "finalReport": "Bilan de stage validé"
+    },
+    "drawer": {
+      "title": "Nouvelle période de stage",
+      "subtitle": "Planifier le stage en entreprise et préparer son suivi pédagogique",
+      "close": "Fermer le formulaire",
+      "student": {
+        "title": "Stagiaire",
+        "student": "Stagiaire"
+      },
+      "company": {
+        "title": "Structure d’accueil et tuteur",
+        "name": "Entreprise / auto-école",
+        "namePlaceholder": "Ex. Auto-école du Centre",
+        "city": "Ville",
+        "cityPlaceholder": "Ex. Nantes",
+        "tutor": "Tuteur de stage",
+        "tutorPlaceholder": "Prénom Nom",
+        "email": "Email du tuteur",
+        "emailPlaceholder": "tuteur@entreprise.fr",
+        "phone": "Téléphone du tuteur",
+        "phonePlaceholder": "+33 6 12 34 56 78"
+      },
+      "period": {
+        "title": "Période et volume horaire",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "plannedHours": "Heures prévues"
+      },
+      "followup": {
+        "title": "Suivi et documents",
+        "agreementReceived": "Convention de stage déjà reçue",
+        "agreementHelp": "La convention sera indiquée comme disponible dans le suivi documentaire du stage.",
+        "notes": "Notes internes",
+        "notesPlaceholder": "Objectifs particuliers, consignes, informations utiles pour le suivi…"
+      },
+      "requiredHint": "* Champs obligatoires",
+      "cancel": "Annuler",
+      "submit": "Créer la période",
+      "errors": {
+        "required": "Ce champ est obligatoire.",
+        "email": "Saisissez une adresse e-mail valide.",
+        "dateRange": "La date de fin doit être postérieure ou égale à la date de début.",
+        "hours": "Le volume horaire doit être compris entre 1 et 1 000 heures."
+      }
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "{{count}} documents dans la bibliothèque",
+    "trainerTitle": "Documents pédagogiques",
+    "trainerSubtitle": "{{count}} documents accessibles pour vos séances et évaluations",
+    "studentTitle": "Mes documents",
+    "studentSubtitle": "{{count}} documents disponibles dans votre espace",
+    "import": "Importer un document",
+    "categoriesTitle": "Catégories",
+    "search": "Rechercher un document",
+    "preview": "Aperçu",
+    "download": "Télécharger",
+    "empty": "Aucun document ne correspond à vos filtres.",
+    "categories": {
+      "all": "Tous",
+      "administrative": "Documents administratifs",
+      "pedagogical": "Documents pédagogiques",
+      "evaluation": "Évaluations",
+      "course": "Supports de cours",
+      "internship": "Conventions de stage",
+      "student": "Documents stagiaire"
+    },
+    "details": {
+      "title": "Détail du document",
+      "close": "Fermer l’aperçu",
+      "preview": "Aperçu du document",
+      "information": "Informations du document",
+      "fileName": "Nom du fichier",
+      "category": "Catégorie",
+      "author": "Auteur",
+      "date": "Date",
+      "addedOn": "Ajouté le",
+      "size": "Taille",
+      "version": "Version",
+      "pages": "Pages",
+      "visibility": "Visibilité",
+      "student": "Stagiaire",
+      "description": "Description",
+      "replace": "Remplacer le fichier",
+      "delete": "Supprimer le document",
+      "generatedPreview": "Aperçu de démonstration",
+      "page": "Page {{current}} / {{total}}"
+    },
+    "visibility": {
+      "all": "Tous les utilisateurs",
+      "staff": "Équipe pédagogique",
+      "student": "Stagiaire concerné"
+    },
+    "descriptions": {
+      "internshipAgreement": "Convention de stage rattachée au dossier du stagiaire, avec les informations du centre, de l’entreprise d’accueil et de la période concernée.",
+      "remc": "Référentiel pédagogique utilisé comme document de référence pour l’organisation et le suivi des compétences de la formation.",
+      "drivingEvaluation": "Grille utilisée par les formateurs pour structurer l’évaluation d’une séance pratique et consigner les acquis, points de vigilance et objectifs suivants.",
+      "intersections": "Support pédagogique consacré aux intersections, aux règles de priorité et aux situations courantes rencontrées en circulation.",
+      "rules": "Règlement intérieur applicable aux stagiaires, formateurs et personnels du centre de formation.",
+      "attendanceCertificate": "Attestation individuelle récapitulant l’assiduité et la présence du stagiaire sur la période concernée.",
+      "interrogativeMethod": "Support méthodologique pour préparer et animer une séquence pédagogique en utilisant la méthode interrogative.",
+      "internshipAssessment": "Bilan pédagogique de la période en entreprise avec les activités réalisées, les observations du tuteur et les points de progression."
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "subtitle": "Générez un rapport puis exportez-le ou imprimez-le",
+    "exportPdf": "Exporter en PDF",
+    "exportExcel": "Exporter en Excel",
+    "print": "Imprimer",
+    "parameters": "Paramètres du rapport",
+    "types": {
+      "individual": "Suivi individuel",
+      "hours": "Heures et rattrapage",
+      "absences": "Absences",
+      "progress": "Progression compétences et fiches",
+      "promotion": "Rapport de promotion",
+      "internship": "Rapport de stage"
+    },
+    "sections": {
+      "individual": {
+        "title": "Suivi individuel des stagiaires"
+      },
+      "hours": {
+        "title": "Heures et rattrapage"
+      },
+      "absences": {
+        "title": "Suivi des absences"
+      },
+      "progress": {
+        "title": "Progression compétences et fiches"
+      },
+      "promotion": {
+        "title": "Rapport de promotion"
+      },
+      "internship": {
+        "title": "Rapport de stage"
+      }
+    },
+    "table": {
+      "student": "Stagiaire",
+      "progress": "Progression",
+      "hours": "Heures réalisées",
+      "catchup": "À rattraper",
+      "sheets": "Fiches",
+      "status": "Statut"
+    },
+    "summary": {
+      "students": "{{count}} stagiaires",
+      "catchup": "{{hours}} h à rattraper",
+      "average": "{{value}} % de progression moyenne",
+      "completedHours": "Heures réalisées",
+      "catchupHours": "Heures à rattraper",
+      "averageProgress": "Progression moyenne"
+    },
+    "dynamicHint": "Cette vue sera alimentée par les données métier du backend. La sélection du type de rapport est déjà prête côté front.",
+    "audit": {
+      "title": "Journal des modifications",
+      "subtitle": "Traçabilité complète des saisies",
+      "columns": {
+        "date": "Date et heure",
+        "author": "Auteur",
+        "action": "Action",
+        "oldValue": "Ancienne valeur",
+        "newValue": "Nouvelle valeur",
+        "reason": "Motif"
+      },
+      "actions": {
+        "samHours": "Modification des heures de Sam Fokam",
+        "sheet32Validated": "Validation de la fiche 32 — Sam Fokam",
+        "julieAbsence": "Justificatif d'absence enregistré — Julie Moreau",
+        "julieDriving": "Création d'une séance de conduite — Julie Moreau",
+        "awaPromotion": "Affectation de Awa Diallo à la promotion TP ECSR 2025–2026"
+      },
+      "reasons": {
+        "inputError": "Erreur de saisie.",
+        "compliantPresentation": "Présentation conforme au référentiel.",
+        "medicalCertificate": "Certificat médical.",
+        "none": "—"
+      }
+    }
+  },
+  "statistics": {
+    "title": "Statistiques",
+    "subtitle": {
+      "direction": "Indicateurs consolidés du centre de formation",
+      "secretariat": "Indicateurs administratifs et suivi de l’assiduité",
+      "trainer": "Indicateurs pédagogiques de vos stagiaires",
+      "student": "Votre progression et vos indicateurs personnels"
+    },
+    "kpi": {
+      "averageProgress": "Progression moyenne",
+      "attendance": "Taux de présence",
+      "completedHours": "Heures réalisées",
+      "catchupHours": "Heures à rattraper"
+    },
+    "promotionProgress": {
+      "title": "Progression par promotion",
+      "detail": "{{completed}} h réalisées sur {{planned}} h · présence {{attendance}} % · {{catchup}} h à rattraper"
+    },
+    "competencyAverage": {
+      "title": "Niveau moyen par compétence"
+    },
+    "competencies": {
+      "c1": "Accompagner un élève dans son apprentissage de la conduite",
+      "c2": "Animer des actions de formation théorique",
+      "c3": "Maîtriser la conduite et la sécurité routière",
+      "c4": "Sensibiliser à la sécurité routière et aux risques"
+    },
+    "sheets": {
+      "title": "Fiches et exposés",
+      "subtitle": "325 fiches validées sur 870 attendues",
+      "prepared": "Préparées",
+      "presented": "Présentées",
+      "validated": "Validées",
+      "rework": "À retravailler"
+    },
+    "statuses": {
+      "title": "Répartition des statuts",
+      "subtitle": "Suivi des stagiaires du centre",
+      "good": "Bonne progression",
+      "warning": "À surveiller",
+      "late": "En retard",
+      "finished": "Terminé"
+    },
+    "ranking": {
+      "title": "Classement par progression"
+    },
+    "trainer": {
+      "kpi": {
+        "averageProgress": "Progression moyenne",
+        "sessions": "Séances réalisées",
+        "students": "Stagiaires suivis"
+      },
+      "studentsTitle": "Progression de mes stagiaires",
+      "competenciesTitle": "Niveau moyen par compétence",
+      "sheetsTitle": "Fiches et exposés évalués",
+      "followUpTitle": "Situation de mes stagiaires",
+      "goodProgress": "stagiaires en bonne progression",
+      "watch": "stagiaire à surveiller",
+      "late": "stagiaire en retard"
+    },
+    "secretariat": {
+      "kpi": {
+        "toRegularize": "Situations à régulariser"
+      },
+      "promotionsTitle": "Assiduité et heures par promotion",
+      "prioritiesTitle": "Priorités administratives",
+      "catchupShort": "à rattraper",
+      "priorities": {
+        "catchup": "Heures à rattraper",
+        "absence": "Absences à régulariser"
+      }
+    },
+    "student": {
+      "kpi": {
+        "progress": "Progression globale"
+      },
+      "competenciesTitle": "Ma progression par compétence",
+      "sheetsTitle": "Mes fiches et exposés",
+      "hoursTitle": "Répartition de mes heures",
+      "attendanceTitle": "Mon assiduité",
+      "hours": {
+        "classroom": "Cours en salle",
+        "driving": "Conduite",
+        "internship": "Stage en entreprise"
+      },
+      "attendance": {
+        "present": "Présence",
+        "late": "Retards",
+        "absent": "Absences",
+        "excused": "Absences excusées"
+      }
+    }
+  },
+  "access": {
+    "title": "Gestion des accès",
+    "subtitle": "Espace réservé à la direction : comptes, rôles et permissions du centre",
+    "kpi": {
+      "accounts": "Comptes",
+      "active": "Accès actifs",
+      "pending": "Invitations en attente",
+      "suspended": "Accès suspendus"
+    },
+    "invite": {
+      "title": "Inviter un utilisateur",
+      "subtitle": "La direction crée les accès : formateur, stagiaire ou secrétariat",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email professionnel",
+      "emailPlaceholder": "prenom.nom@tpecsrpilot.fr",
+      "role": "Rôle attribué",
+      "defaultRights": "Droits par défaut : Stagiaires · Séances & appel · Évaluations",
+      "send": "Envoyer l’invitation"
+    },
+    "roles": {
+      "direction": "Direction",
+      "secretariat": "Secrétariat",
+      "formateur": "Formateur",
+      "stagiaire": "Stagiaire",
+      "jury": "Jury"
+    },
+    "states": {
+      "active": "Accès actif",
+      "invited": "Invitation envoyée",
+      "suspended": "Accès suspendu"
+    },
+    "accounts": {
+      "title": "Comptes du centre",
+      "subtitle": "{{count}} compte(s) affiché(s)",
+      "search": "Rechercher un nom ou un email…",
+      "allRoles": "Tous les rôles",
+      "suspend": "Suspendre",
+      "activate": "Activer",
+      "delete": "Supprimer le compte",
+      "empty": "Aucun compte ne correspond à vos filtres."
+    },
+    "userDetails": {
+      "marc": "Formateur · Conduite · Compétence C3",
+      "jury": "Accès limité à la session, aux dossiers candidats nécessaires et aux évaluations du jury."
+    },
+    "permissions": {
+      "title": "Droits de {{name}}",
+      "roleDetails": {
+        "direction": "Direction · Tous les droits du centre",
+        "secretariat": "Secrétariat · Gestion administrative et assiduité",
+        "formateur": "Formateur · Suivi pédagogique des stagiaires",
+        "stagiaire": "Stagiaire · Consultation de son propre parcours"
+      },
+      "items": {
+        "students": {
+          "title": "Stagiaires",
+          "description": "Consulter et modifier les dossiers stagiaires"
+        },
+        "sessions": {
+          "title": "Séances & appel",
+          "description": "Créer des séances, faire l’appel, saisir les présences"
+        },
+        "evaluations": {
+          "title": "Évaluations",
+          "description": "Évaluer la conduite et les fiches / exposés"
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "Déposer et gérer les documents du centre"
+        },
+        "reports": {
+          "title": "Rapports & exports",
+          "description": "Générer les rapports et exports PDF / Excel"
+        },
+        "administration": {
+          "title": "Administration",
+          "description": "Paramètres du centre et gestion des accès"
+        },
+        "certification": {
+          "title": "Certification / examen",
+          "description": "Accès aux sessions, candidats et évaluations de certification selon le rôle."
+        }
+      },
+      "studentRule": "Un stagiaire ne peut jamais modifier une évaluation saisie par un formateur, même si d’autres droits lui sont accordés."
+    }
+  },
+  "administration": {
+    "title": "Administration",
+    "subtitle": "Paramètres du centre et du référentiel pédagogique",
+    "centre": {
+      "title": "Informations du centre",
+      "name": "Nom du centre",
+      "city": "Ville",
+      "approval": "Numéro d’agrément",
+      "save": "Enregistrer",
+      "saved": "Modifications enregistrées"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "subtitle": "5 formateurs · 2 promotions",
+      "invite": "Inviter",
+      "trainer": "Formateur",
+      "inviteHint": "Le formulaire d’invitation sera relié à la gestion des accès."
+    },
+    "skills": {
+      "title": "Référentiel de compétences",
+      "subtitle": "Compétences et sous-compétences du titre professionnel ECSR"
+    },
+    "hours": {
+      "title": "Catégories d'heures",
+      "subtitle": "Utilisées dans le suivi des heures et les rapports",
+      "classroom": "Salle",
+      "driving": "Conduite",
+      "internship": "Stage entreprise",
+      "presentation": "Exposé",
+      "assessment": "Évaluation",
+      "awareness": "Sensibilisation",
+      "catchup": "Rattrapage",
+      "absence": "Absence",
+      "other": "Autre"
+    },
+    "sheets": {
+      "title": "Fiches pédagogiques",
+      "count": "58 fiches configurables",
+      "description": "Le nombre de fiches, leur numérotation et leurs intitulés sont paramétrables pour correspondre au référentiel de votre centre.",
+      "configure": "Configurer les 58 fiches",
+      "hint": "La configuration détaillée des fiches sera ajoutée dans un écran dédié."
+    },
+    "access": {
+      "title": "Droits d'accès",
+      "direction": "Accès complet : promotions, stagiaires, formateurs, rapports, statistiques, journal.",
+      "formateur": "Séances, appel, évaluations conduite et fiches, observations sur ses stagiaires.",
+      "stagiaire": "Consultation seule de son suivi. Ne peut pas modifier une évaluation d'un formateur.",
+      "secretariat": "Stagiaires, promotions, planning, présences, documents administratifs, exports."
+    },
+    "recent": {
+      "title": "Dernières actions enregistrées",
+      "samHours": {
+        "title": "Modification des heures de Sam Fokam",
+        "meta": "21/09/2026 · 14:32 · Marc Dupont · Erreur de saisie."
+      },
+      "sheet32": {
+        "title": "Validation de la fiche 32 — Sam Fokam",
+        "meta": "21/09/2026 · 11:05 · Claire Berthier · Présentation conforme au référentiel."
+      }
+    }
+  },
+  "studentDetail": {
+    "backStudents": "Retour aux stagiaires",
+    "backHome": "Retour à l’accueil",
+    "profile": {
+      "start": "Début",
+      "expectedEnd": "Fin prévue",
+      "globalProgress": "Progression globale"
+    },
+    "tabs": {
+      "overview": "Vue d’ensemble",
+      "hours": "Heures",
+      "driving": "Conduite",
+      "skills": "Compétences",
+      "sheets": "Fiches / Exposés",
+      "attendance": "Présences",
+      "internships": "Stages",
+      "evaluations": "Évaluations",
+      "documents": "Documents",
+      "history": "Historique",
+      "certification": "Certification"
+    },
+    "overview": {
+      "completedTraining": "Formation réalisée",
+      "pathPercent": "{{value}} % du parcours",
+      "sheetsTitle": "Fiches pédagogiques",
+      "prepared": "Préparées",
+      "presented": "Présentées",
+      "validated": "Validées",
+      "rework": "À retravailler",
+      "latestDriving": "Dernières séances",
+      "nextGoals": "Prochains objectifs",
+      "catchupGoal": "Rattraper {{hours}} h avant la fin du trimestre.",
+      "timelineTitle": "Timeline pédagogique"
+    },
+    "hours": {
+      "planned": "Prévues",
+      "completed": "Réalisées",
+      "remaining": "Restantes",
+      "catchup": "À rattraper",
+      "detailTitle": "Détail par catégorie",
+      "detailSubtitle": "Totaux calculés automatiquement",
+      "columns": {
+        "category": "Catégorie",
+        "planned": "Prévu",
+        "completed": "Réalisé",
+        "remaining": "Restant",
+        "catchup": "Rattrapage"
+      },
+      "categories": {
+        "classroom": "Salle",
+        "driving": "Conduite",
+        "internship": "Stage entreprise",
+        "presentation": "Exposé",
+        "assessment": "Évaluation",
+        "awareness": "Sensibilisation",
+        "catchup": "Rattrapage",
+        "absence": "Absence",
+        "other": "Autre"
+      }
+    },
+    "attendance": {
+      "absences": "Absences",
+      "delays": "Retards",
+      "catchup": "Heures à rattraper",
+      "historyTitle": "Historique des présences",
+      "columns": {
+        "date": "Date",
+        "session": "Séance",
+        "status": "État",
+        "missedHours": "Heures manquées"
+      },
+      "status": {
+        "present": "Présent",
+        "late": "Retard",
+        "absent": "Absent",
+        "excused": "Excusé"
+      },
+      "sessions": {
+        "pedagogicalDay": "Journée pédagogique",
+        "signageClass": "Cours salle — signalisation",
+        "driving": "Séance conduite",
+        "sheet30": "Exposé fiche 30",
+        "classroom": "Cours en salle",
+        "presentation": "Présentation de fiche"
+      }
+    },
+    "sheets": {
+      "title": "58 fiches pédagogiques",
+      "subtitle": "{{prepared}} préparées · {{validated}} validées",
+      "columns": {
+        "title": "Titre",
+        "prepared": "Préparée",
+        "presented": "Présentée",
+        "status": "Statut"
+      }
+    },
+    "internships": {
+      "tutor": "Tuteur",
+      "progress": "Avancement",
+      "activities": "Activités réalisées",
+      "tutorObservation": "Observations et évaluation du tuteur"
+    },
+    "evaluations": {
+      "title": "Évaluations",
+      "readOnly": "Consultation uniquement — seul le formateur peut modifier une évaluation.",
+      "rows": {
+        "sheet32": "Présentation fiche 32",
+        "drivingC1": "Évaluation conduite C1",
+        "internshipReview": "Bilan de stage entreprise",
+        "intermediateC2": "Évaluation intermédiaire C2"
+      },
+      "results": {
+        "validated": "Validée",
+        "rework": "À retravailler",
+        "inProgress": "En cours d’acquisition",
+        "acquired": "Acquis"
+      }
+    },
+    "documents": {
+      "title": "Documents du stagiaire",
+      "rows": {
+        "internshipAgreement": "Convention de stage",
+        "remc": "Référentiel REMC 2026",
+        "drivingGrid": "Grille évaluation conduite",
+        "intersectionsSupport": "Support — Les intersections",
+        "internalRules": "Règlement intérieur du centre"
+      }
+    },
+    "history": {
+      "title": "Journal des modifications",
+      "subtitle": "Traçabilité complète des modifications liées au stagiaire",
+      "oldValue": "Ancienne valeur",
+      "newValue": "Nouvelle valeur",
+      "reason": "Motif",
+      "by": "Par"
+    },
+    "timeline": {
+      "18sep": "18 septembre",
+      "19sep": "19 septembre",
+      "20sep": "20 septembre",
+      "21sep": "21 septembre",
+      "sheet32": "Présentation fiche 32",
+      "bends": "Les virages et la déclivité",
+      "absence": "Absence",
+      "catchup7": "7 heures à rattraper",
+      "driving": "Séance conduite",
+      "drivingDetail": "Virages et déclivité — regard à travailler",
+      "classroom": "Cours en salle",
+      "classroomDetail": "Les intersections et les priorités",
+      "presentation": "Présentation pédagogique",
+      "presentationDetail": "Fiche présentée devant le groupe",
+      "genericDrivingDetail": "Objectifs pratiques travaillés en véhicule"
+    },
+    "empty": {
+      "driving": "Aucune séance de conduite enregistrée pour ce stagiaire.",
+      "internships": "Aucun stage enregistré pour ce stagiaire.",
+      "history": "Aucune modification enregistrée pour ce stagiaire."
+    },
+    "notFound": {
+      "title": "Stagiaire introuvable",
+      "subtitle": "Le dossier demandé n’existe pas ou n’est plus disponible."
+    },
+    "certification": {
+      "title": "Examen final",
+      "missing": "Éléments manquants",
+      "open": "Ouvrir le dossier examen",
+      "schedule": "Planning des épreuves",
+      "notRegistered": "Aucune session de certification n’est encore affectée à ce stagiaire."
+    }
+  },
+  "sheetConfig": {
+    "back": "Retour à l’administration",
+    "title": "Configurer les fiches pédagogiques",
+    "subtitle": "Gérez les 58 fiches du centre : intitulés, catégories, durée, références et exemples corrigés.",
+    "reset": "Réinitialiser les 58 fiches",
+    "add": "Ajouter une fiche",
+    "kpi": {
+      "total": "Fiches configurées",
+      "active": "Fiches actives",
+      "inactive": "Fiches inactives",
+      "custom": "Fiches personnalisées"
+    },
+    "filters": {
+      "search": "Rechercher",
+      "searchPlaceholder": "Rechercher par numéro, intitulé ou référence…",
+      "category": "Catégorie",
+      "allCategories": "Toutes les catégories",
+      "status": "Statut",
+      "allStatuses": "Tous les statuts"
+    },
+    "categories": {
+      "rules": "Réglementation",
+      "risk": "Risques & usagers",
+      "vehicle": "Véhicule & conditions",
+      "pedagogy": "Pédagogie & REMC",
+      "exam": "Examens",
+      "mobility": "Mobilité"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "number": "N°",
+      "title": "Intitulé",
+      "category": "Catégorie",
+      "duration": "Durée",
+      "status": "Statut",
+      "actions": "Actions",
+      "noReference": "Aucune référence renseignée"
+    },
+    "actions": {
+      "view": "Consulter",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "empty": "Aucune fiche ne correspond aux filtres sélectionnés.",
+    "editor": {
+      "close": "Fermer le formulaire",
+      "eyebrow": "Référentiel pédagogique",
+      "editTitle": "Modifier la fiche",
+      "addTitle": "Ajouter une fiche",
+      "number": "Numéro",
+      "sheetTitle": "Intitulé de la fiche",
+      "titlePlaceholder": "Ex. Le temps de réaction et les distances de sécurité",
+      "duplicateNumber": "Ce numéro est déjà utilisé par une autre fiche.",
+      "category": "Catégorie",
+      "duration": "Durée indicative",
+      "reference": "Références",
+      "referencePlaceholder": "Ex. Code de la route, REMC, référentiel TP ECSR…",
+      "objective": "Objectif pédagogique",
+      "objectivePlaceholder": "Décrivez ce que le stagiaire doit être capable de présenter ou expliquer.",
+      "example": "Exemple de sujet / consigne",
+      "examplePlaceholder": "Ajoutez une question d’accroche, une situation ou un exemple de sujet à présenter.",
+      "correction": "Exemple corrigé",
+      "correctionPlaceholder": "Ajoutez une trame corrigée : accroche, objectifs, développement, RIP, bilan et références.",
+      "active": "Fiche active",
+      "activeHint": "Une fiche inactive reste dans le référentiel mais n’est plus proposée dans le suivi courant.",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "viewer": {
+      "close": "Fermer la fiche",
+      "eyebrow": "Fiche",
+      "reference": "Références",
+      "objective": "Objectif pédagogique",
+      "exampleTitle": "Exemple de sujet",
+      "correctionTitle": "Exemple corrigé",
+      "defaultObjective": "Être capable de présenter le thème « {{title}} », d’en expliquer les enjeux de sécurité routière et de faire participer les apprenants.",
+      "defaultExample": "Préparez une présentation structurée sur « {{title}} ». Commencez par une situation concrète ou une question d’accroche, faites émerger les représentations du groupe, puis développez les connaissances utiles avant un bilan final.",
+      "defaultCorrection": "Trame de correction proposée pour « {{title}} » :\n\n1. Accroche : partir d’une situation concrète et questionner le groupe.\n2. Objectifs : annoncer clairement 2 à 3 objectifs observables.\n3. Développement : définitions, réglementation, risques, comportements et exemples pratiques.\n4. Méthode interrogative : alterner questions ouvertes et fermées pour faire participer les apprenants.\n5. RIP : identifier les risques, influences et pressions en lien avec le thème.\n6. Bilan : vérifier les acquis avec quelques questions et annoncer une suite possible.\n7. Références : citer les textes et sources pédagogiques utilisés."
+    },
+    "delete": {
+      "title": "Supprimer cette fiche ?",
+      "message": "La fiche n°{{number}} « {{title}} » sera retirée du référentiel local. Cette action pourra être annulée uniquement en réinitialisant le catalogue ou en recréant la fiche.",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    }
+  },
+  "certification": {
+    "title": "Certification / Examen final",
+    "subtitle": "Préparer les candidats, organiser les sessions, suivre le jury et publier les résultats.",
+    "currentSession": "Session en cours de préparation",
+    "readiness": "Préparation des candidats",
+    "ready": "Dossier prêt",
+    "incomplete": "Dossier incomplet",
+    "complete": "Complet",
+    "actions": {
+      "results": "Voir les résultats",
+      "manageSession": "Gérer la session"
+    },
+    "kpi": {
+      "candidates": "Candidats",
+      "ready": "Dossiers prêts",
+      "jury": "Membres du jury",
+      "readiness": "Taux de préparation"
+    },
+    "sessionStatus": {
+      "preparation": "En préparation",
+      "ready": "Prête",
+      "running": "En cours",
+      "deliberation": "Délibération",
+      "published": "Résultats publiés",
+      "closed": "Clôturée"
+    },
+    "sessionCards": {
+      "promotion": "Promotion",
+      "centre": "Centre",
+      "jury": "Jury"
+    },
+    "jury": {
+      "title": "Jury affecté",
+      "subtitle": "Professionnels habilités affectés à cette session.",
+      "members": "membres",
+      "active": "Actif",
+      "professions": {
+        "teacher": "Enseignant de la conduite",
+        "manager": "Responsable pédagogique"
+      }
+    },
+    "candidates": {
+      "title": "Candidats",
+      "subtitle": "État de préparation des dossiers avant la session.",
+      "readySummary": "{{ready}} dossiers prêts sur {{total}}"
+    },
+    "table": {
+      "candidate": "Candidat",
+      "hours": "Heures",
+      "documents": "Documents",
+      "readiness": "Préparation"
+    },
+    "ccp": {
+      "validated": "Validé",
+      "pending": "En attente",
+      "not_validated": "Non validé"
+    },
+    "steps": {
+      "professionalSituation": "Mise en situation professionnelle",
+      "technicalInterview": "Entretien technique",
+      "questionnaire": "Questionnaire professionnel",
+      "productions": "Questionnement à partir de productions",
+      "finalInterview": "Entretien final"
+    },
+    "stepStatus": {
+      "done": "Terminée",
+      "planned": "Planifiée",
+      "in_progress": "En cours"
+    },
+    "missing": {
+      "hours": "Heures de formation à régulariser",
+      "professionalFile": "Dossier professionnel manquant",
+      "stageDocument": "Justificatif de stage manquant",
+      "ccp2Production": "Production CCP2 manquante"
+    },
+    "trainer": {
+      "title": "Préparation de mes stagiaires",
+      "subtitle": "Repérez rapidement les dossiers à finaliser avant l’examen.",
+      "readyStudents": "Stagiaires prêts"
+    },
+    "student": {
+      "myExam": "Mon examen final",
+      "openFile": "Ouvrir mon dossier examen",
+      "schedule": "Planning des épreuves"
+    },
+    "sessionDetail": {
+      "back": "Retour à la certification",
+      "workflowTitle": "Avancement de la session",
+      "workflowSubtitle": "Chaque étape reste traçable jusqu’à la clôture.",
+      "logisticsTitle": "Organisation de la session",
+      "location": "Lieu",
+      "period": "Période",
+      "candidateListSubtitle": "Dossiers, horaires de passage et état de préparation."
+    },
+    "workflow": {
+      "preparation": "Préparation",
+      "candidates": "Candidatures validées",
+      "jury": "Jury affecté",
+      "running": "Session en cours",
+      "deliberation": "Délibération",
+      "results": "Résultats saisis / publiés",
+      "closed": "Session clôturée"
+    },
+    "workflowHelp": {
+      "preparation": "Paramètres, lieu, dates et référentiel.",
+      "candidates": "Contrôle des dossiers et de l’éligibilité.",
+      "jury": "Affectation des membres habilités.",
+      "running": "Suivi des épreuves et des présences.",
+      "deliberation": "Validation des évaluations du jury.",
+      "results": "Saisie puis publication contrôlée.",
+      "closed": "Archivage et statistiques finales."
+    },
+    "candidate": {
+      "back": "Retour",
+      "missingTitle": "Éléments à régulariser",
+      "examPath": "Parcours d’examen",
+      "examPathSubtitle": "Épreuves prévues pour cette session.",
+      "readinessTitle": "Éligibilité / préparation",
+      "trainingHours": "Heures de formation réalisées",
+      "professionalFile": "Dossier professionnel",
+      "ccp1Stage": "Éléments CCP1",
+      "ccp2Stage": "Éléments CCP2",
+      "juryEvaluation": "Grille d’évaluation Jury",
+      "juryEvaluationHelp": "Grille numérique de démonstration ; les critères officiels seront configurés par référentiel.",
+      "locked": "Évaluation verrouillée",
+      "juryCriteria": {
+        "pedagogy": "Conduite et structuration de la prestation pédagogique",
+        "safety": "Prise en compte de la sécurité routière",
+        "analysis": "Analyse et justification des choix",
+        "communication": "Communication et posture professionnelle"
+      },
+      "juryLevels": {
+        "satisfactory": "Satisfaisant",
+        "partial": "Partiel",
+        "insufficient": "Insuffisant"
+      },
+      "juryNotes": "Observations du jury",
+      "saveDraft": "Enregistrer le brouillon",
+      "validateEvaluation": "Valider mon évaluation",
+      "draftSaved": "Brouillon enregistré."
+    }
+  },
+  "jury": {
+    "space": "Espace Jury",
+    "greeting": "Bonjour {{name}}",
+    "subtitle": "Retrouvez uniquement les candidats et informations nécessaires à votre session.",
+    "candidates": "Candidats affectés",
+    "firstCandidate": "Premier passage",
+    "habilitationValidUntil": "Habilitation valide jusqu’au",
+    "myCandidates": "Mes candidats",
+    "myCandidatesSubtitle": "Ouvrez un dossier pour compléter la grille d’évaluation.",
+    "rules": {
+      "title": "Règles de l’espace Jury",
+      "neutral": "Le dossier pédagogique interne n’est pas exposé au jury afin de préserver la neutralité de l’évaluation.",
+      "draft": "Les évaluations peuvent être enregistrées en brouillon avant validation.",
+      "lock": "Une évaluation validée est verrouillée ; toute correction devra être tracée.",
+      "audit": "Les actions sensibles seront historisées côté backend."
+    }
+  },
+  "results": {
+    "title": "Résultats de certification",
+    "subtitle": "Délibération, saisie et publication contrôlée des résultats.",
+    "back": "Certification",
+    "publish": "Publier les résultats",
+    "published": "Résultats publiés",
+    "publishSuccess": "Les résultats sont maintenant marqués comme publiés dans cette maquette.",
+    "kpi": {
+      "candidates": "Candidats",
+      "obtained": "Titre obtenu",
+      "partial": "Validation partielle",
+      "failed": "Non obtenu",
+      "absent": "Absents"
+    },
+    "tableTitle": "Décisions de la session",
+    "tableSubtitle": "Les résultats restent en brouillon tant qu’ils ne sont pas publiés.",
+    "result": "Résultat",
+    "publication": "Publication",
+    "status": {
+      "pending": "En attente",
+      "obtained": "Titre obtenu",
+      "partial": "Validation partielle",
+      "failed": "Non obtenu",
+      "absent": "Absent"
+    },
+    "publicationStates": {
+      "published": "Publié",
+      "draft": "Brouillon"
+    }
+  },
+  "success": {
+    "title": "Réussites",
+    "subtitle": "Suivi historique des résultats de certification par promotion.",
+    "export": "Exporter PDF",
+    "kpi": {
+      "globalRate": "Taux global",
+      "graduated": "Diplômés",
+      "presented": "Présentés",
+      "promotions": "Promotions"
+    },
+    "evolution": {
+      "title": "Évolution du taux de réussite",
+      "subtitle": "Taux calculé sur les candidats effectivement présentés."
+    },
+    "byPromotion": {
+      "title": "Résultats par promotion",
+      "subtitle": "Détail du dénominateur et des décisions finales."
+    },
+    "table": {
+      "promotion": "Promotion",
+      "presented": "Présentés",
+      "graduated": "Diplômés",
+      "partial": "Partiels",
+      "failed": "Non obtenus",
+      "rate": "Réussite"
+    },
+    "details": "Détails",
+    "detail": {
+      "title": "Détail de la réussite",
+      "close": "Fermer",
+      "absent": "Absents",
+      "definition": "Taux de réussite = nombre de titres obtenus / nombre de candidats effectivement présentés × 100."
+    }
+  }
+}

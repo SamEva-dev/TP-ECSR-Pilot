@@ -1,0 +1,345 @@
+<div
+  class="fixed inset-0 z-[90] bg-[#0f172a]/35 backdrop-blur-[1px]"
+  (click)="close()"
+></div>
+
+<aside
+  class="fixed inset-y-0 right-0 z-[100] flex w-full max-w-[780px] flex-col bg-[#f7f9fc] shadow-[-24px_0_55px_rgba(15,23,42,0.18)]"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="'sheets.evaluation.title' | t"
+>
+  <header
+    class="flex items-start justify-between gap-4 border-b border-[#dfe5ec] bg-white px-5 py-5 sm:px-7"
+  >
+    <div class="flex min-w-0 items-start gap-3.5">
+      <span
+        class="grid size-[44px] shrink-0 place-items-center rounded-[13px] bg-[#fff0d6] text-[#e58a00]"
+      >
+        <i class="ph ph-presentation-chart text-[22px]"></i>
+      </span>
+      <div class="min-w-0">
+        <h2
+          class="text-[20px] font-extrabold tracking-[-0.35px] text-[#172033]"
+        >
+          {{ "sheets.evaluation.title" | t }}
+        </h2>
+        <p class="mt-1 text-[12.5px] leading-5 text-[#748094]">
+          {{ "sheets.evaluation.subtitle" | t }}
+        </p>
+      </div>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="grid size-10 shrink-0 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#64748b] transition hover:bg-[#f7f9fc]"
+      [attr.aria-label]="'sheets.evaluation.close' | t"
+    >
+      <i class="ph ph-x text-[19px]"></i>
+    </button>
+  </header>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-7">
+    <section
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+    >
+      <div class="flex items-center gap-2">
+        <span
+          class="grid size-8 place-items-center rounded-[10px] bg-[#e8f2fd] text-[#2b66a4]"
+          ><i class="ph ph-identification-card text-[17px]"></i
+        ></span>
+        <h3 class="text-[15px] font-bold text-[#172033]">
+          {{ "sheets.evaluation.contextTitle" | t }}
+        </h3>
+      </div>
+
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.student" | t
+          }}</span>
+          <div class="relative">
+            <select
+              [value]="studentId()"
+              (change)="updateStudent($event)"
+              class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3 pr-9 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+            >
+              @for (student of students; track student.id) {
+                <option [value]="student.id">
+                  {{ student.firstName }} {{ student.lastName }}
+                </option>
+              }
+            </select>
+            <i
+              class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#64748b]"
+            ></i>
+          </div>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.sheet" | t
+          }}</span>
+          <div class="relative">
+            <select
+              [value]="sheetNumber()"
+              (change)="updateSheet($event)"
+              class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3 pr-9 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+            >
+              @for (sheet of sheets(); track sheet.number) {
+                <option [value]="sheet.number">
+                  {{ sheet.number }} — {{ sheet.titleKey | t }}
+                </option>
+              }
+            </select>
+            <i
+              class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#64748b]"
+            ></i>
+          </div>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.date" | t
+          }}</span>
+          <input
+            type="date"
+            [value]="presentationDate()"
+            (input)="updateDate($event)"
+            class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          />
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.duration" | t
+          }}</span>
+          <div class="relative">
+            <input
+              type="number"
+              min="1"
+              max="180"
+              [value]="durationMinutes()"
+              (input)="updateDuration($event)"
+              class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3 pr-12 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+            />
+            <span
+              class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-[#8a94a6]"
+              >min</span
+            >
+          </div>
+        </label>
+
+        <label class="block sm:col-span-2">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.evaluator" | t
+          }}</span>
+          <div class="relative">
+            <select
+              [value]="evaluator()"
+              (change)="updateEvaluator($event)"
+              class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3 pr-9 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+            >
+              @for (name of evaluators; track name) {
+                <option [value]="name">{{ name }}</option>
+              }
+            </select>
+            <i
+              class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#64748b]"
+            ></i>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+    >
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div>
+          <h3 class="text-[15px] font-bold text-[#172033]">
+            {{ "sheets.evaluation.gridTitle" | t }}
+          </h3>
+          <p class="mt-1 text-[12px] text-[#748094]">
+            {{ "sheets.evaluation.gridSubtitle" | t }}
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-1.5 text-[10.5px] font-semibold">
+          <span class="rounded-full bg-[#dcf8e3] px-2.5 py-1 text-[#15803d]"
+            >{{ acquiredCount() }}
+            {{ "sheets.evaluation.summary.acquired" | t }}</span
+          >
+          <span class="rounded-full bg-[#fff1cb] px-2.5 py-1 text-[#825a00]"
+            >{{ inProgressCount() }}
+            {{ "sheets.evaluation.summary.inProgress" | t }}</span
+          >
+          <span class="rounded-full bg-[#ffe3e0] px-2.5 py-1 text-[#cf342d]"
+            >{{ reviewCount() }}
+            {{ "sheets.evaluation.summary.review" | t }}</span
+          >
+        </div>
+      </div>
+
+      <div class="mt-4 overflow-hidden rounded-[14px] border border-[#e2e8f0]">
+        @for (criterion of criteria; track criterion; let last = $last) {
+          <div
+            [class]="
+              'grid gap-3 bg-white p-3.5 sm:grid-cols-[1fr_330px] sm:items-center ' +
+              (!last ? 'border-b border-[#edf1f5]' : '')
+            "
+          >
+            <p class="text-[12.5px] font-semibold leading-5 text-[#334155]">
+              {{ "sheets.evaluation.criteria." + criterion | t }}
+            </p>
+            <div class="grid grid-cols-3 gap-1.5">
+              @for (level of levels; track level) {
+                <button
+                  type="button"
+                  (click)="setLevel(criterion, level)"
+                  [class]="
+                    'min-h-[36px] rounded-[10px] border px-2 text-[11px] font-semibold transition ' +
+                    levelClasses(criterion, level)
+                  "
+                >
+                  {{ "sheets.evaluation.level." + level | t }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+    >
+      <h3 class="text-[15px] font-bold text-[#172033]">
+        {{ "sheets.evaluation.synthesisTitle" | t }}
+      </h3>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#15803d]">{{
+            "sheets.evaluation.positivePoints" | t
+          }}</span>
+          <textarea
+            rows="4"
+            [value]="positivePoints()"
+            (input)="updateText('positivePoints', $event)"
+            [placeholder]="'sheets.evaluation.positivePlaceholder' | t"
+            class="w-full resize-none rounded-[11px] border border-[#dce3eb] bg-white p-3 text-[12.5px] leading-5 text-[#334155] outline-none placeholder:text-[#98a2b3] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#c58000]">{{
+            "sheets.evaluation.improvements" | t
+          }}</span>
+          <textarea
+            rows="4"
+            [value]="improvements()"
+            (input)="updateText('improvements', $event)"
+            [placeholder]="'sheets.evaluation.improvementsPlaceholder' | t"
+            class="w-full resize-none rounded-[11px] border border-[#dce3eb] bg-white p-3 text-[12.5px] leading-5 text-[#334155] outline-none placeholder:text-[#98a2b3] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#475569]">{{
+            "sheets.evaluation.generalComment" | t
+          }}</span>
+          <textarea
+            rows="3"
+            [value]="generalComment()"
+            (input)="updateText('generalComment', $event)"
+            [placeholder]="'sheets.evaluation.commentPlaceholder' | t"
+            class="w-full resize-none rounded-[11px] border border-[#dce3eb] bg-white p-3 text-[12.5px] leading-5 text-[#334155] outline-none placeholder:text-[#98a2b3] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+        </label>
+        <label class="block sm:col-span-2">
+          <span class="mb-1.5 block text-[12px] font-semibold text-[#2b66a4]">{{
+            "sheets.evaluation.nextObjective" | t
+          }}</span>
+          <textarea
+            rows="2"
+            [value]="nextObjective()"
+            (input)="updateText('nextObjective', $event)"
+            [placeholder]="'sheets.evaluation.nextObjectivePlaceholder' | t"
+            class="w-full resize-none rounded-[11px] border border-[#dce3eb] bg-white p-3 text-[12.5px] leading-5 text-[#334155] outline-none placeholder:text-[#98a2b3] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+        </label>
+      </div>
+    </section>
+
+    <section
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+    >
+      <h3 class="text-[15px] font-bold text-[#172033]">
+        {{ "sheets.evaluation.decision.title" | t }}
+      </h3>
+      <p class="mt-1 text-[12px] text-[#748094]">
+        {{ "sheets.evaluation.decision.subtitle" | t }}
+      </p>
+      <div class="mt-4 grid gap-2 sm:grid-cols-2">
+        <button
+          type="button"
+          (click)="setDecision('validated')"
+          [class]="
+            'flex min-h-[58px] items-center gap-3 rounded-[13px] border px-4 text-left transition ' +
+            decisionClasses('validated')
+          "
+        >
+          <i class="ph ph-check-circle text-[21px]"></i>
+          <span
+            ><strong class="block text-[12.5px]">{{
+              "sheets.evaluation.decision.validated" | t
+            }}</strong></span
+          >
+        </button>
+        <button
+          type="button"
+          (click)="setDecision('rework')"
+          [class]="
+            'flex min-h-[58px] items-center gap-3 rounded-[13px] border px-4 text-left transition ' +
+            decisionClasses('rework')
+          "
+        >
+          <i class="ph ph-arrow-counter-clockwise text-[21px]"></i>
+          <span
+            ><strong class="block text-[12.5px]">{{
+              "sheets.evaluation.decision.rework" | t
+            }}</strong></span
+          >
+        </button>
+      </div>
+    </section>
+
+    @if (saved()) {
+      <div
+        class="mt-4 flex items-center gap-2 rounded-[13px] border border-[#b8e8c5] bg-[#e7f9ec] px-4 py-3 text-[12px] font-semibold text-[#15803d]"
+      >
+        <i class="ph ph-check-circle text-[18px]"></i
+        >{{ "sheets.evaluation.saved" | t }}
+      </div>
+    }
+  </div>
+
+  <footer
+    class="flex shrink-0 items-center justify-end gap-2 border-t border-[#dfe5ec] bg-white px-4 py-4 sm:px-7"
+  >
+    <button
+      type="button"
+      (click)="close()"
+      class="inline-flex h-[42px] items-center justify-center rounded-[11px] border border-[#dce3eb] bg-white px-5 text-[12.5px] font-semibold text-[#475569] shadow-sm hover:bg-[#f8fafc]"
+    >
+      {{ "sheets.evaluation.cancel" | t }}
+    </button>
+    <button
+      type="button"
+      (click)="save()"
+      class="inline-flex h-[42px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-5 text-[12.5px] font-semibold text-white shadow-sm hover:bg-[#24598e]"
+    >
+      <i class="ph ph-floppy-disk text-[17px]"></i
+      >{{ "sheets.evaluation.save" | t }}
+    </button>
+  </footer>
+</aside>

@@ -1,0 +1,757 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div>
+    <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+      {{ "statistics.title" | t }}
+    </h1>
+    <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      @if (isDirection()) {
+        {{ "statistics.subtitle.direction" | t }}
+      } @else if (isSecretariat()) {
+        {{ "statistics.subtitle.secretariat" | t }}
+      } @else if (isTrainer()) {
+        {{ "statistics.subtitle.trainer" | t }}
+      } @else {
+        {{ "statistics.subtitle.student" | t }}
+      }
+    </p>
+  </div>
+
+  @if (isDirection()) {
+    <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.averageProgress" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">69 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-trend-up text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.attendance" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">96 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+          ><i class="ph ph-calendar-check text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.completedHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">9475 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-clock text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.catchupHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">102 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#7c5914]"
+          ><i class="ph ph-wave-sine text-[20px]"></i
+        ></span>
+      </article>
+    </div>
+
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.promotionProgress.title" | t }}
+        </h2>
+        <div class="mt-4 space-y-6">
+          @for (promotion of centerPromotions; track promotion.id) {
+            <div>
+              <div class="flex justify-between gap-4 text-[13px] font-bold">
+                <span>{{ promotion.name }}</span
+                ><span class="text-[#2a64a2]">{{ promotion.progress }} %</span>
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="promotion.progress"
+                heightClass="h-[10px]"
+              />
+              <p class="mt-2 text-[12px] text-[#768295]">
+                {{
+                  "statistics.promotionProgress.detail"
+                    | t
+                      : {
+                          completed: promotion.completedHours,
+                          planned: promotion.plannedHours,
+                          attendance: promotion.attendance,
+                          catchup: promotion.catchupHours,
+                        }
+                }}
+              </p>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.competencyAverage.title" | t }}
+        </h2>
+        <div class="mt-4 space-y-5">
+          @for (item of centerCompetencies; track item.code) {
+            <div>
+              <div class="flex items-end justify-between gap-4">
+                <p class="text-[13px] font-semibold">
+                  {{ item.code }} — {{ item.labelKey | t }}
+                </p>
+                <span class="text-[13px] font-bold text-[#2a64a2]"
+                  >{{ item.value }} %</span
+                >
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="item.value"
+                heightClass="h-[10px]"
+              />
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.sheets.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[13px] text-[#768295]">
+          {{ "statistics.sheets.subtitle" | t }}
+        </p>
+        <app-progress-bar
+          class="mt-4 block"
+          [value]="37"
+          heightClass="h-[10px]"
+        />
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.prepared" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">540</p>
+            <span
+              class="mt-2 inline-flex rounded-full bg-[#e5f2ff] px-3 py-1 text-[11px] font-semibold text-[#245c97]"
+              >{{ "statistics.sheets.prepared" | t }}</span
+            >
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.presented" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">365</p>
+            <span
+              class="mt-2 inline-flex rounded-full bg-[#2a64a2] px-3 py-1 text-[11px] font-semibold text-white"
+              >{{ "statistics.sheets.presented" | t }}</span
+            >
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.validated" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">325</p>
+            <span
+              class="mt-2 inline-flex rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]"
+              >{{ "statistics.sheets.validated" | t }}</span
+            >
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.rework" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">67</p>
+            <span
+              class="mt-2 inline-flex rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]"
+              >{{ "statistics.sheets.rework" | t }}</span
+            >
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.statuses.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[13px] text-[#768295]">
+          {{ "statistics.statuses.subtitle" | t }}
+        </p>
+        <div class="mt-4 space-y-3">
+          @for (item of centerStatuses; track item.key) {
+            <div
+              class="flex items-center gap-3 rounded-[15px] bg-[#f1f4f8] px-3 py-3"
+            >
+              <span
+                [class]="
+                  'shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                  statusClasses(item.key)
+                "
+                >{{ "statistics.statuses." + item.key | t }}</span
+              ><app-progress-bar
+                class="block flex-1"
+                [value]="item.value"
+                heightClass="h-[9px]"
+              /><span class="w-5 text-right text-[13px] font-bold">{{
+                item.count
+              }}</span>
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "statistics.ranking.title" | t }}
+      </h2>
+      <div class="mt-3 space-y-2">
+        @for (item of centerRanking; track item.rank) {
+          <div
+            class="grid grid-cols-[24px_145px_1fr_48px] items-center gap-3 rounded-[13px] border border-[#e7ebf0] px-3 py-2"
+          >
+            <span class="text-[12px] text-[#6c788b]">{{ item.rank }}</span
+            ><span class="truncate text-[13px] font-medium">{{
+              item.name
+            }}</span
+            ><app-progress-bar
+              class="block"
+              [value]="item.progress"
+              heightClass="h-[8px]"
+            /><span class="text-right text-[12px] font-bold"
+              >{{ item.progress }} %</span
+            >
+          </div>
+        }
+      </div>
+    </article>
+  } @else if (isTrainer()) {
+    <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.trainer.kpi.averageProgress" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">69 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-trend-up text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.attendance" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">96 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+          ><i class="ph ph-calendar-check text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.trainer.kpi.sessions" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">42</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e5f2ff] text-[#245c97]"
+          ><i class="ph ph-calendar-dots text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.trainer.kpi.students" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">6</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#7c5914]"
+          ><i class="ph ph-users-three text-[20px]"></i
+        ></span>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.trainer.studentsTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-3">
+          @for (item of trainerStudents; track item.rank) {
+            <div class="grid grid-cols-[150px_1fr_45px] items-center gap-3">
+              <span class="truncate text-[13px] font-medium">{{
+                item.name
+              }}</span
+              ><app-progress-bar
+                class="block"
+                [value]="item.progress"
+                heightClass="h-[9px]"
+              /><span class="text-right text-[12px] font-bold"
+                >{{ item.progress }} %</span
+              >
+            </div>
+          }
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.trainer.competenciesTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-5">
+          @for (item of trainerCompetencies; track item.code) {
+            <div>
+              <div class="flex justify-between text-[13px]">
+                <span class="font-semibold"
+                  >{{ item.code }} — {{ item.labelKey | t }}</span
+                ><span class="font-bold text-[#2a64a2]"
+                  >{{ item.value }} %</span
+                >
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="item.value"
+                heightClass="h-[9px]"
+              />
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.trainer.sheetsTitle" | t }}
+        </h2>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.presented" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">153</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.validated" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">121</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.rework" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">18</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.trainer.kpi.sessions" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">42</p>
+          </div>
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.trainer.followUpTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-3">
+          <div
+            class="rounded-[14px] bg-[#d8f8df] px-4 py-3 text-[13px] font-medium text-[#157e38]"
+          >
+            4 {{ "statistics.trainer.goodProgress" | t }}
+          </div>
+          <div
+            class="rounded-[14px] bg-[#fff0c9] px-4 py-3 text-[13px] font-medium text-[#7c5914]"
+          >
+            1 {{ "statistics.trainer.watch" | t }}
+          </div>
+          <div
+            class="rounded-[14px] bg-[#ffe1df] px-4 py-3 text-[13px] font-medium text-[#c52222]"
+          >
+            1 {{ "statistics.trainer.late" | t }}
+          </div>
+        </div>
+      </article>
+    </div>
+  } @else if (isSecretariat()) {
+    <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.attendance" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">96 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+          ><i class="ph ph-calendar-check text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.completedHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">9475 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-clock text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.catchupHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">102 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#7c5914]"
+          ><i class="ph ph-wave-sine text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.secretariat.kpi.toRegularize" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">5</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#ffe1df] text-[#c52222]"
+          ><i class="ph ph-warning text-[20px]"></i
+        ></span>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.secretariat.promotionsTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-6">
+          @for (promotion of centerPromotions; track promotion.id) {
+            <div>
+              <div class="flex justify-between text-[13px] font-bold">
+                <span>{{ promotion.name }}</span
+                ><span>{{ promotion.attendance }} %</span>
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="promotion.attendance"
+                heightClass="h-[10px]"
+              />
+              <p class="mt-2 text-[12px] text-[#768295]">
+                {{ promotion.completedHours }} h ·
+                {{ promotion.catchupHours }} h
+                {{ "statistics.secretariat.catchupShort" | t }}
+              </p>
+            </div>
+          }
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.secretariat.prioritiesTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-3">
+          @for (item of secretariatPriorities; track item.name) {
+            <div
+              class="flex items-center justify-between rounded-[14px] bg-[#f1f4f8] px-4 py-3"
+            >
+              <div>
+                <p class="text-[13px] font-semibold">{{ item.name }}</p>
+                <p class="text-[11px] text-[#768295]">
+                  {{ item.detailKey | t }}
+                </p>
+              </div>
+              <span
+                class="rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-bold text-[#8b5e00]"
+                >{{ item.value }}</span
+              >
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.sheets.title" | t }}
+        </h2>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.prepared" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">540</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.presented" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">365</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.validated" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">325</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.rework" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">67</p>
+          </div>
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.statuses.title" | t }}
+        </h2>
+        <div class="mt-4 space-y-3">
+          @for (item of centerStatuses; track item.key) {
+            <div
+              class="flex items-center gap-3 rounded-[15px] bg-[#f1f4f8] px-3 py-3"
+            >
+              <span
+                [class]="
+                  'shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                  statusClasses(item.key)
+                "
+                >{{ "statistics.statuses." + item.key | t }}</span
+              ><app-progress-bar
+                class="block flex-1"
+                [value]="item.value"
+                heightClass="h-[9px]"
+              /><span class="w-5 text-right text-[13px] font-bold">{{
+                item.count
+              }}</span>
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+  } @else {
+    <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.student.kpi.progress" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">72 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-trend-up text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.attendance" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">97 %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+          ><i class="ph ph-calendar-check text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.completedHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">684 / 910 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e5f2ff] text-[#245c97]"
+          ><i class="ph ph-clock text-[20px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "statistics.kpi.catchupHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">4 h</p>
+        <span
+          class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#7c5914]"
+          ><i class="ph ph-wave-sine text-[20px]"></i
+        ></span>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.student.competenciesTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-5">
+          @for (item of studentCompetencies; track item.code) {
+            <div>
+              <div class="flex justify-between text-[13px]">
+                <span class="font-semibold"
+                  >{{ item.code }} — {{ item.labelKey | t }}</span
+                ><span class="font-bold text-[#2a64a2]"
+                  >{{ item.value }} %</span
+                >
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="item.value"
+                heightClass="h-[9px]"
+              />
+            </div>
+          }
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.student.sheetsTitle" | t }}
+        </h2>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.prepared" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">37 / 58</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.presented" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">24</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.validated" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">32</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[12px] text-[#6c788b]">
+              {{ "statistics.sheets.rework" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold">6</p>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.student.hoursTitle" | t }}
+        </h2>
+        <div class="mt-4 space-y-4">
+          @for (
+            h of [
+              { k: "classroom", v: 421, p: 62 },
+              { k: "driving", v: 126, p: 18 },
+              { k: "internship", v: 137, p: 20 },
+            ];
+            track h.k
+          ) {
+            <div>
+              <div class="flex justify-between text-[13px]">
+                <span>{{ "statistics.student.hours." + h.k | t }}</span
+                ><span class="font-bold">{{ h.v }} h</span>
+              </div>
+              <app-progress-bar
+                class="mt-2 block"
+                [value]="h.p"
+                heightClass="h-[9px]"
+              />
+            </div>
+          }
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "statistics.student.attendanceTitle" | t }}
+        </h2>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-[15px] bg-[#d8f8df] p-4">
+            <p class="text-[12px] text-[#157e38]">
+              {{ "statistics.student.attendance.present" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold text-[#157e38]">96 %</p>
+          </div>
+          <div class="rounded-[15px] bg-[#fff0c9] p-4">
+            <p class="text-[12px] text-[#7c5914]">
+              {{ "statistics.student.attendance.late" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold text-[#7c5914]">2</p>
+          </div>
+          <div class="rounded-[15px] bg-[#ffe1df] p-4">
+            <p class="text-[12px] text-[#c52222]">
+              {{ "statistics.student.attendance.absent" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold text-[#c52222]">1</p>
+          </div>
+          <div class="rounded-[15px] bg-[#e5f2ff] p-4">
+            <p class="text-[12px] text-[#245c97]">
+              {{ "statistics.student.attendance.excused" | t }}
+            </p>
+            <p class="mt-1 text-[22px] font-extrabold text-[#245c97]">1</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  }
+</section>

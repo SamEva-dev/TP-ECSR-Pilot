@@ -1,0 +1,226 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "success.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[13px] text-[#6c788b]">
+        {{ "success.subtitle" | t }}
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <button
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
+      >
+        <i class="ph ph-file-pdf"></i>{{ "success.export" | t }}</button
+      ><button
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
+      >
+        <i class="ph ph-file-xls"></i>Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+    <article
+      class="relative rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "success.kpi.globalRate" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#2a64a2]">
+        {{ global().rate }} %
+      </p>
+      <span
+        class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+        ><i class="ph ph-trophy text-[19px]"></i
+      ></span>
+    </article>
+    <article
+      class="relative rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "success.kpi.graduated" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold text-[#18a547]">
+        {{ global().graduated }}
+      </p>
+      <span
+        class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#d8f8df] text-[#18a547]"
+        ><i class="ph ph-graduation-cap text-[19px]"></i
+      ></span>
+    </article>
+    <article
+      class="relative rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "success.kpi.presented" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ global().presented }}</p>
+      <span
+        class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#f1f4f8] text-[#64748b]"
+        ><i class="ph ph-users-three text-[19px]"></i
+      ></span>
+    </article>
+    <article
+      class="relative rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "success.kpi.promotions" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ global().promotions }}</p>
+      <span
+        class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#fff0c9] text-[#8b5e00]"
+        ><i class="ph ph-calendar-dots text-[19px]"></i
+      ></span>
+    </article>
+  </div>
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-[.75fr_1.25fr]">
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">{{ "success.evolution.title" | t }}</h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">
+        {{ "success.evolution.subtitle" | t }}
+      </p>
+      <div class="mt-5 space-y-4">
+        @for (item of history; track item.id) {
+          <div>
+            <div class="mb-1.5 flex items-center justify-between text-[12px]">
+              <span class="font-semibold">{{ item.year }}</span
+              ><span class="font-extrabold text-[#2a64a2]"
+                >{{ item.rate }} %</span
+              >
+            </div>
+            <app-progress-bar [value]="item.rate" heightClass="h-[10px]" />
+          </div>
+        }
+      </div>
+    </article>
+
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "success.byPromotion.title" | t }}
+      </h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">
+        {{ "success.byPromotion.subtitle" | t }}
+      </p>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-left text-[12px]">
+          <thead>
+            <tr
+              class="border-b border-[#e1e7ee] text-[10px] uppercase text-[#718096]"
+            >
+              <th class="pb-2 pr-4">{{ "success.table.promotion" | t }}</th>
+              <th class="pb-2 pr-4">{{ "success.table.presented" | t }}</th>
+              <th class="pb-2 pr-4">{{ "success.table.graduated" | t }}</th>
+              <th class="pb-2 pr-4">{{ "success.table.partial" | t }}</th>
+              <th class="pb-2 pr-4">{{ "success.table.failed" | t }}</th>
+              <th class="pb-2 pr-4">{{ "success.table.rate" | t }}</th>
+              <th class="pb-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of history; track item.id) {
+              <tr class="border-b border-[#edf1f5] last:border-0">
+                <td class="py-3 pr-4 font-bold">{{ item.promotionName }}</td>
+                <td class="py-3 pr-4">{{ item.presented }}</td>
+                <td class="py-3 pr-4 font-semibold text-[#18a547]">
+                  {{ item.graduated }}
+                </td>
+                <td class="py-3 pr-4 text-[#8b5e00]">{{ item.partial }}</td>
+                <td class="py-3 pr-4 text-[#f22b2b]">{{ item.failed }}</td>
+                <td class="py-3 pr-4 font-extrabold text-[#2a64a2]">
+                  {{ item.rate }} %
+                </td>
+                <td class="py-3 text-right">
+                  <a
+                    [routerLink]="['/reussites', item.id]"
+                    class="inline-flex h-[31px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
+                    >{{ "success.details" | t }}</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  @if (selected(); as item) {
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div>
+          <p class="text-[10.5px] font-semibold uppercase text-[#2a64a2]">
+            {{ "success.detail.title" | t }}
+          </p>
+          <h2 class="mt-1 text-[18px] font-extrabold">
+            {{ item.promotionName }}
+          </h2>
+        </div>
+        <a
+          routerLink="/reussites"
+          class="inline-flex h-[34px] items-center gap-2 rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
+          ><i class="ph ph-x"></i>{{ "success.detail.close" | t }}</a
+        >
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-6">
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">
+            {{ "success.table.presented" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold">{{ item.presented }}</p>
+        </div>
+        <div class="rounded-[14px] bg-[#e9f9ed] p-3">
+          <p class="text-[10px] text-[#4c7e5a]">
+            {{ "success.table.graduated" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold text-[#18a547]">
+            {{ item.graduated }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#fff8e8] p-3">
+          <p class="text-[10px] text-[#846522]">
+            {{ "success.table.partial" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold text-[#8b5e00]">
+            {{ item.partial }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#fff1f0] p-3">
+          <p class="text-[10px] text-[#9b5652]">
+            {{ "success.table.failed" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold text-[#f22b2b]">
+            {{ item.failed }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">
+            {{ "success.detail.absent" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold">{{ item.absent }}</p>
+        </div>
+        <div class="rounded-[14px] bg-[#e5f2ff] p-3">
+          <p class="text-[10px] text-[#5b7491]">
+            {{ "success.table.rate" | t }}
+          </p>
+          <p class="mt-1 text-[19px] font-extrabold text-[#2a64a2]">
+            {{ item.rate }} %
+          </p>
+        </div>
+      </div>
+      <p class="mt-4 text-[11px] text-[#7b8798]">
+        {{ "success.detail.definition" | t }}
+      </p>
+    </article>
+  }
+</section>

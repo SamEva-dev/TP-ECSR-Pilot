@@ -1,0 +1,237 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "reports.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+        {{ "reports.subtitle" | t }}
+      </p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"
+      >
+        <i class="ph ph-file-pdf text-[16px]"></i>{{ "reports.exportPdf" | t }}
+      </button>
+      <button
+        type="button"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#dbe3eb] bg-white px-4 text-[13px] font-semibold text-[#26364a] shadow-sm"
+      >
+        <i class="ph ph-table text-[16px]"></i>{{ "reports.exportExcel" | t }}
+      </button>
+      <button
+        type="button"
+        (click)="print()"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#dbe3eb] bg-white px-4 text-[13px] font-semibold text-[#26364a] shadow-sm"
+      >
+        <i class="ph ph-printer text-[16px]"></i>{{ "reports.print" | t }}
+      </button>
+    </div>
+  </div>
+
+  <article
+    class="mt-6 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+  >
+    <h2 class="text-[16px] font-bold">{{ "reports.parameters" | t }}</h2>
+    <div class="mt-4 flex flex-wrap gap-2">
+      @for (type of reportTypes; track type.key) {
+        <button
+          type="button"
+          (click)="selectReport(type.key)"
+          [class]="
+            selectedReport() === type.key
+              ? 'rounded-full bg-[#2b66a4] px-4 py-2 text-[12px] font-semibold text-white'
+              : 'rounded-full border border-[#dbe3eb] bg-white px-4 py-2 text-[12px] font-medium text-[#26364a] transition hover:bg-[#f4f7fa]'
+          "
+        >
+          {{ type.labelKey | t }}
+        </button>
+      }
+    </div>
+
+    <div class="relative mt-3 w-full max-w-[205px]">
+      <select
+        [value]="promotionId()"
+        (change)="updatePromotion($event)"
+        class="h-[39px] w-full appearance-none rounded-[11px] border border-[#dbe3eb] bg-white pl-3 pr-9 text-[13px] text-[#475569] outline-none shadow-sm"
+      >
+        @for (promotion of promotions; track promotion.id) {
+          <option [value]="promotion.id">{{ promotion.name }}</option>
+        }
+      </select>
+      <i
+        class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#6b7788]"
+      ></i>
+    </div>
+  </article>
+
+  <article
+    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+  >
+    <div
+      class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"
+    >
+      <div>
+        <h2 class="text-[16px] font-bold">{{ reportTitleKey() | t }}</h2>
+        <p class="text-[13px] text-[#768295]">
+          {{
+            promotionId() === "p1" ? "TP ECSR 2026–2027" : "TP ECSR 2025–2026"
+          }}
+        </p>
+      </div>
+      @if (selectedReport() !== "individual") {
+        <div class="flex flex-wrap gap-2 pt-2 sm:pt-0">
+          <span
+            class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[11px] font-semibold text-[#245c97]"
+            >{{
+              "reports.summary.students" | t: { count: students().length }
+            }}</span
+          >
+          <span
+            class="rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]"
+            >{{
+              "reports.summary.catchup" | t: { hours: totalCatchupHours() }
+            }}</span
+          >
+          <span
+            class="rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]"
+            >{{
+              "reports.summary.average" | t: { value: averageProgress() }
+            }}</span
+          >
+        </div>
+      }
+    </div>
+
+    @if (selectedReport() === "individual") {
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-[900px] w-full text-left text-[13px]">
+          <thead>
+            <tr
+              class="border-b border-[#e0e6ed] text-[10.5px] uppercase text-[#687589]"
+            >
+              <th class="pb-2 pr-4">{{ "reports.table.student" | t }}</th>
+              <th class="pb-2 pr-4">{{ "reports.table.progress" | t }}</th>
+              <th class="pb-2 pr-4">{{ "reports.table.hours" | t }}</th>
+              <th class="pb-2 pr-4">{{ "reports.table.catchup" | t }}</th>
+              <th class="pb-2 pr-4">{{ "reports.table.sheets" | t }}</th>
+              <th class="pb-2">{{ "reports.table.status" | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of students(); track student.id) {
+              <tr class="border-b border-[#edf1f5] last:border-0">
+                <td class="py-3 pr-4 font-semibold text-[#26364a]">
+                  {{ student.firstName }} {{ student.lastName }}
+                </td>
+                <td class="py-3 pr-4">
+                  <div class="flex min-w-[145px] items-center gap-2">
+                    <app-progress-bar
+                      class="block w-[82px]"
+                      [value]="student.progress"
+                      heightClass="h-[8px]"
+                    />
+                    <span>{{ student.progress }} %</span>
+                  </div>
+                </td>
+                <td class="py-3 pr-4">{{ student.completedHours }} / 910 h</td>
+                <td class="py-3 pr-4">{{ student.catchupHours }} h</td>
+                <td class="py-3 pr-4">{{ student.validatedSheets }}/58</td>
+                <td class="py-3">
+                  <app-status-pill [status]="student.status" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="mt-5 grid gap-4 md:grid-cols-3">
+        <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+          <p class="text-[11px] uppercase text-[#6c788b]">
+            {{ "reports.summary.completedHours" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold text-[#172033]">
+            {{ totalCompletedHours() }} h
+          </p>
+        </div>
+        <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+          <p class="text-[11px] uppercase text-[#6c788b]">
+            {{ "reports.summary.catchupHours" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold text-[#172033]">
+            {{ totalCatchupHours() }} h
+          </p>
+        </div>
+        <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+          <p class="text-[11px] uppercase text-[#6c788b]">
+            {{ "reports.summary.averageProgress" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold text-[#172033]">
+            {{ averageProgress() }} %
+          </p>
+        </div>
+      </div>
+      <div
+        class="mt-4 rounded-[15px] border border-dashed border-[#d5dde7] bg-[#fbfcfe] px-5 py-9 text-center text-[13px] text-[#768295]"
+      >
+        {{ "reports.dynamicHint" | t }}
+      </div>
+    }
+  </article>
+
+  @if (canSeeAudit()) {
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">{{ "reports.audit.title" | t }}</h2>
+      <p class="mt-0.5 text-[13px] text-[#768295]">
+        {{ "reports.audit.subtitle" | t }}
+      </p>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-[1000px] w-full text-left text-[12.5px]">
+          <thead>
+            <tr
+              class="border-b border-[#e0e6ed] text-[10.5px] uppercase text-[#687589]"
+            >
+              <th class="pb-2 pr-4">{{ "reports.audit.columns.date" | t }}</th>
+              <th class="pb-2 pr-4">
+                {{ "reports.audit.columns.author" | t }}
+              </th>
+              <th class="pb-2 pr-4">
+                {{ "reports.audit.columns.action" | t }}
+              </th>
+              <th class="pb-2 pr-4">
+                {{ "reports.audit.columns.oldValue" | t }}
+              </th>
+              <th class="pb-2 pr-4">
+                {{ "reports.audit.columns.newValue" | t }}
+              </th>
+              <th class="pb-2">{{ "reports.audit.columns.reason" | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of auditLog; track item.id) {
+              <tr class="border-b border-[#edf1f5] last:border-0">
+                <td class="py-3 pr-4 whitespace-nowrap">{{ item.dateTime }}</td>
+                <td class="py-3 pr-4">{{ item.author }}</td>
+                <td class="py-3 pr-4 font-medium text-[#26364a]">
+                  {{ item.actionKey | t }}
+                </td>
+                <td class="py-3 pr-4 text-[#768295]">{{ item.oldValue }}</td>
+                <td class="py-3 pr-4 font-medium text-[#22a84b]">
+                  {{ item.newValue }}
+                </td>
+                <td class="py-3 text-[#768295]">{{ item.reasonKey | t }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  }
+</section>

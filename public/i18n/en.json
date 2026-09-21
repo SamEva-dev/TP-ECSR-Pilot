@@ -1,0 +1,1900 @@
+{
+  "brand": {
+    "name": "TP ECSR Pilot",
+    "tagline": "ECSR learning progress, made simple.",
+    "description": "No more paper sheets, binders or spreadsheet hour calculations. Track every trainee's progress in one place.",
+    "centre": "ECSR Grand Ouest Training Centre — Nantes"
+  },
+  "benefits": {
+    "hours": "Completed, remaining and make-up hours calculated automatically",
+    "progress": "Progress tracking by competency and teaching sheet",
+    "driving": "Driving observations available before every session",
+    "audit": "Complete modification history"
+  },
+  "auth": {
+    "subtitle": "Sign in to your workspace",
+    "welcome": "Welcome",
+    "demoHelp": "Use the demo account to test the application",
+    "email": "Email",
+    "emailPlaceholder": "email@example.com",
+    "continue": "Continue",
+    "or": "or",
+    "noAccount": "No account?",
+    "createAccount": "Create an account",
+    "demoEnabled": "Demo mode enabled",
+    "organisation": "Organisation",
+    "organisationPlaceholder": "Your organisation name",
+    "firstName": "First name",
+    "firstNamePlaceholder": "First name",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Last name",
+    "phone": "Phone",
+    "phonePlaceholder": "+33 6 12 34 56 78",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "alreadyAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "errors": {
+      "emailRequired": "Enter a valid email address.",
+      "required": "This field is required.",
+      "passwordMin": "Password must contain at least 8 characters.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "home": {
+    "greeting": "Hello {{name}}",
+    "direction": {
+      "selectedPromotion": "Selected cohort: {{promotion}} · {{start}} → {{end}}",
+      "exportReport": "Export a report",
+      "newSession": "New session",
+      "kpi": {
+        "students": "Trainees",
+        "trainers": "Trainers",
+        "attendance": "Attendance rate",
+        "completedHours": "Completed hours",
+        "catchupHours": "Hours to catch up",
+        "averageProgress": "Average progress"
+      },
+      "progress": {
+        "title": "Cohort progress",
+        "subtitle": "Average individual progress"
+      },
+      "hours": {
+        "title": "Hours",
+        "subtitle": "Whole cohort, all categories",
+        "planned": "Planned hours",
+        "completed": "Completed hours",
+        "remaining": "Remaining hours",
+        "catchup": "Hours to catch up",
+        "volumeDone": "{{value}}% of planned hours completed"
+      },
+      "alerts": {
+        "title": "Alerts",
+        "subtitle": "To handle this week",
+        "over10": {
+          "title": "3 trainees have more than 10 catch-up hours",
+          "detail": "Julie Moreau (14 h), Thomas Roussel (18 h), Léa Perrin (12 h)"
+        },
+        "noEvaluation": {
+          "title": "2 trainees have not been assessed for over 15 days",
+          "detail": "Thomas Roussel, Sarah Colin"
+        },
+        "sheetsDelay": {
+          "title": "4 trainees are behind on their sheets",
+          "detail": "Fewer than 25 sheets prepared by 21 September"
+        },
+        "unjustified": {
+          "title": "1 unjustified absence",
+          "detail": "Thomas Roussel — session on 18 September"
+        },
+        "internship": {
+          "title": "1 internship agreement to sign",
+          "detail": "Drive Académie — Thomas Roussel"
+        }
+      },
+      "watch": {
+        "title": "Trainees to watch",
+        "subtitle": "Sorted by catch-up hours",
+        "allStudents": "All trainees",
+        "name": "Name",
+        "progress": "Progress",
+        "completedHours": "Completed hours",
+        "catchup": "Catch-up",
+        "sheets": "Sheets",
+        "status": "Status"
+      }
+    },
+    "trainer": {
+      "todaySubtitle": "Monday 21 September 2026 · 5 sessions today",
+      "actions": {
+        "newSession": "New session",
+        "attendance": "Take attendance",
+        "evaluateDriving": "Assess driving",
+        "evaluateSheet": "Assess a sheet",
+        "addObservation": "Add observation"
+      },
+      "mySessions": "My sessions today",
+      "lastObservations": "Latest observations",
+      "beforeNextSession": "Before your next session",
+      "myStudents": "My students",
+      "studentSummary": "{{progress}}% · {{hours}} h completed · {{catchup}} h catch-up",
+      "agenda": {
+        "virages": "Bends and gradients",
+        "highway": "Motorway merging",
+        "intersections": "Intersections",
+        "sheet12": "Sheet 12 presentation",
+        "catchupSigns": "Road signs catch-up"
+      }
+    },
+    "observations": {
+      "virages": {
+        "subject": "Taking bends and driving on gradients",
+        "positive": "Good speed adaptation when approaching bends.",
+        "workOn": "Looking too close on bend exit.",
+        "nextGoal": "Improve gaze on bend exit."
+      },
+      "highway": {
+        "subject": "Merging and driving on expressways",
+        "positive": "Merging speed consistent with traffic.",
+        "workOn": "Mirror checks are too late.",
+        "nextGoal": "Anticipate checks before merging."
+      },
+      "lesson": {
+        "subject": "Deliver a driving lesson",
+        "positive": "Clear and progressive instructions.",
+        "workOn": "Too much information at once.",
+        "nextGoal": "Work on bends and gradients."
+      }
+    },
+    "student": {
+      "subtitle": "TP ECSR 2026–2027 · scheduled end 30/06/2027",
+      "kpi": {
+        "progress": "Overall progress",
+        "hours": "Completed hours",
+        "catchup": "Hours to catch up",
+        "validatedSheets": "Validated sheets"
+      },
+      "progress": {
+        "title": "My progress"
+      },
+      "nextSession": {
+        "title": "Next session",
+        "firstDate": "Monday 21 September · 08:00 – 12:00",
+        "firstTitle": "Intersections and priorities",
+        "firstMeta": "Yanis Morel · Room 2",
+        "secondDate": "Tuesday 22 September · 14:00",
+        "secondTitle": "Driving session — gaze on bend exit",
+        "secondMeta": "Marc Dupont · Clio 5",
+        "seePlanning": "View my schedule"
+      },
+      "observations": {
+        "title": "Latest observations",
+        "subtitle": "Feedback from your trainers"
+      },
+      "timeline": {
+        "title": "My recent journey",
+        "subtitle": "Sessions, absences and presentations",
+        "18sep": "18 September",
+        "19sep": "19 September",
+        "20sep": "20 September",
+        "21sep": "21 September",
+        "sheet32": "Sheet 32 presentation",
+        "virages": "Bends and gradients",
+        "absence": "Absence",
+        "catchup7": "7 hours to catch up",
+        "driving": "Driving session",
+        "drivingDetail": "Bends and gradients — gaze to improve",
+        "classroom": "Classroom session",
+        "classroomDetail": "Intersections and priorities",
+        "fullFile": "View my full record"
+      }
+    }
+  },
+  "common": {
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "searchPlaceholder": "Search for a trainee, sheet or document…",
+    "promotion": "Cohort",
+    "open": "Open",
+    "positive": "Positive",
+    "toWorkOn": "To improve",
+    "nextGoal": "Next goal",
+    "nextScreenPlaceholder": "This screen will be migrated faithfully in the next step.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "roles": {
+      "direction": "Management / Pedagogical lead",
+      "formateur": "Trainer",
+      "stagiaire": "Trainee",
+      "secretariat": "Administration",
+      "jury": "Jury member"
+    },
+    "studentStatus": {
+      "good": "On track",
+      "warning": "Attention",
+      "late": "Behind"
+    },
+    "sessionType": {
+      "driving": "Driving",
+      "classroom": "Classroom",
+      "presentation": "Presentation",
+      "catchup": "Catch-up"
+    },
+    "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "planning": "Schedule",
+    "students": "Trainees",
+    "promotions": "Cohorts",
+    "sessions": "Sessions",
+    "driving": "Driving",
+    "sheets": "Sheets / Presentations",
+    "skills": "Skills",
+    "attendance": "Attendance",
+    "internships": "Internships",
+    "documents": "Documents",
+    "reports": "Reports",
+    "statistics": "Statistics",
+    "access": "Access management",
+    "admin": "Administration",
+    "certification": "Certification",
+    "jurySpace": "Jury space",
+    "results": "Results",
+    "success": "Success rates"
+  },
+  "students": {
+    "title": "Students",
+    "resultCount": "{{displayed}} student(s) shown out of {{total}}",
+    "add": "Add a student",
+    "filters": {
+      "title": "Filters",
+      "search": "Search",
+      "searchPlaceholder": "Search by name",
+      "promotion": "Cohort",
+      "allPromotions": "All cohorts",
+      "status": "Status",
+      "allStatuses": "All statuses"
+    },
+    "status": {
+      "good": "On track",
+      "warning": "Attention",
+      "late": "Behind"
+    },
+    "card": {
+      "progress": "Progress",
+      "completed": "Completed",
+      "catchup": "Catch-up",
+      "sheets": "Sheets: {{prepared}} prepared · {{presented}} presented · {{validated}} validated"
+    },
+    "empty": {
+      "title": "No students found",
+      "subtitle": "Change your filters to display other results."
+    },
+    "drawer": {
+      "title": "Add a student",
+      "subtitle": "Create the learning record and assign it to a cohort.",
+      "close": "Close panel",
+      "identity": {
+        "title": "Student information",
+        "firstName": "First name",
+        "firstNamePlaceholder": "e.g. Alexander",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "e.g. Martin",
+        "email": "Email",
+        "emailPlaceholder": "first.last@example.com",
+        "phone": "Phone",
+        "phonePlaceholder": "+33 6 12 34 56 78",
+        "birthDate": "Date of birth"
+      },
+      "training": {
+        "title": "Training assignment",
+        "promotion": "Cohort",
+        "startDate": "Training start date",
+        "initialStateTitle": "Record initialized automatically",
+        "initialStateHelp": "The new student starts at 0 h, 0 sheets and 0% progress. Counters will then evolve with sessions, attendance, internships and assessments."
+      },
+      "access": {
+        "sendInvitation": "Send an access invitation",
+        "sendInvitationHelp": "An invitation can be sent to this email address once the backend and authentication are connected."
+      },
+      "requiredHint": "* Required fields",
+      "cancel": "Cancel",
+      "submit": "Add student",
+      "created": "{{name}} has been added to the list.",
+      "errors": {
+        "required": "This field is required.",
+        "email": "Enter a valid email address."
+      }
+    }
+  },
+  "planning": {
+    "title": "Schedule",
+    "subtitle": "Week of 21 to 25 September 2026",
+    "add": "Add to schedule",
+    "filters": {
+      "title": "Filters",
+      "promotion": "Promotion",
+      "allPromotions": "All promotions",
+      "type": "Type",
+      "allTypes": "All types"
+    },
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "days": {
+      "monday": "Monday 21 September",
+      "tuesday": "Tuesday 22 September",
+      "wednesday": "Wednesday 23 September",
+      "thursday": "Thursday 24 September",
+      "friday": "Friday 25 September"
+    },
+    "types": {
+      "classroom": "Classroom",
+      "driving": "Driving",
+      "evaluation": "Assessment",
+      "internship": "Internship",
+      "presentation": "Presentation",
+      "catchup": "Catch-up",
+      "sensitization": "Awareness",
+      "event": "Event"
+    },
+    "events": {
+      "intersections": "Intersections and priorities",
+      "bends": "Driving — bends and gradients",
+      "sheets30to34": "Presentations: sheets 30 to 34",
+      "questioningMethod": "Questioning method",
+      "c2Evaluation": "Intermediate C2 assessment",
+      "roadRiskAwareness": "Road risk awareness",
+      "motorwayMerging": "Driving — motorway merging",
+      "signsCatchup": "Catch-up — road signs",
+      "companyInternship": "Company internship",
+      "educationalCouncil": "Educational council"
+    },
+    "people": {
+      "samFokam": "Sam Fokam",
+      "julieMoreau": "Julie Moreau",
+      "karimBenali": "Karim Benali"
+    },
+    "programmed": {
+      "classroomTitle": "Scheduled classroom sessions",
+      "drivingTitle": "Scheduled driving sessions"
+    },
+    "emptyDay": "No session matches these filters."
+  },
+  "promotions": {
+    "title": "Cohorts",
+    "subtitle": "TP ECSR Pilot Grand Ouest Training Centre — Nantes",
+    "create": "Create a cohort",
+    "manager": "Manager",
+    "studentCount": "{{count}} trainees",
+    "metrics": {
+      "planned": "Planned hours",
+      "completed": "Completed hours",
+      "remaining": "Remaining hours",
+      "catchup": "Catch-up",
+      "attendance": "Attendance rate"
+    },
+    "averageProgress": "Average progress",
+    "status": {
+      "good": "Good progress",
+      "warning": "Attention",
+      "late": "Behind"
+    },
+    "team": {
+      "title": "Teaching team",
+      "weeklyHours": "{{hours}} h / week",
+      "specialties": {
+        "drivingC3": "Driving · Skill C3",
+        "pedagogyPresentations": "Teaching · Presentations",
+        "regulationClassroom": "Regulations · Classroom",
+        "drivingAssessments": "Driving · Assessments",
+        "awarenessInternships": "Awareness · Internships"
+      }
+    },
+    "drawer": {
+      "title": "Create a cohort",
+      "subtitle": "Add a new TP ECSR cohort to the training centre",
+      "close": "Close panel",
+      "general": {
+        "title": "General information",
+        "name": "Cohort name",
+        "namePlaceholder": "E.g. TP ECSR 2027–2028",
+        "manager": "Pedagogical manager"
+      },
+      "schedule": {
+        "title": "Dates and planned hours",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "plannedHours": "Planned training hours"
+      },
+      "initialState": {
+        "title": "Automatic initialization",
+        "help": "The cohort will be created empty. Metrics will update automatically as trainees, sessions and attendance are linked to it.",
+        "students": "0 trainees",
+        "progress": "0% progress",
+        "hours": "0 h completed"
+      },
+      "emptyPromotion": "No trainee has been assigned to this cohort yet.",
+      "requiredHint": "* Required fields",
+      "cancel": "Cancel",
+      "submit": "Create cohort",
+      "created": "The {{name}} cohort has been created.",
+      "errors": {
+        "required": "This field is required.",
+        "dateOrder": "The end date must be after the start date.",
+        "hours": "Planned hours must be greater than 0."
+      }
+    },
+    "exam": {
+      "finalResults": "Certification results",
+      "presented": "presented",
+      "graduated": "graduated",
+      "partial": "partial",
+      "failed": "not obtained",
+      "successRate": "Success rate",
+      "details": "View results",
+      "upcoming": "Upcoming final exam",
+      "scheduled": "Scheduled session: {{date}}",
+      "ready": "{{ready}} / {{total}} files ready",
+      "prepare": "Prepare certification"
+    }
+  },
+  "sessions": {
+    "title": "Sessions",
+    "subtitle": "Classroom sessions, presentations, assessments and catch-up sessions",
+    "types": {
+      "classroom": "Classroom",
+      "presentation": "Presentation",
+      "evaluation": "Assessment",
+      "sensitization": "Awareness",
+      "catchup": "Catch-up",
+      "event": "Event"
+    },
+    "form": {
+      "title": "New teaching session",
+      "subtitle": "Short form: the essentials in 8 fields",
+      "date": "Date",
+      "start": "Start",
+      "end": "End",
+      "trainer": "Trainer",
+      "promotion": "Cohort",
+      "type": "Session type",
+      "theme": "Topic",
+      "themePlaceholder": "e.g. Intersections and right of way",
+      "objectives": "Learning objectives",
+      "objectivesPlaceholder": "What trainees should be able to do…",
+      "supports": "Materials used",
+      "supportsPlaceholder": "Slides, model…",
+      "comments": "Comments",
+      "create": "Create session",
+      "createAndAttendance": "Create and take attendance"
+    },
+    "programmed": {
+      "title": "Scheduled sessions",
+      "subtitle": "Click a session to manage attendance",
+      "supports": "Materials",
+      "noSupports": "No materials",
+      "attendance": "{{present}}/{{expected}} present",
+      "attendanceButton": "Attendance",
+      "items": {
+        "intersections": {
+          "title": "Intersections and right of way",
+          "objective": "Identify priority rules and build a teaching progression.",
+          "supports": "Slides, road model, REMC sheets"
+        },
+        "sheets30to34": {
+          "title": "Presentations of sheets 30 to 34",
+          "objective": "Assess structure, facilitation and time management.",
+          "supports": "Whiteboard, assessment grid"
+        },
+        "questioningMethod": {
+          "title": "The questioning method",
+          "objective": "Master open questioning in group facilitation.",
+          "supports": "Role play, videos"
+        },
+        "c2Evaluation": {
+          "title": "Intermediate C2 competency assessment",
+          "objective": "Check learning outcomes in theoretical facilitation.",
+          "supports": "National assessment grid"
+        },
+        "roadRisk": {
+          "title": "Road risk awareness",
+          "objective": "Prepare a road-safety awareness action in a company.",
+          "supports": "Accident cases, ONISR statistics"
+        },
+        "signsCatchup": {
+          "title": "Catch-up — road signs",
+          "objective": "Review content missed on 18 and 19 September.",
+          "supports": "Summary sheets"
+        }
+      }
+    }
+  },
+  "sheets": {
+    "title": "Sheets / Presentations",
+    "subtitle": "{{student}} · 58 reference sheets",
+    "evaluate": "Assess a presentation",
+    "kpi": {
+      "prepared": "Prepared",
+      "presented": "Presented",
+      "validated": "Validated",
+      "rework": "To rework"
+    },
+    "progress": {
+      "title": "Progress"
+    },
+    "status": {
+      "not_started": "Not started",
+      "in_progress": "In preparation",
+      "ready": "Ready",
+      "presented": "Presented",
+      "validated": "Validated",
+      "rework": "To rework"
+    },
+    "list": {
+      "title": "Sheet list"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Number or title",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "student": "Student"
+    },
+    "table": {
+      "number": "No.",
+      "title": "Title",
+      "prepared": "Prepared",
+      "presented": "Presented",
+      "duration": "Duration",
+      "evaluator": "Evaluator",
+      "status": "Status"
+    },
+    "comments": {
+      "validated": "Good delivery; questioning method used effectively.",
+      "rework": "Structure needs review: introduction too long, RIP incomplete."
+    },
+    "empty": {
+      "title": "No sheets found",
+      "subtitle": "Change the filters to display other sheets."
+    },
+    "evaluation": {
+      "title": "Presentation assessment",
+      "sheet": "Sheet",
+      "duration": "Presentation duration",
+      "commentPlaceholder": "Evaluator's comments…",
+      "save": "Save assessment",
+      "saved": "Assessment saved in demo mode.",
+      "level": {
+        "acquired": "Acquired",
+        "in_progress": "In progress",
+        "review": "Review"
+      },
+      "criteria": {
+        "structure": "Structure",
+        "introduction": "Introduction",
+        "hook": "Opening hook",
+        "objectives": "Objectives",
+        "content": "Content",
+        "regulation": "Regulations",
+        "questioningMethod": "Questioning method",
+        "animation": "Facilitation",
+        "timeManagement": "Time management",
+        "rip": "RIP",
+        "review": "Review"
+      },
+      "subtitle": "Assess a sheet presentation with a complete rubric and keep a useful pedagogical summary.",
+      "close": "Close panel",
+      "contextTitle": "Assessment context",
+      "student": "Student",
+      "date": "Presentation date",
+      "evaluator": "Assessing trainer",
+      "gridTitle": "Detailed assessment grid",
+      "gridSubtitle": "Rate each criterion according to the level observed during the presentation.",
+      "summary": {
+        "acquired": "acquired",
+        "inProgress": "in progress",
+        "review": "to review"
+      },
+      "synthesisTitle": "Pedagogical summary",
+      "positivePoints": "Positive points",
+      "positivePlaceholder": "E.g. relevant hook, logical progression, good group participation…",
+      "improvements": "Points to improve",
+      "improvementsPlaceholder": "E.g. clarify regulations, incomplete RIP, time management…",
+      "generalComment": "General comment",
+      "nextObjective": "Next objective",
+      "nextObjectivePlaceholder": "E.g. Rework the RIP and reformulate open questions before the next presentation.",
+      "decision": {
+        "title": "Pedagogical decision",
+        "subtitle": "Set the sheet status after the presentation.",
+        "validated": "Sheet validated",
+        "rework": "Needs rework"
+      },
+      "cancel": "Cancel"
+    },
+    "titles": {
+      "verticalSigns": "Vertical road signs",
+      "intersections": "Intersections",
+      "priorities": "Right-of-way rules",
+      "crossingOvertaking": "Passing and overtaking",
+      "speedLimits": "Speed limits",
+      "safetyDistance": "Safe following distance",
+      "trafficLights": "Traffic lights",
+      "parking": "Parking",
+      "motorway": "Motorways",
+      "expressways": "Expressways",
+      "roundabout": "Roundabouts",
+      "reducedVisibility": "Reduced visibility",
+      "braking": "Braking",
+      "tyres": "Tyres",
+      "vehicleLighting": "Vehicle lighting",
+      "alcohol": "Alcohol and driving",
+      "drugs": "Drugs and driving",
+      "fatigueVigilance": "Fatigue and vigilance",
+      "phone": "Mobile phone use while driving",
+      "pointsLicence": "Penalty-points driving licence",
+      "insurance": "Insurance",
+      "accidentStatement": "Accident report form",
+      "firstAid": "First aid",
+      "ecoDriving": "Eco-driving",
+      "seatBelt": "Seat belts",
+      "childRestraints": "Child restraint systems",
+      "sharingRoad": "Sharing the road",
+      "twoWheelers": "Two-wheel vehicles",
+      "heavyVehiclesBlindSpots": "Heavy vehicles and blind spots",
+      "pedestrians": "Pedestrians",
+      "cyclists": "Cyclists",
+      "nightDriving": "Night driving",
+      "bendsGradients": "Bends and gradients",
+      "aquaplaning": "Aquaplaning",
+      "snowDriving": "Driving on snow",
+      "technicalInspection": "Vehicle roadworthiness test",
+      "vehicleDocuments": "Vehicle documents",
+      "vehicleLoading": "Vehicle loading",
+      "towing": "Towing",
+      "accompaniedDriving": "Accompanied driving",
+      "errorPedagogy": "Learning from errors",
+      "questioningMethod": "Questioning method",
+      "learningObjectives": "Learning objectives",
+      "initialAssessment": "Initial assessment",
+      "learningBooklet": "Learning booklet",
+      "remc": "REMC framework",
+      "remcC1": "REMC competency 1",
+      "remcC2": "REMC competency 2",
+      "remcC3": "REMC competency 3",
+      "remcC4": "REMC competency 4",
+      "practicalExam": "Practical exam",
+      "theoryExam": "Theory exam",
+      "drivingAids": "Driver assistance systems",
+      "electricVehicle": "Electric vehicles",
+      "urbanMobility": "Urban mobility",
+      "occupationalRoadRisk": "Occupational road risk",
+      "pedagogicalCommunication": "Pedagogical communication",
+      "endTrainingReview": "End-of-training review"
+    }
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "Pedagogical framework · {{student}}",
+    "studentSelector": "Select a trainee",
+    "level": {
+      "acquired": "Acquired",
+      "in_progress": "In progress",
+      "rework": "To work on"
+    },
+    "definitions": {
+      "C1": {
+        "title": "Support a learner through driving instruction",
+        "criteria": {
+          "prepareIndividual": "Prepare an individual session",
+          "leadDrivingLesson": "Deliver a driving lesson",
+          "assessLearner": "Assess learner outcomes",
+          "learningRecord": "Use the learning record"
+        }
+      },
+      "C2": {
+        "title": "Deliver theoretical training activities",
+        "criteria": {
+          "buildSheet": "Build a teaching sheet",
+          "leadGroup": "Lead a group",
+          "questioningMethod": "Use the questioning method",
+          "timeRip": "Manage time and RIP"
+        }
+      },
+      "C3": {
+        "title": "Master driving and road safety",
+        "criteria": {
+          "bendsGradients": "Take bends and drive on gradients",
+          "expressway": "Merge and drive on expressways",
+          "urban": "Drive in dense urban environments",
+          "ecoDriving": "Drive economically and ecologically"
+        }
+      },
+      "C4": {
+        "title": "Raise awareness of road safety and risks",
+        "criteria": {
+          "awarenessAction": "Run an awareness action",
+          "accident": "Analyse an accident",
+          "roadRisks": "Present road risks",
+          "audience": "Adapt communication to the audience"
+        }
+      }
+    },
+    "linkedSessions": {
+      "title": "Related sessions",
+      "subtitle": "History and objectives worked on",
+      "nextGoal": "Next objective",
+      "empty": "No session recorded for this skill."
+    },
+    "promotion": {
+      "title": "Cohort progress by skill",
+      "student": "Trainee"
+    },
+    "sessions": {
+      "c1": {
+        "subject": "Deliver a driving lesson",
+        "positive": "Clear and progressive instructions.",
+        "workOn": "Too much information at once.",
+        "nextGoal": "Work on bends and gradients."
+      },
+      "c3Sam": {
+        "subject": "Take bends and drive on gradients",
+        "positive": "Good speed adaptation when approaching bends.",
+        "workOn": "Looking too close at bend exit.",
+        "nextGoal": "Improve gaze at bend exit."
+      },
+      "c3Julie": {
+        "subject": "Merge and drive on expressways",
+        "positive": "Merging speed consistent with traffic.",
+        "workOn": "Mirror checks are too late.",
+        "nextGoal": "Anticipate checks before merging."
+      },
+      "c3Karim": {
+        "subject": "Drive in dense urban environments",
+        "positive": "Very good cyclist management.",
+        "workOn": "Anticipation around stopped buses.",
+        "nextGoal": "Eco-driving in town."
+      }
+    }
+  },
+  "drivingSession": {
+    "title": "Driving session",
+    "subtitle": "Interface optimised for smartphone and tablet",
+    "actions": {
+      "validate": "Validate session",
+      "saved": "Session saved",
+      "history": "History"
+    },
+    "lastSession": {
+      "student": "This student's latest session",
+      "mine": "My latest session",
+      "goalReached": "Objective"
+    },
+    "information": {
+      "title": "Session information",
+      "student": "Student",
+      "trainer": "Trainer",
+      "vehicle": "Vehicle",
+      "date": "Date",
+      "start": "Start",
+      "end": "End",
+      "duration": "Duration",
+      "competence": "Competency worked on",
+      "subSkill": "Sub-competency",
+      "objective": "Learning objective"
+    },
+    "competencies": {
+      "c1": {
+        "description": "Support a learner in learning to drive"
+      },
+      "c2": {
+        "description": "Deliver theoretical training activities"
+      },
+      "c3": {
+        "description": "Master driving and road safety"
+      },
+      "c4": {
+        "description": "Raise awareness of road safety and risks"
+      }
+    },
+    "subSkills": {
+      "c1": {
+        "prepare": "Prepare an individual session",
+        "lesson": "Deliver a driving lesson",
+        "assess": "Assess learner outcomes",
+        "booklet": "Use the learning booklet"
+      },
+      "c2": {
+        "sheet": "Build a teaching sheet",
+        "group": "Lead a group",
+        "questioning": "Use the questioning method",
+        "timing": "Manage timing and RIP"
+      },
+      "c3": {
+        "bends": "Take bends and drive on gradients",
+        "expressway": "Merge and drive on expressways",
+        "urban": "Drive in dense urban environments",
+        "eco": "Economic and eco-friendly driving"
+      },
+      "c4": {
+        "awareness": "Run an awareness session",
+        "accident": "Analyse a crash",
+        "risks": "Present road risks",
+        "audience": "Adapt messaging to the audience"
+      }
+    },
+    "evaluation": {
+      "title": "Driving assessment",
+      "subtitle": "Three levels per criterion"
+    },
+    "criteria": {
+      "information": "Information gathering",
+      "speed": "Speed adaptation",
+      "position": "Positioning",
+      "gaze": "Gaze",
+      "anticipation": "Anticipation",
+      "communication": "Communication",
+      "autonomy": "Autonomy",
+      "stress": "Stress management"
+    },
+    "levels": {
+      "acquired": "Acquired",
+      "progress": "In progress",
+      "work": "Needs work"
+    },
+    "observations": {
+      "title": "Trainer observations",
+      "positive": "Positive points",
+      "difficulties": "Observed difficulties",
+      "errors": "Frequent errors",
+      "advice": "Advice",
+      "nextGoal": "Next objective",
+      "free": "Free observation"
+    },
+    "defaults": {
+      "objective": "Improve gaze when exiting bends",
+      "positive": "Good speed adaptation when approaching bends.",
+      "difficulties": "Looking too close when exiting bends.",
+      "errors": "Mirror checks forgotten before overtaking.",
+      "advice": "Fix a distant focal point before the apex.",
+      "nextGoal": "Work on distant gaze and anticipation."
+    },
+    "history": {
+      "title": "Driving session history",
+      "bends": {
+        "subject": "Take bends and drive on gradients",
+        "positive": "Good speed adaptation when approaching bends.",
+        "difficulty": "Looking too close when exiting bends.",
+        "nextGoal": "Improve gaze when exiting bends."
+      },
+      "expressway": {
+        "subject": "Merge and drive on expressways",
+        "positive": "Merging speed consistent with traffic.",
+        "difficulty": "Mirror checks are too late.",
+        "nextGoal": "Anticipate checks before merging."
+      },
+      "lesson": {
+        "subject": "Deliver a driving lesson",
+        "positive": "Clear and progressive instructions.",
+        "difficulty": "Too much information at once.",
+        "nextGoal": "Work on bends and gradients."
+      },
+      "urban": {
+        "subject": "Drive in dense urban environments",
+        "positive": "Very good management of cyclists.",
+        "difficulty": "Anticipation around stopped buses.",
+        "nextGoal": "Eco-driving in the city."
+      }
+    }
+  },
+  "attendance": {
+    "title": "Session attendance",
+    "subtitle": "{{date}} · {{start}}–{{end}} · {{promotion}}",
+    "actions": {
+      "save": "Save attendance",
+      "saveAdministration": "Save attendance records"
+    },
+    "metrics": {
+      "present": "Present",
+      "late": "Late",
+      "absent": "Absent",
+      "missedHours": "Missed hours",
+      "excusedHint": "including 1 excused"
+    },
+    "list": {
+      "title": "Students",
+      "subtitle": "Tap a status and adjust times if needed.",
+      "secretariatSubtitle": "Regularize statuses, times and supporting documents for the session."
+    },
+    "status": {
+      "present": "Present",
+      "late": "Late",
+      "absent": "Absent",
+      "excused": "Excused"
+    },
+    "studentMeta": "{{catchup}} h catch-up · {{absences}} absence(s)",
+    "fields": {
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "actualDuration": "Actual duration",
+      "comment": "Comment",
+      "justification": "Reason / supporting document"
+    },
+    "placeholders": {
+      "comment": "Reason, supporting information…",
+      "justification": "Add the reason or supporting document reference…"
+    },
+    "catchupAdded": "{{hours}} h missed → added to catch-up hours",
+    "saved": "Attendance saved",
+    "studentView": {
+      "title": "My attendance",
+      "subtitle": "View your attendance and hours for this session.",
+      "status": "Status",
+      "completed": "Completed hours",
+      "missed": "Missed hours",
+      "catchup": "Catch-up",
+      "sessionTitle": "Session on 21 September 2026",
+      "readOnlyHint": "Attendance is recorded by your trainer or training centre. Contact administration if something needs correcting."
+    }
+  },
+  "internships": {
+    "title": "Company internships",
+    "subtitle": "{{count}} internship periods tracked",
+    "trainerTitle": "My students’ internships",
+    "trainerSubtitle": "{{count}} internship periods to monitor",
+    "studentTitle": "My company internships",
+    "studentSubtitle": "{{count}} internship period(s) in my programme",
+    "newPeriod": "New internship period",
+    "kpi": {
+      "planned": "Planned hours",
+      "completed": "Completed hours",
+      "remaining": "Remaining hours",
+      "incomplete": "Incomplete internships"
+    },
+    "tutorLine": "Tutor: {{tutor}} · {{start}} → {{end}}",
+    "status": {
+      "completed": "Completed",
+      "incomplete": "Incomplete",
+      "inProgress": "In progress",
+      "planned": "Planned"
+    },
+    "card": {
+      "planned": "Planned hours",
+      "completed": "Completed hours",
+      "remaining": "Remaining",
+      "progress": "Progress"
+    },
+    "activitiesTitle": "Completed activities",
+    "observationsTitle": "Tutor observations and assessment",
+    "activityStatus": {
+      "done": "Done",
+      "pending": "To do"
+    },
+    "activities": {
+      "observeDrivingLessons": "Observation of driving lessons",
+      "leadTheorySession": "Delivery of a theory lesson",
+      "pedagogicalAppointment": "Support during a pedagogical appointment",
+      "lessonPlan": "Preparation of a lesson plan",
+      "studentInitialAssessment": "Welcoming and initial assessment of a learner"
+    },
+    "observations": {
+      "sam": "Very good integration and autonomy on level 2 lessons.",
+      "julie": "Good involvement. Internship goals are partly achieved; several activities still need to be completed.",
+      "karim": "Steady progress and good professional posture. Continue developing autonomous session management.",
+      "notStarted": "The internship has not started yet."
+    },
+    "documents": {
+      "agreement": "Internship agreement",
+      "attendanceCertificate": "Attendance certificate",
+      "finalReport": "Validated internship report"
+    },
+    "drawer": {
+      "title": "New internship period",
+      "subtitle": "Plan the workplace placement and prepare its pedagogical follow-up",
+      "close": "Close form",
+      "student": {
+        "title": "Student",
+        "student": "Student"
+      },
+      "company": {
+        "title": "Host organisation and tutor",
+        "name": "Company / driving school",
+        "namePlaceholder": "E.g. Central Driving School",
+        "city": "City",
+        "cityPlaceholder": "E.g. Nantes",
+        "tutor": "Internship tutor",
+        "tutorPlaceholder": "First name Last name",
+        "email": "Tutor email",
+        "emailPlaceholder": "tutor@company.com",
+        "phone": "Tutor phone",
+        "phonePlaceholder": "+33 6 12 34 56 78"
+      },
+      "period": {
+        "title": "Period and planned hours",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "plannedHours": "Planned hours"
+      },
+      "followup": {
+        "title": "Follow-up and documents",
+        "agreementReceived": "Internship agreement already received",
+        "agreementHelp": "The agreement will be shown as available in the internship document follow-up.",
+        "notes": "Internal notes",
+        "notesPlaceholder": "Specific goals, instructions or useful follow-up information…"
+      },
+      "requiredHint": "* Required fields",
+      "cancel": "Cancel",
+      "submit": "Create period",
+      "errors": {
+        "required": "This field is required.",
+        "email": "Enter a valid email address.",
+        "dateRange": "The end date must be on or after the start date.",
+        "hours": "Planned hours must be between 1 and 1,000 hours."
+      }
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "{{count}} documents in the library",
+    "trainerTitle": "Teaching documents",
+    "trainerSubtitle": "{{count}} documents available for your sessions and assessments",
+    "studentTitle": "My documents",
+    "studentSubtitle": "{{count}} documents available in your space",
+    "import": "Import document",
+    "categoriesTitle": "Categories",
+    "search": "Search for a document",
+    "preview": "Preview",
+    "download": "Download",
+    "empty": "No document matches your filters.",
+    "categories": {
+      "all": "All",
+      "administrative": "Administrative documents",
+      "pedagogical": "Teaching documents",
+      "evaluation": "Assessments",
+      "course": "Course materials",
+      "internship": "Internship agreements",
+      "student": "Student documents"
+    },
+    "details": {
+      "title": "Document details",
+      "close": "Close preview",
+      "preview": "Document preview",
+      "information": "Document information",
+      "fileName": "File name",
+      "category": "Category",
+      "author": "Author",
+      "date": "Date",
+      "addedOn": "Added on",
+      "size": "Size",
+      "version": "Version",
+      "pages": "Pages",
+      "visibility": "Visibility",
+      "student": "Student",
+      "description": "Description",
+      "replace": "Replace file",
+      "delete": "Delete document",
+      "generatedPreview": "Demo preview",
+      "page": "Page {{current}} / {{total}}"
+    },
+    "visibility": {
+      "all": "All users",
+      "staff": "Teaching staff",
+      "student": "Related student"
+    },
+    "descriptions": {
+      "internshipAgreement": "Internship agreement attached to the student record, including the training centre, host company and internship period information.",
+      "remc": "Teaching reference document used to organise and monitor the skills developed during training.",
+      "drivingEvaluation": "Grid used by trainers to structure practical-session assessments and record achievements, areas for attention and next objectives.",
+      "intersections": "Teaching material covering intersections, priority rules and common traffic situations.",
+      "rules": "Internal rules applying to students, trainers and staff of the training centre.",
+      "attendanceCertificate": "Individual certificate summarising the student’s attendance over the relevant period.",
+      "interrogativeMethod": "Methodological material for preparing and delivering teaching sessions using the questioning method.",
+      "internshipAssessment": "Teaching assessment of the workplace placement including completed activities, tutor observations and progress areas."
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Generate a report, then export or print it",
+    "exportPdf": "Export PDF",
+    "exportExcel": "Export Excel",
+    "print": "Print",
+    "parameters": "Report settings",
+    "types": {
+      "individual": "Individual tracking",
+      "hours": "Hours and catch-up",
+      "absences": "Absences",
+      "progress": "Skills and sheets progress",
+      "promotion": "Cohort report",
+      "internship": "Internship report"
+    },
+    "sections": {
+      "individual": {
+        "title": "Individual student tracking"
+      },
+      "hours": {
+        "title": "Hours and catch-up"
+      },
+      "absences": {
+        "title": "Absence tracking"
+      },
+      "progress": {
+        "title": "Skills and sheets progress"
+      },
+      "promotion": {
+        "title": "Cohort report"
+      },
+      "internship": {
+        "title": "Internship report"
+      }
+    },
+    "table": {
+      "student": "Student",
+      "progress": "Progress",
+      "hours": "Completed hours",
+      "catchup": "Catch-up",
+      "sheets": "Sheets",
+      "status": "Status"
+    },
+    "summary": {
+      "students": "{{count}} students",
+      "catchup": "{{hours}} h catch-up",
+      "average": "{{value}}% average progress",
+      "completedHours": "Completed hours",
+      "catchupHours": "Catch-up hours",
+      "averageProgress": "Average progress"
+    },
+    "dynamicHint": "This view will be driven by backend business data. Report type selection is already implemented in the front end.",
+    "audit": {
+      "title": "Change log",
+      "subtitle": "Full traceability of data changes",
+      "columns": {
+        "date": "Date and time",
+        "author": "Author",
+        "action": "Action",
+        "oldValue": "Old value",
+        "newValue": "New value",
+        "reason": "Reason"
+      },
+      "actions": {
+        "samHours": "Updated Sam Fokam's hours",
+        "sheet32Validated": "Validated sheet 32 — Sam Fokam",
+        "julieAbsence": "Absence justification recorded — Julie Moreau",
+        "julieDriving": "Created a driving session — Julie Moreau",
+        "awaPromotion": "Assigned Awa Diallo to cohort TP ECSR 2025–2026"
+      },
+      "reasons": {
+        "inputError": "Data entry error.",
+        "compliantPresentation": "Presentation compliant with the framework.",
+        "medicalCertificate": "Medical certificate.",
+        "none": "—"
+      }
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "subtitle": {
+      "direction": "Consolidated training center indicators",
+      "secretariat": "Administrative indicators and attendance tracking",
+      "trainer": "Teaching indicators for your students",
+      "student": "Your progress and personal indicators"
+    },
+    "kpi": {
+      "averageProgress": "Average progress",
+      "attendance": "Attendance rate",
+      "completedHours": "Completed hours",
+      "catchupHours": "Catch-up hours"
+    },
+    "promotionProgress": {
+      "title": "Progress by cohort",
+      "detail": "{{completed}} h completed out of {{planned}} h · attendance {{attendance}}% · {{catchup}} h catch-up"
+    },
+    "competencyAverage": {
+      "title": "Average level by competency"
+    },
+    "competencies": {
+      "c1": "Support a learner in learning to drive",
+      "c2": "Deliver theoretical training activities",
+      "c3": "Master driving and road safety",
+      "c4": "Raise awareness of road safety and risks"
+    },
+    "sheets": {
+      "title": "Sheets and presentations",
+      "subtitle": "325 validated sheets out of 870 expected",
+      "prepared": "Prepared",
+      "presented": "Presented",
+      "validated": "Validated",
+      "rework": "To rework"
+    },
+    "statuses": {
+      "title": "Status distribution",
+      "subtitle": "Training center student tracking",
+      "good": "Good progress",
+      "warning": "To monitor",
+      "late": "Behind",
+      "finished": "Completed"
+    },
+    "ranking": {
+      "title": "Progress ranking"
+    },
+    "trainer": {
+      "kpi": {
+        "averageProgress": "Average progress",
+        "sessions": "Sessions completed",
+        "students": "Students followed"
+      },
+      "studentsTitle": "My students’ progress",
+      "competenciesTitle": "Average level by competency",
+      "sheetsTitle": "Sheets and presentations assessed",
+      "followUpTitle": "Student situation",
+      "goodProgress": "students making good progress",
+      "watch": "student to monitor",
+      "late": "student behind"
+    },
+    "secretariat": {
+      "kpi": {
+        "toRegularize": "Items to regularize"
+      },
+      "promotionsTitle": "Attendance and hours by cohort",
+      "prioritiesTitle": "Administrative priorities",
+      "catchupShort": "catch-up",
+      "priorities": {
+        "catchup": "Catch-up hours",
+        "absence": "Absences to regularize"
+      }
+    },
+    "student": {
+      "kpi": {
+        "progress": "Overall progress"
+      },
+      "competenciesTitle": "My progress by competency",
+      "sheetsTitle": "My sheets and presentations",
+      "hoursTitle": "My hours breakdown",
+      "attendanceTitle": "My attendance",
+      "hours": {
+        "classroom": "Classroom",
+        "driving": "Driving",
+        "internship": "Internship"
+      },
+      "attendance": {
+        "present": "Attendance",
+        "late": "Late arrivals",
+        "absent": "Absences",
+        "excused": "Excused absences"
+      }
+    }
+  },
+  "access": {
+    "title": "Access management",
+    "subtitle": "Management-only area: training center accounts, roles and permissions",
+    "kpi": {
+      "accounts": "Accounts",
+      "active": "Active access",
+      "pending": "Pending invitations",
+      "suspended": "Suspended access"
+    },
+    "invite": {
+      "title": "Invite a user",
+      "subtitle": "Management creates access for trainers, students or administrative staff",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Professional email",
+      "emailPlaceholder": "first.last@tpecsrpilot.fr",
+      "role": "Assigned role",
+      "defaultRights": "Default permissions: Students · Sessions & attendance · Assessments",
+      "send": "Send invitation"
+    },
+    "roles": {
+      "direction": "Management",
+      "secretariat": "Administration",
+      "formateur": "Trainer",
+      "stagiaire": "Student",
+      "jury": "Jury member"
+    },
+    "states": {
+      "active": "Active access",
+      "invited": "Invitation sent",
+      "suspended": "Suspended access"
+    },
+    "accounts": {
+      "title": "Training center accounts",
+      "subtitle": "{{count}} account(s) displayed",
+      "search": "Search by name or email…",
+      "allRoles": "All roles",
+      "suspend": "Suspend",
+      "activate": "Activate",
+      "delete": "Delete account",
+      "empty": "No account matches your filters."
+    },
+    "userDetails": {
+      "marc": "Trainer · Driving · Competency C3",
+      "jury": "Access limited to the exam session, required candidate files and jury assessments."
+    },
+    "permissions": {
+      "title": "Permissions for {{name}}",
+      "roleDetails": {
+        "direction": "Management · Full training center access",
+        "secretariat": "Administration · Administrative and attendance management",
+        "formateur": "Trainer · Educational student monitoring",
+        "stagiaire": "Student · View own training journey"
+      },
+      "items": {
+        "students": {
+          "title": "Students",
+          "description": "View and edit student records"
+        },
+        "sessions": {
+          "title": "Sessions & attendance",
+          "description": "Create sessions, take attendance and record presence"
+        },
+        "evaluations": {
+          "title": "Assessments",
+          "description": "Assess driving and sheets / presentations"
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "Upload and manage training center documents"
+        },
+        "reports": {
+          "title": "Reports & exports",
+          "description": "Generate reports and PDF / Excel exports"
+        },
+        "administration": {
+          "title": "Administration",
+          "description": "Training center settings and access management"
+        },
+        "certification": {
+          "title": "Certification / exam",
+          "description": "Access to exam sessions, candidates and certification assessments according to role."
+        }
+      },
+      "studentRule": "A student can never edit an assessment entered by a trainer, even if other permissions are granted."
+    }
+  },
+  "administration": {
+    "title": "Administration",
+    "subtitle": "Training centre and teaching framework settings",
+    "centre": {
+      "title": "Training centre information",
+      "name": "Centre name",
+      "city": "City",
+      "approval": "Approval number",
+      "save": "Save",
+      "saved": "Changes saved"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "5 trainers · 2 cohorts",
+      "invite": "Invite",
+      "trainer": "Trainer",
+      "inviteHint": "The invitation form will be connected to access management."
+    },
+    "skills": {
+      "title": "Competency framework",
+      "subtitle": "Competencies and sub-competencies of the ECSR professional qualification"
+    },
+    "hours": {
+      "title": "Hour categories",
+      "subtitle": "Used in hour tracking and reports",
+      "classroom": "Classroom",
+      "driving": "Driving",
+      "internship": "Internship",
+      "presentation": "Presentation",
+      "assessment": "Assessment",
+      "awareness": "Awareness",
+      "catchup": "Catch-up",
+      "absence": "Absence",
+      "other": "Other"
+    },
+    "sheets": {
+      "title": "Teaching sheets",
+      "count": "58 configurable sheets",
+      "description": "The number of sheets, numbering and titles can be configured to match your centre framework.",
+      "configure": "Configure the 58 sheets",
+      "hint": "Detailed sheet configuration will be added in a dedicated screen."
+    },
+    "access": {
+      "title": "Access rights",
+      "direction": "Full access: cohorts, students, trainers, reports, statistics and audit log.",
+      "formateur": "Sessions, attendance, driving and presentation assessments, and observations for assigned students.",
+      "stagiaire": "Read-only access to personal progress. Cannot edit a trainer assessment.",
+      "secretariat": "Students, cohorts, planning, attendance, administrative documents and exports."
+    },
+    "recent": {
+      "title": "Latest recorded actions",
+      "samHours": {
+        "title": "Sam Fokam hours updated",
+        "meta": "21/09/2026 · 14:32 · Marc Dupont · Input error."
+      },
+      "sheet32": {
+        "title": "Sheet 32 validated — Sam Fokam",
+        "meta": "21/09/2026 · 11:05 · Claire Berthier · Presentation compliant with the framework."
+      }
+    }
+  },
+  "studentDetail": {
+    "backStudents": "Back to students",
+    "backHome": "Back to home",
+    "profile": {
+      "start": "Start",
+      "expectedEnd": "Expected end",
+      "globalProgress": "Overall progress"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "hours": "Hours",
+      "driving": "Driving",
+      "skills": "Skills",
+      "sheets": "Sheets / Presentations",
+      "attendance": "Attendance",
+      "internships": "Internships",
+      "evaluations": "Assessments",
+      "documents": "Documents",
+      "history": "History",
+      "certification": "Certification"
+    },
+    "overview": {
+      "completedTraining": "Training completed",
+      "pathPercent": "{{value}}% of the programme",
+      "sheetsTitle": "Pedagogical sheets",
+      "prepared": "Prepared",
+      "presented": "Presented",
+      "validated": "Validated",
+      "rework": "To rework",
+      "latestDriving": "Latest sessions",
+      "nextGoals": "Next objectives",
+      "catchupGoal": "Make up {{hours}} h before the end of the term.",
+      "timelineTitle": "Pedagogical timeline"
+    },
+    "hours": {
+      "planned": "Planned",
+      "completed": "Completed",
+      "remaining": "Remaining",
+      "catchup": "Catch-up",
+      "detailTitle": "Breakdown by category",
+      "detailSubtitle": "Totals calculated automatically",
+      "columns": {
+        "category": "Category",
+        "planned": "Planned",
+        "completed": "Completed",
+        "remaining": "Remaining",
+        "catchup": "Catch-up"
+      },
+      "categories": {
+        "classroom": "Classroom",
+        "driving": "Driving",
+        "internship": "Company internship",
+        "presentation": "Presentation",
+        "assessment": "Assessment",
+        "awareness": "Awareness",
+        "catchup": "Catch-up",
+        "absence": "Absence",
+        "other": "Other"
+      }
+    },
+    "attendance": {
+      "absences": "Absences",
+      "delays": "Late arrivals",
+      "catchup": "Catch-up hours",
+      "historyTitle": "Attendance history",
+      "columns": {
+        "date": "Date",
+        "session": "Session",
+        "status": "Status",
+        "missedHours": "Missed hours"
+      },
+      "status": {
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "excused": "Excused"
+      },
+      "sessions": {
+        "pedagogicalDay": "Pedagogical day",
+        "signageClass": "Classroom — road signs",
+        "driving": "Driving session",
+        "sheet30": "Sheet 30 presentation",
+        "classroom": "Classroom session",
+        "presentation": "Sheet presentation"
+      }
+    },
+    "sheets": {
+      "title": "58 pedagogical sheets",
+      "subtitle": "{{prepared}} prepared · {{validated}} validated",
+      "columns": {
+        "title": "Title",
+        "prepared": "Prepared",
+        "presented": "Presented",
+        "status": "Status"
+      }
+    },
+    "internships": {
+      "tutor": "Tutor",
+      "progress": "Progress",
+      "activities": "Completed activities",
+      "tutorObservation": "Tutor observations and assessment"
+    },
+    "evaluations": {
+      "title": "Assessments",
+      "readOnly": "Read-only — only a trainer can modify an assessment.",
+      "rows": {
+        "sheet32": "Sheet 32 presentation",
+        "drivingC1": "C1 driving assessment",
+        "internshipReview": "Company internship review",
+        "intermediateC2": "Intermediate C2 assessment"
+      },
+      "results": {
+        "validated": "Validated",
+        "rework": "To rework",
+        "inProgress": "In progress",
+        "acquired": "Acquired"
+      }
+    },
+    "documents": {
+      "title": "Student documents",
+      "rows": {
+        "internshipAgreement": "Internship agreement",
+        "remc": "REMC 2026 reference",
+        "drivingGrid": "Driving assessment grid",
+        "intersectionsSupport": "Support — Intersections",
+        "internalRules": "Training centre internal rules"
+      }
+    },
+    "history": {
+      "title": "Change log",
+      "subtitle": "Complete traceability of changes linked to the student",
+      "oldValue": "Old value",
+      "newValue": "New value",
+      "reason": "Reason",
+      "by": "By"
+    },
+    "timeline": {
+      "18sep": "18 September",
+      "19sep": "19 September",
+      "20sep": "20 September",
+      "21sep": "21 September",
+      "sheet32": "Sheet 32 presentation",
+      "bends": "Bends and gradients",
+      "absence": "Absence",
+      "catchup7": "7 hours to catch up",
+      "driving": "Driving session",
+      "drivingDetail": "Bends and gradients — gaze to improve",
+      "classroom": "Classroom session",
+      "classroomDetail": "Intersections and priorities",
+      "presentation": "Pedagogical presentation",
+      "presentationDetail": "Sheet presented to the group",
+      "genericDrivingDetail": "Practical objectives worked on in the vehicle"
+    },
+    "empty": {
+      "driving": "No driving session recorded for this student.",
+      "internships": "No internship recorded for this student.",
+      "history": "No change recorded for this student."
+    },
+    "notFound": {
+      "title": "Student not found",
+      "subtitle": "The requested file does not exist or is no longer available."
+    },
+    "certification": {
+      "title": "Final exam",
+      "missing": "Missing items",
+      "open": "Open exam file",
+      "schedule": "Exam schedule",
+      "notRegistered": "No certification session is assigned to this student yet."
+    }
+  },
+  "sheetConfig": {
+    "back": "Back to administration",
+    "title": "Configure pedagogical sheets",
+    "subtitle": "Manage the centre’s 58 sheets: titles, categories, duration, references and corrected examples.",
+    "reset": "Reset the 58 sheets",
+    "add": "Add a sheet",
+    "kpi": {
+      "total": "Configured sheets",
+      "active": "Active sheets",
+      "inactive": "Inactive sheets",
+      "custom": "Custom sheets"
+    },
+    "filters": {
+      "search": "Search",
+      "searchPlaceholder": "Search by number, title or reference…",
+      "category": "Category",
+      "allCategories": "All categories",
+      "status": "Status",
+      "allStatuses": "All statuses"
+    },
+    "categories": {
+      "rules": "Regulations",
+      "risk": "Risks & road users",
+      "vehicle": "Vehicle & conditions",
+      "pedagogy": "Pedagogy & REMC",
+      "exam": "Exams",
+      "mobility": "Mobility"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "number": "No.",
+      "title": "Title",
+      "category": "Category",
+      "duration": "Duration",
+      "status": "Status",
+      "actions": "Actions",
+      "noReference": "No reference provided"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": "No sheet matches the selected filters.",
+    "editor": {
+      "close": "Close form",
+      "eyebrow": "Pedagogical framework",
+      "editTitle": "Edit sheet",
+      "addTitle": "Add sheet",
+      "number": "Number",
+      "sheetTitle": "Sheet title",
+      "titlePlaceholder": "E.g. Reaction time and safety distances",
+      "duplicateNumber": "This number is already used by another sheet.",
+      "category": "Category",
+      "duration": "Indicative duration",
+      "reference": "References",
+      "referencePlaceholder": "E.g. Highway Code, REMC, TP ECSR framework…",
+      "objective": "Learning objective",
+      "objectivePlaceholder": "Describe what the trainee should be able to present or explain.",
+      "example": "Sample topic / instruction",
+      "examplePlaceholder": "Add a hook question, situation or sample topic to present.",
+      "correction": "Corrected example",
+      "correctionPlaceholder": "Add a corrected outline: hook, objectives, development, RIP, review and references.",
+      "active": "Active sheet",
+      "activeHint": "An inactive sheet remains in the framework but is no longer offered in current tracking.",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "viewer": {
+      "close": "Close sheet",
+      "eyebrow": "Sheet",
+      "reference": "References",
+      "objective": "Learning objective",
+      "exampleTitle": "Sample topic",
+      "correctionTitle": "Corrected example",
+      "defaultObjective": "Be able to present the topic “{{title}}”, explain its road-safety implications and involve learners.",
+      "defaultExample": "Prepare a structured presentation on “{{title}}”. Start with a concrete situation or hook question, explore the group’s prior ideas, then develop the useful knowledge before a final review.",
+      "defaultCorrection": "Suggested correction outline for “{{title}}”:\n\n1. Hook: start from a concrete situation and question the group.\n2. Objectives: clearly state 2 to 3 observable objectives.\n3. Development: definitions, regulations, risks, behaviours and practical examples.\n4. Questioning method: alternate open and closed questions to involve learners.\n5. RIP: identify risks, influences and pressures related to the topic.\n6. Review: check learning with a few questions and announce a possible follow-up.\n7. References: cite the legal and pedagogical sources used."
+    },
+    "delete": {
+      "title": "Delete this sheet?",
+      "message": "Sheet no. {{number}} “{{title}}” will be removed from the local framework. This can only be undone by resetting the catalogue or recreating the sheet.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "certification": {
+    "title": "Certification / Final exam",
+    "subtitle": "Prepare candidates, organize exam sessions, manage the jury and publish results.",
+    "currentSession": "Session being prepared",
+    "readiness": "Candidate readiness",
+    "ready": "Ready",
+    "incomplete": "Incomplete",
+    "complete": "Complete",
+    "actions": {
+      "results": "View results",
+      "manageSession": "Manage session"
+    },
+    "kpi": {
+      "candidates": "Candidates",
+      "ready": "Ready files",
+      "jury": "Jury members",
+      "readiness": "Readiness rate"
+    },
+    "sessionStatus": {
+      "preparation": "Preparing",
+      "ready": "Ready",
+      "running": "Running",
+      "deliberation": "Deliberation",
+      "published": "Results published",
+      "closed": "Closed"
+    },
+    "sessionCards": {
+      "promotion": "Cohort",
+      "centre": "Center",
+      "jury": "Jury"
+    },
+    "jury": {
+      "title": "Assigned jury",
+      "subtitle": "Authorized professionals assigned to this session.",
+      "members": "members",
+      "active": "Active",
+      "professions": {
+        "teacher": "Driving instructor",
+        "manager": "Training manager"
+      }
+    },
+    "candidates": {
+      "title": "Candidates",
+      "subtitle": "Candidate file readiness before the exam session.",
+      "readySummary": "{{ready}} ready files out of {{total}}"
+    },
+    "table": {
+      "candidate": "Candidate",
+      "hours": "Hours",
+      "documents": "Documents",
+      "readiness": "Readiness"
+    },
+    "ccp": {
+      "validated": "Validated",
+      "pending": "Pending",
+      "not_validated": "Not validated"
+    },
+    "steps": {
+      "professionalSituation": "Professional simulation",
+      "technicalInterview": "Technical interview",
+      "questionnaire": "Professional questionnaire",
+      "productions": "Review of submitted productions",
+      "finalInterview": "Final interview"
+    },
+    "stepStatus": {
+      "done": "Completed",
+      "planned": "Scheduled",
+      "in_progress": "In progress"
+    },
+    "missing": {
+      "hours": "Training hours still to complete",
+      "professionalFile": "Professional file missing",
+      "stageDocument": "Internship document missing",
+      "ccp2Production": "CCP2 production missing"
+    },
+    "trainer": {
+      "title": "My students’ exam preparation",
+      "subtitle": "Quickly identify files that still need work before the exam.",
+      "readyStudents": "Students ready"
+    },
+    "student": {
+      "myExam": "My final exam",
+      "openFile": "Open my exam file",
+      "schedule": "Exam schedule"
+    },
+    "sessionDetail": {
+      "back": "Back to certification",
+      "workflowTitle": "Session progress",
+      "workflowSubtitle": "Every step remains traceable until closure.",
+      "logisticsTitle": "Session logistics",
+      "location": "Location",
+      "period": "Period",
+      "candidateListSubtitle": "Files, exam times and readiness status."
+    },
+    "workflow": {
+      "preparation": "Preparation",
+      "candidates": "Candidates validated",
+      "jury": "Jury assigned",
+      "running": "Session running",
+      "deliberation": "Deliberation",
+      "results": "Results entered / published",
+      "closed": "Session closed"
+    },
+    "workflowHelp": {
+      "preparation": "Settings, place, dates and exam framework.",
+      "candidates": "Check files and eligibility.",
+      "jury": "Assign authorized jury members.",
+      "running": "Track exams and attendance.",
+      "deliberation": "Validate jury assessments.",
+      "results": "Enter then publish results in a controlled way.",
+      "closed": "Archive and final statistics."
+    },
+    "candidate": {
+      "back": "Back",
+      "missingTitle": "Items to complete",
+      "examPath": "Exam journey",
+      "examPathSubtitle": "Exams scheduled for this session.",
+      "readinessTitle": "Eligibility / readiness",
+      "trainingHours": "Training hours completed",
+      "professionalFile": "Professional file",
+      "ccp1Stage": "CCP1 requirements",
+      "ccp2Stage": "CCP2 requirements",
+      "juryEvaluation": "Jury assessment grid",
+      "juryEvaluationHelp": "Demo digital grid; official criteria will be configured from the exam framework.",
+      "locked": "Assessment locked",
+      "juryCriteria": {
+        "pedagogy": "Delivery and structure of the teaching performance",
+        "safety": "Road safety considerations",
+        "analysis": "Analysis and rationale for decisions",
+        "communication": "Communication and professional posture"
+      },
+      "juryLevels": {
+        "satisfactory": "Satisfactory",
+        "partial": "Partial",
+        "insufficient": "Insufficient"
+      },
+      "juryNotes": "Jury notes",
+      "saveDraft": "Save draft",
+      "validateEvaluation": "Validate my assessment",
+      "draftSaved": "Draft saved."
+    }
+  },
+  "jury": {
+    "space": "Jury space",
+    "greeting": "Hello {{name}}",
+    "subtitle": "See only the candidates and information required for your session.",
+    "candidates": "Assigned candidates",
+    "firstCandidate": "First candidate",
+    "habilitationValidUntil": "Authorization valid until",
+    "myCandidates": "My candidates",
+    "myCandidatesSubtitle": "Open a file to complete the assessment grid.",
+    "rules": {
+      "title": "Jury space rules",
+      "neutral": "The internal pedagogical record is not shown to the jury to preserve assessment neutrality.",
+      "draft": "Assessments can be saved as drafts before validation.",
+      "lock": "A validated assessment is locked; any correction must be audited.",
+      "audit": "Sensitive actions will be audited by the backend."
+    }
+  },
+  "results": {
+    "title": "Certification results",
+    "subtitle": "Deliberation, result entry and controlled publication.",
+    "back": "Certification",
+    "publish": "Publish results",
+    "published": "Results published",
+    "publishSuccess": "Results are now marked as published in this prototype.",
+    "kpi": {
+      "candidates": "Candidates",
+      "obtained": "Title obtained",
+      "partial": "Partial validation",
+      "failed": "Not obtained",
+      "absent": "Absent"
+    },
+    "tableTitle": "Session decisions",
+    "tableSubtitle": "Results remain drafts until they are published.",
+    "result": "Result",
+    "publication": "Publication",
+    "status": {
+      "pending": "Pending",
+      "obtained": "Title obtained",
+      "partial": "Partial validation",
+      "failed": "Not obtained",
+      "absent": "Absent"
+    },
+    "publicationStates": {
+      "published": "Published",
+      "draft": "Draft"
+    }
+  },
+  "success": {
+    "title": "Success rates",
+    "subtitle": "Historical certification outcomes by cohort.",
+    "export": "Export PDF",
+    "kpi": {
+      "globalRate": "Overall rate",
+      "graduated": "Graduated",
+      "presented": "Presented",
+      "promotions": "Cohorts"
+    },
+    "evolution": {
+      "title": "Success-rate trend",
+      "subtitle": "Rate calculated on candidates who actually sat the exam."
+    },
+    "byPromotion": {
+      "title": "Results by cohort",
+      "subtitle": "Details of the denominator and final decisions."
+    },
+    "table": {
+      "promotion": "Cohort",
+      "presented": "Presented",
+      "graduated": "Graduated",
+      "partial": "Partial",
+      "failed": "Not obtained",
+      "rate": "Success rate"
+    },
+    "details": "Details",
+    "detail": {
+      "title": "Success details",
+      "close": "Close",
+      "absent": "Absent",
+      "definition": "Success rate = number of titles obtained / number of candidates who actually sat the exam × 100."
+    }
+  }
+}

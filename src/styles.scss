@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --ecsr-blue-950: #153f73;
+  --ecsr-blue-900: #17477f;
+  --ecsr-blue-800: #205a98;
+  --ecsr-blue-700: #285f9e;
+  --ecsr-orange: #f8a11a;
+  --ecsr-orange-strong: #ff6500;
+  --ecsr-action-blue: #243fc2;
+  --ecsr-page: #f5f8fc;
+  --ecsr-card: #ffffff;
+  --ecsr-text: #0e1428;
+  --ecsr-muted: #6c778a;
+  --ecsr-border: #d8dfe9;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  background: var(--ecsr-page);
+}
+
+body {
+  margin: 0;
+  color: var(--ecsr-text);
+  background: var(--ecsr-page);
+  font-family:
+    "Plus Jakarta Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+* {
+  box-sizing: border-box;
+}

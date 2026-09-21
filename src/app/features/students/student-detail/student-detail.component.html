@@ -1,0 +1,1046 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  @if (student; as s) {
+    <a
+      [routerLink]="isSelfView() ? '/accueil' : '/stagiaires'"
+      class="mb-3 inline-flex items-center gap-2 rounded-[10px] px-2 py-1.5 text-[13px] font-semibold text-[#526176] transition hover:bg-white hover:text-[#245c97]"
+    >
+      <i class="ph ph-arrow-left text-[16px]"></i>
+      {{
+        (isSelfView() ? "studentDetail.backHome" : "studentDetail.backStudents")
+          | t
+      }}
+    </a>
+
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-center">
+        <div
+          class="grid size-[64px] shrink-0 place-items-center rounded-full bg-[#e5f2ff] text-[20px] font-extrabold text-[#2a64a2]"
+        >
+          {{ initials() }}
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-3">
+            <h1
+              class="text-[25px] font-extrabold tracking-[-0.7px] text-[#172033]"
+            >
+              {{ s.firstName }} {{ s.lastName }}
+            </h1>
+            <span
+              [class]="
+                'inline-flex shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                studentStatusClasses()
+              "
+              >{{ studentStatusKey() | t }}</span
+            >
+          </div>
+          <p class="mt-1 text-[13px] leading-6 text-[#748094]">
+            {{ s.promotionName }} · {{ "studentDetail.profile.start" | t }}
+            {{ s.startDate }} · {{ "studentDetail.profile.expectedEnd" | t }}
+            {{ s.expectedEndDate }} · {{ s.email }}
+          </p>
+        </div>
+
+        <div class="w-full lg:w-[250px]">
+          <div
+            class="flex items-center justify-between text-[13px] font-semibold"
+          >
+            <span>{{ "studentDetail.profile.globalProgress" | t }}</span>
+            <span class="text-[#2a64a2]">{{ s.progress }} %</span>
+          </div>
+          <app-progress-bar
+            class="mt-2 block"
+            [value]="s.progress"
+            heightClass="h-[11px]"
+          />
+        </div>
+      </div>
+    </article>
+
+    <div class="mt-4 overflow-x-auto pb-1">
+      <div
+        class="inline-flex min-w-max rounded-[13px] border border-[#dfe5ec] bg-white p-1 shadow-sm"
+      >
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            (click)="selectTab(tab.id)"
+            [class]="
+              selectedTab() === tab.id
+                ? 'rounded-[10px] bg-[#2a64a2] px-3.5 py-2 text-[12px] font-semibold text-white shadow-sm'
+                : 'rounded-[10px] px-3.5 py-2 text-[12px] font-semibold text-[#617086] transition hover:bg-[#f1f5f9] hover:text-[#245c97]'
+            "
+          >
+            {{ tab.labelKey | t }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @switch (selectedTab()) {
+      @case ("overview") {
+        <div class="mt-4 space-y-4">
+          <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] font-medium uppercase text-[#637083]">
+                {{ "studentDetail.overview.completedTraining" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold">
+                {{ s.completedHours }} / {{ s.plannedHours }} h
+              </p>
+              <p class="mt-1 text-[12px] text-[#748094]">
+                {{
+                  "studentDetail.overview.pathPercent"
+                    | t: { value: s.progress }
+                }}
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] font-medium uppercase text-[#637083]">
+                {{ "studentDetail.hours.categories.classroom" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#2a64a2]">
+                {{ s.hours[0].completed }} h
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] font-medium uppercase text-[#637083]">
+                {{ "studentDetail.hours.categories.driving" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#2a64a2]">
+                {{ s.hours[1].completed }} h
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] font-medium uppercase text-[#637083]">
+                {{ "studentDetail.hours.categories.internship" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#18a547]">
+                {{ s.hours[2].completed }} h
+              </p>
+            </article>
+          </div>
+
+          <div class="grid gap-4 xl:grid-cols-3">
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <h2 class="text-[16px] font-bold">
+                {{ "studentDetail.overview.sheetsTitle" | t }}
+              </h2>
+              <dl class="mt-4 text-[13px]">
+                <div
+                  class="flex justify-between border-b border-[#e7ecf1] py-2.5"
+                >
+                  <dt class="text-[#718096]">
+                    {{ "studentDetail.overview.prepared" | t }}
+                  </dt>
+                  <dd class="font-bold">{{ s.preparedSheets }} / 58</dd>
+                </div>
+                <div
+                  class="flex justify-between border-b border-[#e7ecf1] py-2.5"
+                >
+                  <dt class="text-[#718096]">
+                    {{ "studentDetail.overview.presented" | t }}
+                  </dt>
+                  <dd class="font-bold">{{ s.presentedSheets }}</dd>
+                </div>
+                <div
+                  class="flex justify-between border-b border-[#e7ecf1] py-2.5"
+                >
+                  <dt class="text-[#718096]">
+                    {{ "studentDetail.overview.validated" | t }}
+                  </dt>
+                  <dd class="font-bold text-[#18a547]">
+                    {{ s.validatedSheets }}
+                  </dd>
+                </div>
+                <div class="flex justify-between py-2.5">
+                  <dt class="text-[#718096]">
+                    {{ "studentDetail.overview.rework" | t }}
+                  </dt>
+                  <dd class="font-bold text-[#f22b2b]">{{ s.reworkSheets }}</dd>
+                </div>
+              </dl>
+              <app-progress-bar
+                class="mt-3 block"
+                [value]="(s.preparedSheets / 58) * 100"
+              />
+            </article>
+
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <h2 class="text-[16px] font-bold">
+                {{ "studentDetail.overview.latestDriving" | t }}
+              </h2>
+              @if (drivingHistory.length) {
+                <ul class="mt-4 space-y-3">
+                  @for (item of drivingHistory; track item.id) {
+                    <li class="rounded-[14px] bg-[#f1f4f8] p-3">
+                      <div class="flex items-start justify-between gap-3">
+                        <p class="text-[13px] font-bold">{{ item.date }}</p>
+                        <span
+                          class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
+                          >{{ item.competence }}</span
+                        >
+                      </div>
+                      <p class="mt-1 text-[12px] text-[#748094]">
+                        {{ item.subjectKey | t }}
+                      </p>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div
+                  class="mt-4 rounded-[14px] bg-[#f1f4f8] px-4 py-8 text-center text-[12px] text-[#7b8798]"
+                >
+                  {{ "studentDetail.empty.driving" | t }}
+                </div>
+              }
+            </article>
+
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <h2 class="text-[16px] font-bold">
+                {{ "studentDetail.overview.nextGoals" | t }}
+              </h2>
+              <div class="mt-4 space-y-2">
+                @for (item of drivingHistory; track item.id) {
+                  <div
+                    class="rounded-[14px] bg-[#e5f2ff] px-3.5 py-3 text-[12px] font-medium text-[#245c97]"
+                  >
+                    {{ item.nextGoalKey | t }}
+                  </div>
+                }
+                <div
+                  class="rounded-[14px] bg-[#fff0c9] px-3.5 py-3 text-[12px] font-medium text-[#7c590c]"
+                >
+                  {{
+                    "studentDetail.overview.catchupGoal"
+                      | t: { hours: s.catchupHours }
+                  }}
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <article
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <h2 class="text-[16px] font-bold">
+              {{ "studentDetail.overview.timelineTitle" | t }}
+            </h2>
+            <ol
+              class="relative mt-4 ml-2 space-y-4 border-l border-[#dfe5ec] pl-5"
+            >
+              @for (item of s.timeline; track item.dateKey + item.titleKey) {
+                <li class="relative">
+                  <span
+                    [class]="
+                      'absolute left-[-26px] top-[6px] size-[11px] rounded-full ' +
+                      timelineDot(item.tone)
+                    "
+                  ></span>
+                  <p class="text-[11px] text-[#748094]">
+                    {{ item.dateKey | t }}
+                  </p>
+                  <p class="text-[13px] font-bold">{{ item.titleKey | t }}</p>
+                  <p class="text-[12px] text-[#748094]">
+                    {{ item.detailKey | t }}
+                  </p>
+                </li>
+              }
+            </ol>
+          </article>
+        </div>
+      }
+
+      @case ("hours") {
+        <div class="mt-4 space-y-4">
+          <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.hours.planned" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold">
+                {{ s.plannedHours }} h
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.hours.completed" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#2a64a2]">
+                {{ completedHours() }} h
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.hours.remaining" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold">
+                {{ remainingHours() }} h
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.hours.catchup" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#f59e0b]">
+                {{ s.catchupHours }} h
+              </p>
+            </article>
+          </div>
+
+          <article
+            class="overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <h2 class="text-[16px] font-bold">
+              {{ "studentDetail.hours.detailTitle" | t }}
+            </h2>
+            <p class="mt-0.5 text-[12px] text-[#748094]">
+              {{ "studentDetail.hours.detailSubtitle" | t }}
+            </p>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-[720px] w-full text-left text-[13px]">
+                <thead>
+                  <tr
+                    class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
+                  >
+                    <th class="pb-2">
+                      {{ "studentDetail.hours.columns.category" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.hours.columns.planned" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.hours.columns.completed" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.hours.columns.remaining" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.hours.columns.catchup" | t }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of s.hours; track row.key) {
+                    <tr class="border-b border-[#edf1f5] last:border-0">
+                      <td class="py-3 font-semibold">
+                        {{ "studentDetail.hours.categories." + row.key | t }}
+                      </td>
+                      <td class="py-3">{{ row.planned }} h</td>
+                      <td class="py-3">{{ row.completed }} h</td>
+                      <td class="py-3">
+                        {{
+                          row.planned > 0
+                            ? row.planned - row.completed < 0
+                              ? 0
+                              : row.planned - row.completed
+                            : 0
+                        }}
+                        h
+                      </td>
+                      <td class="py-3">
+                        {{ row.catchup ? row.catchup + " h" : "—" }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      }
+
+      @case ("driving") {
+        <div class="mt-4 space-y-4">
+          @if (drivingHistory.length) {
+            @for (item of drivingHistory; track item.id) {
+              <article
+                class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+              >
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 class="text-[16px] font-bold">
+                      {{ item.date }} · {{ item.studentName }}
+                    </h2>
+                    <p class="mt-1 text-[12px] text-[#748094]">
+                      {{ item.subjectKey | t }} · {{ item.trainer }}
+                    </p>
+                  </div>
+                  <span
+                    class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[11px] font-semibold text-[#2a64a2]"
+                    >{{ item.competence }}</span
+                  >
+                </div>
+
+                <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  @for (
+                    evaluation of item.evaluations;
+                    track evaluation.criterionId
+                  ) {
+                    <div
+                      class="flex items-center justify-between gap-3 rounded-[13px] bg-[#f1f4f8] px-3 py-2.5"
+                    >
+                      <span class="text-[12px]">{{
+                        criterionLabelKey(evaluation.criterionId) | t
+                      }}</span>
+                      <span
+                        [class]="
+                          'shrink-0 rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+                          drivingLevelClasses(evaluation.level)
+                        "
+                        >{{ drivingLevelKey(evaluation.level) | t }}</span
+                      >
+                    </div>
+                  }
+                </div>
+
+                <div class="mt-4 grid gap-3 lg:grid-cols-2">
+                  <div class="rounded-[14px] bg-[#eaf8ee] p-3 text-[12px]">
+                    <span class="font-bold text-[#18a547]"
+                      >{{ "common.positive" | t }} :</span
+                    >
+                    {{ item.positiveKey | t }}
+                  </div>
+                  <div class="rounded-[14px] bg-[#fff0ed] p-3 text-[12px]">
+                    <span class="font-bold text-[#ef2f2f]"
+                      >{{ "common.toWorkOn" | t }} :</span
+                    >
+                    {{ item.difficultyKey | t }}
+                  </div>
+                </div>
+                <div
+                  class="mt-3 rounded-[14px] bg-[#e5f2ff] px-3.5 py-3 text-[12px] font-medium text-[#245c97]"
+                >
+                  <span class="font-bold">{{ "common.nextGoal" | t }} :</span>
+                  {{ item.nextGoalKey | t }}
+                </div>
+              </article>
+            }
+          } @else {
+            <article
+              class="rounded-[17px] border border-dashed border-[#cbd5e1] bg-white px-6 py-14 text-center text-[13px] text-[#718096]"
+            >
+              {{ "studentDetail.empty.driving" | t }}
+            </article>
+          }
+        </div>
+      }
+
+      @case ("skills") {
+        <div class="mt-4 space-y-4">
+          @for (skill of skillDefinitions; track skill.code) {
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-[16px] font-bold">
+                  {{ skill.code }} — {{ skill.titleKey | t }}
+                </h2>
+                <span
+                  class="rounded-full bg-[#2a64a2] px-3 py-1 text-[11px] font-semibold text-white"
+                  >{{ skillProgress(skill.code) }} %</span
+                >
+              </div>
+              <app-progress-bar
+                class="mt-4 block"
+                [value]="skillProgress(skill.code)"
+                heightClass="h-[10px]"
+              />
+              <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                @for (
+                  criterion of skill.criteria;
+                  track criterion.labelKey;
+                  let i = $index
+                ) {
+                  @let level = skillCriterionLevel(skill.code, i);
+                  <div
+                    class="flex items-center justify-between gap-3 rounded-[13px] bg-[#f1f4f8] px-3 py-2.5"
+                  >
+                    <span class="text-[12px]">{{ criterion.labelKey | t }}</span
+                    ><span
+                      [class]="
+                        'rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+                        skillLevelClasses(level)
+                      "
+                      >{{ "skills.level." + level | t }}</span
+                    >
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+
+      @case ("sheets") {
+        <article
+          class="mt-4 overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "studentDetail.sheets.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12px] text-[#748094]">
+            {{
+              "studentDetail.sheets.subtitle"
+                | t
+                  : { prepared: s.preparedSheets, validated: s.validatedSheets }
+            }}
+          </p>
+          <div class="mt-4 max-h-[650px] overflow-auto">
+            <table class="min-w-[760px] w-full text-left text-[12px]">
+              <thead class="sticky top-0 bg-white">
+                <tr
+                  class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
+                >
+                  <th class="pb-2">N°</th>
+                  <th class="pb-2">
+                    {{ "studentDetail.sheets.columns.title" | t }}
+                  </th>
+                  <th class="pb-2">
+                    {{ "studentDetail.sheets.columns.prepared" | t }}
+                  </th>
+                  <th class="pb-2">
+                    {{ "studentDetail.sheets.columns.presented" | t }}
+                  </th>
+                  <th class="pb-2">
+                    {{ "studentDetail.sheets.columns.status" | t }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sheet of sheets; track sheet.number) {
+                  <tr class="border-b border-[#edf1f5]">
+                    <td class="py-3 font-bold">{{ sheet.number }}</td>
+                    <td class="py-3 font-semibold">{{ sheet.titleKey | t }}</td>
+                    <td class="py-3 text-[#748094]">
+                      {{ formatDate(sheet.preparationDate) }}
+                    </td>
+                    <td class="py-3 text-[#748094]">
+                      {{ formatDate(sheet.presentationDate) }}
+                    </td>
+                    <td class="py-3">
+                      <span
+                        [class]="
+                          'rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+                          sheetStatusClasses(sheet.status)
+                        "
+                        >{{ "sheets.status." + sheet.status | t }}</span
+                      >
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+      }
+
+      @case ("attendance") {
+        <div class="mt-4 space-y-4">
+          <div class="grid grid-cols-3 gap-3">
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.attendance.absences" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#ef2f2f]">
+                {{ s.absences }}
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.attendance.delays" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#f59e0b]">
+                {{ s.delays }}
+              </p>
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+            >
+              <p class="text-[11px] uppercase text-[#637083]">
+                {{ "studentDetail.attendance.catchup" | t }}
+              </p>
+              <p class="mt-2 text-[22px] font-extrabold text-[#2a64a2]">
+                {{ s.catchupHours }} h
+              </p>
+            </article>
+          </div>
+          <article
+            class="overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <h2 class="text-[16px] font-bold">
+              {{ "studentDetail.attendance.historyTitle" | t }}
+            </h2>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-[650px] w-full text-left text-[12px]">
+                <thead>
+                  <tr
+                    class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
+                  >
+                    <th class="pb-2">
+                      {{ "studentDetail.attendance.columns.date" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.attendance.columns.session" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.attendance.columns.status" | t }}
+                    </th>
+                    <th class="pb-2">
+                      {{ "studentDetail.attendance.columns.missedHours" | t }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of s.attendance; track row.date + row.sessionKey) {
+                    <tr class="border-b border-[#edf1f5] last:border-0">
+                      <td class="py-3">{{ row.date }}</td>
+                      <td class="py-3 font-semibold">
+                        {{ row.sessionKey | t }}
+                      </td>
+                      <td class="py-3">
+                        <span
+                          [class]="
+                            'rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
+                            attendanceClasses(row.status)
+                          "
+                          >{{
+                            "studentDetail.attendance.status." + row.status | t
+                          }}</span
+                        >
+                      </td>
+                      <td class="py-3">{{ row.missedHours }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      }
+
+      @case ("internships") {
+        <div class="mt-4 space-y-4">
+          @if (internships.length) {
+            @for (stage of internships; track stage.id) {
+              <article
+                class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+              >
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 class="text-[16px] font-bold">
+                      {{ stage.company }} — {{ stage.city }}
+                    </h2>
+                    <p class="mt-1 text-[12px] text-[#748094]">
+                      {{ "studentDetail.internships.tutor" | t }} :
+                      {{ stage.tutor }} · {{ stage.startDate }} →
+                      {{ stage.endDate }}
+                    </p>
+                  </div>
+                  <span
+                    [class]="
+                      'rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                      internshipClasses(stage.status)
+                    "
+                    >{{ "internships.status." + stage.status | t }}</span
+                  >
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+                    <p class="text-[11px] text-[#748094]">
+                      {{ "studentDetail.hours.planned" | t }}
+                    </p>
+                    <p class="mt-1 text-[17px] font-bold">
+                      {{ stage.plannedHours }} h
+                    </p>
+                  </div>
+                  <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+                    <p class="text-[11px] text-[#748094]">
+                      {{ "studentDetail.hours.completed" | t }}
+                    </p>
+                    <p class="mt-1 text-[17px] font-bold">
+                      {{ stage.completedHours }} h
+                    </p>
+                  </div>
+                  <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+                    <p class="text-[11px] text-[#748094]">
+                      {{ "studentDetail.hours.remaining" | t }}
+                    </p>
+                    <p class="mt-1 text-[17px] font-bold">
+                      {{ stage.plannedHours - stage.completedHours }} h
+                    </p>
+                  </div>
+                  <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+                    <p class="text-[11px] text-[#748094]">
+                      {{ "studentDetail.internships.progress" | t }}
+                    </p>
+                    <p class="mt-1 text-[17px] font-bold">
+                      {{
+                        internshipProgress(
+                          stage.completedHours,
+                          stage.plannedHours
+                        )
+                      }}
+                      %
+                    </p>
+                  </div>
+                </div>
+                <app-progress-bar
+                  class="mt-4 block"
+                  [value]="
+                    internshipProgress(stage.completedHours, stage.plannedHours)
+                  "
+                  heightClass="h-[10px]"
+                />
+                <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <h3 class="text-[13px] font-bold">
+                      {{ "studentDetail.internships.activities" | t }}
+                    </h3>
+                    <div class="mt-2 space-y-2">
+                      @for (
+                        activity of stage.activities;
+                        track activity.labelKey
+                      ) {
+                        <div
+                          class="flex items-center justify-between rounded-[12px] bg-[#f1f4f8] px-3 py-2 text-[12px]"
+                        >
+                          <span>{{ activity.labelKey | t }}</span
+                          ><span
+                            [class]="
+                              activity.status === 'done'
+                                ? 'rounded-full bg-[#d8f8df] px-2.5 py-1 text-[10px] font-semibold text-[#18a547]'
+                                : 'rounded-full bg-[#fff0c9] px-2.5 py-1 text-[10px] font-semibold text-[#8b5e00]'
+                            "
+                            >{{
+                              "internships.activityStatus." + activity.status
+                                | t
+                            }}</span
+                          >
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <h3 class="text-[13px] font-bold">
+                      {{ "studentDetail.internships.tutorObservation" | t }}
+                    </h3>
+                    <p
+                      class="mt-2 rounded-[14px] bg-[#e5f2ff] p-3 text-[12px] text-[#245c97]"
+                    >
+                      {{ stage.tutorObservationKey | t }}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            }
+          } @else {
+            <article
+              class="rounded-[17px] border border-dashed border-[#cbd5e1] bg-white px-6 py-14 text-center text-[13px] text-[#718096]"
+            >
+              {{ "studentDetail.empty.internships" | t }}
+            </article>
+          }
+        </div>
+      }
+
+      @case ("evaluations") {
+        <article
+          class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "studentDetail.evaluations.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12px] text-[#748094]">
+            {{ "studentDetail.evaluations.readOnly" | t }}
+          </p>
+          <ul class="mt-4 space-y-3">
+            @for (
+              evaluation of s.evaluations;
+              track evaluation.date + evaluation.titleKey
+            ) {
+              <li
+                class="flex flex-col gap-3 rounded-[14px] border border-[#e2e7ed] p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p class="text-[13px] font-bold">
+                    {{ evaluation.titleKey | t }}
+                  </p>
+                  <p class="mt-1 text-[11px] text-[#748094]">
+                    {{ evaluation.date }} · {{ evaluation.evaluator }}
+                  </p>
+                </div>
+                <span
+                  [class]="
+                    'self-start rounded-full px-3 py-1 text-[10.5px] font-semibold sm:self-auto ' +
+                    evaluationClasses(evaluation.tone)
+                  "
+                  >{{ evaluation.resultKey | t }}</span
+                >
+              </li>
+            }
+          </ul>
+        </article>
+      }
+
+      @case ("documents") {
+        <article
+          class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "studentDetail.documents.title" | t }}
+          </h2>
+          <ul class="mt-4 divide-y divide-[#e7ecf1]">
+            @for (document of s.documents; track document.id) {
+              <li
+                class="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div class="min-w-0">
+                  <p class="truncate text-[13px] font-semibold">
+                    {{ document.titleKey | t }}
+                  </p>
+                  <p class="mt-1 text-[11px] text-[#748094]">
+                    {{ document.categoryKey | t }} · {{ document.date }} ·
+                    {{ document.size }}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="inline-flex h-[34px] items-center justify-center gap-2 self-start rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[11px] font-semibold shadow-sm sm:self-auto"
+                >
+                  <i class="ph ph-download-simple text-[15px]"></i
+                  >{{ "documents.download" | t }}
+                </button>
+              </li>
+            }
+          </ul>
+        </article>
+      }
+
+      @case ("certification") {
+        @if (certification; as examCandidate) {
+          <div class="mt-4 grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-[10.5px] font-semibold uppercase text-[#2a64a2]"
+                  >
+                    {{ "studentDetail.certification.title" | t }}
+                  </p>
+                  <h2 class="mt-1 text-[17px] font-extrabold">
+                    {{ examSession.name }}
+                  </h2>
+                  <p class="mt-1 text-[11px] text-[#748094]">
+                    {{ examCandidate.candidateNumber }}
+                  </p>
+                </div>
+                <span
+                  [class]="
+                    'inline-flex w-fit rounded-full px-3 py-1 text-[10.5px] font-semibold ' +
+                    (examCandidate.ready
+                      ? 'bg-[#d8f8df] text-[#18a547]'
+                      : 'bg-[#fff0c9] text-[#8b5e00]')
+                  "
+                  >{{
+                    (examCandidate.ready
+                      ? "certification.ready"
+                      : "certification.incomplete"
+                    ) | t
+                  }}</span
+                >
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div class="rounded-[13px] bg-[#f1f4f8] p-3">
+                  <p class="text-[10px] text-[#7b8798]">
+                    {{ "certification.table.hours" | t }}
+                  </p>
+                  <p class="mt-1 text-[13px] font-bold">
+                    {{ examCandidate.completedHours }}/{{
+                      examCandidate.plannedHours
+                    }}
+                    h
+                  </p>
+                </div>
+                <div class="rounded-[13px] bg-[#f1f4f8] p-3">
+                  <p class="text-[10px] text-[#7b8798]">
+                    {{ "certification.table.documents" | t }}
+                  </p>
+                  <p class="mt-1 text-[13px] font-bold">
+                    {{ examCandidate.documentsReady }}/{{
+                      examCandidate.documentsTotal
+                    }}
+                  </p>
+                </div>
+                <div class="rounded-[13px] bg-[#f1f4f8] p-3">
+                  <p class="text-[10px] text-[#7b8798]">CCP1</p>
+                  <p class="mt-1 text-[12px] font-bold text-[#18a547]">
+                    {{ "certification.ccp." + examCandidate.ccp1 | t }}
+                  </p>
+                </div>
+                <div class="rounded-[13px] bg-[#f1f4f8] p-3">
+                  <p class="text-[10px] text-[#7b8798]">CCP2</p>
+                  <p class="mt-1 text-[12px] font-bold">
+                    {{ "certification.ccp." + examCandidate.ccp2 | t }}
+                  </p>
+                </div>
+              </div>
+              @if (!examCandidate.ready && examCandidate.missingKeys.length) {
+                <div
+                  class="mt-4 rounded-[13px] border border-[#f1d89c] bg-[#fff8e8] p-3"
+                >
+                  <p class="text-[11.5px] font-bold text-[#7a5410]">
+                    {{ "studentDetail.certification.missing" | t }}
+                  </p>
+                  <ul class="mt-2 list-disc pl-4 text-[11px] text-[#765d2a]">
+                    @for (item of examCandidate.missingKeys; track item) {
+                      <li>{{ item | t }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              <a
+                [routerLink]="['/certification/candidats', examCandidate.id]"
+                class="mt-4 inline-flex h-[36px] items-center gap-2 rounded-[10px] bg-[#2a64a2] px-4 text-[11.5px] font-semibold text-white"
+                ><i class="ph ph-certificate"></i
+                >{{ "studentDetail.certification.open" | t }}</a
+              >
+            </article>
+            <article
+              class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+            >
+              <h2 class="text-[16px] font-bold">
+                {{ "studentDetail.certification.schedule" | t }}
+              </h2>
+              <p class="mt-0.5 text-[12px] text-[#748094]">
+                {{ examSession.startDate }} → {{ examSession.endDate }}
+              </p>
+              <div class="mt-4 space-y-2">
+                @for (step of examCandidate.steps; track step.id) {
+                  <div
+                    class="flex items-center gap-3 rounded-[13px] bg-[#f1f4f8] p-3"
+                  >
+                    <span
+                      class="grid size-[31px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+                      ><i class="ph ph-clock"></i
+                    ></span>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-[11.5px] font-bold">
+                        {{ step.labelKey | t }}
+                      </p>
+                      <p class="text-[10px] text-[#7b8798]">
+                        {{ step.date }} · {{ step.time }} · {{ step.duration }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </article>
+          </div>
+        } @else {
+          <div
+            class="mt-4 rounded-[17px] border border-dashed border-[#cbd8e5] bg-white px-6 py-12 text-center"
+          >
+            <i class="ph ph-certificate text-[32px] text-[#8aa3bd]"></i>
+            <p class="mt-3 text-[13px] font-bold text-[#334155]">
+              {{ "studentDetail.certification.notRegistered" | t }}
+            </p>
+          </div>
+        }
+      }
+
+      @case ("history") {
+        <article
+          class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "studentDetail.history.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12px] text-[#748094]">
+            {{ "studentDetail.history.subtitle" | t }}
+          </p>
+          @if (auditHistory.length) {
+            <ul class="mt-4 space-y-3">
+              @for (item of auditHistory; track item.id) {
+                <li class="rounded-[14px] border border-[#e2e7ed] p-3">
+                  <p class="text-[11px] text-[#748094]">{{ item.dateTime }}</p>
+                  <p class="mt-1 text-[13px] font-bold">
+                    {{ item.actionKey | t }}
+                  </p>
+                  <p class="mt-1 text-[12px] text-[#748094]">
+                    {{ "studentDetail.history.oldValue" | t }} :
+                    {{ item.oldValue }} ·
+                    {{ "studentDetail.history.newValue" | t }} :
+                    {{ item.newValue }}
+                  </p>
+                  <p class="mt-1 text-[12px]">
+                    {{ "studentDetail.history.reason" | t }} :
+                    {{ item.reasonKey | t }}
+                  </p>
+                  <p class="mt-1 text-[11px] text-[#748094]">
+                    {{ "studentDetail.history.by" | t }} {{ item.author }}
+                  </p>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div
+              class="mt-4 rounded-[14px] bg-[#f1f4f8] px-4 py-8 text-center text-[12px] text-[#718096]"
+            >
+              {{ "studentDetail.empty.history" | t }}
+            </div>
+          }
+        </article>
+      }
+    }
+  } @else {
+    <div
+      class="rounded-[17px] border border-dashed border-[#cbd5e1] bg-white px-6 py-16 text-center"
+    >
+      <i class="ph ph-user-minus text-[36px] text-[#8aa3bd]"></i>
+      <h1 class="mt-3 text-[18px] font-bold text-[#334155]">
+        {{ "studentDetail.notFound.title" | t }}
+      </h1>
+      <p class="mt-1 text-[13px] text-[#718096]">
+        {{ "studentDetail.notFound.subtitle" | t }}
+      </p>
+      <a
+        routerLink="/stagiaires"
+        class="mt-5 inline-flex h-[38px] items-center rounded-[10px] bg-[#2a64a2] px-4 text-[12px] font-semibold text-white"
+        >{{ "studentDetail.backStudents" | t }}</a
+      >
+    </div>
+  }
+</section>

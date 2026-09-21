@@ -1,0 +1,357 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[80]">
+    <button
+      type="button"
+      class="absolute inset-0 cursor-default bg-[#0f2744]/35 backdrop-blur-[1px]"
+      (click)="requestClose()"
+      [attr.aria-label]="'internships.drawer.close' | t"
+    ></button>
+
+    <aside
+      class="absolute inset-y-0 right-0 flex w-full max-w-[620px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(16,38,68,0.18)]"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'internships.drawer.title' | t"
+    >
+      <header
+        class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="grid size-11 place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
+          >
+            <i class="ph ph-suitcase-simple text-[22px]"></i>
+          </span>
+          <div>
+            <h2
+              class="text-[20px] font-extrabold tracking-[-0.4px] text-[#172033]"
+            >
+              {{ "internships.drawer.title" | t }}
+            </h2>
+            <p class="mt-0.5 text-[12px] text-[#718096]">
+              {{ "internships.drawer.subtitle" | t }}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="requestClose()"
+          class="grid size-10 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#536277] transition hover:bg-[#f1f5f9]"
+          [attr.aria-label]="'internships.drawer.close' | t"
+        >
+          <i class="ph ph-x text-[20px]"></i>
+        </button>
+      </header>
+
+      <form
+        class="flex min-h-0 flex-1 flex-col"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        novalidate
+      >
+        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i class="ph ph-student text-[19px] text-[#2a64a2]"></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "internships.drawer.student.title" | t }}
+              </h3>
+            </div>
+
+            <label
+              for="internship-student"
+              class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+              >{{ "internships.drawer.student.student" | t }} *</label
+            >
+            <div class="relative">
+              <select
+                id="internship-student"
+                formControlName="studentId"
+                class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+              >
+                @for (student of students; track student.id) {
+                  <option [value]="student.id">
+                    {{ student.firstName }} {{ student.lastName }}
+                  </option>
+                }
+              </select>
+              <i
+                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+              ></i>
+            </div>
+          </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i class="ph ph-buildings text-[19px] text-[#2a64a2]"></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "internships.drawer.company.title" | t }}
+              </h3>
+            </div>
+
+            <div>
+              <label
+                for="internship-company"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "internships.drawer.company.name" | t }} *</label
+              >
+              <input
+                id="internship-company"
+                formControlName="company"
+                [placeholder]="'internships.drawer.company.namePlaceholder' | t"
+                class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+              />
+              @if (showRequired("company")) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ "internships.drawer.errors.required" | t }}
+                </p>
+              }
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="internship-city"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.company.city" | t }} *</label
+                >
+                <input
+                  id="internship-city"
+                  formControlName="city"
+                  [placeholder]="
+                    'internships.drawer.company.cityPlaceholder' | t
+                  "
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+                @if (showRequired("city")) {
+                  <p class="mt-1 text-[11px] text-red-600">
+                    {{ "internships.drawer.errors.required" | t }}
+                  </p>
+                }
+              </div>
+              <div>
+                <label
+                  for="internship-tutor"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.company.tutor" | t }} *</label
+                >
+                <input
+                  id="internship-tutor"
+                  formControlName="tutor"
+                  [placeholder]="
+                    'internships.drawer.company.tutorPlaceholder' | t
+                  "
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+                @if (showRequired("tutor")) {
+                  <p class="mt-1 text-[11px] text-red-600">
+                    {{ "internships.drawer.errors.required" | t }}
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="internship-tutor-email"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.company.email" | t }}</label
+                >
+                <div class="relative">
+                  <i
+                    class="ph ph-envelope-simple absolute left-3.5 top-1/2 -translate-y-1/2 text-[16px] text-[#8a96a8]"
+                  ></i>
+                  <input
+                    id="internship-tutor-email"
+                    type="email"
+                    formControlName="tutorEmail"
+                    [placeholder]="
+                      'internships.drawer.company.emailPlaceholder' | t
+                    "
+                    class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white pl-10 pr-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                  />
+                </div>
+                @if (showEmailError()) {
+                  <p class="mt-1 text-[11px] text-red-600">
+                    {{ "internships.drawer.errors.email" | t }}
+                  </p>
+                }
+              </div>
+              <div>
+                <label
+                  for="internship-tutor-phone"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.company.phone" | t }}</label
+                >
+                <div class="relative">
+                  <i
+                    class="ph ph-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-[16px] text-[#8a96a8]"
+                  ></i>
+                  <input
+                    id="internship-tutor-phone"
+                    type="tel"
+                    formControlName="tutorPhone"
+                    [placeholder]="
+                      'internships.drawer.company.phonePlaceholder' | t
+                    "
+                    class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white pl-10 pr-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i class="ph ph-calendar-dots text-[19px] text-[#2a64a2]"></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "internships.drawer.period.title" | t }}
+              </h3>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  for="internship-start"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.period.startDate" | t }} *</label
+                >
+                <input
+                  id="internship-start"
+                  type="date"
+                  formControlName="startDate"
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+              </div>
+              <div>
+                <label
+                  for="internship-end"
+                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                  >{{ "internships.drawer.period.endDate" | t }} *</label
+                >
+                <input
+                  id="internship-end"
+                  type="date"
+                  formControlName="endDate"
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+              </div>
+            </div>
+            @if (
+              dateRangeInvalid() &&
+              (submitted() || form.controls.endDate.touched)
+            ) {
+              <p class="mt-2 text-[11px] text-red-600">
+                {{ "internships.drawer.errors.dateRange" | t }}
+              </p>
+            }
+
+            <div class="mt-4">
+              <label
+                for="internship-hours"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "internships.drawer.period.plannedHours" | t }} *</label
+              >
+              <div class="relative max-w-[220px]">
+                <input
+                  id="internship-hours"
+                  type="number"
+                  min="1"
+                  max="1000"
+                  formControlName="plannedHours"
+                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 pr-10 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+                />
+                <span
+                  class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#718096]"
+                  >h</span
+                >
+              </div>
+              @if (showHoursError()) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ "internships.drawer.errors.hours" | t }}
+                </p>
+              }
+            </div>
+          </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center gap-2">
+              <i class="ph ph-file-text text-[19px] text-[#2a64a2]"></i>
+              <h3 class="text-[15px] font-bold text-[#172033]">
+                {{ "internships.drawer.followup.title" | t }}
+              </h3>
+            </div>
+
+            <div class="flex items-start gap-3 rounded-[14px] bg-[#eef5fc] p-4">
+              <input
+                id="internship-agreement"
+                type="checkbox"
+                formControlName="agreementReceived"
+                class="mt-0.5 size-4 rounded border-[#b8c5d3] accent-[#2a64a2]"
+              />
+              <label for="internship-agreement" class="cursor-pointer">
+                <span class="block text-[13px] font-semibold text-[#172033]">{{
+                  "internships.drawer.followup.agreementReceived" | t
+                }}</span>
+                <span
+                  class="mt-0.5 block text-[11.5px] leading-[1.45] text-[#718096]"
+                  >{{ "internships.drawer.followup.agreementHelp" | t }}</span
+                >
+              </label>
+            </div>
+
+            <div class="mt-4">
+              <label
+                for="internship-notes"
+                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
+                >{{ "internships.drawer.followup.notes" | t }}</label
+              >
+              <textarea
+                id="internship-notes"
+                rows="4"
+                formControlName="notes"
+                [placeholder]="
+                  'internships.drawer.followup.notesPlaceholder' | t
+                "
+                class="w-full resize-none rounded-[11px] border border-[#dce3eb] bg-white px-3.5 py-3 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
+              ></textarea>
+            </div>
+          </section>
+        </div>
+
+        <footer
+          class="flex items-center justify-between gap-3 border-t border-[#dfe5ec] bg-white px-6 py-4"
+        >
+          <p class="hidden text-[11px] text-[#7a8698] sm:block">
+            {{ "internships.drawer.requiredHint" | t }}
+          </p>
+          <div class="ml-auto flex gap-2">
+            <button
+              type="button"
+              (click)="requestClose()"
+              class="inline-flex h-[40px] items-center justify-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#475569] shadow-sm transition hover:bg-[#f8fafc]"
+            >
+              {{ "internships.drawer.cancel" | t }}
+            </button>
+            <button
+              type="submit"
+              class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f]"
+            >
+              <i class="ph ph-plus text-[17px]"></i
+              >{{ "internships.drawer.submit" | t }}
+            </button>
+          </div>
+        </footer>
+      </form>
+    </aside>
+  </div>
+}

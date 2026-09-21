@@ -1,0 +1,191 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ titleKey() | t }}
+      </h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+        {{ subtitleKey() | t: { count: periods().length } }}
+      </p>
+    </div>
+    @if (canCreate()) {
+      <button
+        type="button"
+        (click)="openDrawer()"
+        class="inline-flex h-[39px] items-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm sm:self-auto"
+      >
+        <i class="ph ph-plus text-[17px]"></i>{{ "internships.newPeriod" | t }}
+      </button>
+    }
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <article
+      class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[11px] font-medium uppercase text-[#637083]">
+        {{ "internships.kpi.planned" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ totals().planned }} h</p>
+      <span
+        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+        ><i class="ph ph-suitcase-simple text-[20px]"></i
+      ></span>
+    </article>
+    <article
+      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[11px] font-medium uppercase text-[#637083]">
+        {{ "internships.kpi.completed" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ totals().completed }} h</p>
+    </article>
+    <article
+      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[11px] font-medium uppercase text-[#637083]">
+        {{ "internships.kpi.remaining" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ totals().remaining }} h</p>
+    </article>
+    <article
+      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[11px] font-medium uppercase text-[#637083]">
+        {{ "internships.kpi.incomplete" | t }}
+      </p>
+      <p class="mt-2 text-[25px] font-extrabold">{{ totals().incomplete }}</p>
+    </article>
+  </div>
+
+  <div class="mt-4 space-y-4">
+    @for (period of periods(); track period.id) {
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <h2 class="text-[16px] font-bold text-[#172033]">
+              {{ period.studentName }} — {{ period.company }} —
+              {{ period.city }}
+            </h2>
+            <p class="mt-1 text-[13px] text-[#6f7b8e]">
+              {{
+                "internships.tutorLine"
+                  | t
+                    : {
+                        tutor: period.tutor,
+                        start: period.startDate,
+                        end: period.endDate,
+                      }
+              }}
+            </p>
+          </div>
+          <span
+            [class]="
+              'inline-flex self-start rounded-full px-3 py-1 text-[12px] font-semibold ' +
+              statusClass(period.status)
+            "
+            >{{ "internships.status." + period.status | t }}</span
+          >
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+            <p class="text-[12px] text-[#748094]">
+              {{ "internships.card.planned" | t }}
+            </p>
+            <p class="mt-1 text-[20px] font-bold">
+              {{ period.plannedHours }} h
+            </p>
+          </div>
+          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+            <p class="text-[12px] text-[#748094]">
+              {{ "internships.card.completed" | t }}
+            </p>
+            <p class="mt-1 text-[20px] font-bold">
+              {{ period.completedHours }} h
+            </p>
+          </div>
+          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+            <p class="text-[12px] text-[#748094]">
+              {{ "internships.card.remaining" | t }}
+            </p>
+            <p class="mt-1 text-[20px] font-bold">{{ remaining(period) }} h</p>
+          </div>
+          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+            <p class="text-[12px] text-[#748094]">
+              {{ "internships.card.progress" | t }}
+            </p>
+            <p class="mt-1 text-[20px] font-bold">{{ progress(period) }} %</p>
+          </div>
+        </div>
+
+        <app-progress-bar
+          class="mt-3 block"
+          [value]="progress(period)"
+          heightClass="h-[11px]"
+        />
+
+        <div class="mt-4 grid gap-4 xl:grid-cols-[1.05fr_1fr]">
+          <div>
+            <h3 class="text-[14px] font-bold">
+              {{ "internships.activitiesTitle" | t }}
+            </h3>
+            <div class="mt-2 space-y-2">
+              @for (activity of period.activities; track activity.labelKey) {
+                <div
+                  class="flex min-h-[38px] items-center justify-between gap-3 rounded-[13px] bg-[#f0f3f7] px-3 py-2"
+                >
+                  <span class="text-[13px] text-[#334155]">{{
+                    activity.labelKey | t
+                  }}</span>
+                  <span
+                    [class]="
+                      activity.status === 'done'
+                        ? 'shrink-0 rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]'
+                        : 'shrink-0 rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]'
+                    "
+                    >{{
+                      "internships.activityStatus." + activity.status | t
+                    }}</span
+                  >
+                </div>
+              }
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-[14px] font-bold">
+              {{ "internships.observationsTitle" | t }}
+            </h3>
+            <div
+              class="mt-2 rounded-[15px] bg-[#e5f2ff] px-3 py-3 text-[13px] leading-[1.45] text-[#245c97]"
+            >
+              {{ period.tutorObservationKey | t }}
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+              @for (document of period.documents; track document.labelKey) {
+                <span
+                  [class]="
+                    'inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                    documentClass(document)
+                  "
+                  >{{ document.labelKey | t }}</span
+                >
+              }
+            </div>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+<app-create-internship-drawer
+  [open]="drawerOpen()"
+  (closed)="closeDrawer()"
+  (periodCreated)="addPeriod($event)"
+/>

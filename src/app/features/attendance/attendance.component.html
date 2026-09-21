@@ -1,0 +1,310 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  @if (!isStudent()) {
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+    >
+      <div>
+        <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+          {{ "attendance.title" | t }}
+        </h1>
+        <p class="mt-0.5 text-[13px] text-[#6c788b]">
+          {{
+            "attendance.subtitle"
+              | t
+                : {
+                    date: "Lundi 21 septembre 2026",
+                    start: session.start,
+                    end: session.end,
+                    promotion: session.promotion,
+                  }
+          }}
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="save()"
+        class="inline-flex h-[39px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"
+      >
+        <i class="ph ph-floppy-disk text-[17px]"></i>
+        {{
+          (isSecretariat()
+            ? "attendance.actions.saveAdministration"
+            : "attendance.actions.save"
+          ) | t
+        }}
+      </button>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] font-medium uppercase text-[#637083]">
+          {{ "attendance.metrics.present" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ metrics().present }}</p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] font-medium uppercase text-[#637083]">
+          {{ "attendance.metrics.late" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ metrics().late }}</p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] font-medium uppercase text-[#637083]">
+          {{ "attendance.metrics.absent" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ metrics().absent }}</p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] font-medium uppercase text-[#637083]">
+          {{ "attendance.metrics.missedHours" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ metrics().missedHours }} h
+        </p>
+        <p class="mt-1 text-[11px] text-[#8b95a5]">
+          {{ "attendance.metrics.excusedHint" | t }}
+        </p>
+      </article>
+    </div>
+
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+    >
+      <div>
+        <h2 class="text-[15px] font-bold">{{ "attendance.list.title" | t }}</h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">
+          {{
+            (isSecretariat()
+              ? "attendance.list.secretariatSubtitle"
+              : "attendance.list.subtitle"
+            ) | t
+          }}
+        </p>
+      </div>
+
+      <div class="mt-4 space-y-2.5">
+        @for (student of visibleStudents(); track student.id) {
+          <section
+            class="rounded-[15px] border border-[#e1e7ee] bg-white px-3 py-3 sm:px-4"
+          >
+            <div class="flex flex-col gap-3 xl:flex-row xl:items-center">
+              <div class="flex min-w-0 flex-1 items-center gap-3">
+                <span
+                  class="grid size-[38px] shrink-0 place-items-center rounded-full bg-[#e6f2ff] text-[12px] font-bold text-[#245c97]"
+                  >{{ initials(student) }}</span
+                >
+                <div class="min-w-0">
+                  <p class="truncate text-[13px] font-bold text-[#172033]">
+                    {{ fullName(student) }}
+                  </p>
+                  <p class="mt-0.5 text-[10.5px] text-[#8a96a7]">
+                    {{
+                      "attendance.studentMeta"
+                        | t
+                          : {
+                              catchup: student.catchupHours,
+                              absences: student.absences,
+                            }
+                    }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                @for (
+                  status of ["present", "late", "absent", "excused"];
+                  track status
+                ) {
+                  <button
+                    type="button"
+                    (click)="setStatus(student.id, $any(status))"
+                    [class]="
+                      'h-[32px] min-w-[58px] rounded-full border px-3 text-[10.5px] font-semibold transition ' +
+                      statusClasses($any(status), student.status === status)
+                    "
+                  >
+                    {{ statusLabelKey($any(status)) | t }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (
+              student.status === "late" ||
+              student.status === "absent" ||
+              student.status === "excused"
+            ) {
+              <div
+                class="mt-3 grid gap-3 border-t border-[#eef2f6] pt-3 md:grid-cols-[1fr_1fr_1fr_1.15fr]"
+              >
+                <label class="block"
+                  ><span class="mb-1 block text-[9.5px] text-[#8a96a7]">{{
+                    "attendance.fields.arrival" | t
+                  }}</span>
+                  <div class="relative">
+                    <input
+                      type="time"
+                      [value]="student.arrival"
+                      (input)="updateField(student.id, 'arrival', $event)"
+                      class="h-[36px] w-full rounded-[9px] border border-[#dfe5ec] bg-white px-3 pr-8 text-[11px] outline-none focus:border-[#8fb4dc]"
+                    /><i
+                      class="ph ph-clock pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#66758a]"
+                    ></i></div
+                ></label>
+                <label class="block"
+                  ><span class="mb-1 block text-[9.5px] text-[#8a96a7]">{{
+                    "attendance.fields.departure" | t
+                  }}</span>
+                  <div class="relative">
+                    <input
+                      type="time"
+                      [value]="student.departure"
+                      (input)="updateField(student.id, 'departure', $event)"
+                      class="h-[36px] w-full rounded-[9px] border border-[#dfe5ec] bg-white px-3 pr-8 text-[11px] outline-none focus:border-[#8fb4dc]"
+                    /><i
+                      class="ph ph-clock pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#66758a]"
+                    ></i></div
+                ></label>
+                <label class="block"
+                  ><span class="mb-1 block text-[9.5px] text-[#8a96a7]">{{
+                    "attendance.fields.actualDuration" | t
+                  }}</span
+                  ><input
+                    [value]="student.duration + ' h'"
+                    readonly
+                    class="h-[36px] w-full rounded-[9px] border border-[#dfe5ec] bg-[#fbfcfe] px-3 text-[11px] text-[#536174]"
+                /></label>
+                <label class="block"
+                  ><span class="mb-1 block text-[9.5px] text-[#8a96a7]">{{
+                    (isSecretariat()
+                      ? "attendance.fields.justification"
+                      : "attendance.fields.comment"
+                    ) | t
+                  }}</span
+                  ><textarea
+                    rows="2"
+                    [value]="student.comment"
+                    (input)="updateField(student.id, 'comment', $event)"
+                    [placeholder]="
+                      (isSecretariat()
+                        ? 'attendance.placeholders.justification'
+                        : 'attendance.placeholders.comment'
+                      ) | t
+                    "
+                    class="min-h-[48px] w-full resize-none rounded-[9px] border border-[#dfe5ec] bg-white px-3 py-2 text-[11px] outline-none placeholder:text-[#a4adba] focus:border-[#8fb4dc]"
+                  ></textarea>
+                </label>
+              </div>
+              @if (student.addToCatchup && student.missedHours > 0) {
+                <p
+                  class="mt-2 inline-flex rounded-full bg-[#ffe6e3] px-2.5 py-1 text-[10px] font-semibold text-[#ee3a3a]"
+                >
+                  {{
+                    "attendance.catchupAdded"
+                      | t: { hours: student.missedHours }
+                  }}
+                </p>
+              }
+            }
+          </section>
+        }
+      </div>
+    </article>
+
+    @if (saved()) {
+      <div
+        class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[12px] bg-[#173f70] px-4 py-3 text-[12px] font-semibold text-white shadow-xl"
+      >
+        <i class="ph ph-check-circle text-[18px] text-[#69dc8c]"></i
+        >{{ "attendance.saved" | t }}
+      </div>
+    }
+  } @else {
+    <div>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "attendance.studentView.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[13px] text-[#6c788b]">
+        {{ "attendance.studentView.subtitle" | t }}
+      </p>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "attendance.studentView.status" | t }}
+        </p>
+        <p class="mt-2 text-[21px] font-extrabold text-[#20a956]">
+          {{ statusLabelKey(visibleStudents()[0].status) | t }}
+        </p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "attendance.studentView.completed" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ studentMetrics().completed }} h
+        </p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "attendance.studentView.missed" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ studentMetrics().missed }} h
+        </p>
+      </article>
+      <article
+        class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[11px] uppercase text-[#637083]">
+          {{ "attendance.studentView.catchup" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ studentMetrics().catchup }} h
+        </p>
+      </article>
+    </div>
+
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[15px] font-bold">
+        {{ "attendance.studentView.sessionTitle" | t }}
+      </h2>
+      <div class="mt-4 rounded-[15px] bg-[#f1f4f8] p-4">
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <p class="text-[13px] font-bold">{{ session.title }}</p>
+            <p class="mt-1 text-[11px] text-[#768295]">
+              {{ session.date }} · {{ session.start }}–{{ session.end }} ·
+              {{ session.trainer }}
+            </p>
+          </div>
+          <span
+            class="inline-flex w-fit rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]"
+            >{{ statusLabelKey(visibleStudents()[0].status) | t }}</span
+          >
+        </div>
+      </div>
+      <p class="mt-4 text-[12px] text-[#758196]">
+        {{ "attendance.studentView.readOnlyHint" | t }}
+      </p>
+    </article>
+  }
+</section>

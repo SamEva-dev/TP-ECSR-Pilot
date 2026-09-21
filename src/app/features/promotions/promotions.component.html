@@ -1,0 +1,274 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "promotions.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[13px] text-[#6c788b]">
+        {{ "promotions.subtitle" | t }}
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="openCreateDrawer()"
+      class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] sm:self-auto"
+    >
+      <i class="ph ph-plus text-[17px]"></i>
+      {{ "promotions.create" | t }}
+    </button>
+  </div>
+
+  @if (createdPromotionName()) {
+    <div
+      class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"
+    >
+      <i class="ph ph-check-circle text-[18px]"></i>
+      <span>{{
+        "promotions.drawer.created" | t: { name: createdPromotionName() }
+      }}</span>
+    </div>
+  }
+
+  <div class="mt-5 space-y-4">
+    @for (promotion of promotions(); track promotion.id) {
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <h2 class="text-[15px] font-extrabold text-[#263143]">
+              {{ promotion.name }}
+            </h2>
+            <p class="mt-1 text-[11.5px] text-[#758196]">
+              {{ promotion.start }} → {{ promotion.end }} ·
+              {{ "promotions.manager" | t }} : {{ promotion.manager }}
+            </p>
+          </div>
+          <span
+            class="inline-flex w-fit items-center gap-1 rounded-full bg-[#2b66a4] px-3 py-1 text-[10.5px] font-semibold text-white"
+          >
+            <i class="ph ph-graduation-cap text-[13px]"></i>
+            {{
+              "promotions.studentCount"
+                | t: { count: promotion.students.length }
+            }}
+          </span>
+        </div>
+
+        <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          <div class="rounded-[14px] bg-[#f0f3f7] px-3 py-2.5">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "promotions.metrics.planned" | t }}
+            </p>
+            <p class="mt-1 text-[15px] font-extrabold text-[#172033]">
+              {{ promotion.plannedHours }} h
+            </p>
+          </div>
+          <div class="rounded-[14px] bg-[#f0f3f7] px-3 py-2.5">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "promotions.metrics.completed" | t }}
+            </p>
+            <p class="mt-1 text-[15px] font-extrabold text-[#172033]">
+              {{ promotion.completedHours }} h
+            </p>
+          </div>
+          <div class="rounded-[14px] bg-[#f0f3f7] px-3 py-2.5">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "promotions.metrics.remaining" | t }}
+            </p>
+            <p class="mt-1 text-[15px] font-extrabold text-[#172033]">
+              {{ promotion.remainingHours }} h
+            </p>
+          </div>
+          <div class="rounded-[14px] bg-[#f0f3f7] px-3 py-2.5">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "promotions.metrics.catchup" | t }}
+            </p>
+            <p class="mt-1 text-[15px] font-extrabold text-[#172033]">
+              {{ promotion.catchupHours }} h
+            </p>
+          </div>
+          <div class="rounded-[14px] bg-[#f0f3f7] px-3 py-2.5">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "promotions.metrics.attendance" | t }}
+            </p>
+            <p class="mt-1 text-[15px] font-extrabold text-[#172033]">
+              {{ promotion.attendanceRate }} %
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="mb-1.5 flex items-center justify-between gap-3">
+            <p class="text-[11.5px] font-bold text-[#263143]">
+              {{ "promotions.averageProgress" | t }}
+            </p>
+            <span class="text-[11.5px] font-bold text-[#2b66a4]"
+              >{{ promotion.averageProgress }} %</span
+            >
+          </div>
+          <app-progress-bar
+            [value]="promotion.averageProgress"
+            heightClass="h-[9px]"
+          />
+        </div>
+
+        @if (promotion.exam; as exam) {
+          @if (exam.successRate !== undefined) {
+            <div
+              class="mt-4 grid gap-3 rounded-[15px] border border-[#dbe7f2] bg-[#f7fbff] p-4 sm:grid-cols-[1fr_auto]"
+            >
+              <div>
+                <p class="text-[10.5px] font-semibold uppercase text-[#5b7491]">
+                  {{ "promotions.exam.finalResults" | t }}
+                </p>
+                <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px]">
+                  <span
+                    ><strong>{{ exam.presented }}</strong>
+                    {{ "promotions.exam.presented" | t }}</span
+                  ><span class="text-[#18a547]"
+                    ><strong>{{ exam.graduated }}</strong>
+                    {{ "promotions.exam.graduated" | t }}</span
+                  ><span class="text-[#8b5e00]"
+                    ><strong>{{ exam.partial }}</strong>
+                    {{ "promotions.exam.partial" | t }}</span
+                  ><span class="text-[#f22b2b]"
+                    ><strong>{{ exam.failed }}</strong>
+                    {{ "promotions.exam.failed" | t }}</span
+                  >
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <p class="text-[10px] uppercase text-[#718096]">
+                    {{ "promotions.exam.successRate" | t }}
+                  </p>
+                  <p class="text-[24px] font-extrabold text-[#2a64a2]">
+                    {{ exam.successRate }} %
+                  </p>
+                </div>
+                <a
+                  [routerLink]="['/reussites', promotion.id]"
+                  class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[10.5px] font-semibold shadow-sm"
+                  ><i class="ph ph-trophy"></i
+                  >{{ "promotions.exam.details" | t }}</a
+                >
+              </div>
+            </div>
+          } @else {
+            <div
+              class="mt-4 flex flex-col gap-3 rounded-[15px] border border-[#ead8a4] bg-[#fff9e9] p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-[10.5px] font-semibold uppercase text-[#87641a]">
+                  {{ "promotions.exam.upcoming" | t }}
+                </p>
+                <p class="mt-1 text-[12px] font-bold text-[#5f4a1c]">
+                  {{
+                    "promotions.exam.scheduled"
+                      | t: { date: exam.scheduled ?? "—" }
+                  }}
+                </p>
+                <p class="mt-1 text-[10.5px] text-[#7b6a43]">
+                  {{
+                    "promotions.exam.ready"
+                      | t
+                        : {
+                            ready: exam.ready ?? 0,
+                            total: promotion.students.length,
+                          }
+                  }}
+                </p>
+              </div>
+              <a
+                routerLink="/certification"
+                class="inline-flex h-[35px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-3 text-[10.5px] font-semibold text-white"
+                ><i class="ph ph-certificate"></i
+                >{{ "promotions.exam.prepare" | t }}</a
+              >
+            </div>
+          }
+        }
+
+        @if (promotion.students.length) {
+          <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            @for (student of promotion.students; track student.id) {
+              <a
+                [routerLink]="['/stagiaires', student.id]"
+                class="flex min-h-[54px] items-center gap-3 rounded-[13px] border border-[#e1e7ee] bg-white px-3 py-2 transition hover:border-[#b8cadc] hover:shadow-sm"
+              >
+                <span
+                  class="grid size-[34px] shrink-0 place-items-center rounded-full bg-[#e5f2ff] text-[11px] font-bold text-[#2b66a4]"
+                  >{{ initials(student) }}</span
+                >
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[12.5px] font-bold text-[#263143]">
+                    {{ fullName(student) }}
+                  </p>
+                  <p class="mt-0.5 text-[10.5px] text-[#7b8798]">
+                    {{ student.progress }} % · {{ student.completedHours }} h
+                  </p>
+                </div>
+                <span
+                  [class]="
+                    'inline-flex shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                    statusClasses(student)
+                  "
+                  >{{ statusKey(student) | t }}</span
+                >
+              </a>
+            }
+          </div>
+        } @else {
+          <div
+            class="mt-4 flex items-center gap-3 rounded-[13px] border border-dashed border-[#cbd8e5] bg-[#f8fafc] px-4 py-3 text-[11.5px] text-[#718096]"
+          >
+            <i class="ph ph-users-three text-[18px] text-[#2a64a2]"></i>
+            {{ "promotions.drawer.emptyPromotion" | t }}
+          </div>
+        }
+      </article>
+    }
+  </div>
+
+  <article
+    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
+  >
+    <h2 class="text-[15px] font-extrabold text-[#263143]">
+      {{ "promotions.team.title" | t }}
+    </h2>
+    <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+      @for (member of team; track member.id) {
+        <div
+          class="flex min-h-[64px] items-center gap-3 rounded-[13px] border border-[#e1e7ee] px-3 py-2.5"
+        >
+          <span
+            class="grid size-[36px] shrink-0 place-items-center rounded-full bg-[#2b66a4] text-[10.5px] font-bold text-white"
+            >{{ member.initials }}</span
+          >
+          <div class="min-w-0">
+            <p class="truncate text-[12.5px] font-bold text-[#263143]">
+              {{ fullName(member) }}
+            </p>
+            <p class="mt-0.5 text-[10.5px] text-[#657286]">
+              {{ member.specialtyKey | t }}
+            </p>
+            <p class="text-[10.5px] text-[#7b8798]">
+              {{
+                "promotions.team.weeklyHours" | t: { hours: member.weeklyHours }
+              }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </article>
+</section>
+
+<app-create-promotion-drawer
+  [open]="drawerOpen()"
+  (closed)="closeCreateDrawer()"
+  (promotionCreated)="createPromotion($event)"
+/>

@@ -1,0 +1,681 @@
+@if (sessionService.session(); as user) {
+  @if (roleIsDirection()) {
+    <section class="mx-auto w-full max-w-[1450px]">
+      <div
+        class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+      >
+        <div>
+          <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+            {{ "home.greeting" | t: { name: user.firstName } }}
+          </h1>
+          <p class="mt-0.5 text-[14px] text-[#6c788b]">
+            {{
+              "home.direction.selectedPromotion"
+                | t
+                  : {
+                      promotion: promotion().name,
+                      start: "01/09/2026",
+                      end: "30/06/2027",
+                    }
+            }}
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a
+            routerLink="/rapports"
+            class="inline-flex h-[39px] items-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold shadow-sm"
+            >{{ "home.direction.exportReport" | t }}</a
+          >
+          <a
+            routerLink="/seances"
+            class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white"
+            ><i class="ph ph-plus text-[17px]"></i
+            >{{ "home.direction.newSession" | t }}</a
+          >
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p class="text-[11px] font-medium uppercase text-[#637083]">
+            {{ "home.direction.kpi.students" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">{{ students().length }}</p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+            ><i class="ph ph-users-three text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p class="text-[11px] font-medium uppercase text-[#637083]">
+            {{ "home.direction.kpi.trainers" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ metrics().trainers }}
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
+            ><i class="ph ph-users text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p class="text-[11px] font-medium uppercase text-[#637083]">
+            {{ "home.direction.kpi.attendance" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ metrics().attendanceRate }} %
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+            ><i class="ph ph-clipboard-text text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p class="text-[11px] font-medium uppercase text-[#637083]">
+            {{ "home.direction.kpi.completedHours" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ metrics().completedHours }} h
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
+            ><i class="ph ph-clock text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p
+            class="max-w-[100px] text-[11px] font-medium uppercase leading-[1.2] text-[#637083]"
+          >
+            {{ "home.direction.kpi.catchupHours" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ metrics().catchupHours }} h
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#6f5013]"
+            ><i class="ph ph-warning text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white px-4 py-4 shadow-sm"
+        >
+          <p
+            class="max-w-[112px] text-[11px] font-medium uppercase leading-[1.2] text-[#637083]"
+          >
+            {{ "home.direction.kpi.averageProgress" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ metrics().progress }} %
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+            ><i class="ph ph-trend-up text-[20px]"></i
+          ></span>
+        </article>
+      </div>
+
+      <div class="mt-4 grid gap-4 xl:grid-cols-3">
+        <article
+          class="min-h-[423px] rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.direction.progress.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.direction.progress.subtitle" | t }}
+          </p>
+          <p class="mt-5 text-[37px] font-extrabold text-[#2a64a2]">
+            {{ metrics().progress }} %
+          </p>
+          <app-progress-bar
+            class="mt-3 block"
+            [value]="metrics().progress"
+            heightClass="h-[11px]"
+          />
+          <div class="mt-4 grid grid-cols-3 gap-2.5 text-center">
+            <div class="rounded-[16px] bg-[#f1f4f8] p-3">
+              <p class="text-[20px] font-bold">{{ statusCounts().good }}</p>
+              <span
+                class="mt-2 inline-flex rounded-full bg-[#d8f8df] px-2.5 py-1 text-[11px] font-semibold text-[#18a547]"
+                >{{ "common.studentStatus.good" | t }}</span
+              >
+            </div>
+            <div class="rounded-[16px] bg-[#f1f4f8] p-3">
+              <p class="text-[20px] font-bold">{{ statusCounts().warning }}</p>
+              <span
+                class="mt-2 inline-flex rounded-full bg-[#fff0c9] px-2.5 py-1 text-[11px] font-semibold text-[#8b5e00]"
+                >{{ "common.studentStatus.warning" | t }}</span
+              >
+            </div>
+            <div class="rounded-[16px] bg-[#f1f4f8] p-3">
+              <p class="text-[20px] font-bold">{{ statusCounts().late }}</p>
+              <span
+                class="mt-2 inline-flex rounded-full bg-[#ffe1df] px-2.5 py-1 text-[11px] font-semibold text-[#f22b2b]"
+                >{{ "common.studentStatus.late" | t }}</span
+              >
+            </div>
+          </div>
+        </article>
+
+        <article
+          class="min-h-[423px] rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.direction.hours.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.direction.hours.subtitle" | t }}
+          </p>
+          <dl class="mt-4 text-[13px]">
+            <div class="flex justify-between border-b border-[#e2e7ed] py-2.5">
+              <dt class="text-[#6e7a8c]">
+                {{ "home.direction.hours.planned" | t }}
+              </dt>
+              <dd class="font-bold">{{ metrics().totalPlannedHours }} h</dd>
+            </div>
+            <div class="flex justify-between border-b border-[#e2e7ed] py-2.5">
+              <dt class="text-[#6e7a8c]">
+                {{ "home.direction.hours.completed" | t }}
+              </dt>
+              <dd class="font-bold text-[#2a64a2]">
+                {{ metrics().completedHours }} h
+              </dd>
+            </div>
+            <div class="flex justify-between border-b border-[#e2e7ed] py-2.5">
+              <dt class="text-[#6e7a8c]">
+                {{ "home.direction.hours.remaining" | t }}
+              </dt>
+              <dd class="font-bold">{{ metrics().remainingHours }} h</dd>
+            </div>
+            <div class="flex justify-between py-2.5">
+              <dt class="text-[#6e7a8c]">
+                {{ "home.direction.hours.catchup" | t }}
+              </dt>
+              <dd class="font-bold text-[#ef2f2f]">
+                {{ metrics().catchupHours }} h
+              </dd>
+            </div>
+          </dl>
+          <app-progress-bar class="mt-2 block" [value]="70" />
+          <p class="mt-2 text-[12px] text-[#7a8698]">
+            {{ "home.direction.hours.volumeDone" | t: { value: 70 } }}
+          </p>
+        </article>
+
+        <article
+          class="min-h-[423px] rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.direction.alerts.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.direction.alerts.subtitle" | t }}
+          </p>
+          <ul class="mt-4 space-y-2">
+            @for (a of alerts; track a.id) {
+              <li
+                [class]="
+                  'flex min-h-[60px] gap-3 rounded-[17px] px-3.5 py-3 ' +
+                  alertClasses(a.level)
+                "
+              >
+                <i
+                  [class]="
+                    'ph mt-0.5 shrink-0 text-[16px] ' +
+                    alertIcon(a.level) +
+                    ' ' +
+                    alertIconClass(a.level)
+                  "
+                ></i>
+                <div>
+                  <p class="text-[12.5px] font-bold leading-[1.35]">
+                    {{ a.titleKey | t }}
+                  </p>
+                  <p class="mt-0.5 text-[11px] leading-[1.3] text-[#687589]">
+                    {{ a.detailKey | t }}
+                  </p>
+                </div>
+              </li>
+            }
+          </ul>
+        </article>
+      </div>
+
+      <article
+        class="mt-4 overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white shadow-sm"
+      >
+        <div class="flex items-start justify-between gap-3 px-5 py-4">
+          <div>
+            <h2 class="text-[16px] font-bold">
+              {{ "home.direction.watch.title" | t }}
+            </h2>
+            <p class="mt-0.5 text-[13px] text-[#768295]">
+              {{ "home.direction.watch.subtitle" | t }}
+            </p>
+          </div>
+          <a
+            routerLink="/stagiaires"
+            class="inline-flex h-[36px] items-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
+            >{{ "home.direction.watch.allStudents" | t }}</a
+          >
+        </div>
+        <div class="overflow-x-auto px-5 pb-4">
+          <table class="min-w-full text-left text-[13px]">
+            <thead>
+              <tr
+                class="border-b border-[#e0e6ed] text-[10.5px] uppercase text-[#687589]"
+              >
+                <th class="pb-2">{{ "home.direction.watch.name" | t }}</th>
+                <th class="pb-2">{{ "home.direction.watch.progress" | t }}</th>
+                <th class="pb-2">
+                  {{ "home.direction.watch.completedHours" | t }}
+                </th>
+                <th class="pb-2">{{ "home.direction.watch.catchup" | t }}</th>
+                <th class="pb-2">{{ "home.direction.watch.sheets" | t }}</th>
+                <th class="pb-2">{{ "home.direction.watch.status" | t }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of studentsToWatch(); track s.id) {
+                <tr class="border-b border-[#edf1f5] last:border-0">
+                  <td class="py-3 pr-4 font-semibold">{{ fullName(s) }}</td>
+                  <td class="py-3 pr-4">
+                    <div class="flex min-w-[135px] items-center gap-2">
+                      <app-progress-bar
+                        class="block w-[96px]"
+                        [value]="s.progress"
+                        heightClass="h-[8px]"
+                      /><span>{{ s.progress }} %</span>
+                    </div>
+                  </td>
+                  <td class="py-3 pr-4">{{ s.completedHours }} h</td>
+                  <td
+                    class="py-3 pr-4 font-semibold"
+                    [class.text-red-600]="s.catchupHours > 10"
+                  >
+                    {{ s.catchupHours }} h
+                  </td>
+                  <td class="py-3 pr-4">{{ s.preparedSheets }} / 58</td>
+                  <td class="py-3"><app-status-pill [status]="s.status" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  } @else if (roleIsTrainer()) {
+    <section class="mx-auto w-full max-w-[1450px]">
+      <div>
+        <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+          {{ "home.greeting" | t: { name: user.firstName } }}
+        </h1>
+        <p class="mt-0.5 text-[14px] text-[#6c788b]">
+          {{ "home.trainer.todaySubtitle" | t }}
+        </p>
+      </div>
+      <div class="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        @for (
+          a of [
+            {
+              k: "home.trainer.actions.newSession",
+              i: "ph-plus",
+              l: "/seances",
+            },
+            {
+              k: "home.trainer.actions.attendance",
+              i: "ph-clipboard-text",
+              l: "/presences",
+            },
+            {
+              k: "home.trainer.actions.evaluateDriving",
+              i: "ph-car",
+              l: "/conduite",
+            },
+            {
+              k: "home.trainer.actions.evaluateSheet",
+              i: "ph-presentation-chart",
+              l: "/fiches",
+            },
+            {
+              k: "home.trainer.actions.addObservation",
+              i: "ph-target",
+              l: "/conduite",
+            },
+          ];
+          track a.k
+        ) {
+          <a
+            [routerLink]="a.l"
+            class="flex min-h-[61px] items-center gap-3 rounded-[15px] border border-[#dfe5ec] bg-white px-4 shadow-sm"
+            ><span
+              class="grid size-[37px] place-items-center rounded-full bg-[#2a64a2] text-white"
+              ><i [class]="'ph text-[17px] ' + a.i"></i></span
+            ><span class="text-[13px] font-bold">{{ a.k | t }}</span></a
+          >
+        }
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[2.05fr_1fr]">
+        <article
+          class="min-h-[610px] rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.trainer.mySessions" | t }}
+          </h2>
+          <ul class="mt-4 space-y-2">
+            @for (item of trainerAgenda; track item.time) {
+              <li
+                class="flex min-h-[68px] items-center gap-4 rounded-[17px] border border-[#dfe5ec] px-3 py-2.5"
+              >
+                <span class="w-[58px] text-[16px] font-bold text-[#2a64a2]">{{
+                  item.time
+                }}</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[14px] font-bold">
+                    {{ item.target }}
+                  </p>
+                  <p class="truncate text-[13px] text-[#748094]">
+                    {{ item.subjectKey | t }}
+                  </p>
+                </div>
+                <app-type-badge [type]="item.type" /><a
+                  [routerLink]="
+                    item.type === 'driving'
+                      ? '/conduite'
+                      : item.type === 'presentation'
+                        ? '/fiches'
+                        : '/presences'
+                  "
+                  class="hidden rounded-[11px] border border-[#d9e0e9] px-3 py-2 text-[11px] font-semibold shadow-sm sm:inline-flex"
+                  >{{ "common.open" | t }}</a
+                >
+              </li>
+            }
+          </ul>
+        </article>
+        <article
+          class="min-h-[610px] rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.trainer.lastObservations" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.trainer.beforeNextSession" | t }}
+          </p>
+          <ul class="mt-4 space-y-3">
+            @for (o of observations; track o.id) {
+              <li class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+                <div class="flex justify-between">
+                  <p class="text-[13px] font-bold">{{ o.studentName }}</p>
+                  <span
+                    class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[11px] font-semibold text-[#2a64a2]"
+                    >{{ o.competence }}</span
+                  >
+                </div>
+                <p class="mt-1 text-[11px] text-[#738095]">
+                  {{ o.subjectKey | t }}
+                </p>
+                <p class="mt-2 text-[12px]">
+                  <span class="font-medium text-[#19a64a]"
+                    >{{ "common.positive" | t }} :</span
+                  >
+                  {{ o.positiveKey | t }}
+                </p>
+                <p class="text-[12px]">
+                  <span class="font-medium text-[#ef2f2f]"
+                    >{{ "common.toWorkOn" | t }} :</span
+                  >
+                  {{ o.workOnKey | t }}
+                </p>
+                <p class="mt-1 text-[12px]">
+                  <span class="font-medium text-[#2a64a2]"
+                    >{{ "common.nextGoal" | t }} :</span
+                  >
+                  {{ o.nextGoalKey | t }}
+                </p>
+              </li>
+            }
+          </ul>
+        </article>
+      </div>
+
+      <article
+        class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "home.trainer.myStudents" | t }}
+        </h2>
+        <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          @for (s of trainerStudents(); track s.id) {
+            <div class="rounded-[17px] border border-[#e1e8ef] bg-white p-4">
+              <div class="flex items-start justify-between gap-3">
+                <p class="text-[14px] font-bold text-[#172033]">
+                  {{ fullName(s) }}
+                </p>
+                <app-status-pill [status]="s.status" />
+              </div>
+              <app-progress-bar class="mt-3 block" [value]="s.progress" />
+              <p class="mt-2 text-[12px] text-[#768295]">
+                {{
+                  "home.trainer.studentSummary"
+                    | t
+                      : {
+                          progress: s.progress,
+                          hours: s.completedHours,
+                          catchup: s.catchupHours,
+                        }
+                }}
+              </p>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  } @else {
+    <section class="mx-auto w-full max-w-[1450px]">
+      <div>
+        <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+          {{ "home.greeting" | t: { name: user.firstName } }}
+        </h1>
+        <p class="mt-0.5 text-[14px] text-[#6c788b]">
+          {{ "home.student.subtitle" | t }}
+        </p>
+      </div>
+      <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <article
+          class="relative min-h-[90px] rounded-[17px] border border-[#dfe5ec] bg-white p-4"
+        >
+          <p class="text-[11px] uppercase text-[#637083]">
+            {{ "home.student.kpi.progress" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">{{ sam.progress }} %</p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
+            ><i class="ph ph-trend-up text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[90px] rounded-[17px] border border-[#dfe5ec] bg-white p-4"
+        >
+          <p class="text-[11px] uppercase text-[#637083]">
+            {{ "home.student.kpi.hours" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ sam.completedHours }} / {{ sam.plannedHours }} h
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
+            ><i class="ph ph-clock text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[90px] rounded-[17px] border border-[#dfe5ec] bg-white p-4"
+        >
+          <p class="text-[11px] uppercase text-[#637083]">
+            {{ "home.student.kpi.catchup" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ sam.catchupHours }} h
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#6f5013]"
+            ><i class="ph ph-warning text-[20px]"></i
+          ></span>
+        </article>
+        <article
+          class="relative min-h-[90px] rounded-[17px] border border-[#dfe5ec] bg-white p-4"
+        >
+          <p class="text-[11px] uppercase text-[#637083]">
+            {{ "home.student.kpi.validatedSheets" | t }}
+          </p>
+          <p class="mt-2 text-[25px] font-extrabold">
+            {{ sam.validatedSheets }} / 58
+          </p>
+          <span
+            class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d9f7df] text-[#22a84b]"
+            ><i class="ph ph-presentation-chart text-[20px]"></i
+          ></span>
+        </article>
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[2.05fr_1fr]">
+        <article
+          class="min-h-[377px] rounded-[17px] border border-[#dfe5ec] bg-white p-5"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.student.progress.title" | t }}
+          </h2>
+          <app-progress-bar
+            class="mt-4 block"
+            [value]="sam.progress"
+            heightClass="h-[12px]"
+          />
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            @for (e of sam.skills | keyvalue; track e.key) {
+              <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
+                <div class="flex justify-between text-[13px] font-bold">
+                  <span>{{ e.key }}</span
+                  ><span>{{ e.value }} %</span>
+                </div>
+                <app-progress-bar class="mt-2 block" [value]="$any(e.value)" />
+              </div>
+            }
+          </div>
+        </article>
+        <article
+          class="min-h-[377px] rounded-[17px] border border-[#dfe5ec] bg-white p-5"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "home.student.nextSession.title" | t }}
+          </h2>
+          <div class="mt-4 rounded-[17px] bg-[#e5f2ff] p-4">
+            <p class="text-[12px] font-semibold text-[#245c97]">
+              {{ "home.student.nextSession.firstDate" | t }}
+            </p>
+            <p class="mt-1 text-[14px] font-bold">
+              {{ "home.student.nextSession.firstTitle" | t }}
+            </p>
+            <p class="mt-1 text-[12px] text-[#687589]">
+              {{ "home.student.nextSession.firstMeta" | t }}
+            </p>
+          </div>
+          <div class="mt-3 rounded-[17px] border border-[#dfe5ec] p-4">
+            <p class="text-[12px] font-semibold">
+              {{ "home.student.nextSession.secondDate" | t }}
+            </p>
+            <p class="mt-1 text-[13px]">
+              {{ "home.student.nextSession.secondTitle" | t }}
+            </p>
+            <p class="mt-1 text-[12px] text-[#687589]">
+              {{ "home.student.nextSession.secondMeta" | t }}
+            </p>
+          </div>
+          <a
+            routerLink="/planning"
+            class="mt-3 flex h-[36px] items-center justify-center rounded-[11px] border border-[#d9e0e9] text-[12px] font-semibold shadow-sm"
+            >{{ "home.student.nextSession.seePlanning" | t }}</a
+          >
+        </article>
+      </div>
+      <div class="mt-4 grid gap-4 xl:grid-cols-2">
+        <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+          <h2 class="text-[16px] font-bold">
+            {{ "home.student.observations.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.student.observations.subtitle" | t }}
+          </p>
+          @for (o of observations; track o.id) {
+            @if (o.studentName === "Sam Fokam") {
+              <div class="mt-4 rounded-[17px] border border-[#dfe5ec] p-4">
+                <div class="flex justify-between">
+                  <p class="text-[13px] font-bold">{{ o.date }}</p>
+                  <span
+                    class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[11px] font-semibold text-[#2a64a2]"
+                    >{{ o.competence }}</span
+                  >
+                </div>
+                <p class="mt-1 text-[12px] text-[#738095]">
+                  {{ o.subjectKey | t }}
+                </p>
+                <p class="mt-2 flex gap-2 text-[12px]">
+                  <i class="ph ph-check-circle text-[#22a84b]"></i
+                  >{{ o.positiveKey | t }}
+                </p>
+                <p class="mt-1 flex gap-2 text-[12px]">
+                  <i class="ph ph-warning text-[#8b5e00]"></i
+                  >{{ o.workOnKey | t }}
+                </p>
+                <p
+                  class="mt-2 rounded-[10px] bg-[#e5f2ff] px-3 py-2 text-[12px] font-medium text-[#245c97]"
+                >
+                  {{ "common.nextGoal" | t }} : {{ o.nextGoalKey | t }}
+                </p>
+              </div>
+            }
+          }
+        </article>
+        <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+          <h2 class="text-[16px] font-bold">
+            {{ "home.student.timeline.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[13px] text-[#768295]">
+            {{ "home.student.timeline.subtitle" | t }}
+          </p>
+          <ol
+            class="relative mt-4 ml-2 space-y-4 border-l border-[#dfe5ec] pl-5"
+          >
+            @for (i of timeline; track i.dateKey) {
+              <li class="relative">
+                <span
+                  [class]="
+                    'absolute left-[-26px] top-[7px] size-[11px] rounded-full ' +
+                    dot(i.status)
+                  "
+                ></span>
+                <p class="text-[11px] text-[#738095]">{{ i.dateKey | t }}</p>
+                <p class="text-[13px] font-bold">{{ i.titleKey | t }}</p>
+                <p class="text-[12px] text-[#738095]">{{ i.detailKey | t }}</p>
+              </li>
+            }
+          </ol>
+          <a
+            routerLink="/stagiaires/s1"
+            class="mt-4 flex h-[36px] items-center justify-center gap-2 rounded-[11px] border border-[#d9e0e9] text-[12px] font-semibold shadow-sm"
+            ><i class="ph ph-calendar-dots text-[16px]"></i
+            >{{ "home.student.timeline.fullFile" | t }}</a
+          >
+        </article>
+      </div>
+    </section>
+  }
+}

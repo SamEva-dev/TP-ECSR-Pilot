@@ -1,0 +1,194 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "students.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+        {{
+          "students.resultCount"
+            | t: { displayed: filteredStudents().length, total: total() }
+        }}
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="openAddDrawer()"
+      class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] sm:self-auto"
+    >
+      <i class="ph ph-user-plus text-[17px]"></i>
+      {{ "students.add" | t }}
+    </button>
+  </div>
+
+  @if (createdStudentName()) {
+    <div
+      class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"
+    >
+      <i class="ph ph-check-circle text-[18px]"></i>
+      <span>{{
+        "students.drawer.created" | t: { name: createdStudentName() }
+      }}</span>
+    </div>
+  }
+
+  <article
+    class="mt-6 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+  >
+    <h2 class="text-[16px] font-bold text-[#172033]">
+      {{ "students.filters.title" | t }}
+    </h2>
+    <div class="mt-4 grid gap-3 lg:grid-cols-3">
+      <label class="relative block">
+        <span class="sr-only">{{ "students.filters.search" | t }}</span>
+        <i
+          class="ph ph-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-[#718096]"
+        ></i>
+        <input
+          type="search"
+          [value]="search()"
+          (input)="updateSearch($event)"
+          [placeholder]="'students.filters.searchPlaceholder' | t"
+          class="h-[40px] w-full rounded-[12px] border border-[#dce3eb] bg-white pl-10 pr-4 text-[13px] text-[#334155] outline-none shadow-sm placeholder:text-[#7d8899] focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+        />
+      </label>
+
+      <label class="relative block">
+        <span class="sr-only">{{ "students.filters.promotion" | t }}</span>
+        <select
+          [value]="promotionId()"
+          (change)="updatePromotion($event)"
+          class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+        >
+          <option value="all">
+            {{ "students.filters.allPromotions" | t }}
+          </option>
+          @for (promotion of promotions; track promotion.id) {
+            <option [value]="promotion.id">{{ promotion.name }}</option>
+          }
+        </select>
+        <i
+          class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+        ></i>
+      </label>
+
+      <label class="relative block">
+        <span class="sr-only">{{ "students.filters.status" | t }}</span>
+        <select
+          [value]="status()"
+          (change)="updateStatus($event)"
+          class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
+        >
+          <option value="all">{{ "students.filters.allStatuses" | t }}</option>
+          <option value="good">{{ "students.status.good" | t }}</option>
+          <option value="warning">{{ "students.status.warning" | t }}</option>
+          <option value="late">{{ "students.status.late" | t }}</option>
+        </select>
+        <i
+          class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
+        ></i>
+      </label>
+    </div>
+  </article>
+
+  @if (filteredStudents().length) {
+    <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      @for (student of filteredStudents(); track student.id) {
+        <a
+          [routerLink]="['/stagiaires', student.id]"
+          class="group block rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cce2] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#8eb4db]"
+        >
+          <div class="flex items-start gap-3">
+            <div
+              class="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#e6f2ff] text-[14px] font-bold text-[#2a64a2]"
+            >
+              {{ initials(student) }}
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[16px] font-bold text-[#172033]">
+                {{ student.firstName }} {{ student.lastName }}
+              </p>
+              <p class="mt-0.5 truncate text-[12px] text-[#748094]">
+                {{ student.promotionName }}
+              </p>
+            </div>
+            <span
+              [class]="
+                'inline-flex shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                statusClasses(student.status)
+              "
+              >{{ statusLabelKey(student.status) | t }}</span
+            >
+          </div>
+
+          <app-progress-bar
+            class="mt-4 block"
+            [value]="student.progress"
+            heightClass="h-[10px]"
+          />
+
+          <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
+              <p class="text-[14px] font-bold text-[#172033]">
+                {{ student.progress }} %
+              </p>
+              <p class="mt-0.5 text-[11px] text-[#718096]">
+                {{ "students.card.progress" | t }}
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
+              <p class="text-[14px] font-bold text-[#172033]">
+                {{ student.completedHours }} h
+              </p>
+              <p class="mt-0.5 text-[11px] text-[#718096]">
+                {{ "students.card.completed" | t }}
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
+              <p
+                class="text-[14px] font-bold"
+                [class.text-red-600]="student.catchupHours >= 10"
+                [class.text-[#172033]]="student.catchupHours < 10"
+              >
+                {{ student.catchupHours }} h
+              </p>
+              <p class="mt-0.5 text-[11px] text-[#718096]">
+                {{ "students.card.catchup" | t }}
+              </p>
+            </div>
+          </div>
+
+          <p class="mt-3 truncate text-[11.5px] text-[#748094]">
+            {{
+              "students.card.sheets"
+                | t
+                  : {
+                      prepared: student.preparedSheets,
+                      presented: student.presentedSheets,
+                      validated: student.validatedSheets,
+                    }
+            }}
+          </p>
+        </a>
+      }
+    </div>
+  } @else {
+    <div
+      class="mt-4 rounded-[17px] border border-dashed border-[#cbd5e1] bg-white px-6 py-14 text-center"
+    >
+      <i class="ph ph-users-three text-[34px] text-[#8aa3bd]"></i>
+      <p class="mt-3 text-[14px] font-semibold text-[#334155]">
+        {{ "students.empty.title" | t }}
+      </p>
+      <p class="mt-1 text-[12px] text-[#718096]">
+        {{ "students.empty.subtitle" | t }}
+      </p>
+    </div>
+  }
+</section>
+
+<app-add-student-drawer
+  [open]="drawerOpen()"
+  (closed)="closeAddDrawer()"
+  (studentCreated)="createStudent($event)"
+/>

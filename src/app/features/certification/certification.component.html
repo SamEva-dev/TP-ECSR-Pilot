@@ -1,0 +1,457 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "certification.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[13px] text-[#6c788b]">
+        {{ "certification.subtitle" | t }}
+      </p>
+    </div>
+    @if (isManagement()) {
+      <div class="flex flex-wrap gap-2">
+        <a
+          routerLink="/resultats"
+          class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold shadow-sm"
+          ><i class="ph ph-check-square-offset text-[16px]"></i
+          >{{ "certification.actions.results" | t }}</a
+        >
+        <a
+          [routerLink]="['/certification/sessions', examSession.id]"
+          class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"
+          ><i class="ph ph-calendar-check text-[16px]"></i
+          >{{ "certification.actions.manageSession" | t }}</a
+        >
+      </div>
+    }
+  </div>
+
+  @if (isManagement()) {
+    <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <article
+        class="relative min-h-[96px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "certification.kpi.candidates" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ candidates.length }}</p>
+        <span
+          class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+          ><i class="ph ph-users-three text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[96px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "certification.kpi.ready" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ readyCount() }} / {{ candidates.length }}
+        </p>
+        <span
+          class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#d8f8df] text-[#18a547]"
+          ><i class="ph ph-check-circle text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[96px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "certification.kpi.jury" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ juryMembers.length }}</p>
+        <span
+          class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#fff0c9] text-[#8b5e00]"
+          ><i class="ph ph-gavel text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[96px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "certification.kpi.readiness" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ completionRate() }} %</p>
+        <span
+          class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-trend-up text-[19px]"></i
+        ></span>
+      </article>
+    </div>
+
+    <div class="mt-4 grid gap-4 xl:grid-cols-[1.35fr_.85fr]">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <p
+              class="text-[10.5px] font-semibold uppercase tracking-wide text-[#2a64a2]"
+            >
+              {{ "certification.currentSession" | t }}
+            </p>
+            <h2 class="mt-1 text-[17px] font-extrabold text-[#172033]">
+              {{ examSession.name }}
+            </h2>
+            <p class="mt-1 text-[12px] text-[#718096]">
+              {{ examSession.startDate }} → {{ examSession.endDate }} ·
+              {{ examSession.location }}
+            </p>
+          </div>
+          <span
+            class="inline-flex w-fit rounded-full bg-[#fff0c9] px-3 py-1 text-[10.5px] font-semibold text-[#8b5e00]"
+            >{{ "certification.sessionStatus." + examSession.status | t }}</span
+          >
+        </div>
+        <div class="mt-5">
+          <div class="mb-2 flex items-center justify-between text-[12px]">
+            <span class="font-semibold text-[#334155]">{{
+              "certification.readiness" | t
+            }}</span
+            ><span class="font-bold text-[#2a64a2]"
+              >{{ completionRate() }} %</span
+            >
+          </div>
+          <app-progress-bar [value]="completionRate()" heightClass="h-[10px]" />
+        </div>
+        <div class="mt-5 grid gap-2 sm:grid-cols-3">
+          <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "certification.sessionCards.promotion" | t }}
+            </p>
+            <p class="mt-1 text-[12px] font-bold">
+              {{ examSession.promotionName }}
+            </p>
+          </div>
+          <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "certification.sessionCards.centre" | t }}
+            </p>
+            <p class="mt-1 text-[12px] font-bold">{{ examSession.centre }}</p>
+          </div>
+          <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+            <p class="text-[10px] text-[#7b8798]">
+              {{ "certification.sessionCards.jury" | t }}
+            </p>
+            <p class="mt-1 text-[12px] font-bold">
+              {{ juryMembers.length }} {{ "certification.jury.members" | t }}
+            </p>
+          </div>
+        </div>
+        <a
+          [routerLink]="['/certification/sessions', examSession.id]"
+          class="mt-4 inline-flex h-[37px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
+          ><i class="ph ph-arrow-right text-[15px]"></i
+          >{{ "common.open" | t }}</a
+        >
+      </article>
+
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "certification.jury.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">
+          {{ "certification.jury.subtitle" | t }}
+        </p>
+        <div class="mt-4 space-y-2">
+          @for (jury of juryMembers; track jury.id) {
+            <div
+              class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"
+            >
+              <span
+                class="grid size-[38px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[11px] font-bold text-white"
+                >{{ initials(jury) }}</span
+              >
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[12.5px] font-bold">
+                  {{ jury.firstName }} {{ jury.lastName }}
+                </p>
+                <p class="truncate text-[10.5px] text-[#748094]">
+                  {{ jury.professionKey | t }} · {{ jury.organisation }}
+                </p>
+              </div>
+              <span
+                class="rounded-full bg-[#d8f8df] px-2.5 py-1 text-[10px] font-semibold text-[#18a547]"
+                >{{ "certification.jury.active" | t }}</span
+              >
+            </div>
+          }
+        </div>
+      </article>
+    </div>
+
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div
+        class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div>
+          <h2 class="text-[16px] font-bold">
+            {{ "certification.candidates.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12px] text-[#768295]">
+            {{ "certification.candidates.subtitle" | t }}
+          </p>
+        </div>
+        <span class="text-[11px] text-[#7b8798]">{{
+          "certification.candidates.readySummary"
+            | t: { ready: readyCount(), total: candidates.length }
+        }}</span>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-left text-[12px]">
+          <thead>
+            <tr
+              class="border-b border-[#e1e7ee] text-[10px] uppercase text-[#718096]"
+            >
+              <th class="pb-2 pr-4">
+                {{ "certification.table.candidate" | t }}
+              </th>
+              <th class="pb-2 pr-4">{{ "certification.table.hours" | t }}</th>
+              <th class="pb-2 pr-4">
+                {{ "certification.table.documents" | t }}
+              </th>
+              <th class="pb-2 pr-4">CCP1</th>
+              <th class="pb-2 pr-4">CCP2</th>
+              <th class="pb-2 pr-4">
+                {{ "certification.table.readiness" | t }}
+              </th>
+              <th class="pb-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (candidate of candidates; track candidate.id) {
+              <tr class="border-b border-[#edf1f5] last:border-0">
+                <td class="py-3 pr-4">
+                  <p class="font-bold text-[#263143]">
+                    {{ candidate.firstName }} {{ candidate.lastName }}
+                  </p>
+                  <p class="text-[10.5px] text-[#7b8798]">
+                    {{ candidate.candidateNumber }}
+                  </p>
+                </td>
+                <td class="py-3 pr-4">
+                  {{ candidate.completedHours }} /
+                  {{ candidate.plannedHours }} h
+                </td>
+                <td class="py-3 pr-4">
+                  {{ candidate.documentsReady }} /
+                  {{ candidate.documentsTotal }}
+                </td>
+                <td class="py-3 pr-4">
+                  <span
+                    [class]="
+                      'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                      ccpClasses(candidate.ccp1)
+                    "
+                    >{{ "certification.ccp." + candidate.ccp1 | t }}</span
+                  >
+                </td>
+                <td class="py-3 pr-4">
+                  <span
+                    [class]="
+                      'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                      ccpClasses(candidate.ccp2)
+                    "
+                    >{{ "certification.ccp." + candidate.ccp2 | t }}</span
+                  >
+                </td>
+                <td class="py-3 pr-4">
+                  <span
+                    [class]="
+                      'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                      readinessClasses(candidate.ready)
+                    "
+                    >{{
+                      (candidate.ready
+                        ? "certification.ready"
+                        : "certification.incomplete"
+                      ) | t
+                    }}</span
+                  >
+                </td>
+                <td class="py-3 text-right">
+                  <a
+                    [routerLink]="['/certification/candidats', candidate.id]"
+                    class="inline-flex h-[31px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
+                    >{{ "common.open" | t }}</a
+                  >
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  } @else if (isTrainer()) {
+    <div class="mt-6 grid gap-4 xl:grid-cols-[1fr_2fr]">
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <span
+          class="grid size-[44px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+          ><i class="ph ph-certificate text-[22px]"></i
+        ></span>
+        <h2 class="mt-4 text-[17px] font-extrabold">{{ examSession.name }}</h2>
+        <p class="mt-1 text-[12px] text-[#718096]">
+          {{ examSession.startDate }} → {{ examSession.endDate }}
+        </p>
+        <div class="mt-5">
+          <div class="flex justify-between text-[12px]">
+            <span>{{ "certification.trainer.readyStudents" | t }}</span
+            ><strong>{{ readyCount() }} / {{ candidates.length }}</strong>
+          </div>
+          <app-progress-bar class="mt-2 block" [value]="completionRate()" />
+        </div>
+      </article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "certification.trainer.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">
+          {{ "certification.trainer.subtitle" | t }}
+        </p>
+        <div class="mt-4 grid gap-2 sm:grid-cols-2">
+          @for (candidate of candidates; track candidate.id) {
+            <a
+              [routerLink]="['/certification/candidats', candidate.id]"
+              class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3 hover:border-[#a9bfd5]"
+              ><span
+                class="grid size-[36px] place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white"
+                >{{ initials(candidate) }}</span
+              >
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[12.5px] font-bold">
+                  {{ candidate.firstName }} {{ candidate.lastName }}
+                </p>
+                <p class="text-[10.5px] text-[#7b8798]">
+                  {{ candidate.completedHours }} /
+                  {{ candidate.plannedHours }} h ·
+                  {{ candidate.documentsReady }}/{{ candidate.documentsTotal }}
+                  docs
+                </p>
+              </div>
+              <span
+                [class]="
+                  'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+                  readinessClasses(candidate.ready)
+                "
+                >{{
+                  (candidate.ready
+                    ? "certification.ready"
+                    : "certification.incomplete"
+                  ) | t
+                }}</span
+              ></a
+            >
+          }
+        </div>
+      </article>
+    </div>
+  } @else if (isStudent()) {
+    @if (currentCandidate(); as candidate) {
+      <div class="mt-6 grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+        <article
+          class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-[10.5px] font-semibold uppercase text-[#2a64a2]">
+                {{ "certification.student.myExam" | t }}
+              </p>
+              <h2 class="mt-1 text-[18px] font-extrabold">
+                {{ examSession.name }}
+              </h2>
+              <p class="mt-1 text-[12px] text-[#718096]">
+                {{ candidate.candidateNumber }}
+              </p>
+            </div>
+            <span
+              [class]="
+                'rounded-full px-3 py-1 text-[10.5px] font-semibold ' +
+                readinessClasses(candidate.ready)
+              "
+              >{{
+                (candidate.ready
+                  ? "certification.ready"
+                  : "certification.incomplete"
+                ) | t
+              }}</span
+            >
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+              <p class="text-[10px] text-[#7b8798]">
+                {{ "certification.table.hours" | t }}
+              </p>
+              <p class="mt-1 text-[14px] font-bold">
+                {{ candidate.completedHours }}/{{ candidate.plannedHours }} h
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+              <p class="text-[10px] text-[#7b8798]">
+                {{ "certification.table.documents" | t }}
+              </p>
+              <p class="mt-1 text-[14px] font-bold">
+                {{ candidate.documentsReady }}/{{ candidate.documentsTotal }}
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+              <p class="text-[10px] text-[#7b8798]">CCP1</p>
+              <p class="mt-1 text-[14px] font-bold text-[#18a547]">
+                {{ "certification.ccp." + candidate.ccp1 | t }}
+              </p>
+            </div>
+            <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+              <p class="text-[10px] text-[#7b8798]">CCP2</p>
+              <p class="mt-1 text-[14px] font-bold text-[#18a547]">
+                {{ "certification.ccp." + candidate.ccp2 | t }}
+              </p>
+            </div>
+          </div>
+          <a
+            [routerLink]="['/certification/candidats', candidate.id]"
+            class="mt-4 inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"
+            ><i class="ph ph-file-text text-[15px]"></i
+            >{{ "certification.student.openFile" | t }}</a
+          >
+        </article>
+        <article
+          class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+        >
+          <h2 class="text-[16px] font-bold">
+            {{ "certification.student.schedule" | t }}
+          </h2>
+          <div class="mt-4 space-y-2">
+            @for (step of candidate.steps; track step.id) {
+              <div
+                class="flex items-center gap-3 rounded-[13px] bg-[#f1f4f8] p-3"
+              >
+                <span
+                  class="grid size-[32px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+                  ><i class="ph ph-clock text-[15px]"></i
+                ></span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[12px] font-bold">
+                    {{ step.labelKey | t }}
+                  </p>
+                  <p class="text-[10.5px] text-[#7b8798]">
+                    {{ step.date }} · {{ step.time }} · {{ step.duration }}
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+    }
+  }
+</section>
