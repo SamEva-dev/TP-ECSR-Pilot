@@ -201,7 +201,7 @@
                   formControlName="promotionId"
                   class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
                 >
-                  @for (promotion of promotions; track promotion.id) {
+                  @for (promotion of promotions(); track promotion.id) {
                     <option [value]="promotion.id">{{ promotion.name }}</option>
                   }
                 </select>

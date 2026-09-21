@@ -1,4 +1,5 @@
 import type { StudentStatus } from "../models/app.models";
+import { STUDENT_DIRECTORY } from "./students.mock";
 
 export interface PromotionStudentSummary {
   id: string;
@@ -21,6 +22,7 @@ export interface PromotionSummary {
   catchupHours: number;
   attendanceRate: number;
   averageProgress: number;
+  studentCount: number;
   students: PromotionStudentSummary[];
   exam?: {
     scheduled?: string;
@@ -43,6 +45,18 @@ export interface PedagogicalTeamMember {
   weeklyHours: number;
 }
 
+const promotionStudents = (promotionId: string): PromotionStudentSummary[] =>
+  STUDENT_DIRECTORY.filter((student) => student.promotionId === promotionId).map(
+    ({ id, firstName, lastName, progress, completedHours, status }) => ({
+      id,
+      firstName,
+      lastName,
+      progress,
+      completedHours,
+      status,
+    }),
+  );
+
 export const PROMOTION_SUMMARIES: PromotionSummary[] = [
   {
     id: "p1",
@@ -57,80 +71,8 @@ export const PROMOTION_SUMMARIES: PromotionSummary[] = [
     attendanceRate: 96,
     averageProgress: 69,
     exam: { scheduled: "Février 2027", ready: 6 },
-    students: [
-      {
-        id: "s1",
-        firstName: "Sam",
-        lastName: "Fokam",
-        progress: 72,
-        completedHours: 684,
-        status: "good",
-      },
-      {
-        id: "s2",
-        firstName: "Julie",
-        lastName: "Moreau",
-        progress: 61,
-        completedHours: 555,
-        status: "late",
-      },
-      {
-        id: "s3",
-        firstName: "Marc",
-        lastName: "Girard",
-        progress: 78,
-        completedHours: 710,
-        status: "good",
-      },
-      {
-        id: "s4",
-        firstName: "Léa",
-        lastName: "Perrin",
-        progress: 55,
-        completedHours: 501,
-        status: "warning",
-      },
-      {
-        id: "s5",
-        firstName: "Karim",
-        lastName: "Benali",
-        progress: 84,
-        completedHours: 764,
-        status: "good",
-      },
-      {
-        id: "s6",
-        firstName: "Nadia",
-        lastName: "Chevalier",
-        progress: 66,
-        completedHours: 601,
-        status: "good",
-      },
-      {
-        id: "s7",
-        firstName: "Thomas",
-        lastName: "Roussel",
-        progress: 47,
-        completedHours: 428,
-        status: "late",
-      },
-      {
-        id: "s8",
-        firstName: "Chloé",
-        lastName: "Marchand",
-        progress: 91,
-        completedHours: 828,
-        status: "good",
-      },
-      {
-        id: "s9",
-        firstName: "Mehdi",
-        lastName: "Amrani",
-        progress: 69,
-        completedHours: 628,
-        status: "good",
-      },
-    ],
+    studentCount: 9,
+    students: promotionStudents("p1"),
   },
   {
     id: "p2",
@@ -152,56 +94,8 @@ export const PROMOTION_SUMMARIES: PromotionSummary[] = [
       absent: 1,
       successRate: 91.3,
     },
-    students: [
-      {
-        id: "s10",
-        firstName: "Emma",
-        lastName: "Lefèvre",
-        progress: 74,
-        completedHours: 673,
-        status: "good",
-      },
-      {
-        id: "s11",
-        firstName: "Lucas",
-        lastName: "Barbier",
-        progress: 58,
-        completedHours: 528,
-        status: "warning",
-      },
-      {
-        id: "s12",
-        firstName: "Awa",
-        lastName: "Diallo",
-        progress: 80,
-        completedHours: 728,
-        status: "good",
-      },
-      {
-        id: "s13",
-        firstName: "Hugo",
-        lastName: "Renaud",
-        progress: 63,
-        completedHours: 573,
-        status: "warning",
-      },
-      {
-        id: "s14",
-        firstName: "Sarah",
-        lastName: "Colin",
-        progress: 52,
-        completedHours: 473,
-        status: "late",
-      },
-      {
-        id: "s15",
-        firstName: "Antoine",
-        lastName: "Vasseur",
-        progress: 88,
-        completedHours: 801,
-        status: "good",
-      },
-    ],
+    studentCount: 24,
+    students: promotionStudents("p2"),
   },
 ];
 

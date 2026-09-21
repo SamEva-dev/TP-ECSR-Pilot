@@ -63,7 +63,7 @@
           <option value="all">
             {{ "students.filters.allPromotions" | t }}
           </option>
-          @for (promotion of promotions; track promotion.id) {
+          @for (promotion of promotions(); track promotion.id) {
             <option [value]="promotion.id">{{ promotion.name }}</option>
           }
         </select>

@@ -7,11 +7,11 @@ import {
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import {
-  CERTIFICATION_CANDIDATES,
-  EXAM_SESSIONS,
-  JURY_MEMBERS,
+import type {
+  CertificationCandidate,
+  CertificationUnitStatus,
 } from "../../core/mock-data/certification.mock";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
 @Component({
@@ -22,24 +22,32 @@ import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 })
 export class CertificationComponent {
   readonly sessionService = inject(SessionService);
-  readonly examSession = EXAM_SESSIONS[0];
-  readonly juryMembers = JURY_MEMBERS;
-  readonly candidates = CERTIFICATION_CANDIDATES;
+  readonly contextData = inject(ContextualTrainingDataService);
 
   readonly role = computed(() => this.sessionService.role());
-  readonly readyCount = computed(
-    () => this.candidates.filter((item) => item.ready).length,
+  readonly scheme = this.contextData.certificationScheme;
+  readonly juryMembers = this.contextData.juryMembers;
+  readonly program = this.contextData.program;
+  readonly readyCount = computed(() =>
+    this.contextData.certificationCandidates().filter((item) => item.ready).length,
   );
-  readonly completionRate = computed(() =>
-    Math.round((this.readyCount() / Math.max(this.candidates.length, 1)) * 100),
-  );
-  readonly currentCandidate = computed(() => {
-    const studentId = this.sessionService.session()?.studentId;
-    return (
-      this.candidates.find((item) => item.studentId === studentId) ??
-      this.candidates[0]
-    );
+  readonly completionRate = computed(() => {
+    const candidates = this.contextData.certificationCandidates();
+    return Math.round((this.readyCount() / Math.max(candidates.length, 1)) * 100);
   });
+  readonly currentCandidate = computed(() => {
+    const candidates = this.contextData.certificationCandidates();
+    const studentId = this.sessionService.session()?.studentId;
+    return candidates.find((item) => item.studentId === studentId) ?? candidates[0];
+  });
+
+  get examSession() {
+    return this.contextData.examSession();
+  }
+
+  get candidates() {
+    return this.contextData.certificationCandidates();
+  }
 
   isManagement(): boolean {
     return this.role() === "direction" || this.role() === "secretariat";
@@ -58,12 +66,18 @@ export class CertificationComponent {
   }
 
   readinessClasses(ready: boolean): string {
-    return ready
-      ? "bg-[#d8f8df] text-[#18a547]"
-      : "bg-[#fff0c9] text-[#8b5e00]";
+    return ready ? "bg-[#d8f8df] text-[#18a547]" : "bg-[#fff0c9] text-[#8b5e00]";
   }
 
-  ccpClasses(status: "validated" | "pending" | "not_validated"): string {
+  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
+    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+    if (explicit) return explicit;
+    if (unitId === "ccp1") return candidate.ccp1;
+    if (unitId === "ccp2") return candidate.ccp2;
+    return candidate.ready ? "validated" : "pending";
+  }
+
+  unitClasses(status: CertificationUnitStatus): string {
     return status === "validated"
       ? "bg-[#d8f8df] text-[#18a547]"
       : status === "pending"

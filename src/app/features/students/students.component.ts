@@ -2,16 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { PROMOTIONS } from "../../core/mock-data/dashboard.mock";
 import {
-  STUDENT_DIRECTORY,
   type StudentDirectoryItem,
 } from "../../core/mock-data/students.mock";
 import type { StudentStatus } from "../../core/models/app.models";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import {
   AddStudentDrawerComponent,
@@ -30,13 +30,23 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentsComponent {
-  readonly promotions = PROMOTIONS;
-  readonly students = signal<StudentDirectoryItem[]>([...STUDENT_DIRECTORY]);
+  readonly contextData = inject(ContextualTrainingDataService);
+  readonly createdStudents = signal<StudentDirectoryItem[]>([]);
   readonly drawerOpen = signal(false);
   readonly createdStudentName = signal("");
   readonly search = signal("");
   readonly promotionId = signal("all");
   readonly status = signal<"all" | StudentStatus>("all");
+
+  readonly promotions = computed(() => {
+    const cohort = this.contextData.cohort();
+    return cohort ? [{ id: cohort.id, name: cohort.name }] : [];
+  });
+
+  readonly students = computed(() => [
+    ...this.createdStudents(),
+    ...this.contextData.students(),
+  ]);
 
   readonly filteredStudents = computed(() => {
     const query = this.search().trim().toLocaleLowerCase("fr");
@@ -44,17 +54,17 @@ export class StudentsComponent {
     const status = this.status();
 
     return this.students().filter((student) => {
-      const fullName =
-        `${student.firstName} ${student.lastName}`.toLocaleLowerCase("fr");
+      const fullName = `${student.firstName} ${student.lastName}`.toLocaleLowerCase("fr");
       const matchesSearch = !query || fullName.includes(query);
-      const matchesPromotion =
-        promotionId === "all" || student.promotionId === promotionId;
+      const matchesPromotion = promotionId === "all" || student.promotionId === promotionId;
       const matchesStatus = status === "all" || student.status === status;
       return matchesSearch && matchesPromotion && matchesStatus;
     });
   });
 
-  readonly total = computed(() => this.students().length);
+  readonly total = computed(
+    () => this.contextData.cohort()?.studentCount ?? this.students().length,
+  );
 
   openAddDrawer() {
     this.drawerOpen.set(true);
@@ -65,15 +75,14 @@ export class StudentsComponent {
   }
 
   createStudent(payload: CreateStudentPayload) {
-    const promotion =
-      this.promotions.find((item) => item.id === payload.promotionId) ??
-      this.promotions[0];
+    const cohort = this.contextData.cohort();
+    if (!cohort) return;
     const student: StudentDirectoryItem = {
-      id: `s-${Date.now()}`,
+      id: `local-${Date.now()}`,
       firstName: payload.firstName.trim(),
       lastName: payload.lastName.trim(),
-      promotionId: promotion.id,
-      promotionName: promotion.name,
+      promotionId: cohort.id,
+      promotionName: cohort.name,
       progress: 0,
       completedHours: 0,
       catchupHours: 0,
@@ -83,7 +92,7 @@ export class StudentsComponent {
       status: "good",
     };
 
-    this.students.update((items) => [student, ...items]);
+    this.createdStudents.update((items) => [student, ...items]);
     this.createdStudentName.set(`${student.firstName} ${student.lastName}`);
     this.drawerOpen.set(false);
     setTimeout(() => this.createdStudentName.set(""), 3500);
@@ -98,9 +107,7 @@ export class StudentsComponent {
   }
 
   updateStatus(event: Event) {
-    this.status.set(
-      (event.target as HTMLSelectElement).value as "all" | StudentStatus,
-    );
+    this.status.set((event.target as HTMLSelectElement).value as "all" | StudentStatus);
   }
 
   initials(student: StudentDirectoryItem) {

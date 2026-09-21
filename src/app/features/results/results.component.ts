@@ -2,16 +2,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  CERTIFICATION_CANDIDATES,
-  EXAM_SESSIONS,
-  type CertificationCandidate,
-  type CertificationResult,
+import type {
+  CertificationCandidate,
+  CertificationResult,
+  CertificationUnitStatus,
 } from "../../core/mock-data/certification.mock";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({
   selector: "app-results",
@@ -20,10 +21,14 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResultsComponent {
-  readonly exam = EXAM_SESSIONS[0];
+  readonly contextData = inject(ContextualTrainingDataService);
   readonly published = signal(false);
-  readonly candidates = signal<CertificationCandidate[]>(
-    CERTIFICATION_CANDIDATES.map((item, index) => ({
+  readonly scheme = this.contextData.certificationScheme;
+  readonly program = this.contextData.program;
+  readonly exam = this.contextData.examSession;
+
+  readonly candidates = computed<CertificationCandidate[]>(() =>
+    this.contextData.certificationCandidates().map((item, index) => ({
       ...item,
       result: ([
         "obtained",
@@ -35,7 +40,7 @@ export class ResultsComponent {
         "failed",
         "obtained",
         "absent",
-      ][index] ?? "pending") as CertificationResult,
+      ][index % 9] ?? "pending") as CertificationResult,
     })),
   );
 
@@ -62,7 +67,15 @@ export class ResultsComponent {
     return "bg-[#e5f2ff] text-[#2a64a2]";
   }
 
-  ccpIcon(status: "validated" | "pending" | "not_validated"): string {
+  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
+    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+    if (explicit) return explicit;
+    if (unitId === "ccp1") return candidate.ccp1;
+    if (unitId === "ccp2") return candidate.ccp2;
+    return candidate.ready ? "validated" : "pending";
+  }
+
+  statusIcon(status: CertificationUnitStatus): string {
     return status === "validated"
       ? "ph-check-circle text-[#18a547]"
       : status === "not_validated"

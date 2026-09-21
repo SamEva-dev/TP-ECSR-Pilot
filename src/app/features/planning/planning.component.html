@@ -34,7 +34,7 @@
           <option value="all">
             {{ "planning.filters.allPromotions" | t }}
           </option>
-          @for (promotion of promotions; track promotion.id) {
+          @for (promotion of promotions(); track promotion.id) {
             <option [value]="promotion.id">{{ promotion.name }}</option>
           }
         </select>
@@ -77,6 +77,21 @@
       </div>
     </div>
   </article>
+
+  @if (canSeeWorkModes()) {
+    <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div><h2 class="text-[14px] font-bold text-[#172033]">{{ "planning.workModes.title" | t }}</h2><p class="mt-0.5 text-[11px] text-[#768295]">{{ "planning.workModes.subtitle" | t }}</p></div>
+        <a routerLink="/teletravail" class="inline-flex h-[34px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold text-[#2a64a2]"><i class="ph ph-house-line text-[15px]"></i>{{ "planning.workModes.open" | t }}</a>
+      </div>
+      <div class="mt-3 overflow-x-auto">
+        <table class="min-w-[720px] w-full text-left text-[11px]">
+          <thead><tr class="border-b border-[#edf1f5] text-[9.5px] uppercase text-[#7a8697]"><th class="pb-2">{{ "remoteWork.columns.employee" | t }}</th><th class="pb-2">{{ "remoteWork.days.monday" | t }}</th><th class="pb-2">{{ "remoteWork.days.tuesday" | t }}</th><th class="pb-2">{{ "remoteWork.days.wednesday" | t }}</th><th class="pb-2">{{ "remoteWork.days.thursday" | t }}</th><th class="pb-2">{{ "remoteWork.days.friday" | t }}</th></tr></thead>
+          <tbody>@for (row of teamWorkModes().slice(0,4); track row.userId) {<tr class="border-b border-[#f0f3f7] last:border-0"><td class="py-2.5 pr-3 font-semibold text-[#263247]">{{ row.userName }}</td>@for (mode of [row.monday,row.tuesday,row.wednesday,row.thursday,row.friday]; track $index) {<td class="py-2.5 pr-2"><span [class]="'inline-flex rounded-full px-2 py-1 text-[9.5px] font-semibold ' + workModeClass(mode)">{{ ('remoteWork.workModes.' + mode) | t }}</span></td>}</tr>}</tbody>
+        </table>
+      </div>
+    </article>
+  }
 
   <div class="mt-4 inline-flex rounded-[12px] bg-[#f1f4f8] p-1 text-[12px]">
     <button

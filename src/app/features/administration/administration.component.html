@@ -1,239 +1,210 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <div>
-    <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
-      {{ "administration.title" | t }}
-    </h1>
-    <p class="mt-0.5 text-[14px] text-[#6c788b]">
-      {{ "administration.subtitle" | t }}
-    </p>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-[#748094]">
+        <span>{{ workspace.organization()?.shortName }}</span>
+        <i class="ph ph-caret-right text-[10px]"></i>
+        <span>{{ "organizationAdmin.breadcrumb" | t }}</span>
+      </div>
+      <h1 class="mt-1 text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+        {{ "organizationAdmin.title" | t }}
+      </h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+        {{ "organizationAdmin.subtitle" | t: { organization: workspace.organization()?.name ?? "" } }}
+      </p>
+    </div>
+    <div class="inline-flex w-fit items-center gap-2 rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[12px] font-semibold text-[#4f5d70] shadow-sm">
+      <span class="size-2 rounded-full bg-[#22a84b]"></span>
+      {{ "organizationAdmin.active" | t }}
+    </div>
   </div>
 
-  <div class="mt-6 grid gap-4 xl:grid-cols-2">
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-    >
-      <div class="flex items-center justify-between gap-3">
-        <h2 class="text-[16px] font-bold">
-          {{ "administration.centre.title" | t }}
-        </h2>
-        <i class="ph ph-buildings text-[18px] text-[#7b8798]"></i>
+  <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <article class="relative min-h-[105px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6f7b8e]">{{ "organizationAdmin.kpi.sites" | t }}</p>
+      <p class="mt-2 text-[27px] font-extrabold text-[#172033]">{{ sites().length }}</p>
+      <span class="absolute right-4 top-4 grid size-[42px] place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-map-pin-area text-[20px]"></i></span>
+    </article>
+    <article class="relative min-h-[105px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6f7b8e]">{{ "organizationAdmin.kpi.programs" | t }}</p>
+      <p class="mt-2 text-[27px] font-extrabold text-[#172033]">{{ programs().length }}</p>
+      <span class="absolute right-4 top-4 grid size-[42px] place-items-center rounded-full bg-[#fff0d6] text-[#d47b00]"><i class="ph ph-books text-[20px]"></i></span>
+    </article>
+    <article class="relative min-h-[105px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6f7b8e]">{{ "organizationAdmin.kpi.students" | t }}</p>
+      <p class="mt-2 text-[27px] font-extrabold text-[#172033]">{{ metrics().students }}</p>
+      <span class="absolute right-4 top-4 grid size-[42px] place-items-center rounded-full bg-[#e2f7e8] text-[#159447]"><i class="ph ph-users-three text-[20px]"></i></span>
+    </article>
+    <article class="relative min-h-[105px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#6f7b8e]">{{ "organizationAdmin.kpi.activeCohorts" | t }}</p>
+      <p class="mt-2 text-[27px] font-extrabold text-[#172033]">{{ activeCohorts() }}</p>
+      <span class="absolute right-4 top-4 grid size-[42px] place-items-center rounded-full bg-[#efe9ff] text-[#6f4ec7]"><i class="ph ph-graduation-cap text-[20px]"></i></span>
+    </article>
+  </div>
+
+  <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+    @for (card of managementCards; track card.path) {
+      <a [routerLink]="card.path" class="group rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#c6d5e6] hover:shadow-md">
+        <div class="flex items-start gap-3">
+          <span [class]="'grid size-[42px] shrink-0 place-items-center rounded-[13px] ' + cardIconClass(card.tone)"><i [class]="'ph text-[20px] ' + card.icon"></i></span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2"><h2 class="text-[14px] font-bold text-[#172033]">{{ card.titleKey | t }}</h2><i class="ph ph-arrow-up-right text-[15px] text-[#9aa4b4] transition group-hover:text-[#2a64a2]"></i></div>
+            <p class="mt-1 text-[11.5px] leading-[1.45] text-[#748094]">{{ card.descriptionKey | t }}</p>
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-[1.25fr_.75fr]">
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.identity.title" | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ "organizationAdmin.identity.subtitle" | t }}</p></div>
+        <span class="rounded-full bg-[#e6f2ff] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]">{{ workspace.organization()?.code }}</span>
       </div>
 
-      <label class="mt-5 block text-[12px] font-semibold text-[#334155]">
-        {{ "administration.centre.name" | t }}
-        <input
-          [(ngModel)]="centreName"
-          class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-        />
-      </label>
-
-      <div class="mt-4 grid gap-3 sm:grid-cols-2">
-        <label class="block text-[12px] font-semibold text-[#334155]">
-          {{ "administration.centre.city" | t }}
-          <input
-            [(ngModel)]="city"
-            class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-          />
+      <div class="mt-5 grid gap-4 sm:grid-cols-2">
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.legalName" | t }}
+          <input [value]="profile().legalName" (input)="updateProfile('legalName', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
         </label>
-        <label class="block text-[12px] font-semibold text-[#334155]">
-          {{ "administration.centre.approval" | t }}
-          <input
-            [(ngModel)]="approvalNumber"
-            class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-          />
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.shortName" | t }}
+          <input [value]="profile().shortName" (input)="updateProfile('shortName', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.siret" | t }}
+          <input [value]="profile().siret" (input)="updateProfile('siret', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.declaration" | t }}
+          <input [value]="profile().trainingDeclarationNumber" (input)="updateProfile('trainingDeclarationNumber', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155] sm:col-span-2">{{ "organizationAdmin.identity.address" | t }}
+          <input [value]="profile().address" (input)="updateProfile('address', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.postalCode" | t }}
+          <input [value]="profile().postalCode" (input)="updateProfile('postalCode', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.city" | t }}
+          <input [value]="profile().city" (input)="updateProfile('city', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.email" | t }}
+          <input type="email" [value]="profile().email" (input)="updateProfile('email', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.phone" | t }}
+          <input [value]="profile().phone" (input)="updateProfile('phone', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.manager" | t }}
+          <input [value]="profile().managerName" (input)="updateProfile('managerName', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.identity.website" | t }}
+          <input [value]="profile().website" (input)="updateProfile('website', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
         </label>
       </div>
 
-      <div class="mt-4 flex items-center gap-3">
-        <button
-          type="button"
-          (click)="saveCentre()"
-          class="inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#255b93]"
-        >
-          <i class="ph ph-gear-six text-[16px]"></i
-          >{{ "administration.centre.save" | t }}
-        </button>
-        @if (saved()) {
-          <span class="text-[12px] font-semibold text-[#18a547]">{{
-            "administration.centre.saved" | t
-          }}</span>
-        }
+      <div class="mt-5 flex items-center gap-3 border-t border-[#edf1f5] pt-4">
+        <button type="button" (click)="saveOrganization()" class="inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#255b93]"><i class="ph ph-floppy-disk text-[16px]"></i>{{ "organizationAdmin.identity.save" | t }}</button>
+        @if (saved()) {<span class="text-[12px] font-semibold text-[#18a547]">{{ "organizationAdmin.saved" | t }}</span>}
       </div>
     </article>
 
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-    >
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <h2 class="text-[16px] font-bold">
-            {{ "administration.users.title" | t }}
-          </h2>
-          <p class="mt-0.5 text-[12px] text-[#768295]">
-            {{ "administration.users.subtitle" | t }}
-          </p>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.branding.title" | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ "organizationAdmin.branding.subtitle" | t }}</p></div>
+
+      <div class="mt-4 overflow-hidden rounded-[16px] border border-[#dfe5ec]">
+        <div class="min-h-[132px] p-5 text-white" [style.background]="'linear-gradient(135deg,' + branding().primaryColor + ' 0%,' + branding().primaryColor + ' 66%,' + branding().secondaryColor + ' 160%)'">
+          <div class="flex items-center gap-3"><span class="grid size-[42px] place-items-center rounded-full bg-white/95 text-[#172033]"><i class="ph ph-car text-[21px]"></i></span><div><p class="text-[18px] font-extrabold">{{ branding().logoLabel }}</p><p class="mt-0.5 text-[11px] text-white/75">{{ branding().loginTagline }}</p></div></div>
         </div>
-        <button
-          type="button"
-          (click)="invite()"
-          class="inline-flex h-[34px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[11px] font-semibold shadow-sm"
-        >
-          <i class="ph ph-plus text-[14px]"></i
-          >{{ "administration.users.invite" | t }}
-        </button>
+        <div class="bg-[#f8fafc] px-4 py-3 text-[10.5px] text-[#738095]">{{ "organizationAdmin.branding.preview" | t }}</div>
       </div>
-      @if (inviteRequested()) {
-        <p class="mt-2 text-right text-[11px] font-semibold text-[#2a64a2]">
-          {{ "administration.users.inviteHint" | t }}
-        </p>
-      }
+
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.branding.primary" | t }}
+          <div class="mt-1.5 flex h-[42px] items-center gap-2 rounded-[10px] border border-[#dbe2ea] px-2"><input type="color" [value]="branding().primaryColor" (input)="updateBranding('primaryColor', $any($event.target).value)" class="size-7 cursor-pointer border-0 bg-transparent p-0"/><span class="text-[12px] font-mono text-[#526075]">{{ branding().primaryColor }}</span></div>
+        </label>
+        <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.branding.secondary" | t }}
+          <div class="mt-1.5 flex h-[42px] items-center gap-2 rounded-[10px] border border-[#dbe2ea] px-2"><input type="color" [value]="branding().secondaryColor" (input)="updateBranding('secondaryColor', $any($event.target).value)" class="size-7 cursor-pointer border-0 bg-transparent p-0"/><span class="text-[12px] font-mono text-[#526075]">{{ branding().secondaryColor }}</span></div>
+        </label>
+      </div>
+
+      <label class="mt-3 block text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.branding.logoLabel" | t }}<input [value]="branding().logoLabel" (input)="updateBranding('logoLabel', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></label>
+      <label class="mt-3 block text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.branding.tagline" | t }}<input [value]="branding().loginTagline" (input)="updateBranding('loginTagline', $any($event.target).value)" class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></label>
 
       <div class="mt-4 space-y-2">
-        @for (user of users; track user.id) {
-          <div
-            class="flex items-center gap-3 rounded-[13px] border border-[#dfe5ec] bg-white px-3 py-2.5"
-          >
-            <span
-              class="grid size-[37px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[11px] font-bold text-white"
-              >{{ user.initials }}</span
-            >
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-[13px] font-bold text-[#172033]">
-                {{ user.firstName }} {{ user.lastName }}
-              </p>
-              <p class="truncate text-[11px] text-[#768295]">
-                {{ user.email }}
-              </p>
-            </div>
-            <span
-              class="rounded-full bg-[#e6f2ff] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
-              >{{ "administration.users.trainer" | t }}</span
-            >
-          </div>
-        }
+        <button type="button" role="switch" [attr.aria-checked]="branding().whiteLabel" (click)="toggleBranding('whiteLabel')" class="flex w-full items-center justify-between gap-4 rounded-[12px] bg-[#f5f7fa] px-3.5 py-3 text-left"><div><p class="text-[12px] font-bold text-[#263247]">{{ "organizationAdmin.branding.whiteLabel.title" | t }}</p><p class="mt-0.5 text-[10.5px] text-[#778396]">{{ "organizationAdmin.branding.whiteLabel.description" | t }}</p></div><span [class]="'relative h-[24px] w-[42px] shrink-0 rounded-full transition ' + (branding().whiteLabel ? 'bg-[#2a64a2]' : 'bg-[#cbd3df]')"><span [class]="'absolute top-[3px] size-[18px] rounded-full bg-white shadow-sm transition ' + (branding().whiteLabel ? 'left-[21px]' : 'left-[3px]')"></span></span></button>
+        <button type="button" role="switch" [attr.aria-checked]="branding().allowSiteOverrides" (click)="toggleBranding('allowSiteOverrides')" class="flex w-full items-center justify-between gap-4 rounded-[12px] bg-[#f5f7fa] px-3.5 py-3 text-left"><div><p class="text-[12px] font-bold text-[#263247]">{{ "organizationAdmin.branding.siteOverride.title" | t }}</p><p class="mt-0.5 text-[10.5px] text-[#778396]">{{ "organizationAdmin.branding.siteOverride.description" | t }}</p></div><span [class]="'relative h-[24px] w-[42px] shrink-0 rounded-full transition ' + (branding().allowSiteOverrides ? 'bg-[#2a64a2]' : 'bg-[#cbd3df]')"><span [class]="'absolute top-[3px] size-[18px] rounded-full bg-white shadow-sm transition ' + (branding().allowSiteOverrides ? 'left-[21px]' : 'left-[3px]')"></span></span></button>
       </div>
+
+      <div class="mt-4 flex items-center gap-3"><button type="button" (click)="saveBranding()" class="inline-flex h-[38px] items-center gap-2 rounded-[10px] border border-[#d4dce6] bg-white px-4 text-[12px] font-semibold text-[#263247] shadow-sm hover:border-[#aabed5]"><i class="ph ph-palette text-[16px] text-[#2a64a2]"></i>{{ "organizationAdmin.branding.save" | t }}</button>@if (brandingSaved()) {<span class="text-[12px] font-semibold text-[#18a547]">{{ "organizationAdmin.saved" | t }}</span>}</div>
     </article>
   </div>
 
   <div class="mt-4 grid gap-4 xl:grid-cols-2">
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm xl:row-span-2"
-    >
-      <h2 class="text-[16px] font-bold">
-        {{ "administration.skills.title" | t }}
-      </h2>
-      <p class="mt-0.5 text-[12px] text-[#768295]">
-        {{ "administration.skills.subtitle" | t }}
-      </p>
-
-      <div class="mt-4 space-y-3">
-        @for (skill of skills; track skill.code) {
-          <div class="rounded-[13px] border border-[#dfe5ec] bg-white p-3.5">
-            <p class="text-[13px] font-bold text-[#245c97]">
-              {{ skill.code }} — {{ skill.titleKey | t }}
-            </p>
-            <div class="mt-2 flex flex-wrap gap-1.5">
-              @for (criterion of skill.criteria; track criterion.labelKey) {
-                <span
-                  class="rounded-full bg-[#f0f3f7] px-2.5 py-1 text-[10.5px] text-[#64748b]"
-                  >{{ criterion.labelKey | t }}</span
-                >
-              }
-            </div>
-          </div>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div class="flex items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.modules.title" | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ "organizationAdmin.modules.subtitle" | t }}</p></div><span class="rounded-full bg-[#f0f3f7] px-2.5 py-1 text-[10.5px] font-semibold text-[#64748b]">{{ "organizationAdmin.modules.inherited" | t }}</span></div>
+      <div class="mt-4 grid gap-2 sm:grid-cols-2">
+        @for (module of modules(); track module.id) {
+          <button type="button" role="switch" [attr.aria-checked]="module.enabled" (click)="toggleModule(module.id)" class="flex min-h-[76px] items-center gap-3 rounded-[14px] border border-[#e1e7ee] px-3.5 py-3 text-left transition hover:bg-[#fafbfd]">
+            <span [class]="'grid size-[38px] shrink-0 place-items-center rounded-[11px] ' + (module.enabled ? 'bg-[#e6f2ff] text-[#2a64a2]' : 'bg-[#f0f3f7] text-[#9aa5b5]')"><i [class]="'ph text-[18px] ' + module.icon"></i></span>
+            <span class="min-w-0 flex-1"><span class="block text-[12px] font-bold text-[#263247]">{{ module.labelKey | t }}</span><span class="mt-0.5 block text-[10px] leading-[1.3] text-[#788496]">{{ module.descriptionKey | t }}</span></span>
+            <span [class]="'relative h-[22px] w-[38px] shrink-0 rounded-full transition ' + (module.enabled ? 'bg-[#2a64a2]' : 'bg-[#ccd4de]')"><span [class]="'absolute top-[3px] size-[16px] rounded-full bg-white shadow-sm transition ' + (module.enabled ? 'left-[19px]' : 'left-[3px]')"></span></span>
+          </button>
         }
       </div>
+      <p class="mt-3 rounded-[12px] bg-[#fff7e8] px-3.5 py-3 text-[10.5px] leading-[1.45] text-[#80601f]"><i class="ph ph-info mr-1.5"></i>{{ "organizationAdmin.modules.hint" | t }}</p>
     </article>
 
-    <div class="space-y-4">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "administration.hours.title" | t }}
-        </h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "administration.hours.subtitle" | t }}
-        </p>
-        <div class="mt-3 flex flex-wrap gap-2">
-          @for (category of hourCategories; track category.key) {
-            <span
-              class="rounded-full bg-[#e6f2ff] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
-              >{{ category.labelKey | t }}</span
-            >
-          }
-        </div>
-      </article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.settings.title" | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ "organizationAdmin.settings.subtitle" | t }}</p></div>
+      <div class="mt-4 flex flex-wrap gap-2 rounded-[12px] bg-[#f3f6f9] p-1.5">
+        @for (tab of [{id:'general',key:'organizationAdmin.settings.tabs.general'},{id:'notifications',key:'organizationAdmin.settings.tabs.notifications'},{id:'security',key:'organizationAdmin.settings.tabs.security'}]; track tab.id) {
+          <button type="button" (click)="activeSettingsTab.set($any(tab.id))" [class]="'rounded-[9px] px-3 py-2 text-[11px] font-semibold transition ' + (activeSettingsTab() === tab.id ? 'bg-white text-[#2a64a2] shadow-sm' : 'text-[#6e7a8c]')">{{ tab.key | t }}</button>
+        }
+      </div>
 
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "administration.sheets.title" | t }}
-        </h2>
-        <p class="mt-1 text-[13px] text-[#768295]">
-          {{ "administration.sheets.count" | t }}
-        </p>
-        <p class="mt-4 text-[12px] leading-[1.5] text-[#768295]">
-          {{ "administration.sheets.description" | t }}
-        </p>
-        <a
-          routerLink="/administration/fiches"
-          class="mt-3 inline-flex h-[36px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[11px] font-semibold shadow-sm hover:border-[#b9c9dc] hover:text-[#2a64a2]"
-          ><i class="ph ph-sliders-horizontal text-[15px]"></i
-          >{{ "administration.sheets.configure" | t }}</a
-        >
-      </article>
-
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <div class="flex items-center justify-between gap-3">
-          <h2 class="text-[16px] font-bold">
-            {{ "administration.access.title" | t }}
-          </h2>
-          <i class="ph ph-shield-check text-[17px] text-[#7b8798]"></i>
+      @if (activeSettingsTab() === "general") {
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.settings.language" | t }}<select class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[12px] outline-none"><option>{{ "organizationAdmin.settings.languages.fr" | t }}</option><option>{{ "organizationAdmin.settings.languages.en" | t }}</option></select></label>
+          <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.settings.timezone" | t }}<select class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[12px] outline-none"><option>Europe/Paris</option></select></label>
+          <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.settings.dateFormat" | t }}<select class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[12px] outline-none"><option>DD/MM/YYYY</option><option>YYYY-MM-DD</option></select></label>
+          <label class="text-[12px] font-semibold text-[#334155]">{{ "organizationAdmin.settings.academicYear" | t }}<select class="mt-1.5 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[12px] outline-none"><option>2026–2027</option><option>2027–2028</option></select></label>
         </div>
+      } @else {
         <div class="mt-4 space-y-2">
-          @for (role of accessRoles; track role.role) {
-            <div class="rounded-[13px] bg-[#f0f3f7] px-3.5 py-3">
-              <span
-                [class]="
-                  'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
-                  roleClasses(role)
-                "
-                ><i [class]="'ph ' + role.icon"></i
-                >{{ "common.roles." + role.role | t }}</span
-              >
-              <p class="mt-1.5 text-[11px] leading-[1.4] text-[#768295]">
-                {{ role.descriptionKey | t }}
-              </p>
-            </div>
+          @for (preference of preferences(); track preference.id) {
+            @if ((activeSettingsTab() === "notifications" && ["absenceAlerts","certificationAlerts","weeklyDigest"].includes(preference.id)) || (activeSettingsTab() === "security" && ["autoArchive","strictAudit"].includes(preference.id))) {
+              <button type="button" role="switch" [attr.aria-checked]="preference.enabled" (click)="togglePreference(preference.id)" class="flex w-full items-center gap-3 rounded-[14px] border border-[#e1e7ee] px-3.5 py-3 text-left hover:bg-[#fafbfd]"><span class="grid size-[38px] shrink-0 place-items-center rounded-[11px] bg-[#f0f3f7] text-[#64748b]"><i [class]="'ph text-[18px] ' + preference.icon"></i></span><span class="min-w-0 flex-1"><span class="block text-[12px] font-bold text-[#263247]">{{ preference.labelKey | t }}</span><span class="mt-0.5 block text-[10.5px] text-[#788496]">{{ preference.descriptionKey | t }}</span></span><span [class]="'relative h-[22px] w-[38px] shrink-0 rounded-full transition ' + (preference.enabled ? 'bg-[#2a64a2]' : 'bg-[#ccd4de]')"><span [class]="'absolute top-[3px] size-[16px] rounded-full bg-white shadow-sm transition ' + (preference.enabled ? 'left-[19px]' : 'left-[3px]')"></span></span></button>
+            }
           }
-        </div>
-      </article>
-    </div>
-  </div>
-
-  <article
-    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-  >
-    <h2 class="text-[16px] font-bold">
-      {{ "administration.recent.title" | t }}
-    </h2>
-    <div class="mt-4 space-y-2">
-      @for (action of recentActions; track action.id) {
-        <div
-          class="rounded-[13px] border border-[#dfe5ec] bg-white px-3.5 py-3"
-        >
-          <p class="text-[13px] font-bold text-[#172033]">
-            {{ action.titleKey | t }}
-          </p>
-          <p class="mt-0.5 text-[11px] text-[#768295]">
-            {{ action.metaKey | t }}
-          </p>
         </div>
       }
+    </article>
+  </div>
+
+  <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div class="max-w-[520px]">
+        <div class="flex items-start gap-3">
+          <span class="grid size-[42px] shrink-0 place-items-center rounded-[13px] bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-house-line text-[20px]"></i></span>
+          <div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.remoteWork.title" | t }}</h2><p class="mt-0.5 text-[12px] leading-[1.45] text-[#768295]">{{ "organizationAdmin.remoteWork.subtitle" | t }}</p></div>
+        </div>
+        <a routerLink="/teletravail" class="mt-4 inline-flex h-[36px] items-center gap-2 rounded-[10px] border border-[#d4dce6] bg-white px-3 text-[11px] font-semibold text-[#2a64a2] shadow-sm"><i class="ph ph-arrow-square-out text-[15px]"></i>{{ "organizationAdmin.remoteWork.open" | t }}</a>
+      </div>
+      <div class="grid w-full gap-2 sm:grid-cols-2 xl:max-w-[760px]">
+        @for (setting of [{field:'enabled',key:'enabled'},{field:'approvalRequired',key:'approval'},{field:'halfDayAllowed',key:'halfDay'},{field:'endOfDayReport',key:'report'}]; track setting.field) {
+          <button type="button" role="switch" [attr.aria-checked]="$any(remoteWorkPolicy())[setting.field]" (click)="toggleRemoteWorkPolicy($any(setting.field))" class="flex min-h-[68px] items-center justify-between gap-3 rounded-[14px] border border-[#e1e7ee] px-3.5 py-3 text-left hover:bg-[#fafbfd]">
+            <div><p class="text-[12px] font-bold text-[#263247]">{{ ('organizationAdmin.remoteWork.' + setting.key) | t }}</p><p class="mt-0.5 text-[10.5px] text-[#788496]">{{ ('organizationAdmin.remoteWork.' + setting.key + 'Hint') | t }}</p></div>
+            <span [class]="'relative h-[22px] w-[38px] shrink-0 rounded-full transition ' + ($any(remoteWorkPolicy())[setting.field] ? 'bg-[#2a64a2]' : 'bg-[#ccd4de]')"><span [class]="'absolute top-[3px] size-[16px] rounded-full bg-white shadow-sm transition ' + ($any(remoteWorkPolicy())[setting.field] ? 'left-[19px]' : 'left-[3px]')"></span></span>
+          </button>
+        }
+        <label class="flex min-h-[68px] items-center justify-between gap-4 rounded-[14px] border border-[#e1e7ee] px-3.5 py-3 text-[12px] font-bold text-[#263247] sm:col-span-2">
+          <span><span class="block">{{ "organizationAdmin.remoteWork.maxDays" | t }}</span><span class="mt-0.5 block text-[10.5px] font-normal text-[#788496]">{{ "organizationAdmin.remoteWork.maxDaysHint" | t }}</span></span>
+          <select [value]="remoteWorkPolicy().maxDaysPerWeek" (change)="updateRemoteWorkMaxDays($event)" class="h-[38px] min-w-[82px] rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[12px] font-semibold"><option [value]="1">1</option><option [value]="2">2</option><option [value]="3">3</option><option [value]="4">4</option><option [value]="5">5</option></select>
+        </label>
+        <div class="flex items-center gap-3 sm:col-span-2"><button type="button" (click)="saveRemoteWorkPolicy()" class="inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"><i class="ph ph-floppy-disk text-[15px]"></i>{{ "organizationAdmin.remoteWork.save" | t }}</button>@if (remoteWorkSaved()) {<span class="text-[12px] font-semibold text-[#18a547]">{{ "organizationAdmin.saved" | t }}</span>}</div>
+      </div>
     </div>
+  </article>
+
+  <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+    <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold text-[#172033]">{{ "organizationAdmin.audit.title" | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ "organizationAdmin.audit.subtitle" | t }}</p></div><button type="button" class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[11px] font-semibold shadow-sm"><i class="ph ph-download-simple text-[15px]"></i>{{ "organizationAdmin.audit.export" | t }}</button></div>
+    <div class="mt-4 overflow-x-auto"><table class="min-w-[760px] w-full text-left text-[12px]"><thead><tr class="border-b border-[#e1e7ee] text-[10px] font-semibold uppercase tracking-[0.05em] text-[#7a8697]"><th class="pb-2.5">{{ "organizationAdmin.audit.columns.action" | t }}</th><th class="pb-2.5">{{ "organizationAdmin.audit.columns.actor" | t }}</th><th class="pb-2.5">{{ "organizationAdmin.audit.columns.detail" | t }}</th><th class="pb-2.5 text-right">{{ "organizationAdmin.audit.columns.date" | t }}</th></tr></thead><tbody>@for (entry of audit; track entry.id) {<tr class="border-b border-[#edf1f5] last:border-0"><td class="py-3 pr-4"><div class="flex items-center gap-2.5"><span [class]="'size-2 shrink-0 rounded-full ' + auditDotClass(entry.tone)"></span><span class="font-bold text-[#263247]">{{ entry.actionKey | t }}</span></div></td><td class="py-3 pr-4"><div class="flex items-center gap-2"><span class="grid size-[28px] place-items-center rounded-full bg-[#e6f2ff] text-[9px] font-bold text-[#2a64a2]">{{ entry.initials }}</span><span>{{ entry.actor }}</span></div></td><td class="py-3 pr-4 text-[#6e7a8c]">{{ entry.detailKey | t }}</td><td class="py-3 text-right text-[#7b8798]">{{ entry.date }}</td></tr>}</tbody></table></div>
   </article>
 </section>

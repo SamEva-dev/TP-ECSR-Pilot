@@ -221,7 +221,11 @@
       "presentation": "Presentation",
       "catchup": "Catch-up"
     },
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "home": "Home",
@@ -242,7 +246,13 @@
     "certification": "Certification",
     "jurySpace": "Jury space",
     "results": "Results",
-    "success": "Success rates"
+    "success": "Success rates",
+    "organizationDashboard": "Organization overview",
+    "sites": "Sites",
+    "programs": "Programs",
+    "referentials": "Frameworks",
+    "remoteWork": "Remote work",
+    "distanceLearning": "Distance learning"
   },
   "students": {
     "title": "Students",
@@ -340,7 +350,8 @@
       "presentation": "Presentation",
       "catchup": "Catch-up",
       "sensitization": "Awareness",
-      "event": "Event"
+      "event": "Event",
+      "distance": "Remote learning"
     },
     "events": {
       "intersections": "Intersections and priorities",
@@ -352,7 +363,8 @@
       "motorwayMerging": "Driving — motorway merging",
       "signsCatchup": "Catch-up — road signs",
       "companyInternship": "Company internship",
-      "educationalCouncil": "Educational council"
+      "educationalCouncil": "Educational council",
+      "remoteClass": "Virtual class — reaction time and distances"
     },
     "people": {
       "samFokam": "Sam Fokam",
@@ -363,7 +375,44 @@
       "classroomTitle": "Scheduled classroom sessions",
       "drivingTitle": "Scheduled driving sessions"
     },
-    "emptyDay": "No session matches these filters."
+    "emptyDay": "No session matches these filters.",
+    "drawer": {
+      "title": "Add to schedule",
+      "subtitle": "Schedule a lesson, assessment, internship or event.",
+      "close": "Close panel",
+      "schedule": {
+        "title": "Date and times",
+        "date": "Date",
+        "start": "Start",
+        "end": "End"
+      },
+      "details": {
+        "title": "Activity details",
+        "promotion": "Cohort",
+        "type": "Type",
+        "eventTitle": "Title",
+        "eventTitlePlaceholder": "E.g. Road safety review",
+        "responsible": "Lead / instructor",
+        "responsiblePlaceholder": "E.g. Marc Dupont",
+        "location": "Room / location / details",
+        "locationPlaceholder": "E.g. Room 2",
+        "competence": "Skill worked on"
+      },
+      "help": "The item is added immediately to the demo schedule. Once the backend is connected, it will be stored and synchronized with sessions and attendance.",
+      "cancel": "Cancel",
+      "submit": "Add to schedule",
+      "created": "“{{title}}” has been added to the schedule.",
+      "errors": {
+        "required": "This field is required.",
+        "period": "End time must be after start time.",
+        "weekday": "The current demo view covers Monday to Friday only."
+      }
+    },
+    "workModes": {
+      "title": "Team work organization",
+      "subtitle": "Quick view of this week’s work modes.",
+      "open": "Manage remote work"
+    }
   },
   "promotions": {
     "title": "Cohorts",
@@ -441,6 +490,59 @@
       "scheduled": "Scheduled session: {{date}}",
       "ready": "{{ready}} / {{total}} files ready",
       "prepare": "Prepare certification"
+    },
+    "contextual": {
+      "title": "Cohorts",
+      "subtitle": "{{program}} cohorts for the {{site}} site",
+      "organization": "Organization",
+      "site": "Site",
+      "program": "Training program",
+      "setContext": "Use this context",
+      "currentContext": "Current context",
+      "kpi": {
+        "total": "Cohorts",
+        "active": "Active",
+        "activeStudents": "Active learners",
+        "referential": "Active framework"
+      },
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "planned": "Upcoming",
+        "completed": "Completed"
+      },
+      "filterHelp": "Displayed cohorts follow the current site and training program context.",
+      "status": {
+        "planned": "Upcoming",
+        "active": "Active",
+        "completed": "Completed"
+      },
+      "planned": {
+        "start": "Start date",
+        "capacity": "Planned learners",
+        "students": "learners",
+        "volume": "Reference volume",
+        "student": "learner"
+      },
+      "exam": {
+        "open": "Open certification"
+      },
+      "empty": {
+        "title": "No cohort in this context",
+        "description": "Create a cohort for this site and training program, or switch context in the top bar."
+      },
+      "drawer": {
+        "title": "Create cohort",
+        "subtitle": "Create a cohort in the currently selected context.",
+        "context": "Creation context",
+        "referential": "Framework version",
+        "chooseReferential": "Select a framework",
+        "status": "Initial status",
+        "studentCount": "Planned learners",
+        "studentCountError": "The learner count must be greater than 0.",
+        "versionBindingTitle": "Framework version locked to the cohort",
+        "versionBindingHelp": "The cohort remains linked to this framework version even if a newer version becomes active later."
+      }
     }
   },
   "sessions": {
@@ -471,7 +573,8 @@
       "supportsPlaceholder": "Slides, model…",
       "comments": "Comments",
       "create": "Create session",
-      "createAndAttendance": "Create and take attendance"
+      "createAndAttendance": "Create and take attendance",
+      "modality": "Delivery mode"
     },
     "programmed": {
       "title": "Scheduled sessions",
@@ -512,6 +615,12 @@
           "supports": "Summary sheets"
         }
       }
+    },
+    "modalities": {
+      "onsite": "On site",
+      "remote-live": "Live remote",
+      "remote-async": "Asynchronous remote",
+      "practical": "Practical / vehicle"
     }
   },
   "sheets": {
@@ -1274,7 +1383,9 @@
       "accounts": "Accounts",
       "active": "Active access",
       "pending": "Pending invitations",
-      "suspended": "Suspended access"
+      "suspended": "Suspended access",
+      "assignments": "Active assignments",
+      "multiScope": "Multi-scope users"
     },
     "invite": {
       "title": "Invite a user",
@@ -1285,7 +1396,10 @@
       "emailPlaceholder": "first.last@tpecsrpilot.fr",
       "role": "Assigned role",
       "defaultRights": "Default permissions: Students · Sessions & attendance · Assessments",
-      "send": "Send invitation"
+      "send": "Send invitation",
+      "multiScopeHint": "Create the account, then define its exact access perimeter.",
+      "sendAndAssign": "Invite and define assignments",
+      "assignmentAfterInvite": "After invitation, the assignments drawer opens automatically to select the organization, site, program or cohort."
     },
     "roles": {
       "direction": "Management",
@@ -1307,7 +1421,11 @@
       "suspend": "Suspend",
       "activate": "Activate",
       "delete": "Delete account",
-      "empty": "No account matches your filters."
+      "empty": "No account matches your filters.",
+      "multiScopeTitle": "Users & access perimeters",
+      "scopeRule": "Context-aware access",
+      "searchExtended": "Search by name, email, site or program…",
+      "assignmentCount": "{{count}} assignment(s)"
     },
     "userDetails": {
       "marc": "Trainer · Driving · Competency C3",
@@ -1319,7 +1437,8 @@
         "direction": "Management · Full training center access",
         "secretariat": "Administration · Administrative and attendance management",
         "formateur": "Trainer · Educational student monitoring",
-        "stagiaire": "Student · View own training journey"
+        "stagiaire": "Student · View own training journey",
+        "jury": "Jury · Access limited to assigned sessions and candidates"
       },
       "items": {
         "students": {
@@ -1351,7 +1470,52 @@
           "description": "Access to exam sessions, candidates and certification assessments according to role."
         }
       },
-      "studentRule": "A student can never edit an assessment entered by a trainer, even if other permissions are granted."
+      "studentRule": "A student can never edit an assessment entered by a trainer, even if other permissions are granted.",
+      "scopeHint": "These permissions define allowed actions; assignments define where they apply.",
+      "effectiveRule": "Effective access = allowed permissions × assignment perimeter. A Read-only assignment blocks edits even when a global permission is enabled."
+    },
+    "multiScopeSubtitle": "Accounts, roles and assignments by organization, site, training program and cohort",
+    "assignments": {
+      "title": "User assignments",
+      "subtitle": "A single user can hold several roles across different access perimeters.",
+      "manage": "Manage assignments",
+      "current": "Current assignments",
+      "currentSubtitle": "{{count}} configured assignment(s)",
+      "add": "Add assignment",
+      "newTitle": "New assignment",
+      "role": "Role",
+      "scope": "Scope",
+      "organization": "Organization",
+      "site": "Site",
+      "program": "Training program",
+      "cohort": "Cohort",
+      "exam": "Exam session",
+      "save": "Add",
+      "remove": "Remove this assignment",
+      "empty": "No assignment configured for this user.",
+      "done": "Done",
+      "summaryTitle": "User access perimeters",
+      "readOnlyBadge": "Read only",
+      "roles": {
+        "platform_admin": "Platform super administrator",
+        "organization_admin": "Organization administrator",
+        "organization_direction": "Organization management",
+        "site_direction": "Site management",
+        "pedagogical_manager": "Educational manager",
+        "secretariat": "Administration",
+        "trainer": "Trainer",
+        "student": "Student",
+        "jury": "Jury member",
+        "read_only": "Read only"
+      },
+      "scopes": {
+        "platform": "Platform",
+        "organization": "Organization",
+        "site": "Site",
+        "program": "Training program",
+        "cohort": "Cohort",
+        "exam": "Exam session"
+      }
     }
   },
   "administration": {
@@ -1712,7 +1876,10 @@
       "active": "Active",
       "professions": {
         "teacher": "Driving instructor",
-        "manager": "Training manager"
+        "manager": "Training manager",
+        "examiner": "Professional examiner",
+        "transport": "Road transport professional",
+        "passenger": "Passenger transport professional"
       }
     },
     "candidates": {
@@ -1814,6 +1981,79 @@
       "saveDraft": "Save draft",
       "validateEvaluation": "Validate my assessment",
       "draftSaved": "Draft saved."
+    },
+    "multi": {
+      "subtitle": "{{program}} certification · {{scheme}} scheme. Exams, units and assessment grids automatically adapt to the active training program.",
+      "activeScheme": "Active certification scheme",
+      "schemeHelp": "Version {{version}} · {{steps}} exams · {{units}} validation units",
+      "scheme": "Scheme",
+      "juryForProgram": "Demo jury authorized for {{program}}.",
+      "examPathSubtitle": "Exams configured by scheme {{scheme}}.",
+      "juryGridHelp": "Demo grid from scheme {{scheme}}; official criteria will be configured by framework.",
+      "examCount": "Exams",
+      "schemeStructure": "Exam structure",
+      "version": "Version {{version}}"
+    },
+    "schemes": {
+      "ecsr": {
+        "name": "TP ECSR · 2026 certification",
+        "units": {
+          "ccp1": "CCP1 · Train learner drivers",
+          "ccp2": "CCP2 · Raise road-user awareness"
+        }
+      },
+      "moto": {
+        "name": "Motorcycle · 2027 certification",
+        "units": {
+          "plateau": "Off-road / manoeuvring mastery",
+          "circulation": "On-road driving"
+        },
+        "steps": {
+          "vehicleCheck": "Checks and vehicle familiarization",
+          "plateau": "Manoeuvring test",
+          "circulation": "On-road test",
+          "safetyInterview": "Safety and analysis interview"
+        }
+      },
+      "pl": {
+        "name": "Heavy vehicle · 2027 certification",
+        "units": {
+          "checks": "Checks and safety",
+          "plateau": "Manoeuvres / yard",
+          "road": "On-road driving"
+        },
+        "steps": {
+          "checks": "Safety checks",
+          "plateau": "Yard and manoeuvring test",
+          "road": "On-road driving",
+          "interview": "Technical interview"
+        }
+      },
+      "bus": {
+        "name": "Passenger transport / Bus · 2027 certification",
+        "units": {
+          "vehicle": "Vehicle preparation",
+          "safety": "Passenger safety",
+          "road": "On-road driving"
+        },
+        "steps": {
+          "preparation": "Vehicle preparation and checks",
+          "maneuver": "Manoeuvres",
+          "road": "On-road driving",
+          "safety": "Passenger safety and care"
+        }
+      },
+      "criteria": {
+        "vehicleMastery": "Vehicle mastery",
+        "safety": "Safety and risk prevention",
+        "observation": "Observation and anticipation",
+        "professionalPosture": "Professional posture",
+        "preparationChecks": "Checks and preparation",
+        "maneuver": "Manoeuvring mastery",
+        "roadSafety": "Safe and appropriate driving",
+        "vehiclePreparation": "Vehicle preparation",
+        "passengerSafety": "Passenger safety and care"
+      }
     }
   },
   "jury": {
@@ -1831,7 +2071,10 @@
       "draft": "Assessments can be saved as drafts before validation.",
       "lock": "A validated assessment is locked; any correction must be audited.",
       "audit": "Sensitive actions will be audited by the backend."
-    }
+    },
+    "multiSubtitle": "{{program}} session · {{scheme}}. Only candidates and criteria for this certification are shown.",
+    "examSteps": "Exams",
+    "schemeTitle": "Assessment scheme"
   },
   "results": {
     "title": "Certification results",
@@ -1861,7 +2104,8 @@
     "publicationStates": {
       "published": "Published",
       "draft": "Draft"
-    }
+    },
+    "multiTableSubtitle": "Decisions and validation units based on scheme {{scheme}}."
   },
   "success": {
     "title": "Success rates",
@@ -1894,7 +2138,1161 @@
       "title": "Success details",
       "close": "Close",
       "absent": "Absent",
-      "definition": "Success rate = number of titles obtained / number of candidates who actually sat the exam × 100."
+      "definition": "Success rate = number of titles obtained / number of candidates who actually sat the exam × 100.",
+      "candidatesTitle": "Candidate details",
+      "candidatesSubtitle": "Final decision and CCP validation for the selected cohort.",
+      "candidate": "Candidate",
+      "number": "Candidate no.",
+      "session": "Session",
+      "result": "Result",
+      "noCandidateDetails": "Named candidate details are not yet loaded for this older cohort.",
+      "filters": {
+        "all": "All"
+      }
+    },
+    "results": {
+      "obtained": "Title obtained",
+      "partial": "Partial validation",
+      "failed": "Not obtained",
+      "absent": "Absent"
+    },
+    "analytics": {
+      "eyebrow": "Multi-level performance",
+      "subtitle": "Success-rate analysis by organization, site, training program and cohort.",
+      "exportExcel": "Export Excel",
+      "scope": {
+        "organization": "Organization",
+        "site": "Site",
+        "program": "Training program",
+        "cohort": "Cohort"
+      },
+      "evolutionSubtitle": "Historical trend for the currently selected scope.",
+      "breakdownTitle": "Performance comparison",
+      "bySite": "Success rate by site",
+      "byProgram": "Success rate by training program",
+      "graduatedShort": "graduated",
+      "presentedShort": "presented",
+      "byPromotionSubtitle": "Cohorts matching the currently selected scope.",
+      "resultSets": "cohorts with results",
+      "site": "Site",
+      "program": "Training program",
+      "units": "Units / blocks",
+      "noResults": "No certification results are available for this scope.",
+      "noCandidates": "No candidate matches this filter."
+    }
+  },
+  "workspace": {
+    "switcher": {
+      "title": "Work context",
+      "subtitle": "Choose the organization, site, training program and cohort.",
+      "change": "Change work context",
+      "students": "learners",
+      "scopeHint": "Available choices depend on your assignments and permissions."
+    },
+    "level": {
+      "organization": "Organization",
+      "site": "Site",
+      "program": "Training",
+      "cohort": "Cohort"
+    }
+  },
+  "organizationDashboard": {
+    "badge": "Organization overview",
+    "subtitle": "Consolidated view of your sites, training programs and performance.",
+    "period": "2026–2027 academic year",
+    "openStatistics": "Open statistics",
+    "kpis": {
+      "sites": "Sites",
+      "programs": "Active programs",
+      "students": "Students",
+      "trainers": "Trainers",
+      "cohorts": "Active cohorts",
+      "success": "Overall success"
+    },
+    "sites": {
+      "title": "Site performance",
+      "subtitle": "Consolidated view by site. Click a site to switch the active context.",
+      "hint": "Click a site",
+      "students": "Students",
+      "trainers": "Trainers",
+      "attendance": "Attendance",
+      "success": "Success",
+      "programs": "programs",
+      "cohorts": "cohorts",
+      "alerts": "alerts"
+    },
+    "global": {
+      "title": "Global overview",
+      "subtitle": "Consolidated organization indicators",
+      "attendance": "Attendance rate",
+      "success": "Success rate",
+      "hours": "Completed hours",
+      "context": "Active operational context",
+      "contextHelp": "The organization dashboard stays consolidated. The active context is used when you open operational screens."
+    },
+    "programs": {
+      "title": "Performance by program",
+      "subtitle": "Enrollment, attendance and success across all sites.",
+      "program": "Program",
+      "students": "Students",
+      "cohorts": "Cohorts",
+      "attendance": "Attendance",
+      "success": "Success",
+      "open": "Open"
+    },
+    "alerts": {
+      "title": "Network alerts",
+      "subtitle": "Items requiring attention at organization level",
+      "catchup": {
+        "title": "7 students have more than 10 catch-up hours",
+        "detail": "Mostly in Marseille and Nice. Review catch-up plans."
+      },
+      "documents": {
+        "title": "5 administrative files are incomplete",
+        "detail": "Missing documents before the next internship periods."
+      },
+      "certification": {
+        "title": "2 certification sessions need finalization",
+        "detail": "Jury assignment or candidate files are still incomplete."
+      },
+      "capacity": {
+        "title": "Nice is nearing capacity",
+        "detail": "The January heavy-vehicle cohort is close to its maximum capacity."
+      },
+      "ecf": {
+        "title": "2 cohorts require review",
+        "detail": "Attendance and administrative documents need regularization."
+      },
+      "horizon": {
+        "title": "One certification needs preparation",
+        "detail": "The session file must be finalized before publication."
+      }
+    },
+    "activity": {
+      "title": "Recent activity",
+      "subtitle": "Important events reported by sites",
+      "item1": {
+        "title": "New cohort created",
+        "detail": "AFTRAL Nice · Heavy vehicle · January 2027",
+        "when": "Today"
+      },
+      "item2": {
+        "title": "Certification session updated",
+        "detail": "TP ECSR · Nice · 18 candidates",
+        "when": "2 hours ago"
+      },
+      "item3": {
+        "title": "New trainer assignment",
+        "detail": "Marc Dupont is now assigned to Motorcycle · Nice",
+        "when": "Yesterday"
+      },
+      "item4": {
+        "title": "Site updated",
+        "detail": "AFTRAL Marseille · training settings updated",
+        "when": "Yesterday"
+      },
+      "ecf": {
+        "title": "New cohort created",
+        "detail": "ECF Nice · TP ECSR 2026–2027",
+        "when": "Today"
+      },
+      "horizon": {
+        "title": "Certification scheduled",
+        "detail": "Horizon Nice · next session prepared",
+        "when": "Today"
+      }
+    }
+  },
+  "sites": {
+    "badge": "Organization & network",
+    "title": "Sites",
+    "subtitle": "Manage {{organization}} sites and their local performance.",
+    "add": "Add a site",
+    "search": "Search by site, city or manager…",
+    "edit": "Edit site",
+    "open": "Open",
+    "kpis": {
+      "sites": "Sites",
+      "students": "Students",
+      "trainers": "Trainers",
+      "alerts": "Alerts"
+    },
+    "filters": {
+      "all": "All statuses"
+    },
+    "status": {
+      "active": "Active",
+      "attention": "Attention",
+      "inactive": "Inactive"
+    },
+    "card": {
+      "students": "Students",
+      "trainers": "Trainers",
+      "programs": "Programs",
+      "cohorts": "Cohorts",
+      "attendance": "Attendance",
+      "success": "Success"
+    },
+    "empty": {
+      "title": "No site found",
+      "subtitle": "Change the search or status filter."
+    },
+    "fields": {
+      "code": "Site code",
+      "name": "Name",
+      "city": "City",
+      "postalCode": "Postal code",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "manager": "Manager",
+      "status": "Status"
+    },
+    "drawer": {
+      "close": "Close panel",
+      "editBadge": "Edit",
+      "addBadge": "New site",
+      "editTitle": "Edit site",
+      "addTitle": "Add a site",
+      "subtitle": "Enter the site administrative and operational information.",
+      "identity": "Identity & location",
+      "contact": "Contact & responsibility",
+      "create": "Create site"
+    },
+    "detail": {
+      "back": "Back to sites",
+      "openWorkspace": "Open this context",
+      "kpis": {
+        "programs": "Programs",
+        "cohorts": "Cohorts",
+        "attendance": "Attendance",
+        "success": "Success"
+      },
+      "programs": {
+        "title": "Active programs",
+        "subtitle": "Programs available at this site",
+        "active": "Active"
+      },
+      "identity": {
+        "title": "Site information",
+        "resources": "Resources",
+        "resourcesValue": "{{rooms}} rooms · {{vehicles}} vehicles"
+      },
+      "alerts": {
+        "title": "Local alerts",
+        "subtitle": "Items requiring attention at this site",
+        "none": "No active alerts for this site.",
+        "documents": {
+          "title": "2 incomplete student files",
+          "detail": "Administrative documents are still missing before validation."
+        },
+        "exam": {
+          "title": "Exam session to prepare",
+          "detail": "The February 2027 TP ECSR session still needs its Jury assignment."
+        },
+        "catchup": {
+          "title": "High catch-up hours",
+          "detail": "18 catch-up hours still need to be scheduled across several students."
+        },
+        "vehicles": {
+          "title": "2 vehicles need maintenance planning",
+          "detail": "Plan inspections before the next practical sessions."
+        },
+        "capacity": {
+          "title": "Capacity available",
+          "detail": "A new cohort can be opened next quarter."
+        }
+      },
+      "cohorts": {
+        "title": "Cohorts & sessions",
+        "subtitle": "Cohorts linked to this site programs",
+        "name": "Cohort",
+        "program": "Program",
+        "period": "Period",
+        "students": "Students",
+        "status": "Status",
+        "statuses": {
+          "planned": "Planned",
+          "active": "Active",
+          "completed": "Completed"
+        }
+      },
+      "notFound": {
+        "title": "Site not found",
+        "subtitle": "This site does not exist in the demo data or is no longer available."
+      }
+    }
+  },
+  "programs": {
+    "badge": "Training catalog",
+    "title": "Programs",
+    "subtitle": "Manage the programs offered by {{organization}} and their business modules.",
+    "add": "Create a program",
+    "edit": "Edit program",
+    "open": "Open",
+    "search": "Search by program, code or framework…",
+    "kpis": {
+      "programs": "Programs",
+      "students": "Students",
+      "trainers": "Trainers",
+      "cohorts": "Active cohorts"
+    },
+    "filters": {
+      "allCategories": "All categories",
+      "allStatuses": "All statuses"
+    },
+    "categories": {
+      "teacher": "Driving instruction",
+      "motorcycle": "Motorcycle",
+      "heavyVehicle": "Heavy vehicle",
+      "passengerTransport": "Passenger transport"
+    },
+    "status": {
+      "active": "Active",
+      "draft": "Draft",
+      "inactive": "Inactive"
+    },
+    "card": {
+      "sites": "Sites",
+      "students": "Students",
+      "cohorts": "Cohorts",
+      "hours": "Duration",
+      "modules": "modules",
+      "success": "success"
+    },
+    "empty": {
+      "title": "No program found",
+      "subtitle": "Change the search or filters to display other programs."
+    },
+    "fields": {
+      "code": "Program code",
+      "name": "Program name",
+      "category": "Category",
+      "status": "Status",
+      "referenceVersion": "Framework / version",
+      "duration": "Training hours",
+      "description": "Description"
+    },
+    "modules": {
+      "planning": "Planning",
+      "attendance": "Attendance",
+      "sessions": "Sessions",
+      "driving": "Driving",
+      "plateau": "Training yard",
+      "sheets": "Sheets / Presentations",
+      "skills": "Skills",
+      "internships": "Internships",
+      "documents": "Documents",
+      "assessments": "Assessments",
+      "certification": "Certification",
+      "statistics": "Statistics",
+      "distanceLearning": "Distance learning"
+    },
+    "drawer": {
+      "close": "Close panel",
+      "editBadge": "Edit",
+      "addBadge": "New program",
+      "editTitle": "Edit program",
+      "addTitle": "Create a program",
+      "subtitle": "Configure the identity, framework and available modules for this program.",
+      "identity": "Identity & framework",
+      "modules": "Enabled modules",
+      "modulesSubtitle": "The sidebar and features can later adapt automatically to the selected modules.",
+      "create": "Create program"
+    },
+    "detail": {
+      "back": "Back to programs",
+      "identity": {
+        "title": "Program overview"
+      },
+      "modules": {
+        "title": "Enabled modules",
+        "subtitle": "Training features available for this program."
+      },
+      "sites": {
+        "title": "Availability by site",
+        "subtitle": "Enable or disable this program in {{organization}} sites.",
+        "hint": "Click a site to change its state."
+      },
+      "cohorts": {
+        "title": "Cohorts & sessions",
+        "subtitle": "Existing cohorts using this program.",
+        "name": "Cohort",
+        "site": "Site",
+        "period": "Period",
+        "students": "Students",
+        "status": "Status",
+        "empty": "No demo cohort for this program.",
+        "statuses": {
+          "planned": "Planned",
+          "active": "Active",
+          "completed": "Completed"
+        }
+      },
+      "notFound": {
+        "title": "Program not found",
+        "subtitle": "This program does not exist in the demo data."
+      }
+    },
+    "demo": {
+      "ecsrDescription": "Preparation for the professional driving and road-safety instructor qualification, with skills, driving, teaching sheets, internships and certification tracking.",
+      "motoDescription": "Training path dedicated to two-wheel instruction with training-yard, road, skills and certification tracking.",
+      "plDescription": "Heavy-vehicle training with driving sessions, training-yard work, skills tracking, internships and final assessment.",
+      "busDescription": "Passenger-transport training combining driving, training-yard practice, professional skills, internships and certification."
+    }
+  },
+  "referentials": {
+    "eyebrow": "Learning architecture",
+    "title": "Training frameworks",
+    "subtitle": "Manage framework versions used by each training program. A cohort remains linked to the version it started with.",
+    "newVersion": "New version",
+    "empty": "No framework matches the selected filters.",
+    "status": {
+      "active": "Active",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
+    "kpis": {
+      "total": "Displayed frameworks",
+      "active": "Active versions",
+      "drafts": "Drafts",
+      "archived": "Archives"
+    },
+    "filters": {
+      "search": "Search a framework…",
+      "allPrograms": "All programs",
+      "allStatuses": "All statuses"
+    },
+    "card": {
+      "hours": "Hours",
+      "skills": "Competencies",
+      "modules": "Modules",
+      "sheets": "Sheets",
+      "stages": "Placements",
+      "documents": "Documents"
+    },
+    "volumes": {
+      "classroom": "Classroom training",
+      "driving": "Practice / driving",
+      "internship": "Work placement",
+      "assessment": "Assessments",
+      "other": "Other activities"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "skills": "Competencies",
+      "hours": "Training hours",
+      "stages": "Placements",
+      "certification": "Certification"
+    },
+    "evaluator": {
+      "jury": "Assessed by jury",
+      "trainer": "Assessed by trainer",
+      "system": "Automated assessment"
+    },
+    "detail": {
+      "back": "Back to frameworks",
+      "duplicate": "Duplicate as new version",
+      "kpis": {
+        "subSkills": "Sub-competencies",
+        "stageHours": "Placement hours",
+        "cohorts": "Linked cohorts"
+      },
+      "identity": {
+        "title": "Framework identity",
+        "effectiveFrom": "Effective from",
+        "effectiveTo": "Effective until",
+        "noEnd": "No end date",
+        "documents": "Required documents",
+        "certification": "Certification scheme"
+      },
+      "modules": {
+        "title": "Enabled modules",
+        "subtitle": "These modules define the features available to cohorts using this framework."
+      },
+      "cohorts": {
+        "title": "Linked cohorts",
+        "subtitle": "A cohort keeps this version even when a newer framework is published.",
+        "name": "Cohort",
+        "site": "Site",
+        "period": "Period",
+        "students": "Students",
+        "status": "Status",
+        "empty": "No cohort is using this version yet."
+      },
+      "hours": {
+        "title": "Training hour allocation",
+        "subtitle": "Learning volumes configured for this version.",
+        "mandatory": "Mandatory",
+        "optional": "Optional",
+        "total": "Total framework hours",
+        "totalHint": "The category totals should remain consistent with the overall training volume assigned to the cohort."
+      },
+      "stages": {
+        "empty": "No placement requirement is configured for this framework."
+      },
+      "certification": {
+        "subtitle": "Certification scheme attached to this version.",
+        "steps": "Configured assessments",
+        "stepsTitle": "Certification flow"
+      },
+      "notFound": {
+        "title": "Framework not found",
+        "subtitle": "This version does not exist in the demo data."
+      }
+    },
+    "compare": {
+      "button": "Compare",
+      "eyebrow": "Version comparison",
+      "title": "Compare frameworks",
+      "subtitle": "Review the main differences before assigning a new version to future cohorts.",
+      "metric": "Metric",
+      "delta": "Delta",
+      "modulesTitle": "Modules in compared version",
+      "metrics": {
+        "hours": "Training hours",
+        "skills": "Competencies",
+        "modules": "Enabled modules",
+        "sheets": "Learning sheets",
+        "documents": "Required documents",
+        "examSteps": "Certification assessments"
+      }
+    },
+    "demo": {
+      "ecsr": {
+        "c1": "Design and prepare a training session",
+        "c1Description": "Prepare a learning intervention adapted to objectives and learners.",
+        "c1a": "Define learning objectives",
+        "c1b": "Select methods and materials",
+        "c1c": "Prepare assessment",
+        "c2": "Deliver group sessions",
+        "c2Description": "Run classroom sessions and foster group participation.",
+        "c2a": "Structure a sequence",
+        "c2b": "Facilitate discussion",
+        "c2c": "Assess learning",
+        "c3": "Teach driving in real situations",
+        "c3Description": "Support a learner in driving and road-sharing situations.",
+        "c3a": "Observe and diagnose",
+        "c3b": "Adapt the intervention",
+        "c3c": "Develop autonomy",
+        "c4": "Support progression and road safety",
+        "c4Description": "Track progress, tailor support and raise risk awareness.",
+        "c4a": "Analyse progression",
+        "c4b": "Individualise objectives",
+        "c4c": "Run an awareness action",
+        "c5": "Manage digital learning pathways",
+        "c5Description": "Example competency added to the mocked future version.",
+        "c5a": "Use learning traces",
+        "c5b": "Adapt a blended pathway",
+        "stage1": "Teaching placement — period 1",
+        "stage1Description": "Immersion and progressive practice within a host organisation.",
+        "stage2": "Teaching placement — period 2",
+        "stage2Description": "Taking responsibility, delivery and learning follow-up in a professional setting.",
+        "certification": "TP ECSR certification",
+        "certificationDraft": "TP ECSR certification — 2029 draft",
+        "exam1": "Professional simulation",
+        "exam2": "Technical interview",
+        "exam3": "Professional questionnaire",
+        "exam4": "Questions based on submitted work",
+        "exam5": "Final interview",
+        "archivedNotes": "Archived version kept to preserve traceability for previous cohorts.",
+        "activeNotes": "Reference version used by active ECSR cohorts in the demo.",
+        "draftNotes": "Working version used to preview framework changes without affecting existing cohorts."
+      },
+      "moto": {
+        "m1": "Master off-road training situations",
+        "m1Description": "Prepare and secure off-road exercises.",
+        "m1a": "Prepare the training area",
+        "m1b": "Support manoeuvres",
+        "m2": "Teach motorcycle road riding",
+        "m2Description": "Build road-learning activities and analyse two-wheel specific risks.",
+        "m2a": "Identify risk situations",
+        "m2b": "Adapt trajectories",
+        "stage": "Motorcycle placement",
+        "stageDescription": "Practical placement in an organisation providing motorcycle training.",
+        "certification": "Motorcycle certification 2027",
+        "exam1": "Off-road assessment",
+        "exam2": "Road assessment",
+        "notes": "Demo framework dedicated to motorcycle training."
+      },
+      "pl": {
+        "c1": "Heavy vehicle control",
+        "c1Description": "Prepare, manoeuvre and inspect a heavy vehicle safely.",
+        "c1a": "Carry out pre-use checks",
+        "c1b": "Perform manoeuvres",
+        "c2": "Road driving and professional regulations",
+        "c2Description": "Drive in traffic while accounting for heavy transport constraints.",
+        "c2a": "Adapt driving to vehicle size",
+        "c2b": "Apply regulations",
+        "stage": "Heavy transport placement",
+        "stageDescription": "Professional immersion with an operator or specialist training centre.",
+        "certification": "Heavy vehicle certification 2027",
+        "exam1": "Off-road test",
+        "exam2": "Road test",
+        "notes": "Demo framework for heavy vehicle pathways."
+      },
+      "bus": {
+        "c1": "Prepare and drive a passenger vehicle",
+        "c1Description": "Master checks, vehicle size and passenger transport specifics.",
+        "c1a": "Prepare for service",
+        "c1b": "Drive smoothly and safely",
+        "c2": "Welcome and secure passengers",
+        "c2Description": "Integrate passenger care, accessibility and safety.",
+        "c2a": "Manage boarding and alighting",
+        "c2b": "Handle special situations",
+        "stage": "Passenger transport placement",
+        "stageDescription": "Work placement with a passenger transport operator.",
+        "certification": "Passenger transport certification 2027",
+        "exam1": "Technical assessment",
+        "exam2": "Road assessment",
+        "notes": "Demo framework for passenger transport pathways."
+      },
+      "createdNotes": "Version created from the demo front end by duplicating an existing framework."
+    },
+    "detailLink": "View framework",
+    "versionDrawer": {
+      "eyebrow": "New version",
+      "title": "Create a framework version",
+      "subtitle": "Duplicate an existing version and adapt it without changing cohorts that are already in progress.",
+      "program": "Program",
+      "source": "Source version",
+      "sourceHint": "Competencies, hours, placements and assessments will be copied from this version.",
+      "version": "Version name",
+      "code": "Code",
+      "effectiveFrom": "Effective from",
+      "status": "Initial status",
+      "info": "This action remains fully mocked in the front end. The new version is kept only for the current session.",
+      "create": "Create version"
+    }
+  },
+  "workspaceOperational": {
+    "events": {
+      "theory": "Theory module",
+      "practice": "Practical session",
+      "assessment": "Training assessment",
+      "safety": "Safety and prevention",
+      "workshop": "Technical workshop"
+    },
+    "sessions": {
+      "theory": "Theory session",
+      "practice": "Practical session",
+      "objective": "Work on the competencies defined by the active framework.",
+      "supports": "Resources adapted to the selected program and framework."
+    },
+    "skills": {
+      "sessionSubject": "Practice for the selected competency",
+      "positive": "Good progress on the observed expectations.",
+      "workOn": "Improve consistency and autonomy.",
+      "nextGoal": "Validate the next sub-competency in the framework."
+    },
+    "driving": {
+      "subject": "Practical session adapted to the active program",
+      "positive": "Good adaptation to instructions and vehicle.",
+      "difficulty": "Anticipation and consistency still need improvement.",
+      "nextGoal": "Continue progressing on the active competency."
+    }
+  },
+  "organizationAdmin": {
+    "breadcrumb": "Organization administration",
+    "title": "Organization administration",
+    "subtitle": "Manage the structure, identity and settings of {{organization}}.",
+    "active": "Active organization",
+    "saved": "Changes saved",
+    "kpi": {
+      "sites": "Training sites",
+      "programs": "Active programs",
+      "students": "Students",
+      "activeCohorts": "Active cohorts"
+    },
+    "cards": {
+      "sites": {
+        "title": "Training sites",
+        "description": "Manage sites, managers and contact details."
+      },
+      "programs": {
+        "title": "Training programs",
+        "description": "Manage the catalog and program availability by site."
+      },
+      "referentials": {
+        "title": "Frameworks",
+        "description": "Manage versions, competencies and pedagogical rules."
+      },
+      "access": {
+        "title": "Users & access",
+        "description": "Manage roles, assignments and access scopes."
+      },
+      "remoteWork": {
+        "title": "Remote work",
+        "description": "Policy, requests, planning and remote activities."
+      }
+    },
+    "identity": {
+      "title": "Organization identity",
+      "subtitle": "Administrative information used across the organization.",
+      "legalName": "Legal name",
+      "shortName": "Short name",
+      "siret": "Company ID",
+      "declaration": "Training activity declaration no.",
+      "address": "Head office address",
+      "postalCode": "Postal code",
+      "city": "City",
+      "email": "Main email",
+      "phone": "Phone",
+      "manager": "Manager",
+      "website": "Website",
+      "save": "Save organization"
+    },
+    "branding": {
+      "title": "Branding",
+      "subtitle": "Customize the visual identity of the organization workspace.",
+      "preview": "Login preview",
+      "primary": "Primary color",
+      "secondary": "Secondary color",
+      "logoLabel": "Name displayed with logo",
+      "tagline": "Login tagline",
+      "save": "Save branding",
+      "whiteLabel": {
+        "title": "White-label mode",
+        "description": "Hide TP ECSR Pilot branding in user workspaces."
+      },
+      "siteOverride": {
+        "title": "Site-level customization",
+        "description": "Allow each site to customize its logo and colors."
+      }
+    },
+    "modules": {
+      "title": "Available modules",
+      "subtitle": "Define capabilities allowed at organization level.",
+      "inherited": "Default settings",
+      "hint": "Programs can only enable modules compatible with their framework. Disabling a module here makes it unavailable across the organization.",
+      "items": {
+        "planning": {
+          "title": "Planning",
+          "description": "Calendars, sessions and events."
+        },
+        "attendance": {
+          "title": "Attendance",
+          "description": "Attendance, absences, lateness and catch-up hours."
+        },
+        "sessions": {
+          "title": "Sessions",
+          "description": "Management of teaching sessions."
+        },
+        "driving": {
+          "title": "Driving",
+          "description": "In-vehicle practical tracking and observations."
+        },
+        "plateau": {
+          "title": "Training ground",
+          "description": "Off-road exercises and manoeuvres."
+        },
+        "sheets": {
+          "title": "Sheets / Presentations",
+          "description": "Preparation and assessment of oral material."
+        },
+        "skills": {
+          "title": "Competencies",
+          "description": "Frameworks and competency progress."
+        },
+        "internships": {
+          "title": "Internships",
+          "description": "Work placements and hour tracking."
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "Library and administrative files."
+        },
+        "certification": {
+          "title": "Certification",
+          "description": "Exams, juries, results and decisions."
+        },
+        "statistics": {
+          "title": "Statistics",
+          "description": "Indicators, reports and success rates."
+        }
+      }
+    },
+    "settings": {
+      "title": "Organization settings",
+      "subtitle": "Global preferences applied by default to training sites.",
+      "tabs": {
+        "general": "General",
+        "notifications": "Notifications",
+        "security": "Security & retention"
+      },
+      "language": "Default language",
+      "timezone": "Time zone",
+      "dateFormat": "Date format",
+      "academicYear": "Reference year",
+      "languages": {
+        "fr": "Français (FR)",
+        "en": "English (EN)"
+      },
+      "items": {
+        "absenceAlerts": {
+          "title": "Absence alerts",
+          "description": "Alert managers when absence thresholds are exceeded."
+        },
+        "certificationAlerts": {
+          "title": "Certification alerts",
+          "description": "Flag incomplete files before an exam session."
+        },
+        "weeklyDigest": {
+          "title": "Weekly digest",
+          "description": "Send managers a summary of indicators and alerts."
+        },
+        "autoArchive": {
+          "title": "Automatic archiving",
+          "description": "Automatically archive closed cohorts after the configured retention period."
+        },
+        "strictAudit": {
+          "title": "Enhanced traceability",
+          "description": "Require a reason for sensitive changes and keep their history."
+        }
+      }
+    },
+    "audit": {
+      "title": "Organization audit log",
+      "subtitle": "Latest sensitive actions performed within this scope.",
+      "export": "Export log",
+      "columns": {
+        "action": "Action",
+        "actor": "User",
+        "detail": "Details",
+        "date": "Date"
+      },
+      "items": {
+        "site": {
+          "title": "Training site updated",
+          "detail": "AFTRAL Nice contact details were updated."
+        },
+        "assignment": {
+          "title": "Assignment added",
+          "detail": "A Trainer assignment was added to TP ECSR · Nice."
+        },
+        "program": {
+          "title": "Program enabled",
+          "detail": "The Heavy vehicle program was enabled at the Marseille site."
+        },
+        "archive": {
+          "title": "Archiving scheduled",
+          "detail": "The TP ECSR 2025–2026 cohort was added to the next archiving operation."
+        }
+      }
+    },
+    "remoteWork": {
+      "title": "Remote work",
+      "subtitle": "Configure the organization's remote-work policy.",
+      "open": "Open Remote work module",
+      "enabled": "Remote work enabled",
+      "enabledHint": "Enable the module for eligible staff.",
+      "approval": "Approval required",
+      "approvalHint": "Requests must be approved by a manager.",
+      "halfDay": "Half-days allowed",
+      "halfDayHint": "Allow requests for a morning or afternoon only.",
+      "report": "End-of-day report",
+      "reportHint": "Ask staff for a short summary of completed activities.",
+      "maxDays": "Maximum days per week",
+      "maxDaysHint": "Indicative limit applied when requests are entered.",
+      "save": "Save policy"
+    }
+  },
+  "remoteWork": {
+    "title": "Remote work",
+    "managerSubtitle": "Manage requests, attendance and remote work organization.",
+    "employeeSubtitle": "Plan your remote days and track your activities.",
+    "newRequest": "Request / declare remote work",
+    "saved": "Your remote work request has been saved.",
+    "managerKpi": {
+      "remoteToday": "Remote today",
+      "pending": "Pending approval",
+      "onsite": "On site",
+      "absent": "Absent"
+    },
+    "employeeKpi": {
+      "status": "Today's status",
+      "nextDate": "Next remote day",
+      "month": "This month",
+      "activities": "Activities completed"
+    },
+    "requests": {
+      "title": "Remote work requests",
+      "subtitle": "Review and track staff requests"
+    },
+    "filters": {
+      "allSites": "All sites",
+      "allStatuses": "All statuses"
+    },
+    "columns": {
+      "employee": "Employee",
+      "date": "Date",
+      "period": "Period",
+      "activities": "Activities",
+      "status": "Status",
+      "action": "Action"
+    },
+    "status": {
+      "requested": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "periods": {
+      "full-day": "Full day",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "custom": "Custom hours"
+    },
+    "review": "Review",
+    "approve": "Approve",
+    "reject": "Reject",
+    "noComment": "No comment.",
+    "policy": {
+      "title": "Remote work policy",
+      "subtitle": "Rules currently active for the organization",
+      "approval": "Approval required",
+      "maxDays": "Max days / week",
+      "halfDay": "Half-days allowed",
+      "report": "End-of-day report",
+      "configure": "Configure in Administration"
+    },
+    "today": {
+      "title": "My remote day",
+      "activitiesPlanned": "Planned activities",
+      "completed": "Completed"
+    },
+    "myActivities": {
+      "title": "My activities",
+      "subtitle": "Work planned for the selected day"
+    },
+    "activityTypes": {
+      "preparation": "Course preparation",
+      "correction": "Sheet correction",
+      "followUp": "Student follow-up",
+      "meeting": "Meeting",
+      "admin": "Administration",
+      "remoteTraining": "Remote training"
+    },
+    "activities": {
+      "prepareCourse": "Prepare the intersections lesson",
+      "correctSheets": "Review pedagogical sheets",
+      "studentFollowUp": "Follow up with a student",
+      "remoteMeeting": "Attend the pedagogical meeting"
+    },
+    "activityStatus": {
+      "todo": "To do",
+      "in-progress": "In progress",
+      "done": "Completed"
+    },
+    "history": {
+      "title": "History",
+      "subtitle": "Your recent remote work days"
+    },
+    "week": {
+      "title": "Team work organization this week",
+      "subtitle": "On site, remote, field and travel"
+    },
+    "workModes": {
+      "onsite": "On site",
+      "remote": "Remote",
+      "field": "Field",
+      "travel": "Travel",
+      "leave": "Leave",
+      "absence": "Absence"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
+    },
+    "drawer": {
+      "title": "New remote work request",
+      "subtitle": "Plan a full or half remote-work day.",
+      "date": "Date",
+      "period": "Period",
+      "start": "Start",
+      "end": "End",
+      "activities": "Planned activities",
+      "comment": "Comment / organization",
+      "commentPlaceholder": "Add useful details about how you will organize your day…",
+      "policyHint": "The current policy allows up to {{days}} remote days per week.",
+      "submit": "Save request"
+    },
+    "decisionDrawer": {
+      "title": "Review request",
+      "subtitle": "Check the requested period and planned organization before deciding."
+    }
+  },
+  "distanceLearning": {
+    "title": "Distance learning",
+    "badge": "Digital classroom",
+    "subtitle": "Virtual classes, asynchronous modules, learning activities and progress tracking.",
+    "students": "students",
+    "actions": {
+      "create": "Create remote activity",
+      "openClass": "Open classroom",
+      "question": "Question",
+      "poll": "Poll",
+      "join": "Join session"
+    },
+    "messages": {
+      "saved": "The remote activity was added in demo mode.",
+      "joined": "Virtual classroom opening simulated."
+    },
+    "kpi": {
+      "liveSessions": "Live sessions",
+      "liveHours": "Synchronous hours",
+      "asyncHours": "Asynchronous hours",
+      "completion": "Modules completed",
+      "lateModules": "Late modules"
+    },
+    "management": {
+      "sessionsTitle": "Remote sessions",
+      "sessionsSubtitle": "Virtual classes for the active learning context.",
+      "modalityTitle": "Learning delivery split",
+      "modalitySubtitle": "On-site / remote share of classroom learning volume.",
+      "remoteShare": "of volume remote",
+      "onsite": "On site",
+      "remote": "Remote",
+      "sitesTitle": "Tracking by site",
+      "sitesSubtitle": "Consolidated remote hours and progress."
+    },
+    "table": {
+      "site": "Site",
+      "liveHours": "Synchronous",
+      "asyncHours": "Asynchronous",
+      "students": "Active students",
+      "completion": "Completion",
+      "late": "Late"
+    },
+    "trainer": {
+      "today": "Today",
+      "liveClasses": "virtual classes",
+      "toCorrect": "To review",
+      "works": "student assignments",
+      "quizzes": "Quizzes",
+      "toAnalyze": "to analyse",
+      "lateStudents": "Late students",
+      "modulesLate": "modules to finish",
+      "sessionsTitle": "My virtual classes",
+      "sessionsSubtitle": "Open a session to take attendance and run learning activities."
+    },
+    "student": {
+      "modulesToDo": "Modules to do",
+      "dueThisWeek": "Due this week",
+      "remoteHours": "Time completed",
+      "progress": "Progress",
+      "nextLive": "Next virtual class",
+      "nextLiveSubtitle": "Your next synchronous session.",
+      "myModules": "My modules",
+      "myModulesSubtitle": "Progress at your pace and validate each step.",
+      "due": "Due"
+    },
+    "async": {
+      "title": "Asynchronous modules",
+      "subtitle": "Courses, videos, exercises and quizzes to complete independently.",
+      "completedStudents": "completed"
+    },
+    "filters": {
+      "all": "All statuses"
+    },
+    "sessionStatus": {
+      "scheduled": "Scheduled",
+      "live": "Live",
+      "closed": "Closed"
+    },
+    "attendance": {
+      "present": "Present",
+      "late": "Late",
+      "absent": "Absent",
+      "disconnected": "Disconnected"
+    },
+    "classroom": {
+      "participants": "Participants",
+      "clickStatus": "Click the status to correct it",
+      "notConnected": "Not connected",
+      "noParticipantsYet": "Participants will be available when the session starts.",
+      "interactions": "Learning interactions",
+      "noInteractions": "No interaction prepared.",
+      "resources": "Resources",
+      "noResources": "No resource published.",
+      "viewed": "views"
+    },
+    "platforms": {
+      "teams": "Microsoft Teams",
+      "zoom": "Zoom",
+      "meet": "Google Meet",
+      "jitsi": "Jitsi",
+      "other": "Other"
+    },
+    "moduleStatus": {
+      "not-started": "To start",
+      "in-progress": "In progress",
+      "completed": "Completed",
+      "late": "Late"
+    },
+    "steps": {
+      "readCourse": "Read the course",
+      "watchVideo": "Watch the video",
+      "exercise": "Complete the exercise",
+      "quiz": "Take the quiz"
+    },
+    "drawer": {
+      "title": "New remote learning activity",
+      "close": "Close",
+      "live": "Virtual classroom",
+      "async": "Asynchronous module",
+      "name": "Title",
+      "namePlaceholder": "e.g. Theme 21 — Reaction time",
+      "date": "Date",
+      "start": "Start",
+      "end": "End",
+      "platform": "Video conference tool",
+      "link": "Join link",
+      "duration": "Estimated duration (min)",
+      "dueDate": "Due date",
+      "help": "Tracking is learning-focused: attendance is validated by the trainer alongside activities, resources and assessments. A technical connection alone does not automatically validate training hours.",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "demo": {
+      "resources": {
+        "reactionCourse": "Course — Reaction time and distances",
+        "brakingVideo": "Video — Emergency braking",
+        "distanceExercise": "Exercise — Distance calculations",
+        "alcoholCourse": "Course — Alcohol and driving"
+      },
+      "interactions": {
+        "reactionPoll": "Poll — distance travelled in one second",
+        "distanceQuiz": "Final quiz — safety distances",
+        "pairExercise": "Pair exercise — reaction-time factors"
+      },
+      "sessions": {
+        "reactionDistances": "Theme 21 — Reaction time and distances",
+        "reactionObjectives": "Understand reaction time, estimate distances and identify aggravating factors.",
+        "alcohol": "Theme 13 — Alcohol and driving",
+        "alcoholObjectives": "Understand absorption, elimination and alcohol-related risks.",
+        "roadRisk": "Road-risk awareness",
+        "roadRiskObjectives": "Identify major risks and build an awareness session.",
+        "plRegulation": "Heavy vehicle regulations — fundamentals",
+        "plObjectives": "Identify key requirements before practical sessions.",
+        "genericTheory": "Virtual class — professional knowledge",
+        "genericObjectives": "Acquire the knowledge required before practical activities."
+      },
+      "modules": {
+        "alcohol": "Alcohol and driving",
+        "alcoholDescription": "Course, video, exercise and validation quiz.",
+        "ecoDriving": "Eco-driving",
+        "ecoDrivingDescription": "Self-paced path on eco-driving principles and behaviours.",
+        "insurance": "Motor insurance and accident report",
+        "insuranceDescription": "Review obligations, cover and the amicable accident report.",
+        "roadRisk": "Road risks",
+        "roadRiskDescription": "Analyse risk factors and prepare a presentation.",
+        "generic": "Remote theory module",
+        "genericDescription": "Self-paced path made of resources, activities and assessment."
+      }
     }
   }
 }

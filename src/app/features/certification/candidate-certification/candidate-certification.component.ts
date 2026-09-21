@@ -9,10 +9,11 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { SessionService } from "../../../core/session/session.service";
-import {
-  certificationCandidateById,
-  EXAM_SESSIONS,
+import type {
+  CertificationCandidate,
+  CertificationUnitStatus,
 } from "../../../core/mock-data/certification.mock";
+import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
 
 type JuryLevel = "satisfactory" | "partial" | "insufficient";
@@ -26,37 +27,28 @@ type JuryLevel = "satisfactory" | "partial" | "insufficient";
 export class CandidateCertificationComponent {
   private readonly route = inject(ActivatedRoute);
   readonly sessionService = inject(SessionService);
-  readonly exam = EXAM_SESSIONS[0];
-  readonly candidate =
-    certificationCandidateById(this.route.snapshot.paramMap.get("id") ?? "") ??
-    certificationCandidateById("c1")!;
+  readonly contextData = inject(ContextualTrainingDataService);
+  readonly scheme = this.contextData.certificationScheme;
+  readonly program = this.contextData.program;
+  readonly exam = this.contextData.examSession;
+
+  private readonly requestedCandidateId = this.route.snapshot.paramMap.get("id") ?? "";
+  private readonly ownStudentId = this.sessionService.session()?.studentId ?? "";
+
+  readonly candidate = computed<CertificationCandidate>(() => {
+    const candidates = this.contextData.certificationCandidates();
+    const wanted = this.sessionService.role() === "stagiaire" ? this.ownStudentId : this.requestedCandidateId;
+    return candidates.find((item) => item.id === wanted || item.studentId === wanted) ?? candidates[0]!;
+  });
+
   readonly isJury = computed(() => this.sessionService.role() === "jury");
-  readonly readiness = computed(() =>
-    Math.round(
-      (this.candidate.completedHours /
-        Math.max(this.candidate.plannedHours, 1)) *
-        100,
-    ),
-  );
+  readonly readiness = computed(() => {
+    const candidate = this.candidate();
+    return Math.round((candidate.completedHours / Math.max(candidate.plannedHours, 1)) * 100);
+  });
   readonly evaluationSaved = signal(false);
   readonly evaluationLocked = signal(false);
   juryNotes = "";
-
-  readonly juryCriteria = [
-    {
-      id: "pedagogy",
-      labelKey: "certification.candidate.juryCriteria.pedagogy",
-    },
-    { id: "safety", labelKey: "certification.candidate.juryCriteria.safety" },
-    {
-      id: "analysis",
-      labelKey: "certification.candidate.juryCriteria.analysis",
-    },
-    {
-      id: "communication",
-      labelKey: "certification.candidate.juryCriteria.communication",
-    },
-  ];
   readonly juryLevels = signal<Record<string, JuryLevel>>({});
 
   setLevel(id: string, level: JuryLevel): void {
@@ -76,6 +68,15 @@ export class CandidateCertificationComponent {
   validateEvaluation(): void {
     this.evaluationSaved.set(true);
     this.evaluationLocked.set(true);
+  }
+
+  unitStatus(unitId: string): CertificationUnitStatus {
+    const candidate = this.candidate();
+    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+    if (explicit) return explicit;
+    if (unitId === "ccp1") return candidate.ccp1;
+    if (unitId === "ccp2") return candidate.ccp2;
+    return candidate.ready ? "validated" : "pending";
   }
 
   statusClasses(status: string): string {

@@ -3,12 +3,13 @@ import {
   Component,
   OnInit,
   computed,
+  inject,
   input,
   output,
   signal,
 } from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { STUDENT_DIRECTORY } from "../../../core/mock-data/students.mock";
+import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
 import {
   EVALUATION_CRITERIA,
   EVALUATORS,
@@ -43,7 +44,8 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   readonly closed = output<void>();
   readonly evaluationSaved = output<SheetEvaluationSavedEvent>();
 
-  readonly students = STUDENT_DIRECTORY;
+  readonly contextData = inject(ContextualTrainingDataService);
+  get students() { return this.contextData.students(); }
   readonly evaluators = EVALUATORS;
   readonly criteria = EVALUATION_CRITERIA;
   readonly levels: EvaluationLevel[] = ["acquired", "in_progress", "review"];
@@ -92,7 +94,8 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.studentId.set(this.initialStudentId());
+    const requested = this.initialStudentId();
+    this.studentId.set(this.students.some((student) => student.id === requested) ? requested : (this.students[0]?.id ?? "s1"));
     const available = this.sheets();
     this.sheetNumber.set(
       available.some((sheet) => sheet.number === 32)

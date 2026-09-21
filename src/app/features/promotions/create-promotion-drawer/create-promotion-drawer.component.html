@@ -8,253 +8,114 @@
     ></button>
 
     <aside
-      class="absolute inset-y-0 right-0 flex w-full max-w-[590px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(16,38,68,0.18)]"
+      class="absolute inset-y-0 right-0 flex w-full max-w-[620px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(16,38,68,0.18)]"
       role="dialog"
       aria-modal="true"
-      [attr.aria-label]="'promotions.drawer.title' | t"
+      [attr.aria-label]="'promotions.contextual.drawer.title' | t"
     >
-      <header
-        class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"
-      >
+      <header class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5">
         <div class="flex items-center gap-3">
-          <span
-            class="grid size-11 place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
-          >
-            <i class="ph ph-graduation-cap text-[22px]"></i>
-          </span>
+          <span class="grid size-11 place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"><i class="ph ph-graduation-cap text-[22px]"></i></span>
           <div>
-            <h2
-              class="text-[20px] font-extrabold tracking-[-0.4px] text-[#172033]"
-            >
-              {{ "promotions.drawer.title" | t }}
-            </h2>
-            <p class="mt-0.5 text-[12px] text-[#718096]">
-              {{ "promotions.drawer.subtitle" | t }}
-            </p>
+            <h2 class="text-[20px] font-extrabold tracking-[-0.4px] text-[#172033]">{{ "promotions.contextual.drawer.title" | t }}</h2>
+            <p class="mt-0.5 text-[12px] text-[#718096]">{{ "promotions.contextual.drawer.subtitle" | t }}</p>
           </div>
         </div>
-        <button
-          type="button"
-          (click)="requestClose()"
-          class="grid size-10 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#536277] transition hover:bg-[#f1f5f9]"
-          [attr.aria-label]="'promotions.drawer.close' | t"
-        >
-          <i class="ph ph-x text-[20px]"></i>
-        </button>
+        <button type="button" (click)="requestClose()" class="grid size-10 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#536277] transition hover:bg-[#f1f5f9]" [attr.aria-label]="'promotions.drawer.close' | t"><i class="ph ph-x text-[20px]"></i></button>
       </header>
 
-      <form
-        class="flex min-h-0 flex-1 flex-col"
-        [formGroup]="form"
-        (ngSubmit)="submit()"
-        novalidate
-      >
+      <form class="flex min-h-0 flex-1 flex-col" [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
-          <section
-            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-          >
-            <div class="mb-4 flex items-center gap-2">
-              <i
-                class="ph ph-identification-badge text-[19px] text-[#2a64a2]"
-              ></i>
-              <h3 class="text-[15px] font-bold text-[#172033]">
-                {{ "promotions.drawer.general.title" | t }}
-              </h3>
+          <section class="rounded-[17px] border border-[#cfe0f0] bg-[#eef5fc] p-4">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6d86a0]">{{ "promotions.contextual.drawer.context" | t }}</p>
+            <div class="mt-3 grid gap-2 sm:grid-cols-3">
+              <div class="rounded-[12px] bg-white px-3 py-2.5"><p class="text-[10px] text-[#7a8698]">{{ "promotions.contextual.organization" | t }}</p><p class="mt-1 truncate text-[12px] font-bold text-[#263143]">{{ organizationName() }}</p></div>
+              <div class="rounded-[12px] bg-white px-3 py-2.5"><p class="text-[10px] text-[#7a8698]">{{ "promotions.contextual.site" | t }}</p><p class="mt-1 truncate text-[12px] font-bold text-[#263143]">{{ siteName() }}</p></div>
+              <div class="rounded-[12px] bg-white px-3 py-2.5"><p class="text-[10px] text-[#7a8698]">{{ "promotions.contextual.program" | t }}</p><p class="mt-1 truncate text-[12px] font-bold text-[#263143]">{{ programName() }}</p></div>
             </div>
+          </section>
+
+          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center gap-2"><i class="ph ph-identification-badge text-[19px] text-[#2a64a2]"></i><h3 class="text-[15px] font-bold text-[#172033]">{{ "promotions.drawer.general.title" | t }}</h3></div>
 
             <div>
-              <label
-                for="promotion-name"
-                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                >{{ "promotions.drawer.general.name" | t }} *</label
-              >
-              <input
-                id="promotion-name"
-                formControlName="name"
-                [placeholder]="'promotions.drawer.general.namePlaceholder' | t"
-                class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-              />
-              @if (showRequired("name")) {
-                <p class="mt-1 text-[11px] text-red-600">
-                  {{ "promotions.drawer.errors.required" | t }}
-                </p>
-              }
+              <label for="promotion-name" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.drawer.general.name" | t }} *</label>
+              <input id="promotion-name" formControlName="name" [placeholder]="'promotions.drawer.general.namePlaceholder' | t" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
+              @if (showRequired("name")) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.drawer.errors.required" | t }}</p>}
             </div>
 
-            <div class="mt-4">
-              <label
-                for="promotion-manager"
-                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                >{{ "promotions.drawer.general.manager" | t }} *</label
-              >
-              <div class="relative">
-                <select
-                  id="promotion-manager"
-                  formControlName="manager"
-                  class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-                >
-                  @for (member of team; track member.id) {
-                    <option [value]="fullName(member)">
-                      {{ fullName(member) }}
-                    </option>
-                  }
-                </select>
-                <i
-                  class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
-                ></i>
-              </div>
-            </div>
-          </section>
-
-          <section
-            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-          >
-            <div class="mb-4 flex items-center gap-2">
-              <i class="ph ph-calendar-dots text-[19px] text-[#2a64a2]"></i>
-              <h3 class="text-[15px] font-bold text-[#172033]">
-                {{ "promotions.drawer.schedule.title" | t }}
-              </h3>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <label
-                  for="promotion-start"
-                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                  >{{ "promotions.drawer.schedule.startDate" | t }} *</label
-                >
-                <input
-                  id="promotion-start"
-                  type="date"
-                  formControlName="startDate"
-                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-                />
-                @if (showRequired("startDate")) {
-                  <p class="mt-1 text-[11px] text-red-600">
-                    {{ "promotions.drawer.errors.required" | t }}
-                  </p>
-                }
+                <label for="promotion-referential" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.contextual.drawer.referential" | t }} *</label>
+                <div class="relative">
+                  <select id="promotion-referential" formControlName="referentialVersionId" class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]">
+                    <option value="">{{ "promotions.contextual.drawer.chooseReferential" | t }}</option>
+                    @for (referential of referentials(); track referential.id) {<option [value]="referential.id">{{ referential.version }}</option>}
+                  </select>
+                  <i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"></i>
+                </div>
+                @if (showRequired("referentialVersionId")) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.drawer.errors.required" | t }}</p>}
               </div>
               <div>
-                <label
-                  for="promotion-end"
-                  class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                  >{{ "promotions.drawer.schedule.endDate" | t }} *</label
-                >
-                <input
-                  id="promotion-end"
-                  type="date"
-                  formControlName="endDate"
-                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-                />
-                @if (showRequired("endDate")) {
-                  <p class="mt-1 text-[11px] text-red-600">
-                    {{ "promotions.drawer.errors.required" | t }}
-                  </p>
-                }
-              </div>
-            </div>
-
-            @if (
-              (submitted() || form.controls.endDate.touched) &&
-              hasInvalidDates()
-            ) {
-              <p
-                class="mt-2 flex items-center gap-1.5 text-[11px] text-red-600"
-              >
-                <i class="ph ph-warning-circle text-[14px]"></i
-                >{{ "promotions.drawer.errors.dateOrder" | t }}
-              </p>
-            }
-
-            <div class="mt-4">
-              <label
-                for="promotion-hours"
-                class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                >{{ "promotions.drawer.schedule.plannedHours" | t }} *</label
-              >
-              <div class="relative">
-                <input
-                  id="promotion-hours"
-                  type="number"
-                  min="1"
-                  step="1"
-                  formControlName="plannedHours"
-                  class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 pr-12 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-                />
-                <span
-                  class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[12px] font-medium text-[#718096]"
-                  >h</span
-                >
-              </div>
-              @if (showRequired("plannedHours")) {
-                <p class="mt-1 text-[11px] text-red-600">
-                  {{ "promotions.drawer.errors.required" | t }}
-                </p>
-              }
-              @if (showHoursError()) {
-                <p class="mt-1 text-[11px] text-red-600">
-                  {{ "promotions.drawer.errors.hours" | t }}
-                </p>
-              }
-            </div>
-          </section>
-
-          <section
-            class="rounded-[17px] border border-[#cfe0f0] bg-[#eef5fc] p-5"
-          >
-            <div class="flex gap-3">
-              <span
-                class="grid size-10 shrink-0 place-items-center rounded-full bg-white text-[#2a64a2] shadow-sm"
-                ><i class="ph ph-info text-[19px]"></i
-              ></span>
-              <div>
-                <p class="text-[13px] font-bold text-[#244e79]">
-                  {{ "promotions.drawer.initialState.title" | t }}
-                </p>
-                <p class="mt-1 text-[11.5px] leading-[1.5] text-[#64748b]">
-                  {{ "promotions.drawer.initialState.help" | t }}
-                </p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                  <span
-                    class="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-semibold text-[#49647f]"
-                    >{{ "promotions.drawer.initialState.students" | t }}</span
-                  >
-                  <span
-                    class="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-semibold text-[#49647f]"
-                    >{{ "promotions.drawer.initialState.progress" | t }}</span
-                  >
-                  <span
-                    class="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-semibold text-[#49647f]"
-                    >{{ "promotions.drawer.initialState.hours" | t }}</span
-                  >
+                <label for="promotion-status" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.contextual.drawer.status" | t }} *</label>
+                <div class="relative">
+                  <select id="promotion-status" formControlName="status" class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]">
+                    <option value="planned">{{ "promotions.contextual.status.planned" | t }}</option>
+                    <option value="active">{{ "promotions.contextual.status.active" | t }}</option>
+                  </select>
+                  <i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"></i>
                 </div>
               </div>
             </div>
+
+            <div class="mt-4">
+              <label for="promotion-manager" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.drawer.general.manager" | t }} *</label>
+              <div class="relative">
+                <select id="promotion-manager" formControlName="manager" class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]">
+                  @for (member of team; track member.id) {<option [value]="fullName(member)">{{ fullName(member) }}</option>}
+                </select>
+                <i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"></i>
+              </div>
+            </div>
+          </section>
+
+          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center gap-2"><i class="ph ph-calendar-dots text-[19px] text-[#2a64a2]"></i><h3 class="text-[15px] font-bold text-[#172033]">{{ "promotions.drawer.schedule.title" | t }}</h3></div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="promotion-start" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.drawer.schedule.startDate" | t }} *</label>
+                <input id="promotion-start" type="date" formControlName="startDate" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
+                @if (showRequired("startDate")) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.drawer.errors.required" | t }}</p>}
+              </div>
+              <div>
+                <label for="promotion-end" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.drawer.schedule.endDate" | t }} *</label>
+                <input id="promotion-end" type="date" formControlName="endDate" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
+                @if (showRequired("endDate")) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.drawer.errors.required" | t }}</p>}
+              </div>
+            </div>
+            @if ((submitted() || form.controls.endDate.touched) && hasInvalidDates()) {<p class="mt-2 flex items-center gap-1.5 text-[11px] text-red-600"><i class="ph ph-warning-circle text-[14px]"></i>{{ "promotions.drawer.errors.dateOrder" | t }}</p>}
+
+            <div class="mt-4">
+              <label for="promotion-student-count" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "promotions.contextual.drawer.studentCount" | t }} *</label>
+              <input id="promotion-student-count" type="number" min="1" step="1" formControlName="studentCount" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
+              @if (showRequired("studentCount")) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.drawer.errors.required" | t }}</p>}
+              @if (showStudentCountError()) {<p class="mt-1 text-[11px] text-red-600">{{ "promotions.contextual.drawer.studentCountError" | t }}</p>}
+            </div>
+          </section>
+
+          <section class="rounded-[17px] border border-[#ead8a4] bg-[#fff9e9] p-5">
+            <div class="flex gap-3">
+              <span class="grid size-10 shrink-0 place-items-center rounded-full bg-white text-[#9b6b00] shadow-sm"><i class="ph ph-link-simple text-[19px]"></i></span>
+              <div><p class="text-[13px] font-bold text-[#6e5116]">{{ "promotions.contextual.drawer.versionBindingTitle" | t }}</p><p class="mt-1 text-[11.5px] leading-[1.5] text-[#7b6a43]">{{ "promotions.contextual.drawer.versionBindingHelp" | t }}</p></div>
+            </div>
           </section>
         </div>
 
-        <footer
-          class="flex items-center justify-between gap-3 border-t border-[#dfe5ec] bg-white px-6 py-4"
-        >
-          <p class="hidden text-[11px] text-[#7a8698] sm:block">
-            {{ "promotions.drawer.requiredHint" | t }}
-          </p>
+        <footer class="flex items-center justify-between gap-3 border-t border-[#dfe5ec] bg-white px-6 py-4">
+          <p class="hidden text-[11px] text-[#7a8698] sm:block">{{ "promotions.drawer.requiredHint" | t }}</p>
           <div class="ml-auto flex gap-2">
-            <button
-              type="button"
-              (click)="requestClose()"
-              class="inline-flex h-[40px] items-center justify-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#475569] shadow-sm transition hover:bg-[#f8fafc]"
-            >
-              {{ "promotions.drawer.cancel" | t }}
-            </button>
-            <button
-              type="submit"
-              class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f]"
-            >
-              <i class="ph ph-plus text-[17px]"></i
-              >{{ "promotions.drawer.submit" | t }}
-            </button>
+            <button type="button" (click)="requestClose()" class="inline-flex h-[40px] items-center justify-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#475569] shadow-sm transition hover:bg-[#f8fafc]">{{ "promotions.drawer.cancel" | t }}</button>
+            <button type="submit" class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f]"><i class="ph ph-plus text-[17px]"></i>{{ "promotions.drawer.submit" | t }}</button>
           </div>
         </footer>
       </form>

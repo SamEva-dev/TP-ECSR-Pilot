@@ -1,13 +1,10 @@
 import { Routes } from "@angular/router";
 import { authGuard } from "./core/session/auth.guard";
-import { directionGuard } from "./core/session/direction.guard";
-const placeholder = (titleKey: string) => ({
-  loadComponent: () =>
-    import("./features/placeholder/feature-placeholder.component").then(
-      (m) => m.FeaturePlaceholderComponent,
-    ),
-  data: { titleKey },
-});
+import { roleGuard } from "./core/session/role.guard";
+
+const trainingRoles = ["direction", "formateur", "stagiaire", "secretariat"] as const;
+const managementRoles = ["direction", "secretariat"] as const;
+
 export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "connexion" },
   {
@@ -31,27 +28,112 @@ export const routes: Routes = [
     children: [
       {
         path: "accueil",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/home/home.component").then((m) => m.HomeComponent),
       },
       {
+        path: "organisation",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/organization-dashboard/organization-dashboard.component").then(
+            (m) => m.OrganizationDashboardComponent,
+          ),
+      },
+      {
+        path: "etablissements",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/sites/sites.component").then((m) => m.SitesComponent),
+      },
+      {
+        path: "etablissements/:id",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/sites/site-detail/site-detail.component").then(
+            (m) => m.SiteDetailComponent,
+          ),
+      },
+      {
+        path: "formations",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/programs/programs.component").then(
+            (m) => m.ProgramsComponent,
+          ),
+      },
+      {
+        path: "formations/:id",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/programs/program-detail/program-detail.component").then(
+            (m) => m.ProgramDetailComponent,
+          ),
+      },
+      {
+        path: "referentiels",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/referentials/referentials.component").then(
+            (m) => m.ReferentialsComponent,
+          ),
+      },
+      {
+        path: "referentiels/:id",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
+        loadComponent: () =>
+          import("./features/referentials/referential-detail/referential-detail.component").then(
+            (m) => m.ReferentialDetailComponent,
+          ),
+      },
+      {
         path: "planning",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/planning/planning.component").then(
             (m) => m.PlanningComponent,
           ),
       },
-      { path: "planning/nouveau", ...placeholder("planning.add") },
+      {
+        path: "teletravail",
+        canActivate: [roleGuard],
+        data: { roles: ["direction", "formateur", "secretariat"] },
+        loadComponent: () =>
+          import("./features/remote-work/remote-work.component").then(
+            (m) => m.RemoteWorkComponent,
+          ),
+      },
+      {
+        path: "distanciel",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
+        loadComponent: () =>
+          import("./features/distance-learning/distance-learning.component").then(
+            (m) => m.DistanceLearningComponent,
+          ),
+      },
       {
         path: "stagiaires",
+        canActivate: [roleGuard],
+        data: { roles: ["direction", "formateur", "secretariat"] },
         loadComponent: () =>
           import("./features/students/students.component").then(
             (m) => m.StudentsComponent,
           ),
       },
-      { path: "stagiaires/nouveau", ...placeholder("students.add") },
       {
         path: "stagiaires/:id",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/students/student-detail/student-detail.component").then(
             (m) => m.StudentDetailComponent,
@@ -59,14 +141,17 @@ export const routes: Routes = [
       },
       {
         path: "promotions",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/promotions/promotions.component").then(
             (m) => m.PromotionsComponent,
           ),
       },
-      { path: "promotions/nouveau", ...placeholder("promotions.create") },
       {
         path: "seances",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/sessions/sessions.component").then(
             (m) => m.SessionsComponent,
@@ -74,6 +159,8 @@ export const routes: Routes = [
       },
       {
         path: "conduite",
+        canActivate: [roleGuard],
+        data: { roles: ["direction", "formateur", "stagiaire"] },
         loadComponent: () =>
           import("./features/driving/driving.component").then(
             (m) => m.DrivingComponent,
@@ -81,6 +168,8 @@ export const routes: Routes = [
       },
       {
         path: "fiches",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/sheets/sheets.component").then(
             (m) => m.SheetsComponent,
@@ -88,6 +177,8 @@ export const routes: Routes = [
       },
       {
         path: "competences",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/skills/skills.component").then(
             (m) => m.SkillsComponent,
@@ -95,6 +186,8 @@ export const routes: Routes = [
       },
       {
         path: "presences",
+        canActivate: [roleGuard],
+        data: { roles: ["direction", "formateur", "secretariat"] },
         loadComponent: () =>
           import("./features/attendance/attendance.component").then(
             (m) => m.AttendanceComponent,
@@ -102,14 +195,17 @@ export const routes: Routes = [
       },
       {
         path: "stages",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/internships/internships.component").then(
             (m) => m.InternshipsComponent,
           ),
       },
-      { path: "stages/nouveau", ...placeholder("internships.newPeriod") },
       {
         path: "documents",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/documents/documents.component").then(
             (m) => m.DocumentsComponent,
@@ -117,6 +213,8 @@ export const routes: Routes = [
       },
       {
         path: "certification",
+        canActivate: [roleGuard],
+        data: { roles: trainingRoles },
         loadComponent: () =>
           import("./features/certification/certification.component").then(
             (m) => m.CertificationComponent,
@@ -124,6 +222,8 @@ export const routes: Routes = [
       },
       {
         path: "certification/sessions/:id",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/certification/exam-session-detail/exam-session-detail.component").then(
             (m) => m.ExamSessionDetailComponent,
@@ -131,6 +231,10 @@ export const routes: Routes = [
       },
       {
         path: "certification/candidats/:id",
+        canActivate: [roleGuard],
+        data: {
+          roles: ["direction", "formateur", "secretariat", "stagiaire", "jury"],
+        },
         loadComponent: () =>
           import("./features/certification/candidate-certification/candidate-certification.component").then(
             (m) => m.CandidateCertificationComponent,
@@ -138,11 +242,15 @@ export const routes: Routes = [
       },
       {
         path: "jury",
+        canActivate: [roleGuard],
+        data: { roles: ["jury"] },
         loadComponent: () =>
           import("./features/jury/jury.component").then((m) => m.JuryComponent),
       },
       {
         path: "resultats",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/results/results.component").then(
             (m) => m.ResultsComponent,
@@ -150,6 +258,8 @@ export const routes: Routes = [
       },
       {
         path: "reussites",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/success/success.component").then(
             (m) => m.SuccessComponent,
@@ -157,6 +267,8 @@ export const routes: Routes = [
       },
       {
         path: "reussites/:promotionId",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/success/success.component").then(
             (m) => m.SuccessComponent,
@@ -164,6 +276,8 @@ export const routes: Routes = [
       },
       {
         path: "rapports",
+        canActivate: [roleGuard],
+        data: { roles: managementRoles },
         loadComponent: () =>
           import("./features/reports/reports.component").then(
             (m) => m.ReportsComponent,
@@ -171,6 +285,8 @@ export const routes: Routes = [
       },
       {
         path: "statistiques",
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
         loadComponent: () =>
           import("./features/statistics/statistics.component").then(
             (m) => m.StatisticsComponent,
@@ -178,7 +294,8 @@ export const routes: Routes = [
       },
       {
         path: "acces",
-        canActivate: [directionGuard],
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
         loadComponent: () =>
           import("./features/access/access.component").then(
             (m) => m.AccessComponent,
@@ -186,7 +303,8 @@ export const routes: Routes = [
       },
       {
         path: "administration/fiches",
-        canActivate: [directionGuard],
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
         loadComponent: () =>
           import("./features/administration/sheets-configuration/sheets-configuration.component").then(
             (m) => m.SheetsConfigurationComponent,
@@ -194,7 +312,8 @@ export const routes: Routes = [
       },
       {
         path: "administration",
-        canActivate: [directionGuard],
+        canActivate: [roleGuard],
+        data: { roles: ["direction"] },
         loadComponent: () =>
           import("./features/administration/administration.component").then(
             (m) => m.AdministrationComponent,

@@ -2,19 +2,22 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { STUDENTS } from "../../core/mock-data/dashboard.mock";
-import {
-  SKILL_DEFINITIONS,
-  SKILL_LINKED_SESSIONS,
-  type SkillCode,
-  type SkillCriterionLevel,
-} from "../../core/mock-data/skills.mock";
+import { SKILL_LINKED_SESSIONS, type SkillCriterionLevel } from "../../core/mock-data/skills.mock";
 import { SessionService } from "../../core/session/session.service";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
+import type { StudentDirectoryItem } from "../../core/mock-data/students.mock";
+
+interface UiSkillDefinition {
+  code: string;
+  titleKey: string;
+  criteria: { labelKey: string; level: SkillCriterionLevel }[];
+}
 
 @Component({
   selector: "app-skills",
@@ -24,33 +27,69 @@ import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 })
 export class SkillsComponent {
   readonly sessionService = inject(SessionService);
-  readonly definitions = SKILL_DEFINITIONS;
-  readonly students = STUDENTS;
-  readonly isStudent = computed(
-    () => this.sessionService.role() === "stagiaire",
+  readonly contextData = inject(ContextualTrainingDataService);
+  readonly students = this.contextData.students;
+  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly selectedStudentId = signal(this.sessionService.session()?.studentId ?? "s1");
+  readonly selectedSkill = signal("");
+
+  readonly definitions = computed<UiSkillDefinition[]>(() =>
+    (this.contextData.referential()?.competencies ?? []).map((competency, competencyIndex) => ({
+      code: competency.code,
+      titleKey: competency.label,
+      criteria: competency.subCompetencies.map((criterion, criterionIndex) => ({
+        labelKey: criterion.label,
+        level:
+          (competencyIndex + criterionIndex) % 4 === 0
+            ? "acquired"
+            : (competencyIndex + criterionIndex) % 3 === 0
+              ? "rework"
+              : "in_progress",
+      })),
+    })),
   );
-  readonly selectedStudentId = signal(
-    this.sessionService.session()?.studentId ?? "s1",
-  );
-  readonly selectedSkill = signal<SkillCode>("C1");
+
+  constructor() {
+    effect(() => {
+      const students = this.students();
+      if (!students.some((student) => student.id === this.selectedStudentId())) {
+        this.selectedStudentId.set(students[0]?.id ?? "s1");
+      }
+      const definitions = this.definitions();
+      if (!definitions.some((definition) => definition.code === this.selectedSkill())) {
+        this.selectedSkill.set(definitions[0]?.code ?? "");
+      }
+    });
+  }
 
   readonly selectedStudent = computed(
-    () =>
-      STUDENTS.find((student) => student.id === this.selectedStudentId()) ??
-      STUDENTS[0],
+    () => this.students().find((student) => student.id === this.selectedStudentId()) ?? this.students()[0],
   );
 
   readonly selectedDefinition = computed(
-    () =>
-      SKILL_DEFINITIONS.find((item) => item.code === this.selectedSkill()) ??
-      SKILL_DEFINITIONS[0],
+    () => this.definitions().find((item) => item.code === this.selectedSkill()) ?? this.definitions()[0],
   );
 
-  readonly linkedSessions = computed(() =>
-    SKILL_LINKED_SESSIONS.filter((item) => item.skill === this.selectedSkill()),
-  );
+  readonly linkedSessions = computed(() => {
+    if (this.contextData.isEcsr()) {
+      return SKILL_LINKED_SESSIONS.filter((item) => item.skill === this.selectedSkill());
+    }
+    const student = this.selectedStudent();
+    if (!student || !this.selectedSkill()) return [];
+    return [
+      {
+        id: `${this.selectedSkill()}-ctx-1`,
+        date: "20/09/2026",
+        studentName: `${student.firstName} ${student.lastName}`,
+        subjectKey: "workspaceOperational.skills.sessionSubject",
+        positiveKey: "workspaceOperational.skills.positive",
+        workOnKey: "workspaceOperational.skills.workOn",
+        nextGoalKey: "workspaceOperational.skills.nextGoal",
+      },
+    ];
+  });
 
-  selectSkill(code: SkillCode): void {
+  selectSkill(code: string): void {
     this.selectedSkill.set(code);
   }
 
@@ -58,8 +97,10 @@ export class SkillsComponent {
     this.selectedStudentId.set((event.target as HTMLSelectElement).value);
   }
 
-  skillValue(code: SkillCode, student = this.selectedStudent()): number {
-    return student.skills[code];
+  skillValue(code: string, student = this.selectedStudent()): number {
+    if (!student) return 0;
+    const index = Math.max(0, this.definitions().findIndex((item) => item.code === code));
+    return Math.max(0, Math.min(100, student.progress + 12 - index * 9));
   }
 
   criterionLabelKey(level: SkillCriterionLevel): string {
@@ -74,7 +115,7 @@ export class SkillsComponent {
         : "bg-[#ffe1df] text-[#f04438]";
   }
 
-  cardClasses(code: SkillCode): string {
+  cardClasses(code: string): string {
     return code === this.selectedSkill()
       ? "border-[#79aee3] bg-[#eaf4ff] shadow-sm"
       : "border-[#dfe5ec] bg-white shadow-sm hover:border-[#b8cee5]";

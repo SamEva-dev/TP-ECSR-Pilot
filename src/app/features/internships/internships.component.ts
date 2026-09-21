@@ -7,12 +7,12 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import {
-  INTERNSHIP_PERIODS,
   type InternshipDocument,
   type InternshipPeriod,
   type InternshipStatus,
 } from "../../core/mock-data/internships.mock";
 import { SessionService } from "../../core/session/session.service";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import {
   CreateInternshipDrawerComponent,
@@ -31,11 +31,12 @@ import {
 })
 export class InternshipsComponent {
   readonly sessionService = inject(SessionService);
+  readonly contextData = inject(ContextualTrainingDataService);
   readonly drawerOpen = signal(false);
   readonly createdPeriods = signal<InternshipPeriod[]>([]);
 
   readonly periods = computed(() => {
-    const allPeriods = [...this.createdPeriods(), ...INTERNSHIP_PERIODS];
+    const allPeriods = [...this.createdPeriods(), ...this.contextData.internships()];
     const role = this.sessionService.role();
     if (role === "stagiaire") {
       const studentId = this.sessionService.session()?.studentId ?? "s1";

@@ -6,6 +6,8 @@ export type PedagogicalSessionType =
   | "catchup"
   | "event";
 
+export type SessionModality = "onsite" | "remote-live" | "remote-async" | "practical";
+
 export interface ProgrammedSession {
   id: string;
   titleKey: string;
@@ -16,6 +18,7 @@ export interface ProgrammedSession {
   promotion: string;
   promotionId: string;
   type: PedagogicalSessionType;
+  modality: SessionModality;
   objectiveKey: string;
   supportsKey: string;
   present: number;
@@ -41,6 +44,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2026–2027",
     promotionId: "p1",
     type: "classroom",
+    modality: "onsite",
     objectiveKey: "sessions.programmed.items.intersections.objective",
     supportsKey: "sessions.programmed.items.intersections.supports",
     present: 8,
@@ -56,6 +60,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2026–2027",
     promotionId: "p1",
     type: "presentation",
+    modality: "onsite",
     objectiveKey: "sessions.programmed.items.sheets30to34.objective",
     supportsKey: "sessions.programmed.items.sheets30to34.supports",
     present: 9,
@@ -71,6 +76,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2026–2027",
     promotionId: "p1",
     type: "classroom",
+    modality: "remote-live",
     objectiveKey: "sessions.programmed.items.questioningMethod.objective",
     supportsKey: "sessions.programmed.items.questioningMethod.supports",
     present: 9,
@@ -86,6 +92,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2025–2026",
     promotionId: "p2",
     type: "evaluation",
+    modality: "onsite",
     objectiveKey: "sessions.programmed.items.c2Evaluation.objective",
     supportsKey: "sessions.programmed.items.c2Evaluation.supports",
     present: 6,
@@ -101,6 +108,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2026–2027",
     promotionId: "p1",
     type: "sensitization",
+    modality: "remote-live",
     objectiveKey: "sessions.programmed.items.roadRisk.objective",
     supportsKey: "sessions.programmed.items.roadRisk.supports",
     present: 9,
@@ -116,6 +124,7 @@ export const PROGRAMMED_SESSIONS: ProgrammedSession[] = [
     promotion: "TP ECSR 2026–2027",
     promotionId: "p1",
     type: "catchup",
+    modality: "onsite",
     objectiveKey: "sessions.programmed.items.signsCatchup.objective",
     supportsKey: "sessions.programmed.items.signsCatchup.supports",
     present: 3,

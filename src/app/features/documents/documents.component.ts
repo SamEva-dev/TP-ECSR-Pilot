@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 type DocumentCategory =
   | "administrative"
@@ -173,11 +174,30 @@ const DOCUMENTS: LibraryDocument[] = [
 })
 export class DocumentsComponent {
   readonly sessionService = inject(SessionService);
+  readonly contextData = inject(ContextualTrainingDataService);
   readonly search = signal("");
   readonly category = signal<"all" | DocumentCategory>("all");
   readonly selectedDocument = signal<LibraryDocument | null>(null);
 
   readonly role = this.sessionService.role;
+  readonly contextualDocuments = computed<LibraryDocument[]>(() => {
+    const program = this.contextData.program();
+    const referential = this.contextData.referential();
+    if (!program || program.id === "program-ecsr") return DOCUMENTS;
+    return DOCUMENTS.map((doc) => {
+      if (doc.id === "d2") {
+        return {
+          ...doc,
+          title: `Référentiel ${program.name} — ${referential?.version ?? "actif"}`,
+          fileName: `referentiel-${program.code.toLowerCase()}.pdf`,
+        };
+      }
+      if (doc.id === "d3") return { ...doc, title: `Grille évaluation — ${program.name}` };
+      if (doc.id === "d4") return { ...doc, title: `Support — ${program.name}` };
+      return doc;
+    });
+  });
+
   readonly canImport = computed(() => this.role() !== "stagiaire");
   readonly canManageDocument = computed(
     () => this.role() === "direction" || this.role() === "secretariat",
@@ -186,16 +206,16 @@ export class DocumentsComponent {
   readonly visibleDocuments = computed(() => {
     const role = this.role();
     if (role === "stagiaire") {
-      return DOCUMENTS.filter(
+      return this.contextualDocuments().filter(
         (d) => d.ownerStudentId === "s1" || d.visibleToStudent === true,
       );
     }
     if (role === "formateur") {
-      return DOCUMENTS.filter(
+      return this.contextualDocuments().filter(
         (d) => d.category !== "administrative" || d.visibleToStudent === true,
       );
     }
-    return DOCUMENTS;
+    return this.contextualDocuments();
   });
 
   readonly filteredDocuments = computed(() => {

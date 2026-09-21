@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
   type WritableSignal,
@@ -11,13 +12,11 @@ import { SessionService } from "../../core/session/session.service";
 import {
   DRIVING_COMPETENCIES,
   DRIVING_CRITERIA,
-  DRIVING_HISTORY,
-  DRIVING_STUDENTS,
   DRIVING_SUB_SKILLS,
   DRIVING_TRAINERS,
-  DRIVING_VEHICLES,
   type DrivingLevel,
 } from "../../core/mock-data/driving.mock";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({
   selector: "app-driving",
@@ -27,18 +26,24 @@ import {
 })
 export class DrivingComponent {
   readonly sessionService = inject(SessionService);
-  readonly students = DRIVING_STUDENTS;
+  readonly contextData = inject(ContextualTrainingDataService);
   readonly trainers = DRIVING_TRAINERS;
-  readonly vehicles = DRIVING_VEHICLES;
   readonly competencies = DRIVING_COMPETENCIES;
   readonly criteria = DRIVING_CRITERIA;
 
-  readonly selectedStudentId = signal(
-    this.sessionService.role() === "stagiaire" ? "s1" : "s1",
-  );
-  readonly selectedTrainerId = signal(
-    this.sessionService.role() === "formateur" ? "f1" : "f1",
-  );
+  get students() {
+    return this.contextData.students().map((student) => ({
+      id: student.id,
+      name: `${student.firstName} ${student.lastName}`,
+    }));
+  }
+
+  get vehicles() {
+    return this.contextData.vehicleLabels().map((label, index) => ({ id: `v${index + 1}`, label }));
+  }
+
+  readonly selectedStudentId = signal(this.sessionService.session()?.studentId ?? "s1");
+  readonly selectedTrainerId = signal("f1");
   readonly selectedVehicleId = signal("v1");
   readonly selectedCompetence = signal<"C1" | "C2" | "C3" | "C4">("C3");
   readonly selectedSubSkill = signal("bends");
@@ -66,53 +71,45 @@ export class DrivingComponent {
     stress: "progress",
   });
 
-  readonly isStudent = computed(
-    () => this.sessionService.role() === "stagiaire",
-  );
-  readonly isTrainer = computed(
-    () => this.sessionService.role() === "formateur",
-  );
+  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly isTrainer = computed(() => this.sessionService.role() === "formateur");
   readonly canEdit = computed(
-    () =>
-      this.sessionService.role() === "direction" ||
-      this.sessionService.role() === "formateur",
+    () => this.sessionService.role() === "direction" || this.sessionService.role() === "formateur",
   );
 
-  readonly selectedStudent = computed(
-    () =>
-      this.students.find((s) => s.id === this.selectedStudentId()) ??
-      this.students[0],
+  constructor() {
+    effect(() => {
+      const students = this.contextData.students();
+      if (!students.some((student) => student.id === this.selectedStudentId())) {
+        this.selectedStudentId.set(students[0]?.id ?? "s1");
+      }
+      this.contextData.program();
+      this.selectedVehicleId.set("v1");
+    });
+  }
+
+  readonly selectedStudent = computed(() =>
+    this.students.find((s) => s.id === this.selectedStudentId()) ?? this.students[0],
   );
-  readonly selectedTrainer = computed(
-    () =>
-      this.trainers.find((t) => t.id === this.selectedTrainerId()) ??
-      this.trainers[0],
+  readonly selectedTrainer = computed(() =>
+    this.trainers.find((t) => t.id === this.selectedTrainerId()) ?? this.trainers[0],
   );
-  readonly selectedVehicle = computed(
-    () =>
-      this.vehicles.find((v) => v.id === this.selectedVehicleId()) ??
-      this.vehicles[0],
+  readonly selectedVehicle = computed(() =>
+    this.vehicles.find((v) => v.id === this.selectedVehicleId()) ?? this.vehicles[0],
   );
-  readonly selectedCompetenceInfo = computed(
-    () =>
-      this.competencies.find((c) => c.id === this.selectedCompetence()) ??
-      this.competencies[2],
+  readonly selectedCompetenceInfo = computed(() =>
+    this.competencies.find((c) => c.id === this.selectedCompetence()) ?? this.competencies[2],
   );
-  readonly subSkills = computed(
-    () => DRIVING_SUB_SKILLS[this.selectedCompetence()],
-  );
-  readonly latestHistory = computed(
-    () =>
-      DRIVING_HISTORY.find(
-        (item) => item.studentId === this.selectedStudentId(),
-      ) ?? DRIVING_HISTORY[0],
-  );
+  readonly subSkills = computed(() => DRIVING_SUB_SKILLS[this.selectedCompetence()]);
+  readonly latestHistory = computed(() => {
+    const history = this.contextData.drivingHistory();
+    return history.find((item) => item.studentId === this.selectedStudentId()) ?? history[0];
+  });
   readonly visibleHistory = computed(() => {
-    if (this.isStudent())
-      return DRIVING_HISTORY.filter((item) => item.studentId === "s1");
-    if (this.isTrainer())
-      return DRIVING_HISTORY.filter((item) => item.trainer === "Marc Dupont");
-    return DRIVING_HISTORY;
+    const history = this.contextData.drivingHistory();
+    if (this.isStudent()) return history.filter((item) => item.studentId === this.selectedStudentId());
+    if (this.isTrainer()) return history.filter((item) => item.trainer === "Marc Dupont");
+    return history;
   });
 
   updateStudent(event: Event) {
@@ -168,9 +165,7 @@ export class DrivingComponent {
   }
 
   labelForCriterion(id: string) {
-    return (
-      this.criteria.find((criterion) => criterion.id === id)?.labelKey ?? id
-    );
+    return this.criteria.find((criterion) => criterion.id === id)?.labelKey ?? id;
   }
 
   save() {
@@ -180,8 +175,6 @@ export class DrivingComponent {
   }
 
   scrollToHistory() {
-    document
-      .getElementById("driving-history")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("driving-history")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }

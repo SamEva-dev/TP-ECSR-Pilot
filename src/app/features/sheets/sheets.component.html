@@ -154,7 +154,7 @@
             (change)="updateStudent($event)"
             class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
           >
-            @for (student of students; track student.id) {
+            @for (student of students(); track student.id) {
               <option [value]="student.id">
                 {{ student.firstName }} {{ student.lastName }}
               </option>

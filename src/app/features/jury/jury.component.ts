@@ -1,11 +1,7 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  CERTIFICATION_CANDIDATES,
-  EXAM_SESSIONS,
-  JURY_MEMBERS,
-} from "../../core/mock-data/certification.mock";
+import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({
   selector: "app-jury",
@@ -14,9 +10,13 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JuryComponent {
-  readonly exam = EXAM_SESSIONS[0];
-  readonly candidates = CERTIFICATION_CANDIDATES;
-  readonly jury = JURY_MEMBERS[0];
+  readonly contextData = inject(ContextualTrainingDataService);
+  readonly exam = this.contextData.examSession;
+  readonly candidates = this.contextData.certificationCandidates;
+  readonly scheme = this.contextData.certificationScheme;
+  readonly program = this.contextData.program;
+  readonly juryMembers = this.contextData.juryMembers;
+  readonly jury = computed(() => this.juryMembers()[0]);
 
   initials(item: { firstName: string; lastName: string }): string {
     return `${item.firstName[0] ?? ""}${item.lastName[0] ?? ""}`.toUpperCase();

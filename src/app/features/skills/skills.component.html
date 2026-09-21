@@ -26,7 +26,7 @@
           (change)="updateStudent($event)"
           class="h-[39px] w-full appearance-none rounded-[12px] border border-[#dfe5ec] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
         >
-          @for (student of students; track student.id) {
+          @for (student of students(); track student.id) {
             <option [value]="student.id">
               {{ student.firstName }} {{ student.lastName }}
             </option>
@@ -40,7 +40,7 @@
   </div>
 
   <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-    @for (skill of definitions; track skill.code) {
+    @for (skill of definitions(); track skill.code) {
       <button
         type="button"
         (click)="selectSkill(skill.code)"
@@ -176,18 +176,18 @@
             class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
           >
             <th class="w-[220px] pb-3">{{ "skills.promotion.student" | t }}</th>
-            @for (skill of definitions; track skill.code) {
+            @for (skill of definitions(); track skill.code) {
               <th class="pb-3">{{ skill.code }}</th>
             }
           </tr>
         </thead>
         <tbody>
-          @for (student of students; track student.id) {
+          @for (student of students(); track student.id) {
             <tr class="border-b border-[#edf1f5] last:border-0">
               <td class="py-3 pr-4 font-medium text-[#334155]">
                 {{ student.firstName }} {{ student.lastName }}
               </td>
-              @for (skill of definitions; track skill.code) {
+              @for (skill of definitions(); track skill.code) {
                 <td class="py-3 pr-4">
                   <div class="flex min-w-[115px] items-center gap-2">
                     <app-progress-bar

@@ -221,7 +221,11 @@
       "presentation": "Exposé",
       "catchup": "Rattrapage"
     },
-    "close": "Fermer"
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "yes": "Oui",
+    "no": "Non"
   },
   "nav": {
     "home": "Accueil",
@@ -242,7 +246,13 @@
     "certification": "Certification",
     "jurySpace": "Espace Jury",
     "results": "Résultats",
-    "success": "Réussites"
+    "success": "Réussites",
+    "organizationDashboard": "Pilotage organisation",
+    "sites": "Établissements",
+    "programs": "Formations",
+    "referentials": "Référentiels",
+    "remoteWork": "Télétravail",
+    "distanceLearning": "Formation à distance"
   },
   "students": {
     "title": "Stagiaires",
@@ -340,7 +350,8 @@
       "presentation": "Exposé",
       "catchup": "Rattrapage",
       "sensitization": "Sensibilisation",
-      "event": "Événement"
+      "event": "Événement",
+      "distance": "Distanciel"
     },
     "events": {
       "intersections": "Les intersections et les priorités",
@@ -352,7 +363,8 @@
       "motorwayMerging": "Conduite — insertion autoroute",
       "signsCatchup": "Rattrapage — la signalisation",
       "companyInternship": "Stage en entreprise",
-      "educationalCouncil": "Conseil pédagogique"
+      "educationalCouncil": "Conseil pédagogique",
+      "remoteClass": "Classe virtuelle — temps de réaction et distances"
     },
     "people": {
       "samFokam": "Sam Fokam",
@@ -363,7 +375,44 @@
       "classroomTitle": "Séances en salle programmées",
       "drivingTitle": "Séances de conduite programmées"
     },
-    "emptyDay": "Aucune séance avec ces filtres."
+    "emptyDay": "Aucune séance avec ces filtres.",
+    "drawer": {
+      "title": "Ajouter au planning",
+      "subtitle": "Planifiez une séance, une évaluation, un stage ou un événement.",
+      "close": "Fermer le panneau",
+      "schedule": {
+        "title": "Date et horaires",
+        "date": "Date",
+        "start": "Début",
+        "end": "Fin"
+      },
+      "details": {
+        "title": "Détails de l’activité",
+        "promotion": "Promotion",
+        "type": "Type",
+        "eventTitle": "Intitulé",
+        "eventTitlePlaceholder": "Ex. Révision sécurité routière",
+        "responsible": "Responsable / intervenant",
+        "responsiblePlaceholder": "Ex. Marc Dupont",
+        "location": "Salle / lieu / précision",
+        "locationPlaceholder": "Ex. Salle 2",
+        "competence": "Compétence travaillée"
+      },
+      "help": "L’élément est ajouté immédiatement au planning de démonstration. Lors du branchement au backend, il sera enregistré et synchronisé avec les séances et les présences.",
+      "cancel": "Annuler",
+      "submit": "Ajouter au planning",
+      "created": "« {{title}} » a été ajouté au planning.",
+      "errors": {
+        "required": "Ce champ est obligatoire.",
+        "period": "L’heure de fin doit être postérieure à l’heure de début.",
+        "weekday": "La vue de démonstration actuelle couvre uniquement du lundi au vendredi."
+      }
+    },
+    "workModes": {
+      "title": "Organisation du travail de l’équipe",
+      "subtitle": "Vue rapide des modes d’activité de la semaine.",
+      "open": "Gérer le télétravail"
+    }
   },
   "promotions": {
     "title": "Promotions",
@@ -441,6 +490,59 @@
       "scheduled": "Session prévue : {{date}}",
       "ready": "{{ready}} / {{total}} dossiers prêts",
       "prepare": "Préparer la certification"
+    },
+    "contextual": {
+      "title": "Promotions",
+      "subtitle": "Promotions de {{program}} pour le site de {{site}}",
+      "organization": "Organisation",
+      "site": "Établissement",
+      "program": "Formation",
+      "setContext": "Utiliser ce contexte",
+      "currentContext": "Contexte actif",
+      "kpi": {
+        "total": "Promotions",
+        "active": "En cours",
+        "activeStudents": "Stagiaires actifs",
+        "referential": "Référentiel actif"
+      },
+      "filters": {
+        "all": "Toutes",
+        "active": "En cours",
+        "planned": "À venir",
+        "completed": "Terminées"
+      },
+      "filterHelp": "Les promotions affichées suivent le site et la formation du contexte courant.",
+      "status": {
+        "planned": "À venir",
+        "active": "En cours",
+        "completed": "Terminée"
+      },
+      "planned": {
+        "start": "Démarrage",
+        "capacity": "Effectif prévu",
+        "students": "stagiaires",
+        "volume": "Volume de référence",
+        "student": "stagiaire"
+      },
+      "exam": {
+        "open": "Ouvrir la certification"
+      },
+      "empty": {
+        "title": "Aucune promotion dans ce contexte",
+        "description": "Créez une promotion pour cet établissement et cette formation, ou changez de contexte dans la barre supérieure."
+      },
+      "drawer": {
+        "title": "Créer une promotion",
+        "subtitle": "Créer une promotion dans le contexte actuellement sélectionné.",
+        "context": "Contexte de création",
+        "referential": "Version du référentiel",
+        "chooseReferential": "Sélectionner un référentiel",
+        "status": "Statut initial",
+        "studentCount": "Effectif prévu",
+        "studentCountError": "L’effectif doit être supérieur à 0.",
+        "versionBindingTitle": "Référentiel figé pour la promotion",
+        "versionBindingHelp": "La promotion restera liée à cette version du référentiel, même si une nouvelle version devient active plus tard."
+      }
     }
   },
   "sessions": {
@@ -471,7 +573,8 @@
       "supportsPlaceholder": "Diaporama, maquette…",
       "comments": "Commentaires",
       "create": "Créer la séance",
-      "createAndAttendance": "Créer puis faire l'appel"
+      "createAndAttendance": "Créer puis faire l'appel",
+      "modality": "Mode de réalisation"
     },
     "programmed": {
       "title": "Séances programmées",
@@ -512,6 +615,12 @@
           "supports": "Fiches de synthèse"
         }
       }
+    },
+    "modalities": {
+      "onsite": "Présentiel",
+      "remote-live": "Distanciel synchrone",
+      "remote-async": "Distanciel asynchrone",
+      "practical": "Pratique / véhicule"
     }
   },
   "sheets": {
@@ -1274,7 +1383,9 @@
       "accounts": "Comptes",
       "active": "Accès actifs",
       "pending": "Invitations en attente",
-      "suspended": "Accès suspendus"
+      "suspended": "Accès suspendus",
+      "assignments": "Affectations actives",
+      "multiScope": "Utilisateurs multi-périmètres"
     },
     "invite": {
       "title": "Inviter un utilisateur",
@@ -1285,7 +1396,10 @@
       "emailPlaceholder": "prenom.nom@tpecsrpilot.fr",
       "role": "Rôle attribué",
       "defaultRights": "Droits par défaut : Stagiaires · Séances & appel · Évaluations",
-      "send": "Envoyer l’invitation"
+      "send": "Envoyer l’invitation",
+      "multiScopeHint": "Créez le compte puis définissez précisément son périmètre d’accès.",
+      "sendAndAssign": "Inviter et définir les affectations",
+      "assignmentAfterInvite": "Après l’invitation, le drawer des affectations s’ouvre automatiquement pour choisir l’organisation, le site, la formation ou la promotion."
     },
     "roles": {
       "direction": "Direction",
@@ -1307,7 +1421,11 @@
       "suspend": "Suspendre",
       "activate": "Activer",
       "delete": "Supprimer le compte",
-      "empty": "Aucun compte ne correspond à vos filtres."
+      "empty": "Aucun compte ne correspond à vos filtres.",
+      "multiScopeTitle": "Utilisateurs & périmètres d’accès",
+      "scopeRule": "Droits contextualisés",
+      "searchExtended": "Rechercher un nom, email, site ou formation…",
+      "assignmentCount": "{{count}} affectation(s)"
     },
     "userDetails": {
       "marc": "Formateur · Conduite · Compétence C3",
@@ -1319,7 +1437,8 @@
         "direction": "Direction · Tous les droits du centre",
         "secretariat": "Secrétariat · Gestion administrative et assiduité",
         "formateur": "Formateur · Suivi pédagogique des stagiaires",
-        "stagiaire": "Stagiaire · Consultation de son propre parcours"
+        "stagiaire": "Stagiaire · Consultation de son propre parcours",
+        "jury": "Jury · Accès limité aux sessions et candidats affectés"
       },
       "items": {
         "students": {
@@ -1351,7 +1470,52 @@
           "description": "Accès aux sessions, candidats et évaluations de certification selon le rôle."
         }
       },
-      "studentRule": "Un stagiaire ne peut jamais modifier une évaluation saisie par un formateur, même si d’autres droits lui sont accordés."
+      "studentRule": "Un stagiaire ne peut jamais modifier une évaluation saisie par un formateur, même si d’autres droits lui sont accordés.",
+      "scopeHint": "Ces droits définissent les actions autorisées ; les affectations ci-contre déterminent où elles s’appliquent.",
+      "effectiveRule": "Accès effectif = permissions autorisées × périmètre de l’affectation. Une affectation « Lecture seule » interdit toute modification même si un droit global est actif."
+    },
+    "multiScopeSubtitle": "Comptes, rôles et affectations par organisation, établissement, formation et promotion",
+    "assignments": {
+      "title": "Affectations utilisateur",
+      "subtitle": "Un même utilisateur peut cumuler plusieurs rôles sur des périmètres différents.",
+      "manage": "Gérer les affectations",
+      "current": "Affectations actuelles",
+      "currentSubtitle": "{{count}} affectation(s) configurée(s)",
+      "add": "Ajouter une affectation",
+      "newTitle": "Nouvelle affectation",
+      "role": "Rôle",
+      "scope": "Périmètre",
+      "organization": "Organisation",
+      "site": "Établissement",
+      "program": "Formation",
+      "cohort": "Promotion",
+      "exam": "Session d’examen",
+      "save": "Ajouter",
+      "remove": "Supprimer cette affectation",
+      "empty": "Aucune affectation configurée pour cet utilisateur.",
+      "done": "Terminer",
+      "summaryTitle": "Périmètres de l’utilisateur",
+      "readOnlyBadge": "Lecture seule",
+      "roles": {
+        "platform_admin": "Super administrateur plateforme",
+        "organization_admin": "Administrateur organisation",
+        "organization_direction": "Direction organisation",
+        "site_direction": "Direction établissement",
+        "pedagogical_manager": "Responsable pédagogique",
+        "secretariat": "Secrétariat",
+        "trainer": "Formateur",
+        "student": "Stagiaire",
+        "jury": "Jury",
+        "read_only": "Lecture seule"
+      },
+      "scopes": {
+        "platform": "Plateforme",
+        "organization": "Organisation",
+        "site": "Établissement",
+        "program": "Formation",
+        "cohort": "Promotion",
+        "exam": "Session d’examen"
+      }
     }
   },
   "administration": {
@@ -1712,7 +1876,10 @@
       "active": "Actif",
       "professions": {
         "teacher": "Enseignant de la conduite",
-        "manager": "Responsable pédagogique"
+        "manager": "Responsable pédagogique",
+        "examiner": "Examinateur professionnel",
+        "transport": "Professionnel transport routier",
+        "passenger": "Professionnel transport de voyageurs"
       }
     },
     "candidates": {
@@ -1814,6 +1981,79 @@
       "saveDraft": "Enregistrer le brouillon",
       "validateEvaluation": "Valider mon évaluation",
       "draftSaved": "Brouillon enregistré."
+    },
+    "multi": {
+      "subtitle": "Certification {{program}} · schéma {{scheme}}. Les épreuves, unités et grilles s’adaptent automatiquement à la formation active.",
+      "activeScheme": "Schéma de certification actif",
+      "schemeHelp": "Version {{version}} · {{steps}} épreuves · {{units}} unités de validation",
+      "scheme": "Schéma",
+      "juryForProgram": "Jury habilité pour {{program}} dans cette maquette.",
+      "examPathSubtitle": "Épreuves configurées par le schéma {{scheme}}.",
+      "juryGridHelp": "Grille de démonstration issue du schéma {{scheme}} ; les critères officiels seront paramétrés par référentiel.",
+      "examCount": "Épreuves",
+      "schemeStructure": "Structure des épreuves",
+      "version": "Version {{version}}"
+    },
+    "schemes": {
+      "ecsr": {
+        "name": "TP ECSR · Certification 2026",
+        "units": {
+          "ccp1": "CCP1 · Former des apprenants conducteurs",
+          "ccp2": "CCP2 · Sensibiliser les usagers"
+        }
+      },
+      "moto": {
+        "name": "Moto · Certification 2027",
+        "units": {
+          "plateau": "Maîtrise hors circulation / plateau",
+          "circulation": "Conduite en circulation"
+        },
+        "steps": {
+          "vehicleCheck": "Vérifications et prise en main",
+          "plateau": "Épreuve plateau",
+          "circulation": "Épreuve en circulation",
+          "safetyInterview": "Entretien sécurité et analyse"
+        }
+      },
+      "pl": {
+        "name": "Poids lourd · Certification 2027",
+        "units": {
+          "checks": "Contrôles et sécurité",
+          "plateau": "Manœuvres / plateau",
+          "road": "Conduite en circulation"
+        },
+        "steps": {
+          "checks": "Contrôles de sécurité",
+          "plateau": "Épreuve plateau et manœuvres",
+          "road": "Conduite en circulation",
+          "interview": "Entretien technique"
+        }
+      },
+      "bus": {
+        "name": "Transport voyageurs / Bus · Certification 2027",
+        "units": {
+          "vehicle": "Préparation du véhicule",
+          "safety": "Sécurité voyageurs",
+          "road": "Conduite en circulation"
+        },
+        "steps": {
+          "preparation": "Préparation et contrôles du véhicule",
+          "maneuver": "Manœuvres",
+          "road": "Conduite en circulation",
+          "safety": "Sécurité et prise en charge des voyageurs"
+        }
+      },
+      "criteria": {
+        "vehicleMastery": "Maîtrise du véhicule",
+        "safety": "Sécurité et prévention des risques",
+        "observation": "Observation et anticipation",
+        "professionalPosture": "Posture professionnelle",
+        "preparationChecks": "Contrôles et préparation",
+        "maneuver": "Maîtrise des manœuvres",
+        "roadSafety": "Conduite sûre et adaptée",
+        "vehiclePreparation": "Préparation du véhicule",
+        "passengerSafety": "Sécurité et prise en charge des voyageurs"
+      }
     }
   },
   "jury": {
@@ -1831,7 +2071,10 @@
       "draft": "Les évaluations peuvent être enregistrées en brouillon avant validation.",
       "lock": "Une évaluation validée est verrouillée ; toute correction devra être tracée.",
       "audit": "Les actions sensibles seront historisées côté backend."
-    }
+    },
+    "multiSubtitle": "Session {{program}} · {{scheme}}. Seuls les candidats et critères de cette certification sont affichés.",
+    "examSteps": "Épreuves",
+    "schemeTitle": "Schéma d’évaluation"
   },
   "results": {
     "title": "Résultats de certification",
@@ -1861,7 +2104,8 @@
     "publicationStates": {
       "published": "Publié",
       "draft": "Brouillon"
-    }
+    },
+    "multiTableSubtitle": "Décisions et unités de validation selon le schéma {{scheme}}."
   },
   "success": {
     "title": "Réussites",
@@ -1894,7 +2138,1161 @@
       "title": "Détail de la réussite",
       "close": "Fermer",
       "absent": "Absents",
-      "definition": "Taux de réussite = nombre de titres obtenus / nombre de candidats effectivement présentés × 100."
+      "definition": "Taux de réussite = nombre de titres obtenus / nombre de candidats effectivement présentés × 100.",
+      "candidatesTitle": "Détail des candidats",
+      "candidatesSubtitle": "Décision finale et validation des CCP pour la promotion sélectionnée.",
+      "candidate": "Candidat",
+      "number": "N° candidat",
+      "session": "Session",
+      "result": "Résultat",
+      "noCandidateDetails": "Le détail nominatif n’est pas encore chargé pour cette ancienne promotion.",
+      "filters": {
+        "all": "Tous"
+      }
+    },
+    "results": {
+      "obtained": "Titre obtenu",
+      "partial": "Validation partielle",
+      "failed": "Non obtenu",
+      "absent": "Absent"
+    },
+    "analytics": {
+      "eyebrow": "Pilotage multi-niveaux",
+      "subtitle": "Analyse des taux de réussite par organisation, établissement, formation et promotion.",
+      "exportExcel": "Exporter Excel",
+      "scope": {
+        "organization": "Organisation",
+        "site": "Établissement",
+        "program": "Formation",
+        "cohort": "Promotion"
+      },
+      "evolutionSubtitle": "Évolution historique sur le périmètre actuellement sélectionné.",
+      "breakdownTitle": "Comparaison des performances",
+      "bySite": "Taux de réussite par établissement",
+      "byProgram": "Taux de réussite par formation",
+      "graduatedShort": "diplômés",
+      "presentedShort": "présentés",
+      "byPromotionSubtitle": "Promotions correspondant au périmètre sélectionné.",
+      "resultSets": "promotions avec résultats",
+      "site": "Établissement",
+      "program": "Formation",
+      "units": "Unités / blocs",
+      "noResults": "Aucun résultat de certification disponible pour ce périmètre.",
+      "noCandidates": "Aucun candidat ne correspond à ce filtre."
+    }
+  },
+  "workspace": {
+    "switcher": {
+      "title": "Contexte de travail",
+      "subtitle": "Choisissez l’organisation, le site, la formation et la promotion.",
+      "change": "Changer de contexte de travail",
+      "students": "stagiaires",
+      "scopeHint": "Les choix disponibles dépendent de vos affectations et de vos droits."
+    },
+    "level": {
+      "organization": "Organisation",
+      "site": "Établissement",
+      "program": "Formation",
+      "cohort": "Promotion"
+    }
+  },
+  "organizationDashboard": {
+    "badge": "Pilotage organisation",
+    "subtitle": "Vue consolidée de vos établissements, formations et performances.",
+    "period": "Année pédagogique 2026–2027",
+    "openStatistics": "Ouvrir les statistiques",
+    "kpis": {
+      "sites": "Établissements",
+      "programs": "Formations actives",
+      "students": "Stagiaires",
+      "trainers": "Formateurs",
+      "cohorts": "Promotions actives",
+      "success": "Réussite globale"
+    },
+    "sites": {
+      "title": "Performance des établissements",
+      "subtitle": "Vue consolidée par site. Cliquez sur un établissement pour basculer le contexte.",
+      "hint": "Cliquez sur un site",
+      "students": "Stagiaires",
+      "trainers": "Formateurs",
+      "attendance": "Présence",
+      "success": "Réussite",
+      "programs": "formations",
+      "cohorts": "promotions",
+      "alerts": "alertes"
+    },
+    "global": {
+      "title": "Vue globale",
+      "subtitle": "Indicateurs consolidés de l’organisation",
+      "attendance": "Taux de présence",
+      "success": "Taux de réussite",
+      "hours": "Heures réalisées",
+      "context": "Contexte opérationnel actif",
+      "contextHelp": "Le dashboard organisation reste consolidé. Le contexte actif est utilisé lorsque vous ouvrez les écrans opérationnels."
+    },
+    "programs": {
+      "title": "Performance par formation",
+      "subtitle": "Effectifs, présence et réussite sur l’ensemble des établissements.",
+      "program": "Formation",
+      "students": "Stagiaires",
+      "cohorts": "Promotions",
+      "attendance": "Présence",
+      "success": "Réussite",
+      "open": "Ouvrir"
+    },
+    "alerts": {
+      "title": "Alertes réseau",
+      "subtitle": "Points nécessitant une attention au niveau de l’organisation",
+      "catchup": {
+        "title": "7 stagiaires dépassent 10 h à rattraper",
+        "detail": "Principalement sur Marseille et Nice. Vérifier les plans de rattrapage."
+      },
+      "documents": {
+        "title": "5 dossiers administratifs incomplets",
+        "detail": "Documents manquants avant les prochaines périodes de stage."
+      },
+      "certification": {
+        "title": "2 sessions de certification à finaliser",
+        "detail": "Affectation jury ou dossier candidat encore incomplet."
+      },
+      "capacity": {
+        "title": "Capacité bientôt atteinte à Nice",
+        "detail": "La promotion Poids lourd de janvier est proche de sa capacité maximale."
+      },
+      "ecf": {
+        "title": "2 promotions nécessitent une vérification",
+        "detail": "Présences et pièces administratives à régulariser."
+      },
+      "horizon": {
+        "title": "Une certification à préparer",
+        "detail": "Le dossier de session doit être finalisé avant publication."
+      }
+    },
+    "activity": {
+      "title": "Activité récente",
+      "subtitle": "Événements importants remontés des établissements",
+      "item1": {
+        "title": "Nouvelle promotion créée",
+        "detail": "AFTRAL Nice · Poids lourd · Janvier 2027",
+        "when": "Aujourd’hui"
+      },
+      "item2": {
+        "title": "Session de certification mise à jour",
+        "detail": "TP ECSR · Nice · 18 candidats",
+        "when": "Il y a 2 h"
+      },
+      "item3": {
+        "title": "Nouvelle affectation formateur",
+        "detail": "Marc Dupont est maintenant affecté à Moto · Nice",
+        "when": "Hier"
+      },
+      "item4": {
+        "title": "Mise à jour établissement",
+        "detail": "AFTRAL Marseille · paramètres pédagogiques actualisés",
+        "when": "Hier"
+      },
+      "ecf": {
+        "title": "Nouvelle promotion créée",
+        "detail": "ECF Nice · TP ECSR 2026–2027",
+        "when": "Aujourd’hui"
+      },
+      "horizon": {
+        "title": "Certification planifiée",
+        "detail": "Horizon Nice · prochaine session préparée",
+        "when": "Aujourd’hui"
+      }
+    }
+  },
+  "sites": {
+    "badge": "Organisation & réseau",
+    "title": "Établissements",
+    "subtitle": "Pilotez les établissements de {{organization}} et leurs performances locales.",
+    "add": "Ajouter un établissement",
+    "search": "Rechercher un établissement, une ville, un responsable…",
+    "edit": "Modifier l’établissement",
+    "open": "Ouvrir",
+    "kpis": {
+      "sites": "Établissements",
+      "students": "Stagiaires",
+      "trainers": "Formateurs",
+      "alerts": "Alertes"
+    },
+    "filters": {
+      "all": "Tous les statuts"
+    },
+    "status": {
+      "active": "Actif",
+      "attention": "Attention",
+      "inactive": "Inactif"
+    },
+    "card": {
+      "students": "Stagiaires",
+      "trainers": "Formateurs",
+      "programs": "Formations",
+      "cohorts": "Promotions",
+      "attendance": "Présence",
+      "success": "Réussite"
+    },
+    "empty": {
+      "title": "Aucun établissement trouvé",
+      "subtitle": "Modifiez la recherche ou le filtre de statut."
+    },
+    "fields": {
+      "code": "Code établissement",
+      "name": "Nom",
+      "city": "Ville",
+      "postalCode": "Code postal",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "Email",
+      "manager": "Responsable",
+      "status": "Statut"
+    },
+    "drawer": {
+      "close": "Fermer le panneau",
+      "editBadge": "Modification",
+      "addBadge": "Nouvel établissement",
+      "editTitle": "Modifier l’établissement",
+      "addTitle": "Ajouter un établissement",
+      "subtitle": "Renseignez les informations administratives et opérationnelles du site.",
+      "identity": "Identité & localisation",
+      "contact": "Contact & responsabilité",
+      "create": "Créer l’établissement"
+    },
+    "detail": {
+      "back": "Retour aux établissements",
+      "openWorkspace": "Ouvrir ce contexte",
+      "kpis": {
+        "programs": "Formations",
+        "cohorts": "Promotions",
+        "attendance": "Présence",
+        "success": "Réussite"
+      },
+      "programs": {
+        "title": "Formations actives",
+        "subtitle": "Programmes proposés dans cet établissement",
+        "active": "Active"
+      },
+      "identity": {
+        "title": "Informations établissement",
+        "resources": "Ressources",
+        "resourcesValue": "{{rooms}} salles · {{vehicles}} véhicules"
+      },
+      "alerts": {
+        "title": "Alertes locales",
+        "subtitle": "Points nécessitant une attention sur ce site",
+        "none": "Aucune alerte active pour cet établissement.",
+        "documents": {
+          "title": "2 dossiers stagiaires incomplets",
+          "detail": "Des pièces administratives sont encore manquantes avant validation."
+        },
+        "exam": {
+          "title": "Session d’examen à préparer",
+          "detail": "La session TP ECSR de février 2027 doit encore recevoir son affectation Jury."
+        },
+        "catchup": {
+          "title": "Heures de rattrapage élevées",
+          "detail": "18 heures de rattrapage restent à planifier sur plusieurs stagiaires."
+        },
+        "vehicles": {
+          "title": "2 véhicules à planifier en maintenance",
+          "detail": "Prévoir les contrôles avant les prochaines séances pratiques."
+        },
+        "capacity": {
+          "title": "Capacité disponible",
+          "detail": "Une nouvelle promotion peut être ouverte sur le prochain trimestre."
+        }
+      },
+      "cohorts": {
+        "title": "Promotions & sessions",
+        "subtitle": "Promotions rattachées aux formations de ce site",
+        "name": "Promotion",
+        "program": "Formation",
+        "period": "Période",
+        "students": "Stagiaires",
+        "status": "Statut",
+        "statuses": {
+          "planned": "Planifiée",
+          "active": "En cours",
+          "completed": "Terminée"
+        }
+      },
+      "notFound": {
+        "title": "Établissement introuvable",
+        "subtitle": "Ce site n’existe pas dans les données de démonstration ou n’est plus disponible."
+      }
+    }
+  },
+  "programs": {
+    "badge": "Catalogue pédagogique",
+    "title": "Formations",
+    "subtitle": "Gérez les formations proposées par {{organization}} et leurs modules métier.",
+    "add": "Créer une formation",
+    "edit": "Modifier la formation",
+    "open": "Consulter",
+    "search": "Rechercher une formation, un code ou un référentiel…",
+    "kpis": {
+      "programs": "Formations",
+      "students": "Stagiaires",
+      "trainers": "Formateurs",
+      "cohorts": "Promotions actives"
+    },
+    "filters": {
+      "allCategories": "Toutes les catégories",
+      "allStatuses": "Tous les statuts"
+    },
+    "categories": {
+      "teacher": "Enseignement de la conduite",
+      "motorcycle": "Moto",
+      "heavyVehicle": "Poids lourd",
+      "passengerTransport": "Transport voyageurs"
+    },
+    "status": {
+      "active": "Active",
+      "draft": "Brouillon",
+      "inactive": "Inactive"
+    },
+    "card": {
+      "sites": "Établissements",
+      "students": "Stagiaires",
+      "cohorts": "Promotions",
+      "hours": "Durée",
+      "modules": "modules",
+      "success": "réussite"
+    },
+    "empty": {
+      "title": "Aucune formation trouvée",
+      "subtitle": "Modifiez la recherche ou les filtres pour afficher d’autres formations."
+    },
+    "fields": {
+      "code": "Code formation",
+      "name": "Nom de la formation",
+      "category": "Catégorie",
+      "status": "Statut",
+      "referenceVersion": "Référentiel / version",
+      "duration": "Volume horaire",
+      "description": "Description"
+    },
+    "modules": {
+      "planning": "Planning",
+      "attendance": "Présences",
+      "sessions": "Séances",
+      "driving": "Conduite",
+      "plateau": "Plateau",
+      "sheets": "Fiches / Exposés",
+      "skills": "Compétences",
+      "internships": "Stages",
+      "documents": "Documents",
+      "assessments": "Évaluations",
+      "certification": "Certification",
+      "statistics": "Statistiques",
+      "distanceLearning": "Formation à distance"
+    },
+    "drawer": {
+      "close": "Fermer le panneau",
+      "editBadge": "Modification",
+      "addBadge": "Nouvelle formation",
+      "editTitle": "Modifier la formation",
+      "addTitle": "Créer une formation",
+      "subtitle": "Configurez l’identité, le référentiel et les modules disponibles pour cette formation.",
+      "identity": "Identité & référentiel",
+      "modules": "Modules activés",
+      "modulesSubtitle": "La sidebar et les fonctionnalités pourront ensuite s’adapter automatiquement aux modules sélectionnés.",
+      "create": "Créer la formation"
+    },
+    "detail": {
+      "back": "Retour aux formations",
+      "identity": {
+        "title": "Présentation de la formation"
+      },
+      "modules": {
+        "title": "Modules activés",
+        "subtitle": "Fonctionnalités pédagogiques disponibles pour cette formation."
+      },
+      "sites": {
+        "title": "Disponibilité par établissement",
+        "subtitle": "Activez ou désactivez cette formation dans les établissements de {{organization}}.",
+        "hint": "Cliquer sur un établissement pour changer son état."
+      },
+      "cohorts": {
+        "title": "Promotions & sessions",
+        "subtitle": "Promotions existantes utilisant cette formation.",
+        "name": "Promotion",
+        "site": "Établissement",
+        "period": "Période",
+        "students": "Stagiaires",
+        "status": "Statut",
+        "empty": "Aucune promotion de démonstration pour cette formation.",
+        "statuses": {
+          "planned": "Planifiée",
+          "active": "En cours",
+          "completed": "Terminée"
+        }
+      },
+      "notFound": {
+        "title": "Formation introuvable",
+        "subtitle": "Cette formation n’existe pas dans les données de démonstration."
+      }
+    },
+    "demo": {
+      "ecsrDescription": "Préparation au titre professionnel Enseignant de la Conduite et de la Sécurité Routière, avec suivi des compétences, conduite, fiches pédagogiques, stages et certification.",
+      "motoDescription": "Parcours pédagogique dédié à la formation deux-roues avec suivi plateau, circulation, compétences et certification.",
+      "plDescription": "Formation poids lourd avec séances de conduite, travail sur plateau, suivi des compétences, stages et évaluation finale.",
+      "busDescription": "Formation transport de voyageurs intégrant conduite, plateau, compétences professionnelles, stages et certification."
+    }
+  },
+  "referentials": {
+    "eyebrow": "Architecture pédagogique",
+    "title": "Référentiels de formation",
+    "subtitle": "Gérez les versions de référentiel utilisées par chaque formation. Une promotion reste liée à la version avec laquelle elle a démarré.",
+    "newVersion": "Nouvelle version",
+    "empty": "Aucun référentiel ne correspond aux filtres sélectionnés.",
+    "status": {
+      "active": "Actif",
+      "draft": "Brouillon",
+      "archived": "Archivé"
+    },
+    "kpis": {
+      "total": "Référentiels affichés",
+      "active": "Versions actives",
+      "drafts": "Brouillons",
+      "archived": "Archives"
+    },
+    "filters": {
+      "search": "Rechercher un référentiel…",
+      "allPrograms": "Toutes les formations",
+      "allStatuses": "Tous les statuts"
+    },
+    "card": {
+      "hours": "Volume",
+      "skills": "Compétences",
+      "modules": "Modules",
+      "sheets": "Fiches",
+      "stages": "Stages",
+      "documents": "Documents"
+    },
+    "volumes": {
+      "classroom": "Formation en salle",
+      "driving": "Pratique / conduite",
+      "internship": "Stage en entreprise",
+      "assessment": "Évaluations",
+      "other": "Autres activités"
+    },
+    "tabs": {
+      "overview": "Vue d’ensemble",
+      "skills": "Compétences",
+      "hours": "Volumes horaires",
+      "stages": "Stages",
+      "certification": "Certification"
+    },
+    "evaluator": {
+      "jury": "Évaluation par jury",
+      "trainer": "Évaluation par formateur",
+      "system": "Évaluation automatisée"
+    },
+    "detail": {
+      "back": "Retour aux référentiels",
+      "duplicate": "Dupliquer en nouvelle version",
+      "kpis": {
+        "subSkills": "Sous-compétences",
+        "stageHours": "Heures de stage",
+        "cohorts": "Promotions liées"
+      },
+      "identity": {
+        "title": "Identité du référentiel",
+        "effectiveFrom": "Applicable depuis",
+        "effectiveTo": "Fin d’application",
+        "noEnd": "Sans date de fin",
+        "documents": "Documents requis",
+        "certification": "Schéma de certification"
+      },
+      "modules": {
+        "title": "Modules activés",
+        "subtitle": "Ces modules définissent les fonctionnalités disponibles pour les promotions utilisant ce référentiel."
+      },
+      "cohorts": {
+        "title": "Promotions rattachées",
+        "subtitle": "Une promotion conserve cette version même lorsqu’un nouveau référentiel est publié.",
+        "name": "Promotion",
+        "site": "Établissement",
+        "period": "Période",
+        "students": "Stagiaires",
+        "status": "Statut",
+        "empty": "Aucune promotion n’utilise encore cette version."
+      },
+      "hours": {
+        "title": "Répartition du volume horaire",
+        "subtitle": "Volumes pédagogiques configurés pour cette version.",
+        "mandatory": "Obligatoire",
+        "optional": "Optionnel",
+        "total": "Volume total du référentiel",
+        "totalHint": "La somme des catégories doit rester cohérente avec le volume global associé à la promotion."
+      },
+      "stages": {
+        "empty": "Aucune exigence de stage n’est configurée pour ce référentiel."
+      },
+      "certification": {
+        "subtitle": "Schéma de certification rattaché à cette version.",
+        "steps": "Épreuves configurées",
+        "stepsTitle": "Déroulement de la certification"
+      },
+      "notFound": {
+        "title": "Référentiel introuvable",
+        "subtitle": "Cette version n’existe pas dans les données de démonstration."
+      }
+    },
+    "compare": {
+      "button": "Comparer",
+      "eyebrow": "Comparaison de versions",
+      "title": "Comparer les référentiels",
+      "subtitle": "Visualisez les principaux écarts avant d’affecter une nouvelle version aux futures promotions.",
+      "metric": "Indicateur",
+      "delta": "Écart",
+      "modulesTitle": "Modules de la version comparée",
+      "metrics": {
+        "hours": "Volume horaire",
+        "skills": "Compétences",
+        "modules": "Modules actifs",
+        "sheets": "Fiches pédagogiques",
+        "documents": "Documents requis",
+        "examSteps": "Épreuves de certification"
+      }
+    },
+    "demo": {
+      "ecsr": {
+        "c1": "Construire et préparer une séance de formation",
+        "c1Description": "Préparer une intervention pédagogique adaptée aux objectifs et aux apprenants.",
+        "c1a": "Définir les objectifs pédagogiques",
+        "c1b": "Choisir les méthodes et supports",
+        "c1c": "Préparer l’évaluation",
+        "c2": "Animer des séances collectives",
+        "c2Description": "Conduire une séance en salle et favoriser la participation du groupe.",
+        "c2a": "Structurer une séquence",
+        "c2b": "Animer les échanges",
+        "c2c": "Évaluer les acquis",
+        "c3": "Former à la conduite en situation réelle",
+        "c3Description": "Accompagner un apprenant dans les situations de conduite et de partage de la route.",
+        "c3a": "Observer et diagnostiquer",
+        "c3b": "Adapter l’intervention",
+        "c3c": "Faire progresser l’autonomie",
+        "c4": "Accompagner la progression et la sécurité routière",
+        "c4Description": "Suivre le parcours, individualiser l’accompagnement et sensibiliser aux risques.",
+        "c4a": "Analyser la progression",
+        "c4b": "Individualiser les objectifs",
+        "c4c": "Conduire une action de sensibilisation",
+        "c5": "Piloter des parcours numériques",
+        "c5Description": "Exemple de compétence ajoutée dans la future version mockée.",
+        "c5a": "Exploiter les traces pédagogiques",
+        "c5b": "Adapter un parcours hybride",
+        "stage1": "Stage pédagogique — période 1",
+        "stage1Description": "Immersion et mise en pratique progressive au sein d’une structure d’accueil.",
+        "stage2": "Stage pédagogique — période 2",
+        "stage2Description": "Mise en responsabilité, animation et suivi pédagogique en situation professionnelle.",
+        "certification": "Certification TP ECSR",
+        "certificationDraft": "Certification TP ECSR — projet 2029",
+        "exam1": "Mise en situation professionnelle",
+        "exam2": "Entretien technique",
+        "exam3": "Questionnaire professionnel",
+        "exam4": "Questionnement à partir de productions",
+        "exam5": "Entretien final",
+        "archivedNotes": "Version archivée conservée pour assurer la traçabilité des anciennes promotions.",
+        "activeNotes": "Version de référence utilisée par les promotions ECSR actuellement actives dans la démonstration.",
+        "draftNotes": "Version de travail permettant de prévisualiser une évolution du référentiel sans impacter les promotions existantes."
+      },
+      "moto": {
+        "m1": "Maîtriser les situations de plateau",
+        "m1Description": "Préparer et sécuriser les exercices hors circulation.",
+        "m1a": "Préparer la zone de travail",
+        "m1b": "Accompagner les manœuvres",
+        "m2": "Former à la circulation deux-roues",
+        "m2Description": "Construire les apprentissages en circulation et l’analyse des risques spécifiques.",
+        "m2a": "Observer les situations à risque",
+        "m2b": "Adapter les trajectoires",
+        "stage": "Stage deux-roues",
+        "stageDescription": "Période pratique au sein d’une structure proposant la formation moto.",
+        "certification": "Certification Moto 2027",
+        "exam1": "Évaluation plateau",
+        "exam2": "Évaluation circulation",
+        "notes": "Référentiel de démonstration dédié à la formation deux-roues."
+      },
+      "pl": {
+        "c1": "Maîtrise du véhicule lourd",
+        "c1Description": "Préparer, manœuvrer et contrôler un véhicule lourd en sécurité.",
+        "c1a": "Effectuer les contrôles préalables",
+        "c1b": "Réaliser les manœuvres",
+        "c2": "Circulation et réglementation professionnelle",
+        "c2Description": "Conduire en circulation en intégrant les contraintes du transport lourd.",
+        "c2a": "Adapter la conduite au gabarit",
+        "c2b": "Appliquer la réglementation",
+        "stage": "Stage transport lourd",
+        "stageDescription": "Immersion professionnelle auprès d’un opérateur ou centre spécialisé.",
+        "certification": "Certification Poids lourd 2027",
+        "exam1": "Épreuve plateau",
+        "exam2": "Épreuve circulation",
+        "notes": "Référentiel de démonstration pour les parcours poids lourd."
+      },
+      "bus": {
+        "c1": "Préparer et conduire un véhicule de transport voyageurs",
+        "c1Description": "Maîtriser les contrôles, le gabarit et les spécificités du transport de passagers.",
+        "c1a": "Préparer la prise de service",
+        "c1b": "Assurer une conduite souple et sûre",
+        "c2": "Accueillir et sécuriser les voyageurs",
+        "c2Description": "Intégrer l’accueil, l’accessibilité et la sécurité des passagers.",
+        "c2a": "Gérer la montée et la descente",
+        "c2b": "Réagir aux situations particulières",
+        "stage": "Stage transport voyageurs",
+        "stageDescription": "Période en entreprise auprès d’un opérateur de transport de voyageurs.",
+        "certification": "Certification Transport voyageurs 2027",
+        "exam1": "Épreuve technique",
+        "exam2": "Épreuve circulation",
+        "notes": "Référentiel de démonstration pour les parcours transport voyageurs."
+      },
+      "createdNotes": "Version créée depuis le front de démonstration à partir d’un référentiel existant."
+    },
+    "detailLink": "Voir le référentiel",
+    "versionDrawer": {
+      "eyebrow": "Nouvelle version",
+      "title": "Créer une version de référentiel",
+      "subtitle": "Dupliquez une version existante puis adaptez-la sans modifier les promotions déjà engagées.",
+      "program": "Formation",
+      "source": "Version source",
+      "sourceHint": "Les compétences, volumes, stages et épreuves seront copiés depuis cette version.",
+      "version": "Nom de version",
+      "code": "Code",
+      "effectiveFrom": "Applicable à partir du",
+      "status": "Statut initial",
+      "info": "Cette action reste entièrement mockée dans le front. La nouvelle version est conservée uniquement pendant la session courante.",
+      "create": "Créer la version"
+    }
+  },
+  "workspaceOperational": {
+    "events": {
+      "theory": "Module théorique",
+      "practice": "Mise en pratique",
+      "assessment": "Évaluation pédagogique",
+      "safety": "Sécurité et prévention",
+      "workshop": "Atelier technique"
+    },
+    "sessions": {
+      "theory": "Séance théorique",
+      "practice": "Séance pratique",
+      "objective": "Travailler les compétences prévues par le référentiel actif.",
+      "supports": "Supports adaptés au programme et au référentiel sélectionnés."
+    },
+    "skills": {
+      "sessionSubject": "Mise en pratique de la compétence sélectionnée",
+      "positive": "Bonne progression sur les attendus observés.",
+      "workOn": "Renforcer la régularité et l’autonomie.",
+      "nextGoal": "Valider la sous-compétence suivante du référentiel."
+    },
+    "driving": {
+      "subject": "Séance pratique contextualisée au programme actif",
+      "positive": "Bonne adaptation aux consignes et au véhicule.",
+      "difficulty": "Anticipation et régularité encore à renforcer.",
+      "nextGoal": "Poursuivre la progression sur la compétence active."
+    }
+  },
+  "organizationAdmin": {
+    "breadcrumb": "Administration organisation",
+    "title": "Administration de l’organisation",
+    "subtitle": "Gérez la structure, l’identité et les paramètres de {{organization}}.",
+    "active": "Organisation active",
+    "saved": "Modifications enregistrées",
+    "kpi": {
+      "sites": "Établissements",
+      "programs": "Formations actives",
+      "students": "Stagiaires",
+      "activeCohorts": "Promotions actives"
+    },
+    "cards": {
+      "sites": {
+        "title": "Établissements",
+        "description": "Gérer les sites, leurs responsables et leurs coordonnées."
+      },
+      "programs": {
+        "title": "Formations",
+        "description": "Piloter le catalogue et les offres disponibles par site."
+      },
+      "referentials": {
+        "title": "Référentiels",
+        "description": "Gérer les versions, compétences et règles pédagogiques."
+      },
+      "access": {
+        "title": "Utilisateurs & accès",
+        "description": "Administrer les rôles, affectations et périmètres d’accès."
+      },
+      "remoteWork": {
+        "title": "Télétravail",
+        "description": "Politique, demandes, planning et activité à distance."
+      }
+    },
+    "identity": {
+      "title": "Identité de l’organisation",
+      "subtitle": "Informations administratives utilisées à l’échelle de l’organisation.",
+      "legalName": "Raison sociale",
+      "shortName": "Nom court",
+      "siret": "SIRET",
+      "declaration": "N° de déclaration d’activité",
+      "address": "Adresse du siège",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "email": "Email principal",
+      "phone": "Téléphone",
+      "manager": "Responsable",
+      "website": "Site web",
+      "save": "Enregistrer l’organisation"
+    },
+    "branding": {
+      "title": "Branding",
+      "subtitle": "Personnalisez l’identité visuelle de l’espace organisation.",
+      "preview": "Aperçu de l’écran de connexion",
+      "primary": "Couleur principale",
+      "secondary": "Couleur secondaire",
+      "logoLabel": "Nom affiché avec le logo",
+      "tagline": "Accroche de connexion",
+      "save": "Enregistrer le branding",
+      "whiteLabel": {
+        "title": "Mode marque blanche",
+        "description": "Masquer la marque TP ECSR Pilot dans les espaces utilisateurs."
+      },
+      "siteOverride": {
+        "title": "Personnalisation par établissement",
+        "description": "Autoriser chaque site à adapter son logo et ses couleurs."
+      }
+    },
+    "modules": {
+      "title": "Modules disponibles",
+      "subtitle": "Définissez les capacités autorisées au niveau de l’organisation.",
+      "inherited": "Paramètres par défaut",
+      "hint": "Les formations peuvent activer uniquement les modules compatibles avec leur référentiel. Désactiver un module ici le rend indisponible pour toute l’organisation.",
+      "items": {
+        "planning": {
+          "title": "Planning",
+          "description": "Calendriers, séances et événements."
+        },
+        "attendance": {
+          "title": "Présences",
+          "description": "Appels, absences, retards et rattrapages."
+        },
+        "sessions": {
+          "title": "Séances",
+          "description": "Gestion des séances pédagogiques."
+        },
+        "driving": {
+          "title": "Conduite",
+          "description": "Suivi pratique en véhicule et observations."
+        },
+        "plateau": {
+          "title": "Plateau",
+          "description": "Exercices hors circulation et manœuvres."
+        },
+        "sheets": {
+          "title": "Fiches / Exposés",
+          "description": "Préparation et évaluation des supports oraux."
+        },
+        "skills": {
+          "title": "Compétences",
+          "description": "Référentiels et progression par compétence."
+        },
+        "internships": {
+          "title": "Stages",
+          "description": "Périodes en entreprise et suivi des heures."
+        },
+        "documents": {
+          "title": "Documents",
+          "description": "Bibliothèque et pièces administratives."
+        },
+        "certification": {
+          "title": "Certification",
+          "description": "Examens, jurys, résultats et décisions."
+        },
+        "statistics": {
+          "title": "Statistiques",
+          "description": "Indicateurs, rapports et taux de réussite."
+        }
+      }
+    },
+    "settings": {
+      "title": "Paramètres organisation",
+      "subtitle": "Préférences globales appliquées par défaut aux établissements.",
+      "tabs": {
+        "general": "Général",
+        "notifications": "Notifications",
+        "security": "Sécurité & conservation"
+      },
+      "language": "Langue par défaut",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "academicYear": "Année de référence",
+      "languages": {
+        "fr": "Français (FR)",
+        "en": "English (EN)"
+      },
+      "items": {
+        "absenceAlerts": {
+          "title": "Alertes d’absence",
+          "description": "Alerter les responsables lorsque les seuils d’absence sont dépassés."
+        },
+        "certificationAlerts": {
+          "title": "Alertes certification",
+          "description": "Signaler les dossiers incomplets avant une session d’examen."
+        },
+        "weeklyDigest": {
+          "title": "Synthèse hebdomadaire",
+          "description": "Envoyer un résumé des indicateurs et alertes aux responsables."
+        },
+        "autoArchive": {
+          "title": "Archivage automatique",
+          "description": "Archiver automatiquement les promotions clôturées après la durée définie."
+        },
+        "strictAudit": {
+          "title": "Traçabilité renforcée",
+          "description": "Exiger un motif pour les modifications sensibles et conserver leur historique."
+        }
+      }
+    },
+    "audit": {
+      "title": "Journal d’audit organisation",
+      "subtitle": "Dernières actions sensibles réalisées sur ce périmètre.",
+      "export": "Exporter le journal",
+      "columns": {
+        "action": "Action",
+        "actor": "Utilisateur",
+        "detail": "Détail",
+        "date": "Date"
+      },
+      "items": {
+        "site": {
+          "title": "Établissement modifié",
+          "detail": "Les coordonnées du site AFTRAL Nice ont été mises à jour."
+        },
+        "assignment": {
+          "title": "Affectation ajoutée",
+          "detail": "Une affectation Formateur a été ajoutée sur TP ECSR · Nice."
+        },
+        "program": {
+          "title": "Formation activée",
+          "detail": "La formation Poids lourd a été activée sur le site de Marseille."
+        },
+        "archive": {
+          "title": "Archivage planifié",
+          "detail": "La promotion TP ECSR 2025–2026 a été ajoutée à la prochaine opération d’archivage."
+        }
+      }
+    },
+    "remoteWork": {
+      "title": "Télétravail",
+      "subtitle": "Configurez la politique de travail à distance de l'organisation.",
+      "open": "Ouvrir le module Télétravail",
+      "enabled": "Télétravail autorisé",
+      "enabledHint": "Active le module pour les collaborateurs éligibles.",
+      "approval": "Validation obligatoire",
+      "approvalHint": "Les demandes passent par un responsable avant validation.",
+      "halfDay": "Demi-journée autorisée",
+      "halfDayHint": "Autorise les demandes sur une matinée ou un après-midi.",
+      "report": "Bilan de journée",
+      "reportHint": "Demande un bref bilan des activités réalisées.",
+      "maxDays": "Nombre maximum de jours par semaine",
+      "maxDaysHint": "Limite indicative appliquée lors de la saisie des demandes.",
+      "save": "Enregistrer la politique"
+    }
+  },
+  "remoteWork": {
+    "title": "Télétravail",
+    "managerSubtitle": "Pilotez les demandes, la présence et l'organisation du travail à distance.",
+    "employeeSubtitle": "Planifiez vos journées à distance et suivez vos activités.",
+    "newRequest": "Déclarer / demander du télétravail",
+    "saved": "Votre demande de télétravail a été enregistrée.",
+    "managerKpi": {
+      "remoteToday": "En télétravail aujourd'hui",
+      "pending": "Demandes à valider",
+      "onsite": "Sur site",
+      "absent": "Absents"
+    },
+    "employeeKpi": {
+      "status": "Statut du jour",
+      "nextDate": "Prochaine journée",
+      "month": "Ce mois",
+      "activities": "Activités terminées"
+    },
+    "requests": {
+      "title": "Demandes de télétravail",
+      "subtitle": "Validation et suivi des collaborateurs"
+    },
+    "filters": {
+      "allSites": "Tous les sites",
+      "allStatuses": "Tous les statuts"
+    },
+    "columns": {
+      "employee": "Collaborateur",
+      "date": "Date",
+      "period": "Période",
+      "activities": "Activités",
+      "status": "Statut",
+      "action": "Action"
+    },
+    "status": {
+      "requested": "À valider",
+      "approved": "Validé",
+      "rejected": "Refusé",
+      "completed": "Terminée"
+    },
+    "periods": {
+      "full-day": "Journée complète",
+      "morning": "Matin",
+      "afternoon": "Après-midi",
+      "custom": "Horaires personnalisés"
+    },
+    "review": "Examiner",
+    "approve": "Valider",
+    "reject": "Refuser",
+    "noComment": "Aucun commentaire.",
+    "policy": {
+      "title": "Politique télétravail",
+      "subtitle": "Règles actives pour l'organisation",
+      "approval": "Validation obligatoire",
+      "maxDays": "Jours max / semaine",
+      "halfDay": "Demi-journée autorisée",
+      "report": "Bilan de journée",
+      "configure": "Configurer dans Administration"
+    },
+    "today": {
+      "title": "Ma journée à distance",
+      "activitiesPlanned": "Activités prévues",
+      "completed": "Terminées"
+    },
+    "myActivities": {
+      "title": "Mes activités",
+      "subtitle": "Travail prévu pour la journée sélectionnée"
+    },
+    "activityTypes": {
+      "preparation": "Préparation pédagogique",
+      "correction": "Correction de fiches",
+      "followUp": "Suivi stagiaires",
+      "meeting": "Réunion",
+      "admin": "Administratif",
+      "remoteTraining": "Formation à distance"
+    },
+    "activities": {
+      "prepareCourse": "Préparer le cours sur les intersections",
+      "correctSheets": "Corriger les fiches pédagogiques",
+      "studentFollowUp": "Faire le suivi d'un stagiaire",
+      "remoteMeeting": "Participer à la réunion pédagogique"
+    },
+    "activityStatus": {
+      "todo": "À faire",
+      "in-progress": "En cours",
+      "done": "Terminée"
+    },
+    "history": {
+      "title": "Historique",
+      "subtitle": "Vos dernières journées de télétravail"
+    },
+    "week": {
+      "title": "Organisation de l'équipe cette semaine",
+      "subtitle": "Sur site, télétravail, terrain et déplacements"
+    },
+    "workModes": {
+      "onsite": "Sur site",
+      "remote": "Télétravail",
+      "field": "Terrain",
+      "travel": "Déplacement",
+      "leave": "Congé",
+      "absence": "Absence"
+    },
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi"
+    },
+    "drawer": {
+      "title": "Nouvelle demande de télétravail",
+      "subtitle": "Planifiez une journée ou une demi-journée à distance.",
+      "date": "Date",
+      "period": "Période",
+      "start": "Début",
+      "end": "Fin",
+      "activities": "Activités prévues",
+      "comment": "Commentaire / organisation",
+      "commentPlaceholder": "Précisez si besoin l'organisation de votre journée…",
+      "policyHint": "La politique actuelle autorise jusqu'à {{days}} jours par semaine.",
+      "submit": "Enregistrer la demande"
+    },
+    "decisionDrawer": {
+      "title": "Valider une demande",
+      "subtitle": "Vérifiez la période et l'organisation prévue avant décision."
+    }
+  },
+  "distanceLearning": {
+    "title": "Formation à distance",
+    "badge": "Salle numérique",
+    "subtitle": "Classes virtuelles, modules asynchrones, activités pédagogiques et suivi des acquis.",
+    "students": "stagiaires",
+    "actions": {
+      "create": "Créer une activité à distance",
+      "openClass": "Ouvrir la classe",
+      "question": "Question",
+      "poll": "Sondage",
+      "join": "Rejoindre la séance"
+    },
+    "messages": {
+      "saved": "L’activité à distance a été ajoutée en mode démonstration.",
+      "joined": "Ouverture de la classe virtuelle simulée."
+    },
+    "kpi": {
+      "liveSessions": "Sessions live",
+      "liveHours": "Heures synchrones",
+      "asyncHours": "Heures asynchrones",
+      "completion": "Modules terminés",
+      "lateModules": "Modules en retard"
+    },
+    "management": {
+      "sessionsTitle": "Sessions à distance",
+      "sessionsSubtitle": "Classes virtuelles du contexte pédagogique actif.",
+      "modalityTitle": "Répartition pédagogique",
+      "modalitySubtitle": "Part présentiel / distanciel sur le volume de salle.",
+      "remoteShare": "du volume en distanciel",
+      "onsite": "Présentiel",
+      "remote": "Distanciel",
+      "sitesTitle": "Suivi par établissement",
+      "sitesSubtitle": "Consolidation des heures et de la progression à distance."
+    },
+    "table": {
+      "site": "Établissement",
+      "liveHours": "Synchrone",
+      "asyncHours": "Asynchrone",
+      "students": "Stagiaires actifs",
+      "completion": "Achèvement",
+      "late": "En retard"
+    },
+    "trainer": {
+      "today": "Aujourd’hui",
+      "liveClasses": "classes virtuelles",
+      "toCorrect": "À corriger",
+      "works": "travaux stagiaires",
+      "quizzes": "Quiz",
+      "toAnalyze": "à analyser",
+      "lateStudents": "Stagiaires en retard",
+      "modulesLate": "modules à terminer",
+      "sessionsTitle": "Mes classes virtuelles",
+      "sessionsSubtitle": "Ouvrez une séance pour faire l’appel et animer les activités."
+    },
+    "student": {
+      "modulesToDo": "Modules à faire",
+      "dueThisWeek": "À terminer cette semaine",
+      "remoteHours": "Temps réalisé",
+      "progress": "Progression",
+      "nextLive": "Prochaine classe virtuelle",
+      "nextLiveSubtitle": "Votre prochaine séance synchrone.",
+      "myModules": "Mes modules",
+      "myModulesSubtitle": "Avancez à votre rythme et validez chaque étape.",
+      "due": "Échéance"
+    },
+    "async": {
+      "title": "Modules asynchrones",
+      "subtitle": "Cours, vidéos, exercices et quiz à réaliser en autonomie.",
+      "completedStudents": "terminés"
+    },
+    "filters": {
+      "all": "Tous les statuts"
+    },
+    "sessionStatus": {
+      "scheduled": "Planifiée",
+      "live": "En direct",
+      "closed": "Clôturée"
+    },
+    "attendance": {
+      "present": "Présent",
+      "late": "Retard",
+      "absent": "Absent",
+      "disconnected": "Déconnecté"
+    },
+    "classroom": {
+      "participants": "Participants",
+      "clickStatus": "Cliquer sur le statut pour corriger",
+      "notConnected": "Non connecté",
+      "noParticipantsYet": "Les participants seront disponibles au démarrage de la séance.",
+      "interactions": "Interactions pédagogiques",
+      "noInteractions": "Aucune interaction préparée.",
+      "resources": "Ressources",
+      "noResources": "Aucune ressource publiée.",
+      "viewed": "consultations"
+    },
+    "platforms": {
+      "teams": "Microsoft Teams",
+      "zoom": "Zoom",
+      "meet": "Google Meet",
+      "jitsi": "Jitsi",
+      "other": "Autre"
+    },
+    "moduleStatus": {
+      "not-started": "À commencer",
+      "in-progress": "En cours",
+      "completed": "Terminé",
+      "late": "En retard"
+    },
+    "steps": {
+      "readCourse": "Lire le cours",
+      "watchVideo": "Regarder la vidéo",
+      "exercise": "Réaliser l’exercice",
+      "quiz": "Faire le quiz"
+    },
+    "drawer": {
+      "title": "Nouvelle activité à distance",
+      "close": "Fermer",
+      "live": "Classe virtuelle",
+      "async": "Module asynchrone",
+      "name": "Intitulé",
+      "namePlaceholder": "Ex. Thème 21 — Temps de réaction",
+      "date": "Date",
+      "start": "Début",
+      "end": "Fin",
+      "platform": "Outil de visioconférence",
+      "link": "Lien de connexion",
+      "duration": "Durée estimée (min)",
+      "dueDate": "Échéance",
+      "help": "Le suivi est pédagogique : présence validée par le formateur, activités, ressources et évaluations. Une simple connexion informatique ne valide pas automatiquement des heures de formation.",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "demo": {
+      "resources": {
+        "reactionCourse": "Cours — Temps de réaction et distances",
+        "brakingVideo": "Vidéo — Freinage d’urgence",
+        "distanceExercise": "Exercice — Calcul des distances",
+        "alcoholCourse": "Cours — Alcool et conduite"
+      },
+      "interactions": {
+        "reactionPoll": "Sondage — distance parcourue en une seconde",
+        "distanceQuiz": "Quiz final — distances de sécurité",
+        "pairExercise": "Exercice en binôme — facteurs du temps de réaction"
+      },
+      "sessions": {
+        "reactionDistances": "Thème 21 — Temps de réaction et distances",
+        "reactionObjectives": "Comprendre le temps de réaction, évaluer les distances et identifier les facteurs aggravants.",
+        "alcohol": "Thème 13 — Alcool et conduite",
+        "alcoholObjectives": "Comprendre la diffusion, l’élimination et les risques liés à l’alcool.",
+        "roadRisk": "Sensibilisation au risque routier",
+        "roadRiskObjectives": "Identifier les risques majeurs et construire une séquence de sensibilisation.",
+        "plRegulation": "Réglementation poids lourd — fondamentaux",
+        "plObjectives": "Identifier les principales obligations avant les séquences pratiques.",
+        "genericTheory": "Classe virtuelle — connaissances professionnelles",
+        "genericObjectives": "Acquérir les connaissances nécessaires avant les activités pratiques."
+      },
+      "modules": {
+        "alcohol": "Alcool et conduite",
+        "alcoholDescription": "Cours, vidéo, exercice puis quiz de validation.",
+        "ecoDriving": "Éco-conduite",
+        "ecoDrivingDescription": "Parcours autonome sur les principes et comportements d’éco-conduite.",
+        "insurance": "Assurance automobile et constat",
+        "insuranceDescription": "Réviser les obligations, garanties et le constat amiable.",
+        "roadRisk": "Risques routiers",
+        "roadRiskDescription": "Analyser les facteurs de risque et préparer une restitution.",
+        "generic": "Module théorique à distance",
+        "genericDescription": "Parcours autonome composé de ressources, activités et évaluation."
+      }
     }
   }
 }

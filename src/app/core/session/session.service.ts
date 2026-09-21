@@ -73,6 +73,20 @@ export class SessionService {
       role = "secretariat";
     else if (e.includes("jury") || e.includes("juré") || e.includes("jure"))
       role = "jury";
+    if (role === "jury") {
+      if (e.includes("moto")) {
+        this.connect({ ...DEMO.jury, firstName: "Nicolas", lastName: "Mercier", promotionId: "cohort-nice-moto-2027-03", email, juryId: "j3" });
+        return;
+      }
+      if (e.includes("pl") || e.includes("poids")) {
+        this.connect({ ...DEMO.jury, firstName: "Patrick", lastName: "Roux", promotionId: "cohort-nice-pl-2027-01", email, juryId: "j5" });
+        return;
+      }
+      if (e.includes("bus")) {
+        this.connect({ ...DEMO.jury, firstName: "Laurent", lastName: "Petit", promotionId: "cohort-nice-bus-2027-02", email, juryId: "j7" });
+        return;
+      }
+    }
     this.connect({ ...DEMO[role], email });
   }
   connectRegistration(v: {

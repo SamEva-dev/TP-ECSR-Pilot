@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  computed,
   input,
   output,
   signal,
@@ -13,14 +14,18 @@ import {
   Validators,
 } from "@angular/forms";
 import { PEDAGOGICAL_TEAM } from "../../../core/mock-data/promotions.mock";
+import { TRAINING_REFERENTIALS } from "../../../core/mock-data/referentials.mock";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
+import type { WorkspaceCohort } from "../../../core/models/workspace.models";
 
 export interface CreatePromotionPayload {
   name: string;
   startDate: string;
   endDate: string;
-  plannedHours: number;
+  studentCount: number;
   manager: string;
+  referentialVersionId: string;
+  status: WorkspaceCohort["status"];
 }
 
 @Component({
@@ -31,13 +36,23 @@ export interface CreatePromotionPayload {
 })
 export class CreatePromotionDrawerComponent {
   readonly open = input(false);
+  readonly organizationName = input("—");
+  readonly siteName = input("—");
+  readonly programId = input("");
+  readonly programName = input("—");
   readonly closed = output<void>();
   readonly promotionCreated = output<CreatePromotionPayload>();
   readonly team = PEDAGOGICAL_TEAM;
   readonly submitted = signal(false);
 
+  readonly referentials = computed(() =>
+    TRAINING_REFERENTIALS.filter(
+      (item) => item.programId === this.programId() && item.status !== "archived",
+    ),
+  );
+
   readonly form = new FormGroup({
-    name: new FormControl("TP ECSR 2027–2028", {
+    name: new FormControl("Promotion 2027–2028", {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(80)],
     }),
@@ -49,11 +64,19 @@ export class CreatePromotionDrawerComponent {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    plannedHours: new FormControl(910, {
+    studentCount: new FormControl(18, {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)],
     }),
     manager: new FormControl("Claire Berthier", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    referentialVersionId: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    status: new FormControl<WorkspaceCohort["status"]>("planned", {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -71,6 +94,9 @@ export class CreatePromotionDrawerComponent {
 
   submit(): void {
     this.submitted.set(true);
+    if (!this.form.controls.referentialVersionId.value && this.referentials().length) {
+      this.form.controls.referentialVersionId.setValue(this.referentials()[0].id);
+    }
     if (this.form.invalid || this.hasInvalidDates()) {
       this.form.markAllAsTouched();
       return;
@@ -86,31 +112,38 @@ export class CreatePromotionDrawerComponent {
   }
 
   showRequired(
-    controlName: "name" | "startDate" | "endDate" | "plannedHours" | "manager",
+    controlName:
+      | "name"
+      | "startDate"
+      | "endDate"
+      | "studentCount"
+      | "manager"
+      | "referentialVersionId"
+      | "status",
   ): boolean {
     const control = this.form.controls[controlName];
-    return (
-      (this.submitted() || control.touched) && control.hasError("required")
-    );
+    return (this.submitted() || control.touched) && control.hasError("required");
   }
 
-  showHoursError(): boolean {
-    const control = this.form.controls.plannedHours;
+  showStudentCountError(): boolean {
+    const control = this.form.controls.studentCount;
     return (this.submitted() || control.touched) && control.hasError("min");
-  }
-
-  private resetForm(): void {
-    this.form.reset({
-      name: "TP ECSR 2027–2028",
-      startDate: "2027-09-01",
-      endDate: "2028-06-30",
-      plannedHours: 910,
-      manager: "Claire Berthier",
-    });
-    this.submitted.set(false);
   }
 
   fullName(member: { firstName: string; lastName: string }): string {
     return `${member.firstName} ${member.lastName}`;
+  }
+
+  private resetForm(): void {
+    this.form.reset({
+      name: "Promotion 2027–2028",
+      startDate: "2027-09-01",
+      endDate: "2028-06-30",
+      studentCount: 18,
+      manager: "Claire Berthier",
+      referentialVersionId: this.referentials()[0]?.id ?? "",
+      status: "planned",
+    });
+    this.submitted.set(false);
   }
 }

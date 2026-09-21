@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  effect,
+  inject,
   input,
   output,
   signal,
@@ -12,8 +14,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { STUDENTS } from "../../../core/mock-data/dashboard.mock";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
+import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
 
 export interface CreateInternshipPeriodPayload {
   studentId: string;
@@ -37,56 +39,40 @@ export interface CreateInternshipPeriodPayload {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateInternshipDrawerComponent {
+  readonly contextData = inject(ContextualTrainingDataService);
   readonly open = input(false);
   readonly closed = output<void>();
   readonly periodCreated = output<CreateInternshipPeriodPayload>();
-  readonly students = STUDENTS;
   readonly submitted = signal(false);
 
+  get students() {
+    return this.contextData.students();
+  }
+
   readonly form = new FormGroup({
-    studentId: new FormControl("s1", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    company: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(120)],
-    }),
-    city: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(80)],
-    }),
-    tutor: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    }),
-    tutorEmail: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.email],
-    }),
+    studentId: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    company: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
+    city: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
+    tutor: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
+    tutorEmail: new FormControl("", { nonNullable: true, validators: [Validators.email] }),
     tutorPhone: new FormControl("", { nonNullable: true }),
-    startDate: new FormControl("2026-11-02", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    endDate: new FormControl("2026-12-11", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    plannedHours: new FormControl(175, {
-      nonNullable: true,
-      validators: [
-        Validators.required,
-        Validators.min(1),
-        Validators.max(1000),
-      ],
-    }),
+    startDate: new FormControl("2026-11-02", { nonNullable: true, validators: [Validators.required] }),
+    endDate: new FormControl("2026-12-11", { nonNullable: true, validators: [Validators.required] }),
+    plannedHours: new FormControl(175, { nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(1000)] }),
     agreementReceived: new FormControl(false, { nonNullable: true }),
-    notes: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.maxLength(500)],
-    }),
+    notes: new FormControl("", { nonNullable: true, validators: [Validators.maxLength(500)] }),
   });
+
+  constructor() {
+    effect(() => {
+      const students = this.contextData.students();
+      const planned = this.contextData.referential()?.stageRequirements[0]?.hours ?? 175;
+      if (!students.some((student) => student.id === this.form.controls.studentId.value)) {
+        this.form.controls.studentId.setValue(students[0]?.id ?? "", { emitEvent: false });
+      }
+      this.form.controls.plannedHours.setValue(planned, { emitEvent: false });
+    });
+  }
 
   @HostListener("document:keydown.escape")
   onEscape(): void {
@@ -114,8 +100,9 @@ export class CreateInternshipDrawerComponent {
       studentName: `${student.firstName} ${student.lastName}`,
     });
 
+    const planned = this.contextData.referential()?.stageRequirements[0]?.hours ?? 175;
     this.form.reset({
-      studentId: "s1",
+      studentId: this.students[0]?.id ?? "",
       company: "",
       city: "",
       tutor: "",
@@ -123,7 +110,7 @@ export class CreateInternshipDrawerComponent {
       tutorPhone: "",
       startDate: "2026-11-02",
       endDate: "2026-12-11",
-      plannedHours: 175,
+      plannedHours: planned,
       agreementReceived: false,
       notes: "",
     });
@@ -132,19 +119,10 @@ export class CreateInternshipDrawerComponent {
   }
 
   showRequired(
-    name:
-      | "studentId"
-      | "company"
-      | "city"
-      | "tutor"
-      | "startDate"
-      | "endDate"
-      | "plannedHours",
+    name: "studentId" | "company" | "city" | "tutor" | "startDate" | "endDate" | "plannedHours",
   ): boolean {
     const control = this.form.controls[name];
-    return (
-      (this.submitted() || control.touched) && control.hasError("required")
-    );
+    return (this.submitted() || control.touched) && control.hasError("required");
   }
 
   showEmailError(): boolean {
@@ -154,10 +132,7 @@ export class CreateInternshipDrawerComponent {
 
   showHoursError(): boolean {
     const control = this.form.controls.plannedHours;
-    return (
-      (this.submitted() || control.touched) &&
-      (control.hasError("min") || control.hasError("max"))
-    );
+    return (this.submitted() || control.touched) && (control.hasError("min") || control.hasError("max"));
   }
 
   dateRangeInvalid(): boolean {

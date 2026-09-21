@@ -2,7 +2,7 @@
   <aside
     class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#1d497d] px-[18px] py-6 text-white lg:flex"
   >
-    <a routerLink="/accueil" class="flex items-center gap-3 px-1">
+    <a [routerLink]="homePath()" class="flex items-center gap-3 px-1">
       <span
         class="flex size-[38px] items-center justify-center rounded-full bg-[#f8a11a] text-[#13233b]"
         ><i class="ph ph-car text-[20px]"></i
@@ -55,7 +55,7 @@
     >
       <div class="flex items-center justify-between">
         <a
-          routerLink="/accueil"
+          [routerLink]="homePath()"
           (click)="closeMobile()"
           class="flex items-center gap-3"
           ><span
@@ -110,19 +110,9 @@
         />
       </div>
       <div class="ml-auto flex items-center gap-3">
-        <div class="relative hidden sm:block">
-          <select
-            [value]="sessionService.promotionId()"
-            (change)="promotionChanged($event)"
-            class="h-[39px] min-w-[210px] appearance-none rounded-[12px] border border-[#dfe5ec] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-[0_1px_4px_rgba(25,47,77,0.06)]"
-          >
-            @for (p of promotions; track p.id) {
-              <option [value]="p.id">{{ p.name }}</option>
-            }</select
-          ><i
-            class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
-          ></i>
-        </div>
+        @if (sessionService.role() !== "jury") {
+          <app-context-switcher />
+        }
         <div
           class="grid size-[40px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[14px] font-bold text-white"
         >

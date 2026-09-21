@@ -1,5 +1,6 @@
 export type PlanningType =
   | "classroom"
+  | "distance"
   | "driving"
   | "evaluation"
   | "internship"
@@ -122,6 +123,16 @@ export const PLANNING_EVENTS: PlanningEvent[] = [
     titleKey: "planning.events.companyInternship",
     time: "14:00 – 18:00",
     meta: "ECF Loire · Karim Benali",
+    date: "24/09/2026",
+  },
+  {
+    id: "pe11",
+    day: "thursday",
+    promotionId: "p1",
+    type: "distance",
+    titleKey: "planning.events.remoteClass",
+    time: "14:00 – 17:00",
+    meta: "Marc Dupont · Microsoft Teams",
     date: "24/09/2026",
   },
   {
