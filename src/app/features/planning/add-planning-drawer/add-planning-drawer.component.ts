@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  inject,
   input,
   output,
   signal,
@@ -13,11 +14,11 @@ import {
   Validators,
 } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { PROMOTIONS } from "../../../core/mock-data/dashboard.mock";
+import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import type {
   PlanningEvent,
   PlanningType,
-} from "../../../core/mock-data/planning.mock";
+} from "../../../core/models/planning.models";
 
 export interface AddPlanningPayload {
   date: string;
@@ -41,7 +42,8 @@ export class AddPlanningDrawerComponent {
   readonly open = input(false);
   readonly closed = output<void>();
   readonly eventCreated = output<AddPlanningPayload>();
-  readonly promotions = PROMOTIONS;
+  private readonly workspace = inject(WorkspaceContextService);
+  readonly promotions = this.workspace.cohorts;
   readonly submitted = signal(false);
 
   readonly types: PlanningType[] = [
@@ -69,7 +71,7 @@ export class AddPlanningDrawerComponent {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    promotionId: new FormControl("p1", {
+    promotionId: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -94,6 +96,10 @@ export class AddPlanningDrawerComponent {
       validators: [Validators.maxLength(20)],
     }),
   });
+
+  constructor() {
+    this.form.controls.promotionId.setValue(this.workspace.selection().cohortId);
+  }
 
   @HostListener("document:keydown.escape")
   onEscape(): void {
@@ -151,7 +157,7 @@ export class AddPlanningDrawerComponent {
       date: "2026-09-25",
       startTime: "09:00",
       endTime: "12:00",
-      promotionId: "p1",
+      promotionId: this.workspace.selection().cohortId,
       type: "classroom",
       title: "",
       responsible: "",

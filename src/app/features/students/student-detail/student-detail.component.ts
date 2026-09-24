@@ -9,29 +9,15 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { SessionService } from "../../../core/session/session.service";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
-import {
-  DRIVING_CRITERIA,
-  type DrivingLevel,
-} from "../../../core/mock-data/driving.mock";
-import {
-  SKILL_DEFINITIONS,
-  type SkillCriterionLevel,
-} from "../../../core/mock-data/skills.mock";
-import type { SheetStatus } from "../../../core/mock-data/sheets.mock";
-import type { InternshipStatus } from "../../../core/mock-data/internships.mock";
-import {
-  certificationCandidateByStudentId,
-  EXAM_SESSIONS,
-} from "../../../core/mock-data/certification.mock";
-import {
-  STUDENT_DETAIL_TABS,
-  studentAuditHistory,
-  studentDetailById,
-  studentDrivingHistory,
-  studentInternships,
-  studentSheets,
-  type StudentDetailTab,
-} from "../../../core/mock-data/student-detail.mock";
+import { DRIVING_CRITERIA } from "../../../core/api-data/runtime-data.store";
+import type { DrivingLevel } from "../../../core/models/driving.models";
+import { SKILL_DEFINITIONS } from "../../../core/api-data/runtime-data.store";
+import type { SkillCriterionLevel } from "../../../core/models/skills.models";
+import type { SheetStatus } from "../../../core/models/sheets.models";
+import type { InternshipStatus } from "../../../core/models/internships.models";
+import { certificationCandidateByStudentId, EXAM_SESSIONS } from "../../../core/api-data/runtime-data.store";
+import { STUDENT_DETAIL_TABS, studentAuditHistory, studentDetailById, studentDrivingHistory, studentInternships, studentSheets } from "../../../core/api-data/runtime-data.store";
+import type { StudentDetailTab } from "../../../core/models/student-detail.models";
 
 @Component({
   selector: "app-student-detail",

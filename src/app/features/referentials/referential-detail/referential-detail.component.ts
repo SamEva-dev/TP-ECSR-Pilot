@@ -1,10 +1,11 @@
+import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { type ReferentialStatus, type ReferentialVersionFormValue, type VolumeCategory } from "../../../core/mock-data/referentials.mock";
-import { ReferentialMockStoreService } from "../../../core/mock-data/referential-mock-store.service";
-import { PROGRAM_CATALOG } from "../../../core/mock-data/programs.mock";
-import { PROGRAM_OFFERINGS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../../core/mock-data/workspace.mock";
+import type { ReferentialStatus, ReferentialVersionFormValue, VolumeCategory } from "../../../core/models/referentials.models";
+
+import { PROGRAM_CATALOG } from "../../../core/api-data/runtime-data.store";
+import { PROGRAM_OFFERINGS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
 import { ReferentialCompareDrawerComponent } from "../referential-compare-drawer/referential-compare-drawer.component";
 import { ReferentialVersionDrawerComponent } from "../referential-version-drawer/referential-version-drawer.component";
 
@@ -18,7 +19,7 @@ type DetailTab = "overview" | "skills" | "hours" | "stages" | "certification";
 })
 export class ReferentialDetailComponent {
   private readonly route = inject(ActivatedRoute);
-  readonly store = inject(ReferentialMockStoreService);
+  readonly store = inject(ReferentialApiStoreService);
   readonly referentialId = this.route.snapshot.paramMap.get("id") ?? "";
   readonly activeTab = signal<DetailTab>("overview");
   readonly compareOpen = signal(false);
@@ -28,7 +29,7 @@ export class ReferentialDetailComponent {
   readonly referential = computed(() => this.store.items().find((item) => item.id === this.referentialId) ?? null);
   readonly program = computed(() => PROGRAM_CATALOG.find((item) => item.id === this.referential()?.programId) ?? null);
   readonly comparisonCandidates = computed(() => this.store.items().filter((item) => item.programId === this.referential()?.programId && item.id !== this.referentialId));
-  readonly compareWith = computed(() => this.comparisonCandidates().find((item) => item.id === this.compareWithId()) ?? this.comparisonCandidates()[0] ?? null);
+  readonly compareWith = computed(() => this.comparisonCandidates().find((item) => item.id === this.compareWithId()) ?? this.comparisonCandidates().at(0) ?? null);
   readonly linkedCohorts = computed(() => WORKSPACE_COHORTS.filter((cohort) => cohort.referentialVersionId === this.referentialId).map((cohort) => {
     const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId);
     const site = TRAINING_SITES.find((item) => item.id === offering?.siteId);

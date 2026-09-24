@@ -1,9 +1,10 @@
+import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { ProgramMockStoreService } from "../../core/mock-data/program-mock-store.service";
+
 import type { ProgramCatalogCategory, ProgramCatalogItem, ProgramCatalogStatus, ProgramFormValue } from "../../core/mock-data/programs.mock";
-import { TRAINING_SITES } from "../../core/mock-data/workspace.mock";
+
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgramDrawerComponent } from "./program-drawer/program-drawer.component";
 
@@ -15,7 +16,7 @@ import { ProgramDrawerComponent } from "./program-drawer/program-drawer.componen
 })
 export class ProgramsComponent {
   private readonly router = inject(Router);
-  readonly store = inject(ProgramMockStoreService);
+  readonly store = inject(ProgramApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly query = signal("");
   readonly category = signal<"all" | ProgramCatalogCategory>("all");
@@ -23,9 +24,7 @@ export class ProgramsComponent {
   readonly drawerOpen = signal(false);
   readonly editingProgram = signal<ProgramCatalogItem | null>(null);
 
-  readonly organizationSiteIds = computed(() => TRAINING_SITES
-    .filter((site) => site.organizationId === this.workspace.organization()?.id)
-    .map((site) => site.id));
+  readonly organizationSiteIds = computed(() => this.workspace.sites().map((site) => site.id));
 
   readonly programs = computed(() => this.store.programs().filter((program) =>
     program.siteIds.some((siteId) => this.organizationSiteIds().includes(siteId)) || program.siteIds.length === 0,

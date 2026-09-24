@@ -7,9 +7,9 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import { PROMOTIONS } from "../../core/mock-data/dashboard.mock";
-import { STUDENT_DIRECTORY } from "../../core/mock-data/students.mock";
-import { AUDIT_LOG } from "../../core/mock-data/reports.mock";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { STUDENT_DIRECTORY } from "../../core/api-data/runtime-data.store";
+import { AUDIT_LOG } from "../../core/api-data/runtime-data.store";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import { StatusPillComponent } from "../../shared/ui/status-pill.component";
 
@@ -24,10 +24,16 @@ type ReportType =
 })
 export class ReportsComponent {
   readonly sessionService = inject(SessionService);
-  readonly promotions = PROMOTIONS;
+  readonly workspace = inject(WorkspaceContextService);
+  readonly promotions = this.workspace.cohorts;
   readonly auditLog = AUDIT_LOG;
   readonly selectedReport = signal<ReportType>("individual");
-  readonly promotionId = signal(this.sessionService.promotionId());
+  readonly promotionId = signal(this.workspace.selection().cohortId);
+
+
+  readonly selectedPromotion = computed(() =>
+    this.workspace.cohorts().find((promotion) => promotion.id === this.promotionId()) ?? null,
+  );
 
   readonly reportTypes: { key: ReportType; labelKey: string }[] = [
     { key: "individual", labelKey: "reports.types.individual" },

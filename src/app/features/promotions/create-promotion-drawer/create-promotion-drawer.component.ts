@@ -13,8 +13,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { PEDAGOGICAL_TEAM } from "../../../core/mock-data/promotions.mock";
-import { TRAINING_REFERENTIALS } from "../../../core/mock-data/referentials.mock";
+import { PEDAGOGICAL_TEAM } from "../../../core/api-data/runtime-data.store";
+import { TRAINING_REFERENTIALS } from "../../../core/api-data/runtime-data.store";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import type { WorkspaceCohort } from "../../../core/models/workspace.models";
 

@@ -1,9 +1,11 @@
+import { SiteApiStoreService } from "../../../core/api-data/site-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { SiteMockStoreService } from "../../../core/mock-data/site-mock-store.service";
-import { SITE_ALERTS, SITE_PROGRAM_METRICS, type SiteFormValue } from "../../../core/mock-data/sites.mock";
-import { PROGRAM_OFFERINGS, TRAINING_PROGRAMS, WORKSPACE_COHORTS } from "../../../core/mock-data/workspace.mock";
+
+import { SITE_ALERTS, SITE_PROGRAM_METRICS } from "../../../core/api-data/runtime-data.store";
+import type { SiteFormValue } from "../../../core/models/sites.models";
+import { PROGRAM_OFFERINGS, TRAINING_PROGRAMS, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "../site-drawer/site-drawer.component";
 
@@ -16,7 +18,7 @@ import { SiteDrawerComponent } from "../site-drawer/site-drawer.component";
 export class SiteDetailComponent {
   private readonly route = inject(ActivatedRoute);
   readonly workspace = inject(WorkspaceContextService);
-  readonly store = inject(SiteMockStoreService);
+  readonly store = inject(SiteApiStoreService);
   readonly drawerOpen = signal(false);
   readonly siteId = this.route.snapshot.paramMap.get("id") ?? "";
   readonly site = computed(() => this.store.byId(this.siteId) ?? null);

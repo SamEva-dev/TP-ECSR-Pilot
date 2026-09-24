@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, output } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../../core/mock-data/sites.mock";
+import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../../core/models/sites.models";
 
 @Component({
   selector: "app-site-drawer",

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  HostListener,
   computed,
   inject,
   signal,
@@ -11,171 +12,34 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from "@angular/router";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
+import { AttentionService } from "../../core/attention/attention.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import { APP_NAV_ITEMS } from "../../core/navigation/app-navigation.config";
+import { GlobalSearchService } from "../../core/search/global-search.service";
 import { SessionService } from "../../core/session/session.service";
-import type { UserRole } from "../../core/models/app.models";
-import type { ProgramModule } from "../../core/models/workspace.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { ProgramLogoComponent } from "../../shared/branding/program-logo.component";
 import { ContextSwitcherComponent } from "../../shared/workspace/context-switcher.component";
-interface NavItem {
-  path: string;
-  labelKey: string;
-  icon: string;
-  roles: UserRole[];
-  module?: ProgramModule;
-}
-const TRAINING_USERS: UserRole[] = ["direction", "formateur", "stagiaire", "secretariat"];
-const NAV: NavItem[] = [
-  { path: "/accueil", labelKey: "nav.home", icon: "ph-house", roles: TRAINING_USERS },
-  {
-    path: "/organisation",
-    labelKey: "nav.organizationDashboard",
-    icon: "ph-buildings",
-    roles: ["direction"],
-  },
-  {
-    path: "/etablissements",
-    labelKey: "nav.sites",
-    icon: "ph-map-pin-area",
-    roles: ["direction"],
-  },
-  {
-    path: "/formations",
-    labelKey: "nav.programs",
-    icon: "ph-books",
-    roles: ["direction"],
-  },
-  {
-    path: "/referentiels",
-    labelKey: "nav.referentials",
-    icon: "ph-stack",
-    roles: ["direction"],
-  },
-  {
-    path: "/planning",
-    labelKey: "nav.planning",
-    icon: "ph-calendar-dots",
-    roles: TRAINING_USERS, module: "planning",
-  },
-  {
-    path: "/teletravail",
-    labelKey: "nav.remoteWork",
-    icon: "ph-house-line",
-    roles: ["direction", "formateur", "secretariat"],
-  },
-  {
-    path: "/distanciel",
-    labelKey: "nav.distanceLearning",
-    icon: "ph-video-camera",
-    roles: TRAINING_USERS,
-    module: "distanceLearning",
-  },
-  {
-    path: "/stagiaires",
-    labelKey: "nav.students",
-    icon: "ph-users-three",
-    roles: ["direction", "formateur", "secretariat"],
-  },
-  {
-    path: "/promotions",
-    labelKey: "nav.promotions",
-    icon: "ph-graduation-cap",
-    roles: ["direction", "secretariat"],
-  },
-  {
-    path: "/seances",
-    labelKey: "nav.sessions",
-    icon: "ph-list-bullets",
-    roles: TRAINING_USERS, module: "sessions",
-  },
-  {
-    path: "/conduite",
-    labelKey: "nav.driving",
-    icon: "ph-car",
-    roles: ["direction", "formateur", "stagiaire"], module: "driving",
-  },
-  {
-    path: "/fiches",
-    labelKey: "nav.sheets",
-    icon: "ph-presentation-chart",
-    roles: TRAINING_USERS, module: "sheets",
-  },
-  {
-    path: "/competences",
-    labelKey: "nav.skills",
-    icon: "ph-target",
-    roles: TRAINING_USERS, module: "skills",
-  },
-  {
-    path: "/presences",
-    labelKey: "nav.attendance",
-    icon: "ph-clipboard-text",
-    roles: ["direction", "formateur", "secretariat"], module: "attendance",
-  },
-  {
-    path: "/stages",
-    labelKey: "nav.internships",
-    icon: "ph-files",
-    roles: TRAINING_USERS, module: "internships",
-  },
-  {
-    path: "/documents",
-    labelKey: "nav.documents",
-    icon: "ph-folder-open",
-    roles: TRAINING_USERS, module: "documents",
-  },
-  {
-    path: "/certification",
-    labelKey: "nav.certification",
-    icon: "ph-certificate",
-    roles: TRAINING_USERS, module: "certification",
-  },
-  {
-    path: "/jury",
-    labelKey: "nav.jurySpace",
-    icon: "ph-gavel",
-    roles: ["jury"],
-  },
-  {
-    path: "/resultats",
-    labelKey: "nav.results",
-    icon: "ph-check-square-offset",
-    roles: ["direction", "secretariat"],
-  },
-  {
-    path: "/reussites",
-    labelKey: "nav.success",
-    icon: "ph-trophy",
-    roles: ["direction", "secretariat"],
-  },
-  {
-    path: "/rapports",
-    labelKey: "nav.reports",
-    icon: "ph-chart-bar",
-    roles: ["direction", "secretariat"],
-  },
-  {
-    path: "/statistiques",
-    labelKey: "nav.statistics",
-    icon: "ph-chart-line-up",
-    roles: ["direction"],
-  },
-  {
-    path: "/acces",
-    labelKey: "nav.access",
-    icon: "ph-shield-check",
-    roles: ["direction"],
-  },
-  {
-    path: "/administration",
-    labelKey: "nav.admin",
-    icon: "ph-gear",
-    roles: ["direction"],
-  },
-];
+
+const MOBILE_PRIORITY: Record<string, string[]> = {
+  direction: ["/accueil", "/organisation", "/planning", "/stagiaires"],
+  formateur: ["/accueil", "/planning", "/stagiaires", "/seances"],
+  stagiaire: ["/accueil", "/planning", "/distanciel", "/certification"],
+  secretariat: ["/accueil", "/planning", "/stagiaires", "/documents"],
+  jury: ["/jury"],
+};
+
 @Component({
   selector: "app-shell",
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, ContextSwitcherComponent],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslatePipe,
+    ContextSwitcherComponent,
+    ProgramLogoComponent,
+  ],
   templateUrl: "./app-shell.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -183,41 +47,107 @@ export class AppShellComponent {
   private readonly router = inject(Router);
   readonly sessionService = inject(SessionService);
   readonly workspace = inject(WorkspaceContextService);
+  readonly access = inject(AccessPolicyService);
+  readonly attention = inject(AttentionService);
+  private readonly globalSearch = inject(GlobalSearchService);
+
   readonly mobileOpen = signal(false);
-  readonly homePath = computed(() =>
-    this.sessionService.role() === "jury" ? "/jury" : "/accueil",
-  );
+  readonly notificationsOpen = signal(false);
+  readonly searchOpen = signal(false);
+  readonly searchQuery = signal("");
+
+  readonly homePath = computed(() => this.access.defaultPath());
+
   readonly navItems = computed(() => {
     const modules = this.workspace.program()?.enabledModules ?? [];
-    return NAV.filter((i) =>
-      i.roles.includes(this.sessionService.role()) && (!i.module || modules.includes(i.module)),
+    return APP_NAV_ITEMS.filter(
+      (item) =>
+        this.access.can(item.permission) &&
+        (!item.module || modules.includes(item.module)),
     );
   });
-  readonly mobileNavItems = computed(() =>
-    this.sessionService.role() === "jury"
-      ? this.navItems()
-      : this.navItems()
-          .filter((i) =>
-            [
-              "/accueil",
-              "/planning",
-              "/stagiaires",
-              "/conduite",
-              "/fiches",
-            ].includes(i.path),
-          )
-          .slice(0, 5),
+
+  readonly mobileNavItems = computed(() => {
+    const items = this.navItems();
+    const preferred = MOBILE_PRIORITY[this.sessionService.role()] ?? [];
+    const primary = preferred
+      .map((path) => items.find((item) => item.path === path))
+      .filter((item): item is (typeof items)[number] => !!item);
+    const remaining = items.filter(
+      (item) => !primary.some((candidate) => candidate.path === item.path),
+    );
+    return [...primary, ...remaining].slice(0, 4);
+  });
+
+  readonly hasMoreMobileNav = computed(
+    () => this.navItems().length > this.mobileNavItems().length,
   );
-  roleLabelKey() {
+
+  readonly searchResults = computed(() =>
+    this.globalSearch.search(this.searchQuery()),
+  );
+
+  roleLabelKey(): string {
     return `common.roles.${this.sessionService.role()}`;
   }
-  toggleMobile() {
-    this.mobileOpen.update((v) => !v);
+
+  onSearchInput(event: Event): void {
+    this.searchQuery.set((event.target as HTMLInputElement).value);
+    this.searchOpen.set(true);
+    this.notificationsOpen.set(false);
   }
-  closeMobile() {
+
+  openSearch(): void {
+    this.searchOpen.set(true);
+    this.notificationsOpen.set(false);
+  }
+
+  openFirstSearchResult(): void {
+    const first = this.searchResults()[0];
+    if (first) this.openSearchResult(first.path);
+  }
+
+  openSearchResult(path: string): void {
+    this.searchOpen.set(false);
+    this.searchQuery.set("");
+    void this.router.navigateByUrl(path);
+  }
+
+  toggleNotifications(): void {
+    this.notificationsOpen.update((value) => !value);
+    this.searchOpen.set(false);
+  }
+
+  openAttention(id: string, path: string): void {
+    this.attention.markRead(id);
+    this.notificationsOpen.set(false);
+    void this.router.navigateByUrl(path);
+  }
+
+  attentionToneClass(level: "info" | "warning" | "danger"): string {
+    if (level === "danger") return "bg-[#fdeaea] text-[#c33d3d]";
+    if (level === "warning") return "bg-[#fff2df] text-[#b66d08]";
+    return "bg-[#eaf3fc] text-[#245c97]";
+  }
+
+  toggleMobile(): void {
+    this.mobileOpen.update((value) => !value);
+    this.searchOpen.set(false);
+    this.notificationsOpen.set(false);
+  }
+
+  closeMobile(): void {
     this.mobileOpen.set(false);
   }
-  logout() {
+
+  @HostListener("document:keydown.escape")
+  closeOverlays(): void {
+    this.mobileOpen.set(false);
+    this.searchOpen.set(false);
+    this.notificationsOpen.set(false);
+  }
+
+  logout(): void {
     this.sessionService.disconnect();
     void this.router.navigateByUrl("/connexion");
   }

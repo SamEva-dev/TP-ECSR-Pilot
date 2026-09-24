@@ -1,19 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from "@angular/forms";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
-import {
-  REMOTE_WORK_ACTIVITIES,
-  REMOTE_WORK_POLICY,
-  REMOTE_WORK_REQUESTS,
-  TEAM_WORK_MODE_WEEK,
-  type RemoteActivityStatus,
-  type RemoteWorkPeriod,
-  type RemoteWorkRequest,
-  type RemoteWorkStatus,
-  type WorkMode,
-} from "../../core/mock-data/remote-work.mock";
+import { WorkforceApiService } from "../../core/workforce/workforce-api.service";
+import type { RemoteWorkRequestApi } from "../../core/workforce/workforce.models";
+import { RealtimeService } from "../../core/realtime/realtime.service";
+import { REMOTE_WORK_ACTIVITIES, REMOTE_WORK_POLICY, REMOTE_WORK_REQUESTS, TEAM_WORK_MODE_WEEK } from "../../core/api-data/runtime-data.store";
+import type { RemoteActivityStatus, RemoteWorkPeriod, RemoteWorkRequest, RemoteWorkStatus, WorkMode } from "../../core/models/remote-work.models";
 
 @Component({
   selector: "app-remote-work",
@@ -24,6 +18,9 @@ import {
 export class RemoteWorkComponent {
   readonly session = inject(SessionService);
   readonly workspace = inject(WorkspaceContextService);
+  private readonly api = inject(WorkforceApiService);
+  private readonly realtime = inject(RealtimeService);
+  readonly apiConnected = signal(false);
   readonly policy = signal({ ...REMOTE_WORK_POLICY });
   readonly requests = signal(REMOTE_WORK_REQUESTS.map((item) => ({ ...item })));
   readonly activities = signal(REMOTE_WORK_ACTIVITIES.map((item) => ({ ...item })));
@@ -82,6 +79,78 @@ export class RemoteWorkComponent {
     comment: new FormControl("", { nonNullable: true }),
   });
 
+
+  constructor() {
+    void this.reloadFromApi();
+    void this.realtime.start().catch(() => undefined);
+
+    effect(() => {
+      const event = this.realtime.lastEvent();
+      if (!event?.typeKey.startsWith("pedagora.workforce.")) return;
+      void this.reloadFromApi();
+    });
+  }
+
+  private isUuid(value?: string): value is string {
+    return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+  }
+
+  private backendSiteId(): string | undefined {
+    const site = this.workspace.site();
+    if (!site) return undefined;
+    return site.apiId ?? site.id;
+  }
+
+  private mapRequest(item: RemoteWorkRequestApi): RemoteWorkRequest {
+    const periodMap: Record<string, RemoteWorkPeriod> = {
+      fullday: "full-day",
+      morning: "morning",
+      afternoon: "afternoon",
+      custom: "custom",
+    };
+    const status = item.status.toLowerCase() as RemoteWorkStatus;
+    return {
+      id: item.id,
+      userId: item.authGateUserId,
+      userName: item.userDisplayName,
+      roleKey: "common.roles.formateur",
+      siteId: item.siteId,
+      date: item.date,
+      period: periodMap[item.period.toLowerCase()] ?? "full-day",
+      startTime: item.startTime?.slice(0, 5) ?? "08:30",
+      endTime: item.endTime?.slice(0, 5) ?? "17:00",
+      status,
+      activityCount: item.activities.length,
+      completedActivities: item.activities.filter((activity) => activity.status.toLowerCase() === "done").length,
+      comment: item.comment ?? undefined,
+      approver: item.approverDisplayName ?? undefined,
+    };
+  }
+
+  private async reloadFromApi(): Promise<void> {
+    const siteId = this.backendSiteId();
+    if (!this.isUuid(siteId)) {
+      this.apiConnected.set(false);
+      return;
+    }
+
+    try {
+      const rows = await this.api.list(siteId, !this.isManager());
+      this.requests.set(rows.map((item) => this.mapRequest(item)));
+      this.activities.set(rows.flatMap((item) => item.activities.map((activity) => ({
+        id: activity.id,
+        requestId: item.id,
+        titleKey: activity.label,
+        typeKey: `remoteWork.activityTypes.${activity.code.toLowerCase()}`,
+        status: activity.status.toLowerCase().replace("inprogress", "in-progress") as RemoteActivityStatus,
+      }))));
+      this.apiConnected.set(true);
+    } catch {
+      this.apiConnected.set(false);
+      // API is authoritative: no legacy mock fallback.
+    }
+  }
+
   openRequestDrawer(): void {
     this.selectedRequest.set(null);
     this.drawerOpen.set(true);
@@ -97,10 +166,52 @@ export class RemoteWorkComponent {
     this.selectedRequest.set(null);
   }
 
-  submitRequest(): void {
+  async submitRequest(): Promise<void> {
     if (this.requestForm.invalid) return;
     const value = this.requestForm.getRawValue();
-    const activityCount = [value.preparation, value.correction, value.followUp, value.meeting, value.admin, value.remoteTraining].filter(Boolean).length;
+    const activityInputs = [
+      value.preparation ? { code: "PREPARATION", label: "Préparation pédagogique" } : null,
+      value.correction ? { code: "CORRECTION", label: "Correction des évaluations" } : null,
+      value.followUp ? { code: "FOLLOW_UP", label: "Suivi des apprenants" } : null,
+      value.meeting ? { code: "MEETING", label: "Réunion à distance" } : null,
+      value.admin ? { code: "ADMIN", label: "Travaux administratifs" } : null,
+      value.remoteTraining ? { code: "REMOTE_TRAINING", label: "Formation à distance" } : null,
+    ].filter((item): item is { code: string; label: string } => item !== null);
+
+    const siteId = this.backendSiteId();
+    if (this.isUuid(siteId)) {
+      try {
+        const created = await this.api.create({
+          siteId,
+          date: value.date,
+          period: value.period,
+          startTime: value.startTime || null,
+          endTime: value.endTime || null,
+          comment: value.comment || null,
+          activities: activityInputs,
+        });
+        this.requests.update((items) => [this.mapRequest(created), ...items.filter((item) => item.id !== created.id)]);
+        this.activities.update((items) => [
+          ...created.activities.map((activity) => ({
+            id: activity.id,
+            requestId: created.id,
+            titleKey: activity.label,
+            typeKey: `remoteWork.activityTypes.${activity.code.toLowerCase()}`,
+            status: activity.status.toLowerCase().replace("inprogress", "in-progress") as RemoteActivityStatus,
+          })),
+          ...items,
+        ]);
+        this.apiConnected.set(true);
+        this.saved.set(true);
+        this.closeDrawer();
+        window.setTimeout(() => this.saved.set(false), 1800);
+        return;
+      } catch {
+        this.apiConnected.set(false);
+      }
+    }
+
+    const activityCount = activityInputs.length;
     const next: RemoteWorkRequest = {
       id: `rw-demo-${this.requests().length + 1}`,
       userId: this.currentUserId(),
@@ -122,18 +233,50 @@ export class RemoteWorkComponent {
     window.setTimeout(() => this.saved.set(false), 1800);
   }
 
-  approve(request: RemoteWorkRequest): void {
+  async approve(request: RemoteWorkRequest): Promise<void> {
+    if (this.isUuid(request.id)) {
+      try {
+        const updated = await this.api.decide(request.id, true);
+        this.requests.update((items) => items.map((item) => item.id === request.id ? this.mapRequest(updated) : item));
+        this.closeDrawer();
+        return;
+      } catch {
+        await this.reloadFromApi();
+      }
+    }
     this.requests.update((items) => items.map((item) => item.id === request.id ? { ...item, status: "approved", approver: "Claire Berthier" } : item));
     this.closeDrawer();
   }
 
-  reject(request: RemoteWorkRequest): void {
+  async reject(request: RemoteWorkRequest): Promise<void> {
+    if (this.isUuid(request.id)) {
+      try {
+        const updated = await this.api.decide(request.id, false);
+        this.requests.update((items) => items.map((item) => item.id === request.id ? this.mapRequest(updated) : item));
+        this.closeDrawer();
+        return;
+      } catch {
+        await this.reloadFromApi();
+      }
+    }
     this.requests.update((items) => items.map((item) => item.id === request.id ? { ...item, status: "rejected", approver: "Claire Berthier" } : item));
     this.closeDrawer();
   }
 
-  toggleActivity(id: string): void {
-    this.activities.update((items) => items.map((item) => item.id === id ? { ...item, status: item.status === "done" ? "todo" : "done" } : item));
+  async toggleActivity(id: string): Promise<void> {
+    const activity = this.activities().find((item) => item.id === id);
+    if (!activity) return;
+    const nextStatus: RemoteActivityStatus = activity.status === "done" ? "todo" : "done";
+
+    this.activities.update((items) => items.map((item) => item.id === id ? { ...item, status: nextStatus } : item));
+
+    if (this.isUuid(activity.requestId) && this.isUuid(id)) {
+      try {
+        await this.api.updateActivity(activity.requestId, id, nextStatus);
+      } catch {
+        await this.reloadFromApi();
+      }
+    }
   }
 
   setSiteFilter(event: Event): void {

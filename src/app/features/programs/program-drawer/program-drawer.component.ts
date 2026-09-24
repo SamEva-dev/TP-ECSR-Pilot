@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { TranslateService } from "../../../core/i18n/translate.service";
-import { PROGRAM_MODULES, type ProgramCatalogCategory, type ProgramCatalogItem, type ProgramCatalogStatus, type ProgramFormValue } from "../../../core/mock-data/programs.mock";
+import { PROGRAM_MODULES } from "../../../core/api-data/runtime-data.store";
+import type { ProgramCatalogCategory, ProgramCatalogItem, ProgramCatalogStatus, ProgramFormValue } from "../../../core/models/programs.models";
 import type { ProgramModule } from "../../../core/models/workspace.models";
 
 @Component({

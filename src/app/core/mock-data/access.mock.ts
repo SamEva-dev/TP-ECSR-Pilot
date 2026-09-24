@@ -1,4 +1,4 @@
-import type { UserRole } from "../models/app.models";
+import type { DemoSession, UserRole } from "../models/app.models";
 import type { WorkspaceMembership } from "../models/workspace.models";
 
 export type AccessState = "active" | "invited" | "suspended";
@@ -251,3 +251,22 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     assignments: [membership("u19", "exam-bus", { role: "jury", scope: "exam", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-bus", cohortId: "cohort-nice-bus-2027-02", examSessionId: "exam-cohort-nice-bus-2027-02" })],
   },
 ];
+
+export function accessAccountForSession(session: DemoSession | null): AccessAccount | null {
+  if (!session) return null;
+
+  const exact = ACCESS_ACCOUNTS.find(
+    (item) => item.email.toLowerCase() === session.email.toLowerCase(),
+  );
+  if (exact) return exact;
+
+  const fallbackId: Record<UserRole, string> = {
+    direction: "u1",
+    secretariat: "u2",
+    formateur: "u3",
+    stagiaire: "u8",
+    jury: "u16",
+  };
+
+  return ACCESS_ACCOUNTS.find((item) => item.id === fallbackId[session.role]) ?? null;
+}

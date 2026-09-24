@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { TRAINING_REFERENTIALS } from "../../core/mock-data/referentials.mock";
-import {
-  CONTEXTUAL_PROMOTIONS,
-  type ContextualPromotionSummary,
-} from "../../core/mock-data/contextual-promotions.mock";
-import { PROGRAM_OFFERINGS } from "../../core/mock-data/workspace.mock";
+import { TRAINING_REFERENTIALS } from "../../core/api-data/runtime-data.store";
+import { CONTEXTUAL_PROMOTIONS } from "../../core/api-data/runtime-data.store";
+import type { ContextualPromotionSummary } from "../../core/models/contextual-promotions.models";
+import { PROGRAM_OFFERINGS } from "../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import {

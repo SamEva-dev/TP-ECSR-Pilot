@@ -2,13 +2,10 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal } from "@ang
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  SESSION_TRAINERS,
-  type PedagogicalSessionType,
-  type ProgrammedSession,
-  type SessionModality,
-} from "../../core/mock-data/sessions.mock";
+import { SESSION_TRAINERS } from "../../core/api-data/runtime-data.store";
+import type { PedagogicalSessionType, ProgrammedSession, SessionModality } from "../../core/models/sessions.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { TrainingDeliveryApiService, type TrainingSessionApi } from "../../core/training-delivery/training-delivery-api.service";
 
 @Component({
   selector: "app-sessions",
@@ -18,6 +15,9 @@ import { ContextualTrainingDataService } from "../../core/workspace/contextual-t
 })
 export class SessionsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  readonly trainingApi = inject(TrainingDeliveryApiService);
+  readonly loading = signal(false);
+  readonly apiMode = signal(false);
   readonly trainers = SESSION_TRAINERS;
   readonly types: PedagogicalSessionType[] = [
     "classroom",
@@ -49,9 +49,54 @@ export class SessionsComponent {
 
   constructor() {
     effect(() => {
-      this.sessions.set(this.contextData.programmedSessions().map((item) => ({ ...item })));
-      this.promotionId = this.contextData.cohort()?.id ?? "";
+      const cohort = this.contextData.cohort();
+      this.promotionId = cohort?.id ?? "";
+      if (cohort?.apiId) {
+        void this.loadRemoteSessions(cohort.apiId);
+      } else {
+        this.apiMode.set(false);
+        this.sessions.set(this.contextData.programmedSessions().map((item) => ({ ...item })));
+      }
     });
+  }
+
+  private async loadRemoteSessions(cohortApiId: string) {
+    this.loading.set(true);
+    try {
+      const remote = await this.trainingApi.list(cohortApiId);
+      this.sessions.set(remote.map((item) => this.toProgrammedSession(item)).filter((item): item is ProgrammedSession => item !== null));
+      this.apiMode.set(true);
+    } catch {
+      this.apiMode.set(false);
+      this.sessions.set(this.contextData.programmedSessions().map((item) => ({ ...item })));
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private toProgrammedSession(item: TrainingSessionApi): ProgrammedSession | null {
+    if (!["classroom", "presentation", "evaluation", "sensitization", "catchup", "event"].includes(item.type)) return null;
+    const cohort = this.contextData.cohort();
+    const start = new Date(item.startsAtUtc);
+    const end = new Date(item.endsAtUtc);
+    const formatDate = new Intl.DateTimeFormat("fr-FR", { timeZone: item.timeZoneId, day: "2-digit", month: "2-digit", year: "numeric" });
+    const formatTime = new Intl.DateTimeFormat("fr-FR", { timeZone: item.timeZoneId, hour: "2-digit", minute: "2-digit", hour12: false });
+    return {
+      id: item.id,
+      titleKey: item.title,
+      date: formatDate.format(start),
+      start: formatTime.format(start),
+      end: formatTime.format(end),
+      trainer: item.trainerDisplayName ?? "—",
+      promotion: cohort?.name ?? "",
+      promotionId: cohort?.id ?? item.cohortId,
+      type: item.type as PedagogicalSessionType,
+      modality: item.modality,
+      objectiveKey: item.objective ?? "",
+      supportsKey: item.supports ?? "",
+      present: item.presentLearners,
+      expected: item.expectedLearners,
+    };
   }
 
   typeKey(type: PedagogicalSessionType) {
@@ -104,29 +149,58 @@ export class SessionsComponent {
       : "bg-[#fff0c9] text-[#8b5e00]";
   }
 
-  createSession() {
+  async createSession() {
     if (!this.theme.trim()) return;
     const cohort = this.contextData.cohort();
     if (!cohort) return;
-    const id = `ps-${Date.now()}`;
-    const formattedDate = this.date.split("-").reverse().join("/");
-    const newSession: ProgrammedSession = {
-      id,
-      titleKey: this.theme.trim(),
-      date: formattedDate,
-      start: this.start,
-      end: this.end,
-      trainer: this.trainer,
-      promotion: cohort.name,
-      promotionId: cohort.id,
-      type: this.selectedType(),
-      modality: this.selectedModality(),
-      objectiveKey: this.objectives.trim(),
-      supportsKey: this.supports.trim(),
-      present: 0,
-      expected: cohort.studentCount,
-    };
-    this.sessions.update((items) => [newSession, ...items]);
+
+    if (cohort.apiId) {
+      const startsAt = new Date(`${this.date}T${this.start}:00`);
+      const endsAt = new Date(`${this.date}T${this.end}:00`);
+      try {
+        const created = await this.trainingApi.create({
+          cohortId: cohort.apiId,
+          type: this.selectedType(),
+          modality: this.selectedModality(),
+          title: this.theme.trim(),
+          startsAtUtc: startsAt.toISOString(),
+          endsAtUtc: endsAt.toISOString(),
+          timeZoneId: "Europe/Paris",
+          trainerDisplayName: this.trainer,
+          objective: this.objectives.trim() || null,
+          supports: this.supports.trim() || null,
+          comments: this.comments.trim() || null,
+          audienceMode: "whole-cohort",
+          participantEnrollmentIds: [],
+        });
+        const mapped = this.toProgrammedSession(created);
+        if (mapped) this.sessions.update((items) => [mapped, ...items]);
+        this.apiMode.set(true);
+      } catch {
+        return;
+      }
+    } else {
+      const id = `ps-${Date.now()}`;
+      const formattedDate = this.date.split("-").reverse().join("/");
+      const newSession: ProgrammedSession = {
+        id,
+        titleKey: this.theme.trim(),
+        date: formattedDate,
+        start: this.start,
+        end: this.end,
+        trainer: this.trainer,
+        promotion: cohort.name,
+        promotionId: cohort.id,
+        type: this.selectedType(),
+        modality: this.selectedModality(),
+        objectiveKey: this.objectives.trim(),
+        supportsKey: this.supports.trim(),
+        present: 0,
+        expected: cohort.studentCount,
+      };
+      this.sessions.update((items) => [newSession, ...items]);
+    }
+
     this.theme = "";
     this.objectives = "";
     this.supports = "";

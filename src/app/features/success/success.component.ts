@@ -1,13 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { TRAINING_PROGRAMS, TRAINING_SITES } from "../../core/mock-data/workspace.mock";
-import {
-  SUCCESS_ANALYTICS_RECORDS,
-  type SuccessAnalyticsRecord,
-  type SuccessCandidateDetail,
-  type SuccessOutcome,
-} from "../../core/mock-data/success-analytics.mock";
+import { TRAINING_PROGRAMS, TRAINING_SITES } from "../../core/api-data/runtime-data.store";
+import { SUCCESS_ANALYTICS_RECORDS } from "../../core/api-data/runtime-data.store";
+import type { SuccessAnalyticsRecord, SuccessCandidateDetail, SuccessOutcome } from "../../core/models/success-analytics.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 

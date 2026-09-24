@@ -7,9 +7,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  type StudentDirectoryItem,
-} from "../../core/mock-data/students.mock";
+import type { StudentDirectoryItem } from "../../core/models/students.models";
 import type { StudentStatus } from "../../core/models/app.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";

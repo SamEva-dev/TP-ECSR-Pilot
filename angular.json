@@ -53,6 +53,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+           "options": {
+            "port": 5200
+          },
           "configurations": {
             "production": {
               "buildTarget": "tp-ecsr-pilot:build:production"

@@ -9,12 +9,8 @@ import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { TranslateService } from "../../../core/i18n/translate.service";
-import {
-  DEFAULT_SHEET_CATALOG,
-  SHEET_CATEGORIES,
-  type SheetCatalogItem,
-  type SheetCategory,
-} from "../../../core/mock-data/sheet-catalog.mock";
+import { DEFAULT_SHEET_CATALOG, SHEET_CATEGORIES } from "../../../core/api-data/runtime-data.store";
+import type { SheetCatalogItem, SheetCategory } from "../../../core/models/sheet-catalog.models";
 
 interface SheetDraft {
   id?: string;

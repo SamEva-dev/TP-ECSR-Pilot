@@ -9,12 +9,8 @@ import {
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { TranslateService } from "../../core/i18n/translate.service";
 import { SessionService } from "../../core/session/session.service";
-import {
-  ALL_SHEET_STATUSES,
-  reworkCountFor,
-  sheetsFor,
-  type SheetStatus,
-} from "../../core/mock-data/sheets.mock";
+import { ALL_SHEET_STATUSES, reworkCountFor, sheetsFor } from "../../core/api-data/runtime-data.store";
+import type { SheetStatus } from "../../core/models/sheets.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import { EvaluateSheetDrawerComponent } from "./evaluate-sheet-drawer/evaluate-sheet-drawer.component";
@@ -52,7 +48,7 @@ export class SheetsComponent {
 
   readonly allSheets = computed(() => {
     const student = this.selectedStudent();
-    return student ? sheetsFor(student) : [];
+    return student ? sheetsFor(student.id) : [];
   });
 
   readonly filteredSheets = computed(() => {
@@ -68,7 +64,7 @@ export class SheetsComponent {
 
   readonly reworkCount = computed(() => {
     const student = this.selectedStudent();
-    return student ? reworkCountFor(student) : 0;
+    return student ? reworkCountFor(student.id) : 0;
   });
   readonly preparedProgress = computed(() => {
     const student = this.selectedStudent();

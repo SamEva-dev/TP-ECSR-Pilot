@@ -17,6 +17,8 @@ export type ProgramModule =
 
 export interface Organization {
   id: string;
+  /** Backend UUID; id stays the stable external key until BE-02/BE-03 complete the migration. */
+  apiId?: string;
   code: string;
   name: string;
   shortName: string;
@@ -28,6 +30,8 @@ export interface Organization {
 
 export interface TrainingSite {
   id: string;
+  /** Backend UUID; id stays the stable external key during the progressive migration. */
+  apiId?: string;
   organizationId: string;
   code: string;
   name: string;
@@ -39,7 +43,9 @@ export interface TrainingProgram {
   id: string;
   code: string;
   name: string;
-  category: "teacher" | "motorcycle" | "heavy-vehicle" | "passenger-transport";
+  category: string;
+  familyCode?: string;
+  apiId?: string;
   icon: string;
   active: boolean;
   enabledModules: ProgramModule[];
@@ -47,6 +53,7 @@ export interface TrainingProgram {
 
 export interface ProgramOffering {
   id: string;
+  apiId?: string;
   siteId: string;
   programId: string;
   active: boolean;
@@ -54,6 +61,7 @@ export interface ProgramOffering {
 
 export interface WorkspaceCohort {
   id: string;
+  apiId?: string;
   offeringId: string;
   name: string;
   shortName: string;
@@ -62,8 +70,6 @@ export interface WorkspaceCohort {
   status: "planned" | "active" | "completed";
   studentCount: number;
   referentialVersionId?: string;
-  /** Existing ECSR mock promotion id. Used during the UI migration only. */
-  legacyPromotionId?: string;
 }
 
 export interface WorkspaceSelection {

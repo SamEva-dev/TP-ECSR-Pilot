@@ -1,10 +1,11 @@
+import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { type ReferentialStatus, type ReferentialVersionFormValue } from "../../core/mock-data/referentials.mock";
-import { ReferentialMockStoreService } from "../../core/mock-data/referential-mock-store.service";
+import type { ReferentialStatus, ReferentialVersionFormValue } from "../../core/models/referentials.models";
+
 import { ReferentialVersionDrawerComponent } from "./referential-version-drawer/referential-version-drawer.component";
-import { PROGRAM_CATALOG } from "../../core/mock-data/programs.mock";
+import { PROGRAM_CATALOG } from "../../core/api-data/runtime-data.store";
 
 @Component({
   selector: "app-referentials",
@@ -13,7 +14,7 @@ import { PROGRAM_CATALOG } from "../../core/mock-data/programs.mock";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferentialsComponent {
-  readonly store = inject(ReferentialMockStoreService);
+  readonly store = inject(ReferentialApiStoreService);
   readonly drawerOpen = signal(false);
   readonly query = signal("");
   readonly programId = signal("all");

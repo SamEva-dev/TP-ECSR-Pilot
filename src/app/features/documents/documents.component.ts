@@ -3,12 +3,15 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { DocumentApiService } from "../../core/documents/document-api.service";
+import type { DocumentDto } from "../../core/documents/document.models";
 
 type DocumentCategory =
   | "administrative"
@@ -37,6 +40,7 @@ interface LibraryDocument {
   pages: number;
   visibility: DocumentVisibility;
   descriptionKey: string;
+  blobAvailable?: boolean;
 }
 
 const DOCUMENTS: LibraryDocument[] = [
@@ -175,12 +179,63 @@ const DOCUMENTS: LibraryDocument[] = [
 export class DocumentsComponent {
   readonly sessionService = inject(SessionService);
   readonly contextData = inject(ContextualTrainingDataService);
+  readonly documentApi = inject(DocumentApiService);
+  readonly remoteDocuments = signal<LibraryDocument[] | null>(null);
   readonly search = signal("");
   readonly category = signal<"all" | DocumentCategory>("all");
   readonly selectedDocument = signal<LibraryDocument | null>(null);
 
+  constructor() {
+    effect(() => {
+      const cohortId = this.contextData.cohort()?.apiId;
+      void this.loadRemoteDocuments(cohortId);
+    });
+  }
+
+  private async loadRemoteDocuments(cohortId?: string) {
+    try {
+      const documents = await this.documentApi.list(cohortId);
+      this.remoteDocuments.set(documents.map((doc) => this.toLibraryDocument(doc)));
+    } catch {
+      this.remoteDocuments.set(null);
+    }
+  }
+
+  private toLibraryDocument(doc: DocumentDto): LibraryDocument {
+    const version = doc.versions[0];
+    const date = new Date(doc.updatedAtUtc);
+    return {
+      id: doc.id,
+      title: doc.title,
+      date: Number.isNaN(date.valueOf()) ? "" : date.toLocaleDateString("fr-FR"),
+      author: doc.createdByDisplayName,
+      size: this.formatBytes(version?.sizeBytes ?? 0),
+      category: (["administrative","pedagogical","evaluation","course","internship","student"].includes(doc.category)
+        ? doc.category
+        : "administrative") as DocumentCategory,
+      ownerStudentId: doc.ownerType === "enrollment" ? doc.ownerId ?? undefined : undefined,
+      visibleToStudent: doc.visibility === "all" || doc.visibility === "student",
+      fileName: version?.fileName ?? "",
+      format: (version?.fileName?.toLowerCase().endsWith(".docx") ? "DOCX" : "PDF") as DocumentFormat,
+      version: version ? `${version.versionNumber}.0` : "1.0",
+      pages: 1,
+      visibility: doc.visibility,
+      descriptionKey: "documents.descriptions.generic",
+      blobAvailable: version?.blobAvailable ?? false,
+    };
+  }
+
+  private formatBytes(value: number) {
+    if (value < 1024) return `${value} o`;
+    if (value < 1024 * 1024) return `${Math.round(value / 1024)} Ko`;
+    return `${(value / 1024 / 1024).toFixed(1).replace(".", ",")} Mo`;
+  }
+
   readonly role = this.sessionService.role;
   readonly contextualDocuments = computed<LibraryDocument[]>(() => {
+    const remote = this.remoteDocuments();
+    if (remote) return remote;
+
     const program = this.contextData.program();
     const referential = this.contextData.referential();
     if (!program || program.id === "program-ecsr") return DOCUMENTS;
@@ -313,6 +368,42 @@ export class DocumentsComponent {
 
   closePreview() {
     this.selectedDocument.set(null);
+  }
+
+
+
+  async uploadFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const cohort = this.contextData.cohort();
+    const site = this.contextData.site();
+    const program = this.contextData.program();
+    const form = new FormData();
+    form.append("title", file.name.replace(/\.[^.]+$/, ""));
+    form.append("category", "administrative");
+    form.append("visibility", "staff");
+    form.append("ownerType", "none");
+    form.append("authorDisplayName", "Utilisateur");
+    if (cohort?.apiId) form.append("cohortId", cohort.apiId);
+    if (site?.apiId) form.append("siteId", site.apiId);
+    if (program?.apiId) form.append("programId", program.apiId);
+    form.append("file", file, file.name);
+
+    try {
+      await this.documentApi.upload(form);
+      await this.loadRemoteDocuments(cohort?.apiId);
+    } finally {
+      input.value = "";
+    }
+  }
+
+  async download(doc: LibraryDocument) {
+    if (!this.remoteDocuments() || !doc.blobAvailable) return;
+    const apiDoc = (await this.documentApi.list(this.contextData.cohort()?.apiId))
+      .find((item) => item.id === doc.id);
+    if (apiDoc) await this.documentApi.download(apiDoc);
   }
 
   @HostListener("document:keydown.escape")

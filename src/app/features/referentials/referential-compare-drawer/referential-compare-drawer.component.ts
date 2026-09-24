@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { TrainingReferential } from "../../../core/mock-data/referentials.mock";
+import type { TrainingReferential } from "../../../core/models/referentials.models";
 
 @Component({
   selector: "app-referential-compare-drawer",

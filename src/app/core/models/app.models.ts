@@ -14,6 +14,13 @@ export interface DemoSession {
   trainerId?: string;
   juryId?: string;
   organisation?: string;
+
+  /** AuthGate session metadata. */
+  authMode?: "authgate";
+  userId?: string;
+  organizationId?: string;
+  roles?: string[];
+  permissions?: string[];
 }
 export interface Promotion {
   id: string;

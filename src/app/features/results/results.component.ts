@@ -11,7 +11,7 @@ import type {
   CertificationCandidate,
   CertificationResult,
   CertificationUnitStatus,
-} from "../../core/mock-data/certification.mock";
+} from "../../core/models/certification.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({

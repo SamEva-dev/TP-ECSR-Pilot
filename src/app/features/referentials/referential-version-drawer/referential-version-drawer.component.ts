@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { PROGRAM_CATALOG } from "../../../core/mock-data/programs.mock";
-import type { ReferentialVersionFormValue, TrainingReferential } from "../../../core/mock-data/referentials.mock";
+import { PROGRAM_CATALOG } from "../../../core/api-data/runtime-data.store";
+import type { ReferentialVersionFormValue, TrainingReferential } from "../../../core/models/referentials.models";
 
 @Component({
   selector: "app-referential-version-drawer",

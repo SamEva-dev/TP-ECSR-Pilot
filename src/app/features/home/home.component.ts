@@ -8,15 +8,7 @@ import { KeyValuePipe } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import {
-  ALERTS,
-  DRIVING_OBSERVATIONS,
-  PROMOTION_METRICS,
-  PROMOTIONS,
-  SAM_TIMELINE,
-  STUDENTS,
-  TRAINER_AGENDA,
-} from "../../core/mock-data/dashboard.mock";
+import { ALERTS, DRIVING_OBSERVATIONS, PROMOTION_METRICS, PROMOTIONS, SAM_TIMELINE, STUDENTS, TRAINER_AGENDA } from "../../core/api-data/runtime-data.store";
 import type { AlertLevel } from "../../core/models/app.models";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import { StatusPillComponent } from "../../shared/ui/status-pill.component";
@@ -53,9 +45,9 @@ export class HomeComponent {
   );
   readonly metrics = computed(
     () =>
-      PROMOTION_METRICS[
-        this.sessionService.promotionId() as keyof typeof PROMOTION_METRICS
-      ] ?? PROMOTION_METRICS.p1,
+      PROMOTION_METRICS.find((item) => item.cohortId === this.sessionService.promotionId())
+      ?? PROMOTION_METRICS[0]
+      ?? { trainers: 0, attendanceRate: 0, completedHours: 0, remainingHours: 0, catchupHours: 0, progress: 0, totalPlannedHours: 0 },
   );
   readonly studentsToWatch = computed(() =>
     [...this.students()]

@@ -7,11 +7,12 @@ import {
   signal,
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { SKILL_LINKED_SESSIONS, type SkillCriterionLevel } from "../../core/mock-data/skills.mock";
+import { SKILL_LINKED_SESSIONS } from "../../core/api-data/runtime-data.store";
+import type { SkillCriterionLevel } from "../../core/models/skills.models";
 import { SessionService } from "../../core/session/session.service";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
-import type { StudentDirectoryItem } from "../../core/mock-data/students.mock";
+import type { StudentDirectoryItem } from "../../core/models/students.models";
 
 interface UiSkillDefinition {
   code: string;

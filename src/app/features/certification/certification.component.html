@@ -21,14 +21,14 @@
       <div class="flex items-start gap-3">
         <span class="grid size-[42px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-white"><i [class]="'ph text-[20px] ' + (program()?.icon ?? 'ph-certificate')"></i></span>
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-[.1em] text-[#718096]">{{ 'certification.multi.activeScheme' | t }}</p>
+          <p class="text-[10px] font-semibold uppercase tracking-[.1em] text-[#718096] ">{{ 'certification.multi.activeScheme' | t }}</p>
           <p class="mt-1 text-[14px] font-bold text-[#172033]">{{ scheme().nameKey | t }}</p>
           <p class="mt-1 text-[11px] text-[#718096]">{{ 'certification.multi.schemeHelp' | t: { version: scheme().version, steps: scheme().steps.length, units: scheme().units.length } }}</p>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-2 md:justify-end">
         @for (unit of scheme().units; track unit.id) {
-          <span class="rounded-full border border-[#d9e2ec] bg-[#f8fafc] px-3 py-1.5 text-[10.5px] font-semibold text-[#445268]">{{ unit.shortLabel }}</span>
+          <span class="rounded-full border border-[#d9e2ec] bg-[#f8a11a] px-3 py-1.5 text-[10.5px] font-semibold text-white">{{ unit.shortLabel }}</span>
         }
       </div>
     </div>

@@ -27,7 +27,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
           routerLink="/connexion"
           class="mt-6 inline-flex rounded-lg bg-[var(--ecsr-action-blue)] px-5 py-3 font-semibold text-white"
         >
-          TP ECSR Pilot
+          Pedagora Pilot
         </a>
       </section>
     </main>

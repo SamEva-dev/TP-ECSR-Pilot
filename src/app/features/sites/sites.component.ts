@@ -1,8 +1,9 @@
+import { SiteApiStoreService } from "../../core/api-data/site-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { SiteMockStoreService } from "../../core/mock-data/site-mock-store.service";
-import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../core/mock-data/sites.mock";
+
+import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../core/models/sites.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
 
@@ -15,7 +16,7 @@ import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
 export class SitesComponent {
   private readonly router = inject(Router);
   readonly workspace = inject(WorkspaceContextService);
-  readonly store = inject(SiteMockStoreService);
+  readonly store = inject(SiteApiStoreService);
   readonly query = signal("");
   readonly status = signal<"all" | SiteOperationalStatus>("all");
   readonly drawerOpen = signal(false);

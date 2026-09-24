@@ -1,385 +1,296 @@
 <main class="min-h-screen bg-[var(--ecsr-page)] lg:grid lg:grid-cols-2">
   <section
     class="relative hidden min-h-screen overflow-hidden bg-[linear-gradient(140deg,#17477f_0%,#285f9e_70%,#6f8798_100%)] px-[62px] py-[62px] text-white lg:flex lg:flex-col lg:justify-between"
-    aria-label="Présentation TP ECSR Pilot"
+    aria-label="Pedagora Pilot"
   >
     <div class="flex items-center gap-4">
-      <div
-        class="flex size-[54px] items-center justify-center rounded-full bg-[var(--ecsr-orange)] text-[#152033]"
-      >
-        <i class="ph ph-car text-[27px]" aria-hidden="true"></i>
+      <div class="flex size-[54px] items-center justify-center rounded-full bg-[var(--ecsr-orange)] text-[#152033]">
+        <i class="ph ph-graduation-cap text-[27px]" aria-hidden="true"></i>
       </div>
       <div class="text-[26px] font-extrabold tracking-[-0.8px]">
-        TP ECSR <span class="text-[var(--ecsr-orange)]">Pilot</span>
+        Pedagora <span class="text-[var(--ecsr-orange)]">Pilot</span>
       </div>
     </div>
 
     <div class="relative z-10 mb-[72px] max-w-[555px]">
-      <h1
-        class="max-w-[530px] text-[37px] leading-[1.22] font-extrabold tracking-[-1.2px]"
-      >
+      <h1 class="max-w-[530px] text-[37px] leading-[1.22] font-extrabold tracking-[-1.2px]">
         {{ "brand.tagline" | t }}
       </h1>
       <p class="mt-5 max-w-[550px] text-[20px] leading-[1.45] text-white/88">
         {{ "brand.description" | t }}
       </p>
 
-      <ul class="mt-10 space-y-4 text-[17px] leading-[1.35] text-white/94">
-        <li class="flex items-start gap-4">
-          <i
-            class="ph ph-clock mt-[2px] text-[25px] text-[var(--ecsr-orange)]"
-            aria-hidden="true"
-          ></i>
-          <span>{{ "benefits.hours" | t }}</span>
-        </li>
-        <li class="flex items-start gap-4">
-          <i
-            class="ph ph-trend-up mt-[2px] text-[25px] text-[var(--ecsr-orange)]"
-            aria-hidden="true"
-          ></i>
-          <span>{{ "benefits.progress" | t }}</span>
-        </li>
-        <li class="flex items-start gap-4">
-          <i
-            class="ph ph-graduation-cap mt-[2px] text-[25px] text-[var(--ecsr-orange)]"
-            aria-hidden="true"
-          ></i>
-          <span>{{ "benefits.driving" | t }}</span>
-        </li>
-        <li class="flex items-start gap-4">
-          <i
-            class="ph ph-shield-check mt-[2px] text-[25px] text-[var(--ecsr-orange)]"
-            aria-hidden="true"
-          ></i>
-          <span>{{ "benefits.audit" | t }}</span>
-        </li>
-      </ul>
+      <div class="mt-9 grid grid-cols-2 gap-3 text-[14px] sm:grid-cols-3">
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-steering-wheel mr-2 text-[var(--ecsr-orange)]"></i>TP ECSR <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-motorcycle mr-2 text-[var(--ecsr-orange)]"></i>Moto <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-truck mr-2 text-[var(--ecsr-orange)]"></i>Groupe Lourd <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-bus mr-2 text-[var(--ecsr-orange)]"></i>Bus <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-ambulance mr-2 text-[var(--ecsr-orange)]"></i>Ambulance <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+        <div class="rounded-xl border border-white/20 bg-white/10 px-3 py-3"><i class="ph ph-first-aid-kit mr-2 text-[var(--ecsr-orange)]"></i>Secourisme <strong class="text-[var(--ecsr-orange)]">Pilot</strong></div>
+      </div>
     </div>
 
-    <p class="text-[14px] text-white/65">{{ "brand.centre" | t }}</p>
-    <div
-      class="pointer-events-none absolute -right-24 -bottom-24 size-[380px] rounded-full bg-orange-200/10 blur-3xl"
-    ></div>
+    <p class="text-[14px] text-white/65">Pedagora Pilot</p>
   </section>
 
-  <section
-    class="flex min-h-screen items-center justify-center bg-[var(--ecsr-page)] px-5 py-8 sm:px-8 lg:px-12"
-  >
-    <div class="w-full max-w-[610px]">
-      <div class="flex flex-col items-center text-center">
-        <div
-          class="mx-auto flex w-fit items-center justify-center gap-4 px-1 py-2 text-[var(--ecsr-blue-950)]"
-        >
-          <div
-            class="flex size-[54px] items-center justify-center rounded-full bg-[var(--ecsr-orange)] text-[#152033] shadow-[0_8px_18px_rgba(248,161,26,0.18)]"
-          >
-            <i class="ph ph-car text-[27px]" aria-hidden="true"></i>
-          </div>
-          <div
-            class="text-[25px] font-extrabold tracking-[-0.7px] text-[var(--ecsr-blue-950)]"
-          >
-            TP ECSR <span class="text-[var(--ecsr-orange)]">Pilot</span>
-          </div>
+  <section class="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
+    <div class="w-full max-w-[500px]">
+      <div class="mb-8 flex items-center gap-3 lg:hidden">
+        <div class="flex size-11 items-center justify-center rounded-full bg-[var(--ecsr-orange)] text-[#152033]">
+          <i class="ph ph-graduation-cap text-[22px]" aria-hidden="true"></i>
         </div>
-        <p class="mt-3 text-center text-[18px] text-[var(--ecsr-muted)]">
-          {{ "auth.subtitle" | t }}
-        </p>
+        <div class="text-[22px] font-extrabold text-[var(--ecsr-blue-950)]">
+          Pedagora <span class="text-[var(--ecsr-orange)]">Pilot</span>
+        </div>
       </div>
 
-      @if (!isRegister()) {
-        <form
-          class="mx-auto mt-8 max-w-[520px] rounded-[18px] bg-white px-7 pb-8 pt-8 shadow-[0_18px_42px_rgba(24,38,65,0.12)] sm:px-10"
-          [formGroup]="loginForm"
-          (ngSubmit)="submitLogin()"
-          novalidate
-        >
-          <h2 class="text-center text-[22px] font-bold text-[#0a0f20]">
-            {{ "auth.welcome" | t }}
-          </h2>
-          <p class="mt-7 text-center text-[16px] text-[var(--ecsr-muted)]">
-            {{ "auth.demoHelp" | t }}
-          </p>
+      @if (message()) {
+        <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          {{ message() }}
+        </div>
+      }
+      @if (error()) {
+        <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ error() }}
+        </div>
+      }
 
-          <div class="mt-9">
-            <label
-              class="mb-2 block text-[17px] font-semibold"
-              for="login-email"
-              >{{ "auth.email" | t }}</label
-            >
-            <div class="relative">
-              <i
-                class="ph ph-envelope-simple absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                aria-hidden="true"
-              ></i>
-              <input
-                id="login-email"
-                type="email"
-                autocomplete="email"
-                formControlName="email"
-                [placeholder]="'auth.emailPlaceholder' | t"
-                class="h-[54px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] text-[#20283a] outline-none transition focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-            @if (submitted() && loginForm.controls.email.invalid) {
-              <p class="mt-2 text-sm text-red-600">
-                {{ "auth.errors.emailRequired" | t }}
-              </p>
-            }
-          </div>
-
-          <button
-            type="submit"
-            class="mt-5 flex h-[59px] w-full items-center justify-center rounded-[8px] bg-[var(--ecsr-orange-strong)] text-[18px] font-bold text-white shadow-[0_5px_10px_rgba(255,101,0,0.2)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
-          >
-            {{ "auth.continue" | t }}
-          </button>
-
-          <div class="my-9 flex items-center gap-4 text-[15px] text-[#929aab]">
-            <span class="h-px flex-1 bg-[#d8dce4]"></span>
-            <span>{{ "auth.or" | t }}</span>
-            <span class="h-px flex-1 bg-[#d8dce4]"></span>
-          </div>
-
-          <p class="text-center text-[15px] text-[var(--ecsr-muted)]">
-            {{ "auth.noAccount" | t }}
-          </p>
-          <button
-            type="button"
-            (click)="openRegister()"
-            class="mt-3 flex h-[59px] w-full items-center justify-center rounded-[7px] bg-[var(--ecsr-action-blue)] text-[18px] font-bold text-white transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-          >
-            {{ "auth.createAccount" | t }}
-          </button>
-        </form>
-
-        <p class="mt-9 text-center text-[15px] text-[#9aa3b3]">
-          {{ "auth.demoEnabled" | t }}
+      @if (demoLoginEnabled) {
+        <h1 class="text-[31px] font-extrabold tracking-[-0.7px] text-[#102847]">
+          {{ "auth.demoTitle" | t }}
+        </h1>
+        <p class="mt-2 text-[16px] leading-6 text-[#6a788b]">
+          {{ "auth.demoSubtitle" | t }}
         </p>
-      } @else {
+
+        <div class="mt-7 grid grid-cols-2 gap-3">
+          @for (profile of demoProfiles; track profile.role) {
+            <button
+              type="button"
+              (click)="selectDemoProfile(profile)"
+              class="rounded-xl border px-4 py-3 text-left transition"
+              [class.border-[#2d67a6]]="selectedDemoRole() === profile.role"
+              [class.bg-[#edf5ff]]="selectedDemoRole() === profile.role"
+              [class.border-[#d9e0e9]]="selectedDemoRole() !== profile.role"
+              [class.bg-white]="selectedDemoRole() !== profile.role"
+            >
+              <span class="block text-[15px] font-bold text-[#243850]">
+                {{ profile.titleKey | t }}
+              </span>
+              <span class="mt-1 block text-[12px] leading-4 text-[#7b8797]">
+                {{ profile.descriptionKey | t }}
+              </span>
+            </button>
+          }
+        </div>
+
         <form
-          class="mx-auto mt-8 max-w-[560px] rounded-[18px] bg-white px-7 pb-8 pt-8 shadow-[0_18px_42px_rgba(24,38,65,0.12)] sm:px-10"
-          [formGroup]="registerForm"
-          (ngSubmit)="submitRegister()"
-          novalidate
+          class="mt-7 space-y-5"
+          [formGroup]="demoLoginForm"
+          (ngSubmit)="submitDemoLogin()"
         >
-          <h2 class="text-center text-[22px] font-bold text-[#0a0f20]">
-            {{ "auth.welcome" | t }}
-          </h2>
-          <p class="mt-7 text-center text-[16px] text-[var(--ecsr-muted)]">
-            {{ "auth.demoHelp" | t }}
-          </p>
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-[#263b55]">
+              {{ "auth.email" | t }}
+            </label>
+            <input
+              formControlName="email"
+              type="email"
+              autocomplete="username"
+              class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
 
-          <div class="mt-9 space-y-[18px]">
-            <div>
-              <label
-                class="mb-2 block text-[17px] font-semibold"
-                for="organisation"
-                >{{ "auth.organisation" | t }}</label
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-[#263b55]">
+              {{ "auth.password" | t }}
+            </label>
+            <div class="relative">
+              <input
+                formControlName="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                autocomplete="current-password"
+                class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 pr-12 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
+              />
+              <button
+                type="button"
+                (click)="togglePassword()"
+                class="absolute inset-y-0 right-0 px-4 text-[#6a788b]"
+                [attr.aria-label]="'auth.togglePassword' | t"
               >
-              <div class="relative">
-                <i
-                  class="ph ph-buildings absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                  aria-hidden="true"
-                ></i>
-                <input
-                  id="organisation"
-                  formControlName="organisation"
-                  [placeholder]="'auth.organisationPlaceholder' | t"
-                  class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label
-                  class="mb-2 block text-[17px] font-semibold"
-                  for="first-name"
-                  >{{ "auth.firstName" | t }}</label
-                >
-                <div class="relative">
-                  <i
-                    class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                    aria-hidden="true"
-                  ></i>
-                  <input
-                    id="first-name"
-                    autocomplete="given-name"
-                    formControlName="firstName"
-                    [placeholder]="'auth.firstNamePlaceholder' | t"
-                    class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  class="mb-2 block text-[17px] font-semibold"
-                  for="last-name"
-                  >{{ "auth.lastName" | t }}</label
-                >
-                <div class="relative">
-                  <i
-                    class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                    aria-hidden="true"
-                  ></i>
-                  <input
-                    id="last-name"
-                    autocomplete="family-name"
-                    formControlName="lastName"
-                    [placeholder]="'auth.lastNamePlaceholder' | t"
-                    class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label class="mb-2 block text-[17px] font-semibold" for="phone">{{
-                "auth.phone" | t
-              }}</label>
-              <div class="relative">
-                <i
-                  class="ph ph-phone absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                  aria-hidden="true"
-                ></i>
-                <input
-                  id="phone"
-                  type="tel"
-                  autocomplete="tel"
-                  formControlName="phone"
-                  [placeholder]="'auth.phonePlaceholder' | t"
-                  class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                class="mb-2 block text-[17px] font-semibold"
-                for="register-email"
-                >{{ "auth.email" | t }}</label
-              >
-              <div class="relative">
-                <i
-                  class="ph ph-envelope-simple absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                  aria-hidden="true"
-                ></i>
-                <input
-                  id="register-email"
-                  type="email"
-                  autocomplete="email"
-                  formControlName="email"
-                  [placeholder]="'auth.emailPlaceholder' | t"
-                  class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-4 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                class="mb-2 block text-[17px] font-semibold"
-                for="password"
-                >{{ "auth.password" | t }}</label
-              >
-              <div class="relative">
-                <i
-                  class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                  aria-hidden="true"
-                ></i>
-                <input
-                  id="password"
-                  [type]="showPassword() ? 'text' : 'password'"
-                  autocomplete="new-password"
-                  formControlName="password"
-                  class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-12 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                />
-                <button
-                  type="button"
-                  (click)="togglePassword()"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-[#8e98aa]"
-                  [attr.aria-label]="
-                    showPassword()
-                      ? 'Masquer le mot de passe'
-                      : 'Afficher le mot de passe'
-                  "
-                >
-                  <i
-                    [class]="
-                      showPassword()
-                        ? 'ph ph-eye-slash text-[19px]'
-                        : 'ph ph-eye text-[19px]'
-                    "
-                    aria-hidden="true"
-                  ></i>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label
-                class="mb-2 block text-[17px] font-semibold"
-                for="confirm-password"
-                >{{ "auth.confirmPassword" | t }}</label
-              >
-              <div class="relative">
-                <i
-                  class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#a7afbd]"
-                  aria-hidden="true"
-                ></i>
-                <input
-                  id="confirm-password"
-                  [type]="showConfirmPassword() ? 'text' : 'password'"
-                  autocomplete="new-password"
-                  formControlName="confirmPassword"
-                  class="h-[51px] w-full rounded-[9px] border border-[var(--ecsr-border)] bg-white pl-12 pr-12 text-[17px] outline-none focus:border-[var(--ecsr-blue-700)] focus:ring-2 focus:ring-blue-100"
-                />
-                <button
-                  type="button"
-                  (click)="toggleConfirmPassword()"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-[#8e98aa]"
-                  [attr.aria-label]="
-                    showConfirmPassword()
-                      ? 'Masquer le mot de passe'
-                      : 'Afficher le mot de passe'
-                  "
-                >
-                  <i
-                    [class]="
-                      showConfirmPassword()
-                        ? 'ph ph-eye-slash text-[19px]'
-                        : 'ph ph-eye text-[19px]'
-                    "
-                    aria-hidden="true"
-                  ></i>
-                </button>
-              </div>
-              @if (passwordMismatch()) {
-                <p class="mt-2 text-sm text-red-600">
-                  {{ "auth.errors.passwordMismatch" | t }}
-                </p>
-              }
+                <i [class]="showPassword() ? 'ph ph-eye-slash' : 'ph ph-eye'"></i>
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
-            class="mt-5 flex h-[51px] w-full items-center justify-center rounded-[8px] bg-[var(--ecsr-orange-strong)] text-[18px] font-bold text-white shadow-[0_5px_10px_rgba(255,101,0,0.18)] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+            [disabled]="loading()"
+            class="flex h-[56px] w-full items-center justify-center rounded-lg bg-[#2d67a6] text-[17px] font-bold text-white disabled:opacity-60"
           >
-            {{ "auth.createAccount" | t }}
-          </button>
-
-          <p class="mt-8 text-center text-[15px] text-[var(--ecsr-muted)]">
-            {{ "auth.alreadyAccount" | t }}
-          </p>
-          <button
-            type="button"
-            (click)="openLogin()"
-            class="mt-3 flex h-[51px] w-full items-center justify-center rounded-[7px] bg-[var(--ecsr-action-blue)] text-[18px] font-bold text-white transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-          >
+            @if (loading()) {
+              <i class="ph ph-circle-notch mr-2 animate-spin"></i>
+            }
             {{ "auth.signIn" | t }}
           </button>
         </form>
+
+        <div class="my-8 flex items-center gap-4 text-sm text-[#929aab]">
+          <span class="h-px flex-1 bg-[#d8dce4]"></span>
+          <span>{{ "auth.or" | t }}</span>
+          <span class="h-px flex-1 bg-[#d8dce4]"></span>
+        </div>
+
+        <p class="text-center text-sm text-[var(--ecsr-muted)]">
+          {{ "auth.noAccount" | t }}
+        </p>
+        <button
+          type="button"
+          (click)="simulateDemoRegister()"
+          class="mt-3 h-[50px] w-full rounded-lg border border-[#cbd5e1] bg-white font-semibold text-[#245d9b]"
+        >
+          {{ "auth.createAccount" | t }}
+        </button>
+
+        <p class="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-[12px] leading-5 text-[#49627d]">
+          <i class="ph ph-info mr-1"></i>
+          {{ "auth.demoCredentialsEditable" | t }}
+        </p>
+      } @else {
+        @if (!isRegister()) {
+        <h1 class="text-[31px] font-extrabold tracking-[-0.7px] text-[#102847]">
+          {{ "auth.welcome" | t }}
+        </h1>
+        <p class="mt-2 text-[16px] text-[#6a788b]">
+          {{ "auth.subtitle" | t }}
+        </p>
+
+        <form class="mt-8 space-y-5" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-[#263b55]">
+              {{ "auth.email" | t }}
+            </label>
+            <input
+              formControlName="email"
+              type="email"
+              [readOnly]="loginStep() === 'password'"
+              class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
+              [placeholder]="'auth.emailPlaceholder' | t"
+            />
+            @if (loginStep() === "password") {
+              <button type="button" (click)="changeLoginEmail()" class="mt-2 text-sm font-semibold text-[#245d9b]">
+                {{ "auth.changeEmail" | t }}
+              </button>
+            }
+          </div>
+
+          @if (loginStep() === "password") {
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-[#263b55]">
+                {{ "auth.password" | t }}
+              </label>
+              <div class="relative">
+                <input
+                  formControlName="password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 pr-12 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
+                />
+                <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 px-4 text-[#6a788b]">
+                  <i [class]="showPassword() ? 'ph ph-eye-slash' : 'ph ph-eye'"></i>
+                </button>
+              </div>
+            </div>
+
+            <label class="flex items-center gap-2 text-sm text-[#58687a]">
+              <input type="checkbox" formControlName="rememberMe" />
+              {{ "auth.rememberMe" | t }}
+            </label>
+          }
+
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="flex h-[56px] w-full items-center justify-center rounded-lg bg-[var(--ecsr-orange-strong)] text-[17px] font-bold text-white disabled:opacity-60"
+          >
+            @if (loading()) {
+              <i class="ph ph-circle-notch mr-2 animate-spin"></i>
+            }
+            {{ loginStep() === "email" ? ("auth.continue" | t) : ("auth.signIn" | t) }}
+          </button>
+        </form>
+
+        <div class="my-8 flex items-center gap-4 text-sm text-[#929aab]">
+          <span class="h-px flex-1 bg-[#d8dce4]"></span>
+          <span>{{ "auth.or" | t }}</span>
+          <span class="h-px flex-1 bg-[#d8dce4]"></span>
+        </div>
+
+        <p class="text-center text-sm text-[var(--ecsr-muted)]">
+          {{ "auth.noAccount" | t }}
+        </p>
+        <button type="button" (click)="openRegister()" class="mt-3 h-[50px] w-full rounded-lg border border-[#cbd5e1] bg-white font-semibold text-[#245d9b]">
+          {{ "auth.createAccount" | t }}
+        </button>
+      } @else {
+        <h1 class="text-[31px] font-extrabold tracking-[-0.7px] text-[#102847]">
+          {{ "auth.registerTitle" | t }}
+        </h1>
+        <p class="mt-2 text-[16px] text-[#6a788b]">
+          {{ "auth.registerSubtitle" | t }}
+        </p>
+
+        <form class="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+          <div class="sm:col-span-2">
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.organisation" | t }}</label>
+            <input formControlName="organisation" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" [placeholder]="'auth.organisationPlaceholder' | t" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.firstName" | t }}</label>
+            <input formControlName="firstName" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.lastName" | t }}</label>
+            <input formControlName="lastName" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.phone" | t }}</label>
+            <input formControlName="phone" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" [placeholder]="'auth.phonePlaceholder' | t" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.email" | t }}</label>
+            <input formControlName="email" type="email" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.password" | t }}</label>
+            <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" />
+          </div>
+          <div>
+            <label class="mb-2 block text-sm font-semibold">{{ "auth.confirmPassword" | t }}</label>
+            <input formControlName="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4" />
+          </div>
+
+          @if (passwordMismatch()) {
+            <p class="sm:col-span-2 text-sm text-red-600">{{ "auth.errors.passwordMismatch" | t }}</p>
+          }
+
+          <button type="submit" [disabled]="loading()" class="sm:col-span-2 mt-2 flex h-[56px] items-center justify-center rounded-lg bg-[var(--ecsr-orange-strong)] font-bold text-white disabled:opacity-60">
+            @if (loading()) {
+              <i class="ph ph-circle-notch mr-2 animate-spin"></i>
+            }
+            {{ "auth.createAccount" | t }}
+          </button>
+        </form>
+
+        <p class="mt-7 text-center text-sm text-[var(--ecsr-muted)]">
+          {{ "auth.alreadyAccount" | t }}
+          <button type="button" (click)="openLogin()" class="font-semibold text-[#245d9b]">
+            {{ "auth.signIn" | t }}
+          </button>
+        </p>
       }
+
+        }
+      
     </div>
   </section>
 </main>

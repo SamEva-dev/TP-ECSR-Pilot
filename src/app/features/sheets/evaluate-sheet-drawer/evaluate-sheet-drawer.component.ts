@@ -10,12 +10,8 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
-import {
-  EVALUATION_CRITERIA,
-  EVALUATORS,
-  sheetsFor,
-  type EvaluationLevel,
-} from "../../../core/mock-data/sheets.mock";
+import { EVALUATION_CRITERIA, EVALUATORS, sheetsFor } from "../../../core/api-data/runtime-data.store";
+import type { EvaluationLevel } from "../../../core/models/sheets.models";
 
 export type FinalEvaluationDecision = "validated" | "rework";
 
@@ -74,7 +70,7 @@ export class EvaluateSheetDrawerComponent implements OnInit {
       this.students[0],
   );
 
-  readonly sheets = computed(() => sheetsFor(this.selectedStudent()));
+  readonly sheets = computed(() => sheetsFor(this.selectedStudent().id));
 
   readonly acquiredCount = computed(
     () =>

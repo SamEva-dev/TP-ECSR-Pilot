@@ -1,14 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { AccessAccount } from "../../../core/mock-data/access.mock";
-import {
-  ORGANIZATIONS,
-  PROGRAM_OFFERINGS,
-  TRAINING_PROGRAMS,
-  TRAINING_SITES,
-  WORKSPACE_COHORTS,
-} from "../../../core/mock-data/workspace.mock";
+import type { AccessAccount } from "../../../core/models/access.models";
+import { ORGANIZATIONS, PROGRAM_OFFERINGS, TRAINING_PROGRAMS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
 import type { MembershipRole, MembershipScope, WorkspaceMembership } from "../../../core/models/workspace.models";
 
 @Component({
@@ -28,11 +22,11 @@ export class AccessAssignmentDrawerComponent {
 
   role: MembershipRole = "trainer";
   scope: MembershipScope = "program";
-  organizationId = "org-aftral";
-  siteId = "site-aftral-nice";
-  programId = "program-ecsr";
-  cohortId = "p1";
-  examSessionId = "exam-2027-02";
+  organizationId = ORGANIZATIONS[0]?.id ?? "";
+  siteId = TRAINING_SITES[0]?.id ?? "";
+  programId = TRAINING_PROGRAMS[0]?.id ?? "";
+  cohortId = WORKSPACE_COHORTS[0]?.id ?? "";
+  examSessionId = "";
   readonly showCreate = signal(false);
 
   sites() {

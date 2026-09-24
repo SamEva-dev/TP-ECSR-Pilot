@@ -1,43 +1,14 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
+import { ProgramCatalogApiService, type ProgramApiDto } from "../catalog/program-catalog-api.service";
+import { WorkspaceContextService } from "../workspace/workspace-context.service";
 import { PROGRAM_CATALOG, type ProgramCatalogItem, type ProgramFormValue } from "./programs.mock";
-
-@Injectable({ providedIn: "root" })
-export class ProgramMockStoreService {
-  private readonly programsSignal = signal<ProgramCatalogItem[]>(structuredClone(PROGRAM_CATALOG));
-  readonly programs = this.programsSignal.asReadonly();
-
-  create(value: ProgramFormValue): ProgramCatalogItem {
-    const id = `program-demo-${Date.now()}`;
-    const item: ProgramCatalogItem = {
-      id,
-      ...value,
-      icon: this.iconFor(value.category),
-      siteIds: [],
-      students: 0,
-      trainers: 0,
-      activeCohorts: 0,
-      successRate: null,
-    };
-    this.programsSignal.update((items) => [...items, item]);
-    return item;
-  }
-
-  update(id: string, value: ProgramFormValue): void {
-    this.programsSignal.update((items) => items.map((item) => item.id === id ? { ...item, ...value, icon: this.iconFor(value.category) } : item));
-  }
-
-  toggleSite(programId: string, siteId: string): void {
-    this.programsSignal.update((items) => items.map((item) => {
-      if (item.id !== programId) return item;
-      const enabled = item.siteIds.includes(siteId);
-      return { ...item, siteIds: enabled ? item.siteIds.filter((id) => id !== siteId) : [...item.siteIds, siteId] };
-    }));
-  }
-
-  private iconFor(category: ProgramFormValue["category"]): string {
-    if (category === "motorcycle") return "ph-motorcycle";
-    if (category === "heavy-vehicle") return "ph-truck";
-    if (category === "passenger-transport") return "ph-bus";
-    return "ph-steering-wheel";
-  }
+@Injectable({providedIn:"root"}) export class ProgramMockStoreService {
+ private readonly api=inject(ProgramCatalogApiService); private readonly workspace=inject(WorkspaceContextService); private readonly programsSignal=signal<ProgramCatalogItem[]>(structuredClone(PROGRAM_CATALOG)); readonly programs=this.programsSignal.asReadonly(); readonly remoteLoaded=signal(false);
+ constructor(){void this.reload();}
+ async reload():Promise<void>{try{const rows=await this.api.list();this.programsSignal.set(rows.map(x=>this.map(x)));this.remoteLoaded.set(true);}catch{this.remoteLoaded.set(false);}}
+ create(value:ProgramFormValue):void{const optimistic:ProgramCatalogItem={id:`program-demo-${Date.now()}`,...value,icon:this.iconFor(value.category),siteIds:[],students:0,trainers:0,activeCohorts:0,successRate:null};this.programsSignal.update(x=>[...x,optimistic]);void this.api.create({familyCode:this.familyFor(value.category),code:value.code,name:value.name,descriptionKey:value.description,icon:optimistic.icon,durationHours:value.durationHours,status:value.status,enabledModules:value.enabledModules,externalKey:optimistic.id}).then(()=>this.reload()).catch(()=>{});}
+ update(id:string,value:ProgramFormValue):void{const current=this.programsSignal().find(x=>x.id===id);this.programsSignal.update(items=>items.map(x=>x.id===id?{...x,...value,icon:this.iconFor(value.category)}:x));if(!current?.apiId)return;void this.api.update(current.apiId,{familyCode:this.familyFor(value.category),name:value.name,descriptionKey:value.description,icon:this.iconFor(value.category),durationHours:value.durationHours,status:value.status,enabledModules:value.enabledModules}).then(()=>this.reload()).catch(()=>{});}
+ toggleSite(programId:string,siteId:string):void{const p=this.programsSignal().find(x=>x.id===programId);if(!p)return;const enabled=p.siteIds.includes(siteId);this.programsSignal.update(items=>items.map(x=>x.id===programId?{...x,siteIds:enabled?x.siteIds.filter(s=>s!==siteId):[...x.siteIds,siteId]}:x));const siteApiId=this.workspace.sites().find(x=>x.id===siteId)?.apiId;if(p.apiId&&siteApiId)void this.api.setOffering(p.apiId,siteApiId,!enabled).then(()=>this.reload()).catch(()=>{});}
+ private map(x:ProgramApiDto):ProgramCatalogItem{return {id:x.key,apiId:x.id,code:x.code,name:x.name,category:x.category,icon:x.icon,description:x.descriptionKey,referenceVersion:x.referenceVersion??"—",durationHours:x.durationHours,enabledModules:x.enabledModules as any,siteIds:x.siteKeys,status:x.status,students:0,trainers:0,activeCohorts:0,successRate:null};}
+ private familyFor(category:string):string{if(category==="motorcycle")return "MOTORCYCLE";if(category==="heavy-vehicle")return "HEAVY_VEHICLE";if(category==="passenger-transport")return "PASSENGER_TRANSPORT";return "ROAD_EDUCATION";} private iconFor(category:string):string{if(category==="motorcycle")return "ph-motorcycle";if(category==="heavy-vehicle")return "ph-truck";if(category==="passenger-transport")return "ph-bus";return "ph-steering-wheel";}
 }

@@ -12,7 +12,7 @@ import { SessionService } from "../../../core/session/session.service";
 import type {
   CertificationCandidate,
   CertificationUnitStatus,
-} from "../../../core/mock-data/certification.mock";
+} from "../../../core/models/certification.models";
 import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
 

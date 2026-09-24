@@ -1,10 +1,11 @@
 import type { ProgramModule } from "../models/workspace.models";
 
 export type ProgramCatalogStatus = "active" | "draft" | "inactive";
-export type ProgramCatalogCategory = "teacher" | "motorcycle" | "heavy-vehicle" | "passenger-transport";
+export type ProgramCatalogCategory = string;
 
 export interface ProgramCatalogItem {
   id: string;
+  apiId?: string;
   code: string;
   name: string;
   category: ProgramCatalogCategory;

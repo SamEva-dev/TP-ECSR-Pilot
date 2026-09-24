@@ -1,109 +1,70 @@
 import { Injectable, computed, signal } from "@angular/core";
 import type { DemoSession, UserRole } from "../models/app.models";
+
 const STORAGE_KEY = "tp-ecsr-pilot.session";
 const LEGACY_KEY = "tp-ecsr-pilot.demo-session";
-const DEMO: Record<UserRole, DemoSession> = {
-  direction: {
-    role: "direction",
-    firstName: "Claire",
-    lastName: "Berthier",
-    promotionId: "p1",
-    email: "claire@demo.tpecsrpilot.fr",
-  },
-  formateur: {
-    role: "formateur",
-    firstName: "Marc",
-    lastName: "Dupont",
-    promotionId: "p1",
-    email: "marc@demo.tpecsrpilot.fr",
-    trainerId: "f1",
-  },
-  stagiaire: {
-    role: "stagiaire",
-    firstName: "Sam",
-    lastName: "Fokam",
-    promotionId: "p1",
-    email: "sam@demo.tpecsrpilot.fr",
-    studentId: "s1",
-  },
-  secretariat: {
-    role: "secretariat",
-    firstName: "Nadia",
-    lastName: "Lambert",
-    promotionId: "p1",
-    email: "nadia@demo.tpecsrpilot.fr",
-  },
-  jury: {
-    role: "jury",
-    firstName: "Jean",
-    lastName: "Martin",
-    promotionId: "p1",
-    email: "jury@demo.tpecsrpilot.fr",
-    juryId: "j1",
-  },
+
+
+type JwtPayload = Record<string, unknown> & {
+  sub?: string;
+  email?: string;
+  given_name?: string;
+  family_name?: string;
+  org_id?: string;
+  organization_id?: string;
+  roles?: string | string[];
+  role?: string | string[];
+  permissions?: string | string[];
+  permission?: string | string[];
 };
+
 @Injectable({ providedIn: "root" })
 export class SessionService {
   private readonly sessionSignal = signal<DemoSession | null>(this.restore());
   private readonly promotionSignal = signal(
-    this.sessionSignal()?.promotionId ?? "p1",
+    this.sessionSignal()?.promotionId ?? "",
   );
+
   readonly session = this.sessionSignal.asReadonly();
   readonly promotionId = this.promotionSignal.asReadonly();
   readonly isConnected = computed(() => this.sessionSignal() !== null);
   readonly role = computed<UserRole>(
     () => this.sessionSignal()?.role ?? "direction",
   );
-  connectFromEmail(email: string): void {
-    const e = email.trim().toLowerCase();
-    let role: UserRole = "direction";
-    if (e.includes("marc") || e.includes("formateur") || e.includes("trainer"))
-      role = "formateur";
-    else if (
-      e.includes("sam") ||
-      e.includes("stagiaire") ||
-      e.includes("student")
-    )
-      role = "stagiaire";
-    else if (
-      e.includes("nadia") ||
-      e.includes("secretariat") ||
-      e.includes("secretaire")
-    )
-      role = "secretariat";
-    else if (e.includes("jury") || e.includes("juré") || e.includes("jure"))
-      role = "jury";
-    if (role === "jury") {
-      if (e.includes("moto")) {
-        this.connect({ ...DEMO.jury, firstName: "Nicolas", lastName: "Mercier", promotionId: "cohort-nice-moto-2027-03", email, juryId: "j3" });
-        return;
-      }
-      if (e.includes("pl") || e.includes("poids")) {
-        this.connect({ ...DEMO.jury, firstName: "Patrick", lastName: "Roux", promotionId: "cohort-nice-pl-2027-01", email, juryId: "j5" });
-        return;
-      }
-      if (e.includes("bus")) {
-        this.connect({ ...DEMO.jury, firstName: "Laurent", lastName: "Petit", promotionId: "cohort-nice-bus-2027-02", email, juryId: "j7" });
-        return;
-      }
-    }
-    this.connect({ ...DEMO[role], email });
+
+  connectAuthenticatedToken(accessToken: string): void {
+    const payload = this.decodeJwt(accessToken);
+    const roles = this.readClaimValues(payload.roles, payload.role);
+    const permissions = this.readClaimValues(
+      payload.permissions,
+      payload.permission,
+    );
+
+    const session: DemoSession = {
+      authMode: "authgate",
+      userId: typeof payload.sub === "string" ? payload.sub : undefined,
+      organizationId:
+        typeof payload.org_id === "string"
+          ? payload.org_id
+          : typeof payload.organization_id === "string"
+            ? payload.organization_id
+            : undefined,
+      email: typeof payload.email === "string" ? payload.email : "",
+      firstName:
+        typeof payload.given_name === "string" ? payload.given_name : "",
+      lastName:
+        typeof payload.family_name === "string" ? payload.family_name : "",
+      role: this.mapRole(roles),
+      roles,
+      permissions,
+      // The real cohort is selected from /api/v1/me/workspace after login.
+      promotionId: "",
+    };
+
+    this.connect(session);
   }
-  connectRegistration(v: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    organisation: string;
-  }): void {
-    this.connect({
-      role: "direction",
-      firstName: v.firstName,
-      lastName: v.lastName,
-      promotionId: "p1",
-      email: v.email,
-      organisation: v.organisation,
-    });
-  }
+
+
   setPromotion(id: string): void {
     this.promotionSignal.set(id);
     const s = this.sessionSignal();
@@ -113,23 +74,32 @@ export class SessionService {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(n));
     }
   }
+
   disconnect(): void {
     this.sessionSignal.set(null);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(LEGACY_KEY);
   }
+
   initials(): string {
     const s = this.sessionSignal();
-    return s ? `${s.firstName[0]}${s.lastName[0]}`.toUpperCase() : "--";
+    if (!s) return "--";
+
+    const first = s.firstName?.[0] ?? "";
+    const last = s.lastName?.[0] ?? "";
+    return `${first}${last}`.toUpperCase() || s.email.slice(0, 2).toUpperCase();
   }
+
   private connect(s: DemoSession): void {
     this.sessionSignal.set(s);
     this.promotionSignal.set(s.promotionId);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     localStorage.removeItem(LEGACY_KEY);
   }
+
   private restore(): DemoSession | null {
     if (typeof localStorage === "undefined") return null;
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
@@ -138,21 +108,84 @@ export class SessionService {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-    const old = localStorage.getItem(LEGACY_KEY);
-    if (old) {
-      try {
-        const e = (
-          (JSON.parse(old) as { email?: string }).email ?? ""
-        ).toLowerCase();
-        if (e.includes("marc")) return DEMO.formateur;
-        if (e.includes("sam")) return DEMO.stagiaire;
-        if (e.includes("nadia")) return DEMO.secretariat;
-        if (e.includes("jury") || e.includes("jure")) return DEMO.jury;
-        return DEMO.direction;
-      } catch {
-        localStorage.removeItem(LEGACY_KEY);
-      }
-    }
+
     return null;
+  }
+
+  private decodeJwt(token: string): JwtPayload {
+    try {
+      const part = token.split(".")[1];
+      if (!part) return {};
+      const normalized = part.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = normalized.padEnd(
+        normalized.length + ((4 - (normalized.length % 4)) % 4),
+        "=",
+      );
+      const json = decodeURIComponent(
+        atob(padded)
+          .split("")
+          .map((c) => `%${c.charCodeAt(0).toString(16).padStart(2, "0")}`)
+          .join(""),
+      );
+      return JSON.parse(json) as JwtPayload;
+    } catch {
+      return {};
+    }
+  }
+
+  private readClaimValues(...values: unknown[]): string[] {
+    const result = new Set<string>();
+
+    for (const value of values) {
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (typeof item === "string" && item.trim()) result.add(item.trim());
+        });
+        continue;
+      }
+
+      if (typeof value !== "string" || !value.trim()) continue;
+
+      const raw = value.trim();
+      if (raw.startsWith("[")) {
+        try {
+          const parsed = JSON.parse(raw) as unknown;
+          if (Array.isArray(parsed)) {
+            parsed.forEach((item) => {
+              if (typeof item === "string" && item.trim()) result.add(item.trim());
+            });
+            continue;
+          }
+        } catch {
+          // Fall through to scalar parsing.
+        }
+      }
+
+      raw
+        .split(/[ ,]+/)
+        .filter(Boolean)
+        .forEach((item) => result.add(item));
+    }
+
+    return [...result];
+  }
+
+  private mapRole(roles: string[]): UserRole {
+    const normalized = roles.map((role) => role.toLowerCase());
+
+    if (normalized.some((role) => role.includes("jury"))) return "jury";
+    if (normalized.some((role) => role.includes("student"))) return "stagiaire";
+    if (normalized.some((role) => role.includes("secretariat"))) return "secretariat";
+    if (
+      normalized.some(
+        (role) =>
+          role.includes("trainer") ||
+          role.includes("pedagogicalmanager"),
+      )
+    ) {
+      return "formateur";
+    }
+
+    return "direction";
   }
 }

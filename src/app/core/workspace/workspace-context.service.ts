@@ -1,13 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from "@angular/core";
+import { WorkspaceApiService } from "./workspace-api.service";
 import { SessionService } from "../session/session.service";
-import {
-  ORGANIZATIONS,
-  PROGRAM_OFFERINGS,
-  TRAINING_PROGRAMS,
-  TRAINING_SITES,
-  WORKSPACE_COHORTS,
-  workspaceAccessFor,
-} from "../mock-data/workspace.mock";
+import { RuntimeDataLoaderService } from "../api-data/runtime-data-loader.service";
 import type {
   ProgramOffering,
   WorkspaceAccessRule,
@@ -19,57 +13,65 @@ const STORAGE_PREFIX = "tp-ecsr-pilot.workspace-context";
 @Injectable({ providedIn: "root" })
 export class WorkspaceContextService {
   private readonly sessionService = inject(SessionService);
+  private readonly workspaceApi = inject(WorkspaceApiService);
+  private readonly runtimeData = inject(RuntimeDataLoaderService);
+  private readonly organizationsSignal = signal<any[]>([]);
+  private readonly sitesSignal = signal<any[]>([]);
+  private readonly programsSignal = signal<any[]>([]);
+  private readonly offeringsSignal = signal<any[]>([]);
+  private readonly cohortsSignal = signal<any[]>([]);
+  readonly remoteWorkspaceLoaded = signal(false);
   private readonly selectionSignal = signal<WorkspaceSelection>({
-    organizationId: "org-aftral",
-    siteId: "site-aftral-nice",
-    programId: "program-ecsr",
-    cohortId: "p1",
+    organizationId: "",
+    siteId: "",
+    programId: "",
+    cohortId: "",
   });
   private sessionKey = "";
 
   readonly selection = this.selectionSignal.asReadonly();
-  readonly access = computed(() => workspaceAccessFor(this.sessionService.session()));
-  readonly isLocked = computed(() => this.access().locked === true);
+  readonly access = computed<WorkspaceAccessRule>(() => ({ scope: "platform" as const, locked: false }));
+  readonly isLocked = computed(() => false);
 
   readonly organizations = computed(() =>
-    ORGANIZATIONS.filter((organization) => this.canAccessOrganization(organization.id)),
+    this.organizationsSignal().filter((organization) => this.canAccessOrganization(organization.id)),
   );
 
   readonly sites = computed(() => {
     const organizationId = this.selectionSignal().organizationId;
-    return TRAINING_SITES.filter(
+    return this.sitesSignal().filter(
       (site) => site.organizationId === organizationId && this.canAccessSite(site.id),
     );
   });
 
   readonly programs = computed(() => {
     const siteId = this.selectionSignal().siteId;
-    const programIds = PROGRAM_OFFERINGS.filter(
+    const programIds = this.offeringsSignal().filter(
       (offering) => offering.siteId === siteId && offering.active && this.canAccessOffering(offering),
     ).map((offering) => offering.programId);
-    return TRAINING_PROGRAMS.filter((program) => programIds.includes(program.id));
+    return this.programsSignal().filter((program) => programIds.includes(program.id));
   });
 
   readonly cohorts = computed(() => {
     const selection = this.selectionSignal();
     const offering = this.findOffering(selection.siteId, selection.programId);
     if (!offering) return [];
-    return WORKSPACE_COHORTS.filter(
+    return this.cohortsSignal().filter(
       (cohort) => cohort.offeringId === offering.id && this.canAccessCohort(cohort.id),
     );
   });
 
   readonly organization = computed(
-    () => ORGANIZATIONS.find((item) => item.id === this.selectionSignal().organizationId) ?? null,
+    () => this.organizationsSignal().find((item) => item.id === this.selectionSignal().organizationId) ?? null,
   );
   readonly site = computed(
-    () => TRAINING_SITES.find((item) => item.id === this.selectionSignal().siteId) ?? null,
+    () => this.sitesSignal().find((item) => item.id === this.selectionSignal().siteId) ?? null,
   );
   readonly program = computed(
-    () => TRAINING_PROGRAMS.find((item) => item.id === this.selectionSignal().programId) ?? null,
+    () => this.programsSignal().find((item) => item.id === this.selectionSignal().programId) ?? null,
   );
   readonly cohort = computed(
-    () => WORKSPACE_COHORTS.find((item) => item.id === this.selectionSignal().cohortId) ?? null,
+    () => this.cohortsSignal().find((item) => item.id === this.selectionSignal().cohortId) ?? null,
   );
 
   readonly secondaryLabel = computed(() => {
@@ -95,6 +97,8 @@ export class WorkspaceContextService {
     );
   });
 
+  async reload(): Promise<void> { await this.loadRemoteWorkspace(this.sessionKey || "current"); }
+
   constructor() {
     effect(() => {
       const session = this.sessionService.session();
@@ -102,21 +106,87 @@ export class WorkspaceContextService {
       if (key === this.sessionKey) return;
       this.sessionKey = key;
       this.selectionSignal.set(this.resolveInitialSelection(key));
+      if (session) void this.loadRemoteWorkspace(key);
     });
+  }
+
+  private async loadRemoteWorkspace(key: string): Promise<void> {
+    try {
+      const dto = await this.workspaceApi.load();
+      const organizations = dto.organizations.map((item) => ({
+        id: item.key, apiId: item.id, code: item.code, name: item.name, shortName: item.shortName,
+        city: item.city, active: item.active, primaryColor: item.primaryColor, secondaryColor: item.secondaryColor,
+      }));
+      const orgApiToKey = new Map(dto.organizations.map((item) => [item.id, item.key]));
+      const sites = dto.sites.map((item) => ({
+        id: item.key, apiId: item.id, organizationId: item.organizationKey || orgApiToKey.get(item.organizationId) || item.organizationId,
+        code: item.code, name: item.name, city: item.city, active: item.active,
+      }));
+      if (organizations.length) this.organizationsSignal.set(organizations);
+      if (sites.length) this.sitesSignal.set(sites);
+      const programs = (dto.programs ?? []).map((item) => ({ id:item.key, apiId:item.id, code:item.code, name:item.name, category:item.category, familyCode:item.familyCode, icon:item.icon, active:item.status === "active", enabledModules:item.enabledModules as any }));
+      const offerings = (dto.offerings ?? []).map((item) => ({ id:item.key, apiId:item.id, siteId:item.siteKey, programId:item.programKey, active:item.active }));
+      const offeringApiToKey = new Map((dto.offerings ?? []).map((item) => [item.id, item.key]));
+      const cohorts = (dto.cohorts ?? []).map((item) => ({
+        id: item.key,
+        apiId: item.id,
+        offeringId: offeringApiToKey.get(item.programOfferingId) ?? item.programOfferingId,
+        name: item.name,
+        shortName: item.code,
+        start: item.startDate,
+        end: item.endDate,
+        status: (item.status === "completed" ? "completed" : item.status === "planned" ? "planned" : "active") as "planned" | "active" | "completed",
+        studentCount: item.learnerCount,
+        referentialVersionId: item.referentialVersionId,
+      }));
+      if (programs.length) this.programsSignal.set(programs);
+      if (offerings.length) this.offeringsSignal.set(offerings);
+      if (cohorts.length) this.cohortsSignal.set(cohorts);
+      const apiSelection = dto.defaultSelection ?? null;
+      const defaultSelection = apiSelection
+        ? {
+            organizationId: dto.organizations.find(x => x.id === apiSelection.organizationId)?.key ?? "",
+            siteId: dto.sites.find(x => x.id === apiSelection.siteId)?.key ?? "",
+            programId: dto.programs.find(x => x.id === apiSelection.programId)?.key ?? "",
+            cohortId: dto.cohorts.find(x => x.id === apiSelection.cohortId)?.key ?? "",
+          }
+        : null;
+
+      await this.runtimeData.hydrateWorkspace(dto, defaultSelection);
+      this.remoteWorkspaceLoaded.set(true);
+      const restored = this.restore(key);
+      if (restored && this.isSelectionAccessible(restored)) {
+        this.selectionSignal.set(restored);
+      } else if (defaultSelection && this.isSelectionAccessible(defaultSelection)) {
+        this.selectionSignal.set(defaultSelection);
+        this.persist(defaultSelection);
+      } else {
+        const resolved = this.resolveInitialSelection(key);
+        this.selectionSignal.set(resolved);
+        this.persist(resolved);
+      }
+    } catch {
+      this.organizationsSignal.set([]);
+      this.sitesSignal.set([]);
+      this.programsSignal.set([]);
+      this.offeringsSignal.set([]);
+      this.cohortsSignal.set([]);
+      this.remoteWorkspaceLoaded.set(false);
+    }
   }
 
   selectOrganization(organizationId: string): void {
     const organization = this.organizations().find((item) => item.id === organizationId);
     if (!organization) return;
-    const site = TRAINING_SITES.find(
+    const site = this.sitesSignal().find(
       (item) => item.organizationId === organization.id && this.canAccessSite(item.id),
     );
     if (!site) return;
-    const offering = PROGRAM_OFFERINGS.find(
+    const offering = this.offeringsSignal().find(
       (item) => item.siteId === site.id && item.active && this.canAccessOffering(item),
     );
     if (!offering) return;
-    const cohort = WORKSPACE_COHORTS.find(
+    const cohort = this.cohortsSignal().find(
       (item) => item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
     if (!cohort) return;
@@ -131,11 +201,11 @@ export class WorkspaceContextService {
   selectSite(siteId: string): void {
     const site = this.sites().find((item) => item.id === siteId);
     if (!site) return;
-    const offering = PROGRAM_OFFERINGS.find(
+    const offering = this.offeringsSignal().find(
       (item) => item.siteId === site.id && item.active && this.canAccessOffering(item),
     );
     if (!offering) return;
-    const cohort = WORKSPACE_COHORTS.find(
+    const cohort = this.cohortsSignal().find(
       (item) => item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
     if (!cohort) return;
@@ -151,7 +221,7 @@ export class WorkspaceContextService {
     const siteId = this.selectionSignal().siteId;
     const offering = this.findOffering(siteId, programId);
     if (!offering || !this.canAccessOffering(offering)) return;
-    const cohort = WORKSPACE_COHORTS.find(
+    const cohort = this.cohortsSignal().find(
       (item) => item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
     if (!cohort) return;
@@ -168,22 +238,29 @@ export class WorkspaceContextService {
     const restored = this.restore(key);
     if (restored && this.isSelectionAccessible(restored)) return restored;
 
-    const cohort = WORKSPACE_COHORTS.find((item) => this.canAccessCohort(item.id));
+    const cohort = this.cohortsSignal().find((item) => this.canAccessCohort(item.id));
     if (cohort) return this.selectionFromCohort(cohort.id);
 
-    const offering = PROGRAM_OFFERINGS.find((item) => this.canAccessOffering(item));
+    const offering = this.offeringsSignal().find((item) => this.canAccessOffering(item));
     if (offering) {
-      const fallbackCohort = WORKSPACE_COHORTS.find((item) => item.offeringId === offering.id);
+      const fallbackCohort = this.cohortsSignal().find((item) => item.offeringId === offering.id);
       if (fallbackCohort) return this.selectionFromCohort(fallbackCohort.id);
     }
 
-    return { organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" };
+    const firstOrg = this.organizationsSignal()[0];
+    const firstSite = firstOrg ? this.sitesSignal().find(x => x.organizationId === firstOrg.id) : undefined;
+    const firstOffering = firstSite ? this.offeringsSignal().find(x => x.siteId === firstSite.id && x.active) : undefined;
+    const firstCohort = firstOffering ? this.cohortsSignal().find(x => x.offeringId === firstOffering.id) : undefined;
+    return { organizationId:firstOrg?.id ?? "", siteId:firstSite?.id ?? "", programId:firstOffering?.programId ?? "", cohortId:firstCohort?.id ?? "" };
   }
 
   private selectionFromCohort(cohortId: string): WorkspaceSelection {
-    const cohort = WORKSPACE_COHORTS.find((item) => item.id === cohortId) ?? WORKSPACE_COHORTS[0];
-    const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId) ?? PROGRAM_OFFERINGS[0];
-    const site = TRAINING_SITES.find((item) => item.id === offering.siteId) ?? TRAINING_SITES[0];
+    const cohort = this.cohortsSignal().find((item) => item.id === cohortId) ?? this.cohortsSignal()[0];
+    if (!cohort) return { organizationId: "", siteId: "", programId: "", cohortId: "" };
+    const offering = this.offeringsSignal().find((item) => item.id === cohort.offeringId) ?? this.offeringsSignal()[0];
+    if (!offering) return { organizationId: "", siteId: "", programId: "", cohortId: "" };
+    const site = this.sitesSignal().find((item) => item.id === offering.siteId) ?? this.sitesSignal()[0];
+    if (!site) return { organizationId: "", siteId: "", programId: "", cohortId: "" };
     return {
       organizationId: site.organizationId,
       siteId: site.id,
@@ -193,12 +270,12 @@ export class WorkspaceContextService {
   }
 
   private isSelectionAccessible(selection: WorkspaceSelection): boolean {
-    const organization = ORGANIZATIONS.some((item) => item.id === selection.organizationId);
-    const site = TRAINING_SITES.some(
+    const organization = this.organizationsSignal().some((item) => item.id === selection.organizationId);
+    const site = this.sitesSignal().some(
       (item) => item.id === selection.siteId && item.organizationId === selection.organizationId,
     );
     const offering = this.findOffering(selection.siteId, selection.programId);
-    const cohort = WORKSPACE_COHORTS.some(
+    const cohort = this.cohortsSignal().some(
       (item) => item.id === selection.cohortId && item.offeringId === offering?.id,
     );
     return Boolean(
@@ -218,22 +295,22 @@ export class WorkspaceContextService {
     if (access.scope === "platform") return true;
     if (access.organizationIds) return access.organizationIds.includes(organizationId);
     if (access.siteIds) {
-      return TRAINING_SITES.some(
+      return this.sitesSignal().some(
         (site) => access.siteIds?.includes(site.id) && site.organizationId === organizationId,
       );
     }
     if (access.offeringIds) {
-      return PROGRAM_OFFERINGS.some((offering) => {
+      return this.offeringsSignal().some((offering) => {
         if (!access.offeringIds?.includes(offering.id)) return false;
-        const site = TRAINING_SITES.find((item) => item.id === offering.siteId);
+        const site = this.sitesSignal().find((item) => item.id === offering.siteId);
         return site?.organizationId === organizationId;
       });
     }
     if (access.cohortIds) {
       return access.cohortIds.some((cohortId) => {
-        const cohort = WORKSPACE_COHORTS.find((item) => item.id === cohortId);
-        const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort?.offeringId);
-        const site = TRAINING_SITES.find((item) => item.id === offering?.siteId);
+        const cohort = this.cohortsSignal().find((item) => item.id === cohortId);
+        const offering = this.offeringsSignal().find((item) => item.id === cohort?.offeringId);
+        const site = this.sitesSignal().find((item) => item.id === offering?.siteId);
         return site?.organizationId === organizationId;
       });
     }
@@ -243,19 +320,19 @@ export class WorkspaceContextService {
   private canAccessSite(siteId: string): boolean {
     const access = this.access();
     if (access.scope === "platform" || access.organizationIds) {
-      const site = TRAINING_SITES.find((item) => item.id === siteId);
+      const site = this.sitesSignal().find((item) => item.id === siteId);
       return !!site && this.canAccessOrganization(site.organizationId);
     }
     if (access.siteIds) return access.siteIds.includes(siteId);
     if (access.offeringIds) {
-      return PROGRAM_OFFERINGS.some(
+      return this.offeringsSignal().some(
         (offering) => access.offeringIds?.includes(offering.id) && offering.siteId === siteId,
       );
     }
     if (access.cohortIds) {
       return access.cohortIds.some((cohortId) => {
-        const cohort = WORKSPACE_COHORTS.find((item) => item.id === cohortId);
-        const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort?.offeringId);
+        const cohort = this.cohortsSignal().find((item) => item.id === cohortId);
+        const offering = this.offeringsSignal().find((item) => item.id === cohort?.offeringId);
         return offering?.siteId === siteId;
       });
     }
@@ -270,7 +347,7 @@ export class WorkspaceContextService {
     if (access.offeringIds) return access.offeringIds.includes(offering.id);
     if (access.cohortIds) {
       return access.cohortIds.some(
-        (cohortId) => WORKSPACE_COHORTS.find((item) => item.id === cohortId)?.offeringId === offering.id,
+        (cohortId) => this.cohortsSignal().find((item) => item.id === cohortId)?.offeringId === offering.id,
       );
     }
     return false;
@@ -278,26 +355,24 @@ export class WorkspaceContextService {
 
   private canAccessCohort(cohortId: string): boolean {
     const access = this.access();
-    const cohort = WORKSPACE_COHORTS.find((item) => item.id === cohortId);
+    const cohort = this.cohortsSignal().find((item) => item.id === cohortId);
     if (!cohort) return false;
     if (access.cohortIds) return access.cohortIds.includes(cohortId);
-    const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId);
+    const offering = this.offeringsSignal().find((item) => item.id === cohort.offeringId);
     return !!offering && this.canAccessOffering(offering);
   }
 
   private findOffering(siteId: string, programId: string): ProgramOffering | undefined {
-    return PROGRAM_OFFERINGS.find(
+    return this.offeringsSignal().find(
       (item) => item.siteId === siteId && item.programId === programId && item.active,
     );
   }
 
   private commit(selection: WorkspaceSelection): void {
     this.selectionSignal.set(selection);
+    this.sessionService.setPromotion(selection.cohortId);
+    void this.runtimeData.hydrateContext(selection);
     this.persist(selection);
-    const cohort = WORKSPACE_COHORTS.find((item) => item.id === selection.cohortId);
-    if (cohort?.legacyPromotionId) {
-      this.sessionService.setPromotion(cohort.legacyPromotionId);
-    }
   }
 
   private persist(selection: WorkspaceSelection): void {

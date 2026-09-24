@@ -12,7 +12,7 @@
             "attendance.subtitle"
               | t
                 : {
-                    date: "Lundi 21 septembre 2026",
+                    date: session.date,
                     start: session.start,
                     end: session.end,
                     promotion: session.promotion,
@@ -244,7 +244,7 @@
           {{ "attendance.studentView.status" | t }}
         </p>
         <p class="mt-2 text-[21px] font-extrabold text-[#20a956]">
-          {{ statusLabelKey(visibleStudents()[0].status) | t }}
+          {{ statusLabelKey(visibleStudents().at(0)?.status ?? 'pending') | t }}
         </p>
       </article>
       <article
@@ -298,7 +298,7 @@
           </div>
           <span
             class="inline-flex w-fit rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]"
-            >{{ statusLabelKey(visibleStudents()[0].status) | t }}</span
+            >{{ statusLabelKey(visibleStudents().at(0)?.status ?? 'pending') | t }}</span
           >
         </div>
       </div>

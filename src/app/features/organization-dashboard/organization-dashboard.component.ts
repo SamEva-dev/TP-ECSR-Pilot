@@ -1,14 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  ORGANIZATION_ACTIVITY,
-  ORGANIZATION_ALERTS,
-  ORGANIZATION_KPIS,
-  PROGRAM_PERFORMANCES,
-  SITE_PERFORMANCES,
-} from "../../core/mock-data/organization-dashboard.mock";
-import { PROGRAM_OFFERINGS } from "../../core/mock-data/workspace.mock";
+import { ORGANIZATION_ACTIVITY, ORGANIZATION_ALERTS, ORGANIZATION_KPIS, PROGRAM_PERFORMANCES, SITE_PERFORMANCES } from "../../core/api-data/runtime-data.store";
+import { PROGRAM_OFFERINGS } from "../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
 @Component({

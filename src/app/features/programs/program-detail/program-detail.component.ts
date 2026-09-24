@@ -1,10 +1,11 @@
+import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { ProgramMockStoreService } from "../../../core/mock-data/program-mock-store.service";
-import type { ProgramCatalogItem, ProgramFormValue } from "../../../core/mock-data/programs.mock";
-import { PROGRAM_OFFERINGS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../../core/mock-data/workspace.mock";
-import { TRAINING_REFERENTIALS } from "../../../core/mock-data/referentials.mock";
+
+import type { ProgramCatalogItem, ProgramFormValue } from "../../../core/models/programs.models";
+import { PROGRAM_OFFERINGS, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
+import { TRAINING_REFERENTIALS } from "../../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { ProgramDrawerComponent } from "../program-drawer/program-drawer.component";
 
@@ -16,14 +17,14 @@ import { ProgramDrawerComponent } from "../program-drawer/program-drawer.compone
 })
 export class ProgramDetailComponent {
   private readonly route = inject(ActivatedRoute);
-  readonly store = inject(ProgramMockStoreService);
+  readonly store = inject(ProgramApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly drawerOpen = signal(false);
   readonly programId = this.route.snapshot.paramMap.get("id") ?? "";
 
   readonly program = computed(() => this.store.programs().find((item) => item.id === this.programId) ?? null);
   readonly activeReferential = computed(() => TRAINING_REFERENTIALS.find((item) => item.programId === this.programId && item.status === "active") ?? null);
-  readonly organizationSites = computed(() => TRAINING_SITES.filter((site) => site.organizationId === this.workspace.organization()?.id));
+  readonly organizationSites = computed(() => this.workspace.sites());
   readonly offeredSites = computed(() => {
     const program = this.program();
     return this.organizationSites().map((site) => ({ ...site, enabled: !!program?.siteIds.includes(site.id) }));
@@ -35,7 +36,7 @@ export class ProgramDetailComponent {
     return WORKSPACE_COHORTS.flatMap((cohort) => {
       const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId && item.programId === program.id);
       if (!offering) return [];
-      const site = TRAINING_SITES.find((item) => item.id === offering.siteId);
+      const site = this.workspace.sites().find((item) => item.id === offering.siteId);
       if (!site || site.organizationId !== this.workspace.organization()?.id) return [];
       return [{ ...cohort, siteName: site.name }];
     });

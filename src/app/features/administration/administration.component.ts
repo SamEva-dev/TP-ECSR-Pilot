@@ -8,24 +8,11 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  PROGRAM_OFFERINGS,
-  TRAINING_PROGRAMS,
-  TRAINING_SITES,
-  WORKSPACE_COHORTS,
-} from "../../core/mock-data/workspace.mock";
-import {
-  ORGANIZATION_AUDIT,
-  ORGANIZATION_MODULE_SETTINGS,
-  ORGANIZATION_PREFERENCES,
-  organizationBrandingFor,
-  organizationMetricsFor,
-  organizationProfileFor,
-  type OrganizationAdminProfile,
-  type OrganizationBrandingSettings,
-} from "../../core/mock-data/organization-administration.mock";
+import { PROGRAM_OFFERINGS, TRAINING_PROGRAMS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../core/api-data/runtime-data.store";
+import { ORGANIZATION_AUDIT, ORGANIZATION_MODULE_SETTINGS, ORGANIZATION_PREFERENCES, organizationBrandingFor, organizationMetricsFor, organizationProfileFor } from "../../core/api-data/runtime-data.store";
+import type { OrganizationAdminProfile, OrganizationBrandingSettings } from "../../core/models/organization-administration.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
-import { REMOTE_WORK_POLICY } from "../../core/mock-data/remote-work.mock";
+import { REMOTE_WORK_POLICY } from "../../core/api-data/runtime-data.store";
 
 @Component({
   selector: "app-administration",

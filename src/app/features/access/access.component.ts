@@ -1,16 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  ACCESS_ACCOUNTS,
-  type AccessAccount,
-  type AccessPermissionKey,
-} from "../../core/mock-data/access.mock";
-import {
-  ORGANIZATIONS,
-  TRAINING_PROGRAMS,
-  TRAINING_SITES,
-} from "../../core/mock-data/workspace.mock";
+import { ACCESS_ACCOUNTS } from "../../core/api-data/runtime-data.store";
+import type { AccessAccount, AccessPermissionKey } from "../../core/models/access.models";
+import { ORGANIZATIONS, TRAINING_PROGRAMS, TRAINING_SITES } from "../../core/api-data/runtime-data.store";
 import type { UserRole } from "../../core/models/app.models";
 import type { WorkspaceMembership } from "../../core/models/workspace.models";
 import { AccessAssignmentDrawerComponent } from "./access-assignment-drawer/access-assignment-drawer.component";

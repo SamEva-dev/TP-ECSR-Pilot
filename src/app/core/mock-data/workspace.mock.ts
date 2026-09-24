@@ -7,7 +7,7 @@ import type {
   WorkspaceCohort,
 } from "../models/workspace.models";
 import type { DemoSession } from "../models/app.models";
-import { ACCESS_ACCOUNTS } from "./access.mock";
+import { accessAccountForSession } from "./access.mock";
 
 export const ORGANIZATIONS: Organization[] = [
   {
@@ -107,8 +107,8 @@ export const PROGRAM_OFFERINGS: ProgramOffering[] = [
 ];
 
 export const WORKSPACE_COHORTS: WorkspaceCohort[] = [
-  { id: "p1", offeringId: "off-aftral-nice-ecsr", referentialVersionId: "ref-ecsr-2026", name: "TP ECSR 2026–2027", shortName: "2026–2027", start: "2026-09-01", end: "2027-06-30", status: "active", studentCount: 18, legacyPromotionId: "p1" },
-  { id: "p2", offeringId: "off-aftral-nice-ecsr", referentialVersionId: "ref-ecsr-2024", name: "TP ECSR 2025–2026", shortName: "2025–2026", start: "2025-09-02", end: "2026-06-26", status: "completed", studentCount: 24, legacyPromotionId: "p2" },
+  { id: "p1", offeringId: "off-aftral-nice-ecsr", referentialVersionId: "ref-ecsr-2026", name: "TP ECSR 2026–2027", shortName: "2026–2027", start: "2026-09-01", end: "2027-06-30", status: "active", studentCount: 18 },
+  { id: "p2", offeringId: "off-aftral-nice-ecsr", referentialVersionId: "ref-ecsr-2024", name: "TP ECSR 2025–2026", shortName: "2025–2026", start: "2025-09-02", end: "2026-06-26", status: "completed", studentCount: 24 },
   { id: "cohort-nice-moto-2027-03", offeringId: "off-aftral-nice-moto", referentialVersionId: "ref-moto-2027", name: "Moto · Mars 2027", shortName: "Mars 2027", start: "2027-03-01", end: "2027-05-28", status: "planned", studentCount: 14 },
   { id: "cohort-nice-pl-2027-01", offeringId: "off-aftral-nice-pl", referentialVersionId: "ref-pl-2027", name: "Poids lourd · Janvier 2027", shortName: "Janv. 2027", start: "2027-01-11", end: "2027-04-02", status: "planned", studentCount: 12 },
   { id: "cohort-nice-bus-2027-02", offeringId: "off-aftral-nice-bus", referentialVersionId: "ref-bus-2027", name: "Bus · Février 2027", shortName: "Févr. 2027", start: "2027-02-08", end: "2027-05-14", status: "planned", studentCount: 10 },
@@ -126,24 +126,13 @@ export const WORKSPACE_COHORTS: WorkspaceCohort[] = [
 export function workspaceAccessFor(session: DemoSession | null): WorkspaceAccessRule {
   if (!session) return { scope: "cohort", cohortIds: ["p1"], locked: true };
 
-  const account = ACCESS_ACCOUNTS.find(
-    (item) => item.email.toLowerCase() === session.email.toLowerCase(),
+  // Real AuthGate sessions are already scoped by PedagoraPilot.Api.
+  // Never re-apply the legacy demo assignment matrix on top of a real token.
+  if (session.authMode === "authgate") return { scope: "platform" };
+
+  const active = (accessAccountForSession(session)?.assignments ?? []).filter(
+    (item) => item.active,
   );
-
-  // Demo aliases (claire@demo..., marc@demo...) resolve by legacy role when no
-  // exact access-management account exists yet.
-  const assignments = account?.assignments ??
-    (session.role === "direction"
-      ? ACCESS_ACCOUNTS.find((item) => item.id === "u1")?.assignments
-      : session.role === "secretariat"
-        ? ACCESS_ACCOUNTS.find((item) => item.id === "u2")?.assignments
-        : session.role === "formateur"
-          ? ACCESS_ACCOUNTS.find((item) => item.id === "u3")?.assignments
-          : session.role === "stagiaire"
-            ? ACCESS_ACCOUNTS.find((item) => item.id === "u8")?.assignments
-            : ACCESS_ACCOUNTS.find((item) => item.id === "u16")?.assignments) ?? [];
-
-  const active = assignments.filter((item) => item.active);
   if (active.some((item) => item.scope === "platform")) return { scope: "platform" };
 
   const organizationIds = [...new Set(active.filter((item) => item.scope === "organization").map((item) => item.organizationId).filter((id): id is string => !!id))];

@@ -9,13 +9,8 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import {
-  DRIVING_COMPETENCIES,
-  DRIVING_CRITERIA,
-  DRIVING_SUB_SKILLS,
-  DRIVING_TRAINERS,
-  type DrivingLevel,
-} from "../../core/mock-data/driving.mock";
+import { DRIVING_COMPETENCIES, DRIVING_CRITERIA, DRIVING_SUB_SKILLS, DRIVING_TRAINERS } from "../../core/api-data/runtime-data.store";
+import type { DrivingLevel } from "../../core/models/driving.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({
@@ -100,7 +95,7 @@ export class DrivingComponent {
   readonly selectedCompetenceInfo = computed(() =>
     this.competencies.find((c) => c.id === this.selectedCompetence()) ?? this.competencies[2],
   );
-  readonly subSkills = computed(() => DRIVING_SUB_SKILLS[this.selectedCompetence()]);
+  readonly subSkills = computed(() => DRIVING_SUB_SKILLS.filter((skill) => skill.parentId === this.selectedCompetenceInfo()?.id));
   readonly latestHistory = computed(() => {
     const history = this.contextData.drivingHistory();
     return history.find((item) => item.studentId === this.selectedStudentId()) ?? history[0];
@@ -133,7 +128,7 @@ export class DrivingComponent {
   selectCompetence(id: "C1" | "C2" | "C3" | "C4") {
     if (!this.canEdit()) return;
     this.selectedCompetence.set(id);
-    this.selectedSubSkill.set(DRIVING_SUB_SKILLS[id][0]?.id ?? "");
+    this.selectedSubSkill.set(this.subSkills()[0]?.id ?? "");
   }
 
   selectSubSkill(id: string) {
