@@ -16,14 +16,18 @@ export class ReportingApiService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiBaseUrl}/api/v1/reporting`;
 
-  organizationDashboard(organizationId: string): Observable<OrganizationDashboard> {
+  organizationDashboard(
+    organizationId: string,
+  ): Observable<OrganizationDashboard> {
     return this.http.get<OrganizationDashboard>(
       `${this.base}/organizations/${organizationId}/dashboard`,
     );
   }
 
   siteDashboard(siteId: string): Observable<SiteDashboard> {
-    return this.http.get<SiteDashboard>(`${this.base}/sites/${siteId}/dashboard`);
+    return this.http.get<SiteDashboard>(
+      `${this.base}/sites/${siteId}/dashboard`,
+    );
   }
 
   cohortDashboard(cohortId: string): Observable<CohortDashboard> {
@@ -44,16 +48,18 @@ export class ReportingApiService {
     );
   }
 
-  audit(filters: {
-    organizationId?: string;
-    action?: string;
-    entityType?: string;
-    userId?: string;
-    from?: string;
-    to?: string;
-    page?: number;
-    pageSize?: number;
-  } = {}): Observable<PagedAudit> {
+  audit(
+    filters: {
+      organizationId?: string;
+      action?: string;
+      entityType?: string;
+      userId?: string;
+      from?: string;
+      to?: string;
+      page?: number;
+      pageSize?: number;
+    } = {},
+  ): Observable<PagedAudit> {
     let params = new HttpParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {

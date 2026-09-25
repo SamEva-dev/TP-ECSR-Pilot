@@ -1,12 +1,22 @@
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 
-import type { ProgramCatalogCategory, ProgramCatalogItem, ProgramCatalogStatus, ProgramFormValue } from "../../core/mock-data/programs.mock";
-
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgramDrawerComponent } from "./program-drawer/program-drawer.component";
+import {
+  ProgramCatalogCategory,
+  ProgramCatalogItem,
+  ProgramCatalogStatus,
+  ProgramFormValue,
+} from "../../core/models/programs.models";
 
 @Component({
   selector: "app-programs",
@@ -24,27 +34,47 @@ export class ProgramsComponent {
   readonly drawerOpen = signal(false);
   readonly editingProgram = signal<ProgramCatalogItem | null>(null);
 
-  readonly organizationSiteIds = computed(() => this.workspace.sites().map((site) => site.id));
+  readonly organizationSiteIds = computed(() =>
+    this.workspace.sites().map((site) => site.id),
+  );
 
-  readonly programs = computed(() => this.store.programs().filter((program) =>
-    program.siteIds.some((siteId) => this.organizationSiteIds().includes(siteId)) || program.siteIds.length === 0,
-  ));
+  readonly programs = computed(() =>
+    this.store
+      .programs()
+      .filter(
+        (program) =>
+          program.siteIds.some((siteId) =>
+            this.organizationSiteIds().includes(siteId),
+          ) || program.siteIds.length === 0,
+      ),
+  );
 
   readonly filteredPrograms = computed(() => {
     const q = this.query().trim().toLocaleLowerCase("fr-FR");
     return this.programs().filter((program) => {
-      const matchesQuery = !q || [program.name, program.code, program.referenceVersion].some((value) => value.toLocaleLowerCase("fr-FR").includes(q));
-      const matchesCategory = this.category() === "all" || program.category === this.category();
-      const matchesStatus = this.status() === "all" || program.status === this.status();
+      const matchesQuery =
+        !q ||
+        [program.name, program.code, program.referenceVersion].some((value) =>
+          value.toLocaleLowerCase("fr-FR").includes(q),
+        );
+      const matchesCategory =
+        this.category() === "all" || program.category === this.category();
+      const matchesStatus =
+        this.status() === "all" || program.status === this.status();
       return matchesQuery && matchesCategory && matchesStatus;
     });
   });
 
-  readonly totals = computed(() => this.programs().reduce((acc, program) => ({
-    students: acc.students + program.students,
-    trainers: acc.trainers + program.trainers,
-    cohorts: acc.cohorts + program.activeCohorts,
-  }), { students: 0, trainers: 0, cohorts: 0 }));
+  readonly totals = computed(() =>
+    this.programs().reduce(
+      (acc, program) => ({
+        students: acc.students + program.students,
+        trainers: acc.trainers + program.trainers,
+        cohorts: acc.cohorts + program.activeCohorts,
+      }),
+      { students: 0, trainers: 0, cohorts: 0 },
+    ),
+  );
 
   addProgram(): void {
     this.editingProgram.set(null);
@@ -77,10 +107,16 @@ export class ProgramsComponent {
   }
 
   organizationSiteCount(program: ProgramCatalogItem): number {
-    return program.siteIds.filter((siteId) => this.organizationSiteIds().includes(siteId)).length;
+    return program.siteIds.filter((siteId) =>
+      this.organizationSiteIds().includes(siteId),
+    ).length;
   }
 
   statusClass(status: ProgramCatalogStatus): string {
-    return status === "active" ? "bg-[#e6f7ec] text-[#1b8f4d]" : status === "draft" ? "bg-[#fff1d2] text-[#8b6100]" : "bg-[#eef1f5] text-[#667085]";
+    return status === "active"
+      ? "bg-[#e6f7ec] text-[#1b8f4d]"
+      : status === "draft"
+        ? "bg-[#fff1d2] text-[#8b6100]"
+        : "bg-[#eef1f5] text-[#667085]";
   }
 }

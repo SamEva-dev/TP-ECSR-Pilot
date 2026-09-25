@@ -5,9 +5,11 @@ export type DistancePlatform = "teams" | "zoom" | "meet" | "jitsi" | "other";
 
 export type DistanceSessionStatus = "scheduled" | "live" | "closed";
 
-export type DistanceAttendanceStatus = "present" | "late" | "absent" | "disconnected";
+export type DistanceAttendanceStatus =
+  "present" | "late" | "absent" | "disconnected";
 
-export type DistanceModuleStatus = "not-started" | "in-progress" | "completed" | "late";
+export type DistanceModuleStatus =
+  "not-started" | "in-progress" | "completed" | "late";
 
 export type DistanceResourceType = "document" | "video" | "link" | "exercise";
 

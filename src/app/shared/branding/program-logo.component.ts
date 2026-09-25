@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from "@angular/core";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { brandingForProgram } from "./program-branding.config";
 
@@ -12,7 +18,10 @@ import { brandingForProgram } from "./program-branding.config";
         [style.background]="branding().accentColor"
         [attr.title]="workspace.program()?.name ?? branding().brandName"
       >
-        <i [class]="'ph ' + branding().icon + ' text-[20px]'" aria-hidden="true"></i>
+        <i
+          [class]="'ph ' + branding().icon + ' text-[20px]'"
+          aria-hidden="true"
+        ></i>
       </span>
 
       <span [class]="labelClass()">
@@ -27,7 +36,9 @@ export class ProgramLogoComponent {
   readonly workspace = inject(WorkspaceContextService);
   readonly compact = input(false);
   readonly theme = input<"dark" | "light">("dark");
-  readonly branding = computed(() => brandingForProgram(this.workspace.program()));
+  readonly branding = computed(() =>
+    brandingForProgram(this.workspace.program()),
+  );
 
   readonly iconContainerClass = computed(() =>
     this.compact()

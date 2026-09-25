@@ -30,9 +30,11 @@ export class ReportsComponent {
   readonly selectedReport = signal<ReportType>("individual");
   readonly promotionId = signal(this.workspace.selection().cohortId);
 
-
-  readonly selectedPromotion = computed(() =>
-    this.workspace.cohorts().find((promotion) => promotion.id === this.promotionId()) ?? null,
+  readonly selectedPromotion = computed(
+    () =>
+      this.workspace
+        .cohorts()
+        .find((promotion) => promotion.id === this.promotionId()) ?? null,
   );
 
   readonly reportTypes: { key: ReportType; labelKey: string }[] = [

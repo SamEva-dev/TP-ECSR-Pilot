@@ -1,11 +1,24 @@
 import { SiteApiStoreService } from "../../../core/api-data/site-api-store.service";
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 
-import { SITE_ALERTS, SITE_PROGRAM_METRICS } from "../../../core/api-data/runtime-data.store";
+import {
+  SITE_ALERTS,
+  SITE_PROGRAM_METRICS,
+} from "../../../core/api-data/runtime-data.store";
 import type { SiteFormValue } from "../../../core/models/sites.models";
-import { PROGRAM_OFFERINGS, TRAINING_PROGRAMS, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
+import {
+  PROGRAM_OFFERINGS,
+  TRAINING_PROGRAMS,
+  WORKSPACE_COHORTS,
+} from "../../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "../site-drawer/site-drawer.component";
 
@@ -22,21 +35,38 @@ export class SiteDetailComponent {
   readonly drawerOpen = signal(false);
   readonly siteId = this.route.snapshot.paramMap.get("id") ?? "";
   readonly site = computed(() => this.store.byId(this.siteId) ?? null);
-  readonly alerts = computed(() => SITE_ALERTS.filter((item) => item.siteId === this.siteId));
+  readonly alerts = computed(() =>
+    SITE_ALERTS.filter((item) => item.siteId === this.siteId),
+  );
 
   readonly programs = computed(() => {
-    const offeringProgramIds = PROGRAM_OFFERINGS.filter((offering) => offering.siteId === this.siteId && offering.active).map((offering) => offering.programId);
-    return TRAINING_PROGRAMS.filter((program) => offeringProgramIds.includes(program.id)).map((program) => ({
+    const offeringProgramIds = PROGRAM_OFFERINGS.filter(
+      (offering) => offering.siteId === this.siteId && offering.active,
+    ).map((offering) => offering.programId);
+    return TRAINING_PROGRAMS.filter((program) =>
+      offeringProgramIds.includes(program.id),
+    ).map((program) => ({
       ...program,
-      metric: SITE_PROGRAM_METRICS.find((metric) => metric.siteId === this.siteId && metric.programId === program.id),
+      metric: SITE_PROGRAM_METRICS.find(
+        (metric) =>
+          metric.siteId === this.siteId && metric.programId === program.id,
+      ),
     }));
   });
 
   readonly cohorts = computed(() => {
-    const offeringIds = PROGRAM_OFFERINGS.filter((offering) => offering.siteId === this.siteId).map((offering) => offering.id);
-    return WORKSPACE_COHORTS.filter((cohort) => offeringIds.includes(cohort.offeringId)).map((cohort) => {
-      const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId);
-      const program = TRAINING_PROGRAMS.find((item) => item.id === offering?.programId);
+    const offeringIds = PROGRAM_OFFERINGS.filter(
+      (offering) => offering.siteId === this.siteId,
+    ).map((offering) => offering.id);
+    return WORKSPACE_COHORTS.filter((cohort) =>
+      offeringIds.includes(cohort.offeringId),
+    ).map((cohort) => {
+      const offering = PROGRAM_OFFERINGS.find(
+        (item) => item.id === cohort.offeringId,
+      );
+      const program = TRAINING_PROGRAMS.find(
+        (item) => item.id === offering?.programId,
+      );
       return { ...cohort, programName: program?.name ?? "—" };
     });
   });

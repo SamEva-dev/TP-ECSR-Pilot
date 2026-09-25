@@ -1,25 +1,220 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <a routerLink="/certification" class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#2a64a2]"><i class="ph ph-arrow-left"></i>{{ 'certification.sessionDetail.back' | t }}</a>
-  <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-    <div><div class="flex flex-wrap gap-2"><span class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10px] font-semibold text-[#2a64a2]">{{ program()?.name }}</span><span class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10px] font-semibold text-[#8b5e00]">{{ scheme().code }}</span></div><h1 class="mt-2 text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ exam().name }}</h1><p class="mt-1 text-[13px] text-[#6c788b]">{{ exam().promotionName }} · {{ exam().startDate }} → {{ exam().endDate }}</p></div>
-    <span class="inline-flex w-fit rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]">{{ 'certification.sessionStatus.' + exam().status | t }}</span>
+  <a
+    routerLink="/certification"
+    class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#2a64a2]"
+    ><i class="ph ph-arrow-left"></i
+    >{{ "certification.sessionDetail.back" | t }}</a
+  >
+  <div
+    class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+  >
+    <div>
+      <div class="flex flex-wrap gap-2">
+        <span
+          class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10px] font-semibold text-[#2a64a2]"
+          >{{ program()?.name }}</span
+        ><span
+          class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10px] font-semibold text-[#8b5e00]"
+          >{{ scheme().code }}</span
+        >
+      </div>
+      <h1
+        class="mt-2 text-[30px] font-extrabold tracking-[-1px] text-[#172033]"
+      >
+        {{ exam().name }}
+      </h1>
+      <p class="mt-1 text-[13px] text-[#6c788b]">
+        {{ exam().promotionName }} · {{ exam().startDate }} →
+        {{ exam().endDate }}
+      </p>
+    </div>
+    <span
+      class="inline-flex w-fit rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]"
+      >{{ "certification.sessionStatus." + exam().status | t }}</span
+    >
   </div>
 
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'certification.kpi.candidates' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ candidates().length }}</p></article>
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'certification.kpi.ready' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#18a547]">{{ ready() }}</p></article>
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'certification.kpi.jury' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ juryMembers().length }}</p></article>
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'certification.multi.examCount' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ scheme().steps.length }}</p></article>
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'certification.kpi.readiness' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#2a64a2]">{{ readiness() }} %</p></article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.kpi.candidates" | t }}
+      </p>
+      <p class="mt-2 text-[24px] font-extrabold">{{ candidates().length }}</p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.kpi.ready" | t }}
+      </p>
+      <p class="mt-2 text-[24px] font-extrabold text-[#18a547]">
+        {{ ready() }}
+      </p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.kpi.jury" | t }}
+      </p>
+      <p class="mt-2 text-[24px] font-extrabold">{{ juryMembers().length }}</p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.multi.examCount" | t }}
+      </p>
+      <p class="mt-2 text-[24px] font-extrabold">{{ scheme().steps.length }}</p>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+    >
+      <p class="text-[10px] uppercase text-[#718096]">
+        {{ "certification.kpi.readiness" | t }}
+      </p>
+      <p class="mt-2 text-[24px] font-extrabold text-[#2a64a2]">
+        {{ readiness() }} %
+      </p>
+    </article>
   </div>
 
   <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_1fr]">
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"><h2 class="text-[16px] font-bold">{{ 'certification.sessionDetail.workflowTitle' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'certification.sessionDetail.workflowSubtitle' | t }}</p><ol class="mt-5 space-y-3">@for (step of ['preparation','candidates','jury','running','deliberation','results','closed']; track step; let i = $index) {<li class="flex items-center gap-3"><span [class]="'grid size-[30px] place-items-center rounded-full text-[11px] font-bold ' + (i < 3 ? 'bg-[#2a64a2] text-white' : 'bg-[#eef2f6] text-[#7b8798]')">{{ i + 1 }}</span><div><p class="text-[12.5px] font-bold text-[#263143]">{{ 'certification.workflow.' + step | t }}</p><p class="text-[10.5px] text-[#7b8798]">{{ 'certification.workflowHelp.' + step | t }}</p></div></li>}</ol></article>
-    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"><h2 class="text-[16px] font-bold">{{ 'certification.multi.schemeStructure' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ scheme().nameKey | t }} · {{ 'certification.multi.version' | t: { version: scheme().version } }}</p><div class="mt-4 space-y-2">@for (step of scheme().steps; track step.id; let i = $index) {<div class="flex items-center gap-3 rounded-[13px] bg-[#f1f4f8] p-3"><span class="grid size-[30px] place-items-center rounded-full bg-[#e5f2ff] text-[11px] font-bold text-[#2a64a2]">{{ i + 1 }}</span><div class="min-w-0 flex-1"><p class="truncate text-[12px] font-bold">{{ step.labelKey | t }}</p><p class="text-[10.5px] text-[#7b8798]">{{ step.duration }}</p></div></div>}</div><div class="mt-4"><div class="mb-2 flex justify-between text-[11.5px]"><span>{{ 'certification.readiness' | t }}</span><strong>{{ readiness() }} %</strong></div><app-progress-bar [value]="readiness()" /></div></article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "certification.sessionDetail.workflowTitle" | t }}
+      </h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">
+        {{ "certification.sessionDetail.workflowSubtitle" | t }}
+      </p>
+      <ol class="mt-5 space-y-3">
+        @for (
+          step of [
+            "preparation",
+            "candidates",
+            "jury",
+            "running",
+            "deliberation",
+            "results",
+            "closed",
+          ];
+          track step;
+          let i = $index
+        ) {
+          <li class="flex items-center gap-3">
+            <span
+              [class]="
+                'grid size-[30px] place-items-center rounded-full text-[11px] font-bold ' +
+                (i < 3
+                  ? 'bg-[#2a64a2] text-white'
+                  : 'bg-[#eef2f6] text-[#7b8798]')
+              "
+              >{{ i + 1 }}</span
+            >
+            <div>
+              <p class="text-[12.5px] font-bold text-[#263143]">
+                {{ "certification.workflow." + step | t }}
+              </p>
+              <p class="text-[10.5px] text-[#7b8798]">
+                {{ "certification.workflowHelp." + step | t }}
+              </p>
+            </div>
+          </li>
+        }
+      </ol>
+    </article>
+    <article
+      class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <h2 class="text-[16px] font-bold">
+        {{ "certification.multi.schemeStructure" | t }}
+      </h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">
+        {{ scheme().nameKey | t }} ·
+        {{ "certification.multi.version" | t: { version: scheme().version } }}
+      </p>
+      <div class="mt-4 space-y-2">
+        @for (step of scheme().steps; track step.id; let i = $index) {
+          <div class="flex items-center gap-3 rounded-[13px] bg-[#f1f4f8] p-3">
+            <span
+              class="grid size-[30px] place-items-center rounded-full bg-[#e5f2ff] text-[11px] font-bold text-[#2a64a2]"
+              >{{ i + 1 }}</span
+            >
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-[12px] font-bold">
+                {{ step.labelKey | t }}
+              </p>
+              <p class="text-[10.5px] text-[#7b8798]">{{ step.duration }}</p>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="mt-4">
+        <div class="mb-2 flex justify-between text-[11.5px]">
+          <span>{{ "certification.readiness" | t }}</span
+          ><strong>{{ readiness() }} %</strong>
+        </div>
+        <app-progress-bar [value]="readiness()" />
+      </div>
+    </article>
   </div>
 
-  <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-    <div class="flex items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold">{{ 'certification.candidates.title' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'certification.sessionDetail.candidateListSubtitle' | t }}</p></div><a routerLink="/resultats" class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-3 text-[11px] font-semibold shadow-sm"><i class="ph ph-check-square-offset"></i>{{ 'certification.actions.results' | t }}</a></div>
-    <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">@for (candidate of candidates(); track candidate.id) {<a [routerLink]="['/certification/candidats', candidate.id]" class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3 transition hover:border-[#a9bfd5] hover:shadow-sm"><span class="grid size-[37px] place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white">{{ initials(candidate) }}</span><div class="min-w-0 flex-1"><p class="truncate text-[12.5px] font-bold">{{ candidate.firstName }} {{ candidate.lastName }}</p><p class="text-[10.5px] text-[#7b8798]">{{ candidate.candidateNumber }} · {{ candidate.examTime }}</p></div><span [class]="'rounded-full px-2.5 py-1 text-[10px] font-semibold ' + (candidate.ready ? 'bg-[#d8f8df] text-[#18a547]' : 'bg-[#fff0c9] text-[#8b5e00]')">{{ (candidate.ready ? 'certification.ready' : 'certification.incomplete') | t }}</span></a>}</div>
+  <article
+    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h2 class="text-[16px] font-bold">
+          {{ "certification.candidates.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">
+          {{ "certification.sessionDetail.candidateListSubtitle" | t }}
+        </p>
+      </div>
+      <a
+        routerLink="/resultats"
+        class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-3 text-[11px] font-semibold shadow-sm"
+        ><i class="ph ph-check-square-offset"></i
+        >{{ "certification.actions.results" | t }}</a
+      >
+    </div>
+    <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+      @for (candidate of candidates(); track candidate.id) {
+        <a
+          [routerLink]="['/certification/candidats', candidate.id]"
+          class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3 transition hover:border-[#a9bfd5] hover:shadow-sm"
+          ><span
+            class="grid size-[37px] place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white"
+            >{{ initials(candidate) }}</span
+          >
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-[12.5px] font-bold">
+              {{ candidate.firstName }} {{ candidate.lastName }}
+            </p>
+            <p class="text-[10.5px] text-[#7b8798]">
+              {{ candidate.candidateNumber }} · {{ candidate.examTime }}
+            </p>
+          </div>
+          <span
+            [class]="
+              'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
+              (candidate.ready
+                ? 'bg-[#d8f8df] text-[#18a547]'
+                : 'bg-[#fff0c9] text-[#8b5e00]')
+            "
+            >{{
+              (candidate.ready
+                ? "certification.ready"
+                : "certification.incomplete"
+              ) | t
+            }}</span
+          ></a
+        >
+      }
+    </div>
   </article>
 </section>

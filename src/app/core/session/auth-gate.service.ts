@@ -5,10 +5,7 @@ import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "./auth-token.store";
 
 export type AuthGatePreLoginStep =
-  | "Password"
-  | "Register"
-  | "RegisterApplication"
-  | "Error";
+  "Password" | "Register" | "RegisterApplication" | "Error";
 
 export interface AuthGatePreLoginResponse {
   nextStep: AuthGatePreLoginStep | string;
@@ -68,10 +65,13 @@ export class AuthGateService {
   private readonly baseUrl = `${environment.authGateBaseUrl}/api/Auth`;
 
   prelogin(email: string): Observable<AuthGatePreLoginResponse> {
-    return this.http.post<AuthGatePreLoginResponse>(`${this.baseUrl}/prelogin`, {
-      email: email.trim().toLowerCase(),
-      clientId: environment.authGateClientId,
-    });
+    return this.http.post<AuthGatePreLoginResponse>(
+      `${this.baseUrl}/prelogin`,
+      {
+        email: email.trim().toLowerCase(),
+        clientId: environment.authGateClientId,
+      },
+    );
   }
 
   login(request: AuthGateLoginRequest): Observable<AuthGateLoginResponse> {
@@ -98,11 +98,14 @@ export class AuthGateService {
     request: AuthGateRegistrationRequest,
   ): Observable<AuthGateRegistrationResponse> {
     return this.http
-      .post<AuthGateRegistrationResponse>(`${this.baseUrl}/register-with-tenant`, {
-        clientId: environment.authGateClientId,
-        ...request,
-        email: request.email.trim().toLowerCase(),
-      })
+      .post<AuthGateRegistrationResponse>(
+        `${this.baseUrl}/register-with-tenant`,
+        {
+          clientId: environment.authGateClientId,
+          ...request,
+          email: request.email.trim().toLowerCase(),
+        },
+      )
       .pipe(
         tap((response) => {
           if (response.accessToken) {

@@ -12,21 +12,35 @@ export class WorkforceApiService {
   list(siteId?: string, mineOnly = false): Promise<RemoteWorkRequestApi[]> {
     let params = new HttpParams().set("mineOnly", mineOnly);
     if (siteId) params = params.set("siteId", siteId);
-    return firstValueFrom(this.http.get<RemoteWorkRequestApi[]>(this.base, { params }));
+    return firstValueFrom(
+      this.http.get<RemoteWorkRequestApi[]>(this.base, { params }),
+    );
   }
 
   create(payload: unknown): Promise<RemoteWorkRequestApi> {
-    return firstValueFrom(this.http.post<RemoteWorkRequestApi>(this.base, payload));
+    return firstValueFrom(
+      this.http.post<RemoteWorkRequestApi>(this.base, payload),
+    );
   }
 
   decide(id: string, approved: boolean): Promise<RemoteWorkRequestApi> {
-    return firstValueFrom(this.http.put<RemoteWorkRequestApi>(`${this.base}/${id}/decision`, { approved }));
+    return firstValueFrom(
+      this.http.put<RemoteWorkRequestApi>(`${this.base}/${id}/decision`, {
+        approved,
+      }),
+    );
   }
 
-  updateActivity(requestId: string, activityId: string, status: string): Promise<RemoteWorkRequestApi> {
-    return firstValueFrom(this.http.put<RemoteWorkRequestApi>(
-      `${this.base}/${requestId}/activities/${activityId}`,
-      { status },
-    ));
+  updateActivity(
+    requestId: string,
+    activityId: string,
+    status: string,
+  ): Promise<RemoteWorkRequestApi> {
+    return firstValueFrom(
+      this.http.put<RemoteWorkRequestApi>(
+        `${this.base}/${requestId}/activities/${activityId}`,
+        { status },
+      ),
+    );
   }
 }

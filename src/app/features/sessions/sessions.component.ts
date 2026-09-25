@@ -1,11 +1,29 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { SESSION_TRAINERS } from "../../core/api-data/runtime-data.store";
-import type { PedagogicalSessionType, ProgrammedSession, SessionModality } from "../../core/models/sessions.models";
-import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
-import { TrainingDeliveryApiService, type TrainingSessionApi } from "../../core/training-delivery/training-delivery-api.service";
+import { SessionService } from "../../core/session/session.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { StudentProfileApiService } from "../../core/students/student-profile-api.service";
+import {
+  PARIS_ZONE,
+  parisInstant,
+} from "../../core/training-delivery/paris-time";
+import {
+  TrainingDeliveryApiService,
+  type TrainingSessionApi,
+  type TrainingSessionType,
+  type TrainingSessionModality,
+  type CreateTrainingSessionApiRequest,
+} from "../../core/training-delivery/training-delivery-api.service";
 
 @Component({
   selector: "app-sessions",
@@ -14,214 +32,227 @@ import { TrainingDeliveryApiService, type TrainingSessionApi } from "../../core/
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionsComponent {
-  readonly contextData = inject(ContextualTrainingDataService);
-  readonly trainingApi = inject(TrainingDeliveryApiService);
+  readonly session = inject(SessionService);
+  readonly workspace = inject(WorkspaceContextService);
+  private readonly profiles = inject(StudentProfileApiService);
+  private readonly api = inject(TrainingDeliveryApiService);
+  private readonly router = inject(Router);
+  readonly sessions = signal<TrainingSessionApi[]>([]);
   readonly loading = signal(false);
-  readonly apiMode = signal(false);
-  readonly trainers = SESSION_TRAINERS;
-  readonly types: PedagogicalSessionType[] = [
+  readonly loadError = signal(false);
+  readonly saveError = signal(false);
+  readonly actionErrorId = signal("");
+  readonly saving = signal(false);
+  readonly changingId = signal("");
+  readonly canManage = computed(() =>
+    ["direction", "formateur", "secretariat"].includes(this.session.role()),
+  );
+  readonly types: TrainingSessionType[] = [
     "classroom",
     "presentation",
     "evaluation",
     "sensitization",
     "catchup",
     "event",
+    "distance",
+    "driving",
+    "internship",
   ];
-  readonly sessions = signal<ProgrammedSession[]>([]);
-  readonly modalities: SessionModality[] = ["onsite", "remote-live", "remote-async", "practical"];
-
-  date = "2026-09-25";
-  start = "08:00";
-  end = "12:00";
-  trainer = "Yanis Morel";
-  promotionId = "";
-  selectedType = signal<PedagogicalSessionType>("classroom");
-  selectedModality = signal<SessionModality>("onsite");
+  readonly modalities: TrainingSessionModality[] = [
+    "onsite",
+    "remote-live",
+    "remote-async",
+    "practical",
+  ];
+  readonly selectedType = signal<TrainingSessionType>("classroom");
+  readonly selectedModality = signal<TrainingSessionModality>("onsite");
+  date = "";
+  start = "";
+  end = "";
+  trainer = "";
   theme = "";
   objectives = "";
   supports = "";
   comments = "";
-
-  get promotions() {
-    const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id, name: cohort.name }] : [];
-  }
+  private generation = 0;
 
   constructor() {
-    effect(() => {
-      const cohort = this.contextData.cohort();
-      this.promotionId = cohort?.id ?? "";
-      if (cohort?.apiId) {
-        void this.loadRemoteSessions(cohort.apiId);
-      } else {
-        this.apiMode.set(false);
-        this.sessions.set(this.contextData.programmedSessions().map((item) => ({ ...item })));
+    effect((onCleanup) => {
+      const user = this.session.session();
+      const cohort = this.workspace.cohort();
+      const loaded = this.workspace.remoteWorkspaceLoaded();
+      const generation = ++this.generation;
+      this.sessions.set([]);
+      this.loading.set(false);
+      this.loadError.set(false);
+      this.saveError.set(false);
+      this.actionErrorId.set("");
+      this.changingId.set("");
+      if (user && loaded) {
+        this.loading.set(true);
+        if (user.role === "stagiaire") void this.loadSelf(generation);
+        else if (cohort?.apiId) void this.load(cohort.apiId, generation);
+        else this.loading.set(false);
       }
+      onCleanup(() => {
+        this.generation++;
+      });
     });
   }
-
-  private async loadRemoteSessions(cohortApiId: string) {
-    this.loading.set(true);
+  private async loadSelf(generation: number): Promise<void> {
     try {
-      const remote = await this.trainingApi.list(cohortApiId);
-      this.sessions.set(remote.map((item) => this.toProgrammedSession(item)).filter((item): item is ProgrammedSession => item !== null));
-      this.apiMode.set(true);
+      const profile = await firstValueFrom(this.profiles.self());
+      if (generation === this.generation)
+        await this.load(profile.cohortId, generation);
     } catch {
-      this.apiMode.set(false);
-      this.sessions.set(this.contextData.programmedSessions().map((item) => ({ ...item })));
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  private toProgrammedSession(item: TrainingSessionApi): ProgrammedSession | null {
-    if (!["classroom", "presentation", "evaluation", "sensitization", "catchup", "event"].includes(item.type)) return null;
-    const cohort = this.contextData.cohort();
-    const start = new Date(item.startsAtUtc);
-    const end = new Date(item.endsAtUtc);
-    const formatDate = new Intl.DateTimeFormat("fr-FR", { timeZone: item.timeZoneId, day: "2-digit", month: "2-digit", year: "numeric" });
-    const formatTime = new Intl.DateTimeFormat("fr-FR", { timeZone: item.timeZoneId, hour: "2-digit", minute: "2-digit", hour12: false });
-    return {
-      id: item.id,
-      titleKey: item.title,
-      date: formatDate.format(start),
-      start: formatTime.format(start),
-      end: formatTime.format(end),
-      trainer: item.trainerDisplayName ?? "—",
-      promotion: cohort?.name ?? "",
-      promotionId: cohort?.id ?? item.cohortId,
-      type: item.type as PedagogicalSessionType,
-      modality: item.modality,
-      objectiveKey: item.objective ?? "",
-      supportsKey: item.supports ?? "",
-      present: item.presentLearners,
-      expected: item.expectedLearners,
-    };
-  }
-
-  typeKey(type: PedagogicalSessionType) {
-    return `sessions.types.${type}`;
-  }
-
-  typeBadgeClasses(type: PedagogicalSessionType) {
-    switch (type) {
-      case "classroom": return "bg-[#2b66a4] text-white";
-      case "presentation": return "bg-[#f0f2f5] text-[#6b7280]";
-      case "evaluation": return "bg-[#fff0c9] text-[#7a5300]";
-      case "sensitization": return "bg-[#d8f8df] text-[#18a547]";
-      case "catchup": return "bg-[#ffe1df] text-[#f04438]";
-      case "event": return "bg-[#e5f2ff] text-[#2b66a4]";
-    }
-  }
-
-
-  modalityKey(modality: SessionModality) {
-    return `sessions.modalities.${modality}`;
-  }
-
-  modalityBadgeClasses(modality: SessionModality) {
-    switch (modality) {
-      case "remote-live": return "bg-[#efe9ff] text-[#6f4ec7]";
-      case "remote-async": return "bg-[#fff0d6] text-[#a26100]";
-      case "practical": return "bg-[#e6f2ff] text-[#205a98]";
-      case "onsite": return "bg-[#f0f3f7] text-[#667085]";
-    }
-  }
-
-  modalityChipClasses(modality: SessionModality) {
-    return this.selectedModality() === modality
-      ? "border-[#6f4ec7] bg-[#f3efff] text-[#6548b8] ring-1 ring-[#6f4ec7]/15"
-      : "border-[#dce3eb] bg-white text-[#475569] hover:bg-[#f7f9fc]";
-  }
-  typeChipClasses(type: PedagogicalSessionType) {
-    return this.selectedType() === type
-      ? "border-[#2b66a4] bg-[#eaf3fc] text-[#245c97] ring-1 ring-[#2b66a4]/15"
-      : "border-[#dce3eb] bg-white text-[#475569] hover:bg-[#f7f9fc]";
-  }
-
-  attendancePercent(session: ProgrammedSession) {
-    return session.expected === 0 ? 0 : Math.round((session.present / session.expected) * 100);
-  }
-
-  attendanceClasses(session: ProgrammedSession) {
-    return session.present === session.expected
-      ? "bg-[#d8f8df] text-[#18a547]"
-      : "bg-[#fff0c9] text-[#8b5e00]";
-  }
-
-  async createSession() {
-    if (!this.theme.trim()) return;
-    const cohort = this.contextData.cohort();
-    if (!cohort) return;
-
-    if (cohort.apiId) {
-      const startsAt = new Date(`${this.date}T${this.start}:00`);
-      const endsAt = new Date(`${this.date}T${this.end}:00`);
-      try {
-        const created = await this.trainingApi.create({
-          cohortId: cohort.apiId,
-          type: this.selectedType(),
-          modality: this.selectedModality(),
-          title: this.theme.trim(),
-          startsAtUtc: startsAt.toISOString(),
-          endsAtUtc: endsAt.toISOString(),
-          timeZoneId: "Europe/Paris",
-          trainerDisplayName: this.trainer,
-          objective: this.objectives.trim() || null,
-          supports: this.supports.trim() || null,
-          comments: this.comments.trim() || null,
-          audienceMode: "whole-cohort",
-          participantEnrollmentIds: [],
-        });
-        const mapped = this.toProgrammedSession(created);
-        if (mapped) this.sessions.update((items) => [mapped, ...items]);
-        this.apiMode.set(true);
-      } catch {
-        return;
+      if (generation === this.generation) {
+        this.loadError.set(true);
+        this.loading.set(false);
       }
-    } else {
-      const id = `ps-${Date.now()}`;
-      const formattedDate = this.date.split("-").reverse().join("/");
-      const newSession: ProgrammedSession = {
-        id,
-        titleKey: this.theme.trim(),
-        date: formattedDate,
-        start: this.start,
-        end: this.end,
-        trainer: this.trainer,
-        promotion: cohort.name,
-        promotionId: cohort.id,
-        type: this.selectedType(),
-        modality: this.selectedModality(),
-        objectiveKey: this.objectives.trim(),
-        supportsKey: this.supports.trim(),
-        present: 0,
-        expected: cohort.studentCount,
-      };
-      this.sessions.update((items) => [newSession, ...items]);
     }
-
-    this.theme = "";
-    this.objectives = "";
-    this.supports = "";
-    this.comments = "";
   }
-
-  sessionTitle(session: ProgrammedSession) {
-    return session.titleKey.startsWith("sessions.") || session.titleKey.startsWith("workspaceOperational.")
-      ? session.titleKey
-      : null;
+  private async load(cohortId: string, generation: number): Promise<void> {
+    try {
+      const sessions = await this.api.list(cohortId);
+      if (generation === this.generation)
+        this.sessions.set(
+          sessions.sort((a, b) => b.startsAtUtc.localeCompare(a.startsAtUtc)),
+        );
+    } catch {
+      if (generation === this.generation) this.loadError.set(true);
+    } finally {
+      if (generation === this.generation) this.loading.set(false);
+    }
   }
-
-  sessionObjective(session: ProgrammedSession) {
-    return session.objectiveKey.startsWith("sessions.") || session.objectiveKey.startsWith("workspaceOperational.")
-      ? session.objectiveKey
-      : null;
+  dateLabel(item: TrainingSessionApi): string {
+    const date = new Date(item.startsAtUtc);
+    if (Number.isNaN(date.getTime())) return "—";
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        timeZone: item.timeZoneId,
+        dateStyle: "medium",
+      }).format(date);
+    } catch {
+      return "—";
+    }
   }
-
-  sessionSupports(session: ProgrammedSession) {
-    return session.supportsKey.startsWith("sessions.") || session.supportsKey.startsWith("workspaceOperational.")
-      ? session.supportsKey
-      : null;
+  timeLabel(item: TrainingSessionApi): string {
+    try {
+      const format = new Intl.DateTimeFormat(undefined, {
+        timeZone: item.timeZoneId,
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return `${format.format(new Date(item.startsAtUtc))} – ${format.format(new Date(item.endsAtUtc))}`;
+    } catch {
+      return "—";
+    }
+  }
+  attendancePercent(item: TrainingSessionApi): number {
+    return item.expectedLearners > 0
+      ? Math.min(
+          100,
+          Math.round((item.presentLearners / item.expectedLearners) * 100),
+        )
+      : 0;
+  }
+  canManageSession(item: TrainingSessionApi): boolean {
+    return (
+      this.canManage() &&
+      (this.session.role() !== "formateur" ||
+        !item.trainerAuthGateUserId ||
+        item.trainerAuthGateUserId === this.session.session()?.userId)
+    );
+  }
+  async createSession(openAttendance = false): Promise<void> {
+    if (!this.canManage() || this.saving()) return;
+    const cohortId = this.workspace.cohort()?.apiId;
+    const startsAtUtc = parisInstant(this.date, this.start);
+    const endsAtUtc = parisInstant(this.date, this.end);
+    if (
+      !cohortId ||
+      !startsAtUtc ||
+      !endsAtUtc ||
+      endsAtUtc <= startsAtUtc ||
+      !this.theme.trim()
+    ) {
+      this.saveError.set(true);
+      return;
+    }
+    const generation = this.generation;
+    const current = this.session.session();
+    const isTrainer = this.session.role() === "formateur";
+    const trainerDisplayName = isTrainer
+      ? [current?.firstName, current?.lastName].filter(Boolean).join(" ") ||
+        current?.email ||
+        null
+      : this.trainer.trim() || null;
+    const payload: CreateTrainingSessionApiRequest = {
+      cohortId,
+      type: this.selectedType(),
+      modality: this.selectedModality(),
+      title: this.theme.trim(),
+      startsAtUtc,
+      endsAtUtc,
+      timeZoneId: PARIS_ZONE,
+      trainerAuthGateUserId: isTrainer ? (current?.userId ?? null) : null,
+      trainerDisplayName,
+      objective: this.objectives.trim() || null,
+      supports: this.supports.trim() || null,
+      comments: this.comments.trim() || null,
+      audienceMode: "whole-cohort",
+      participantEnrollmentIds: [],
+    };
+    this.saving.set(true);
+    this.saveError.set(false);
+    try {
+      const created = await this.api.create(payload);
+      if (generation !== this.generation) return;
+      this.sessions.update((items) => [created, ...items]);
+      this.theme = "";
+      this.objectives = "";
+      this.supports = "";
+      this.comments = "";
+      this.date = "";
+      this.start = "";
+      this.end = "";
+      if (openAttendance)
+        await this.router.navigate(["/presences"], {
+          queryParams: { sessionId: created.id },
+        });
+    } catch {
+      if (generation === this.generation) this.saveError.set(true);
+    } finally {
+      this.saving.set(false);
+    }
+  }
+  async setStatus(
+    item: TrainingSessionApi,
+    action: "cancel" | "complete",
+  ): Promise<void> {
+    if (
+      !this.canManageSession(item) ||
+      this.changingId() ||
+      item.status === "cancelled" ||
+      item.status === "completed"
+    )
+      return;
+    const generation = this.generation;
+    this.changingId.set(item.id);
+    this.actionErrorId.set("");
+    try {
+      const updated =
+        action === "cancel"
+          ? await this.api.cancel(item.id)
+          : await this.api.complete(item.id);
+      if (generation === this.generation)
+        this.sessions.update((rows) =>
+          rows.map((x) => (x.id === item.id ? updated : x)),
+        );
+    } catch {
+      if (generation === this.generation) this.actionErrorId.set(item.id);
+    } finally {
+      if (this.changingId() === item.id) this.changingId.set("");
+    }
   }
 }

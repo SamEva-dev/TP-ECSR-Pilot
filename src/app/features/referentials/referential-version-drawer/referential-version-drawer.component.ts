@@ -1,7 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { PROGRAM_CATALOG } from "../../../core/api-data/runtime-data.store";
-import type { ReferentialVersionFormValue, TrainingReferential } from "../../../core/models/referentials.models";
+import type {
+  ReferentialVersionFormValue,
+  TrainingReferential,
+} from "../../../core/models/referentials.models";
 
 @Component({
   selector: "app-referential-version-drawer",
@@ -24,22 +34,48 @@ export class ReferentialVersionDrawerComponent {
   readonly effectiveFrom = signal("2027-01-01");
   readonly status = signal<ReferentialVersionFormValue["status"]>("draft");
 
-  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || this.referentials()[0]?.programId || "");
-  readonly sources = computed(() => this.referentials().filter((item) => item.programId === this.effectiveProgramId()));
+  readonly effectiveProgramId = computed(
+    () =>
+      this.programId() ||
+      this.referentials().find((item) => item.id === this.defaultSourceId())
+        ?.programId ||
+      this.referentials()[0]?.programId ||
+      "",
+  );
+  readonly sources = computed(() =>
+    this.referentials().filter(
+      (item) => item.programId === this.effectiveProgramId(),
+    ),
+  );
 
   setProgram(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.programId.set(value);
     this.sourceId.set(this.sources()[0]?.id ?? "");
   }
-  setSource(event: Event): void { this.sourceId.set((event.target as HTMLSelectElement).value); }
-  setVersion(event: Event): void { this.version.set((event.target as HTMLInputElement).value); }
-  setCode(event: Event): void { this.code.set((event.target as HTMLInputElement).value); }
-  setEffectiveFrom(event: Event): void { this.effectiveFrom.set((event.target as HTMLInputElement).value); }
-  setStatus(event: Event): void { this.status.set((event.target as HTMLSelectElement).value as ReferentialVersionFormValue["status"]); }
+  setSource(event: Event): void {
+    this.sourceId.set((event.target as HTMLSelectElement).value);
+  }
+  setVersion(event: Event): void {
+    this.version.set((event.target as HTMLInputElement).value);
+  }
+  setCode(event: Event): void {
+    this.code.set((event.target as HTMLInputElement).value);
+  }
+  setEffectiveFrom(event: Event): void {
+    this.effectiveFrom.set((event.target as HTMLInputElement).value);
+  }
+  setStatus(event: Event): void {
+    this.status.set(
+      (event.target as HTMLSelectElement)
+        .value as ReferentialVersionFormValue["status"],
+    );
+  }
 
   initialise(): void {
-    const source = this.referentials().find((item) => item.id === this.defaultSourceId()) ?? this.referentials()[0];
+    const source =
+      this.referentials().find((item) => item.id === this.defaultSourceId()) ??
+      this.referentials()[0];
     if (!source) return;
     this.programId.set(source.programId);
     this.sourceId.set(source.id);

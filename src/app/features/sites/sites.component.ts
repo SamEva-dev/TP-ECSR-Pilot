@@ -1,9 +1,19 @@
 import { SiteApiStoreService } from "../../core/api-data/site-api-store.service";
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 
-import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../core/models/sites.models";
+import type {
+  SiteFormValue,
+  SiteOperationalStatus,
+  SiteProfile,
+} from "../../core/models/sites.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
 
@@ -23,28 +33,38 @@ export class SitesComponent {
   readonly editingSite = signal<SiteProfile | null>(null);
 
   readonly organizationSites = computed(() =>
-    this.store.sites().filter((site) => site.organizationId === this.workspace.organization()?.id),
+    this.store
+      .sites()
+      .filter(
+        (site) => site.organizationId === this.workspace.organization()?.id,
+      ),
   );
 
   readonly filteredSites = computed(() => {
     const query = this.query().trim().toLocaleLowerCase("fr-FR");
     const status = this.status();
     return this.organizationSites().filter((site) => {
-      const matchesQuery = !query || [site.name, site.city, site.code, site.manager].some((value) => value.toLocaleLowerCase("fr-FR").includes(query));
+      const matchesQuery =
+        !query ||
+        [site.name, site.city, site.code, site.manager].some((value) =>
+          value.toLocaleLowerCase("fr-FR").includes(query),
+        );
       const matchesStatus = status === "all" || site.status === status;
       return matchesQuery && matchesStatus;
     });
   });
 
-  readonly totals = computed(() => this.organizationSites().reduce(
-    (acc, site) => ({
-      students: acc.students + site.students,
-      trainers: acc.trainers + site.trainers,
-      programs: acc.programs + site.programs,
-      alerts: acc.alerts + site.alerts,
-    }),
-    { students: 0, trainers: 0, programs: 0, alerts: 0 },
-  ));
+  readonly totals = computed(() =>
+    this.organizationSites().reduce(
+      (acc, site) => ({
+        students: acc.students + site.students,
+        trainers: acc.trainers + site.trainers,
+        programs: acc.programs + site.programs,
+        alerts: acc.alerts + site.alerts,
+      }),
+      { students: 0, trainers: 0, programs: 0, alerts: 0 },
+    ),
+  );
 
   setStatus(value: string): void {
     this.status.set(value as "all" | SiteOperationalStatus);
@@ -63,7 +83,11 @@ export class SitesComponent {
   saveSite(value: SiteFormValue): void {
     const current = this.editingSite();
     if (current) this.store.update(current.id, value);
-    else this.store.create(this.workspace.organization()?.id ?? "org-aftral", value);
+    else
+      this.store.create(
+        this.workspace.organization()?.id ?? "org-aftral",
+        value,
+      );
     this.drawerOpen.set(false);
     this.editingSite.set(null);
   }

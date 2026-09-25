@@ -1,4 +1,5 @@
-export type WorkspaceScope = "platform" | "organization" | "site" | "program" | "cohort";
+export type WorkspaceScope =
+  "platform" | "organization" | "site" | "program" | "cohort";
 
 export type ProgramModule =
   | "planning"
@@ -67,8 +68,9 @@ export interface WorkspaceCohort {
   shortName: string;
   start: string;
   end: string;
-  status: "planned" | "active" | "completed";
+  status: "draft" | "planned" | "active" | "completed" | "cancelled";
   studentCount: number;
+  capacity?: number;
   referentialVersionId?: string;
 }
 
@@ -102,12 +104,7 @@ export type MembershipRole =
   | "read_only";
 
 export type MembershipScope =
-  | "platform"
-  | "organization"
-  | "site"
-  | "program"
-  | "cohort"
-  | "exam";
+  "platform" | "organization" | "site" | "program" | "cohort" | "exam";
 
 export interface WorkspaceMembership {
   id: string;

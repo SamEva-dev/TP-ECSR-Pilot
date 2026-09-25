@@ -2,131 +2,194 @@
   <div class="fixed inset-0 z-[80]">
     <button
       type="button"
-      class="absolute inset-0 cursor-default bg-[#0f2744]/35 backdrop-blur-[1px]"
+      class="absolute inset-0 bg-[#0f2744]/35"
       (click)="requestClose()"
       [attr.aria-label]="'planning.drawer.close' | t"
     ></button>
-
     <aside
-      class="absolute inset-y-0 right-0 flex w-full max-w-[610px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(16,38,68,0.18)]"
+      class="absolute inset-y-0 right-0 flex w-full max-w-[610px] flex-col bg-[#f7f9fc] shadow-xl"
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="'planning.drawer.title' | t"
     >
-      <header class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5">
-        <div class="flex items-center gap-3">
-          <span class="grid size-11 place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]">
-            <i class="ph ph-calendar-plus text-[22px]"></i>
-          </span>
-          <div>
-            <h2 class="text-[20px] font-extrabold tracking-[-0.4px] text-[#172033]">{{ "planning.drawer.title" | t }}</h2>
-            <p class="mt-0.5 text-[12px] text-[#718096]">{{ "planning.drawer.subtitle" | t }}</p>
-          </div>
+      <header
+        class="flex items-center justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"
+      >
+        <div>
+          <h2 class="text-[20px] font-extrabold text-[#172033]">
+            {{ "planning.drawer.title" | t }}
+          </h2>
+          <p class="text-[12px] text-[#718096]">
+            {{ "planning.drawer.subtitle" | t }}
+          </p>
         </div>
         <button
           type="button"
           (click)="requestClose()"
-          class="grid size-10 place-items-center rounded-[11px] border border-[#dce3eb] bg-white text-[#536277] transition hover:bg-[#f1f5f9]"
+          [disabled]="saving()"
+          class="rounded-lg border px-3 py-2"
           [attr.aria-label]="'planning.drawer.close' | t"
         >
-          <i class="ph ph-x text-[20px]"></i>
+          <i class="ph ph-x"></i>
         </button>
       </header>
-
-      <form class="flex min-h-0 flex-1 flex-col" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
-          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-            <div class="mb-4 flex items-center gap-2">
-              <i class="ph ph-calendar-dots text-[19px] text-[#2a64a2]"></i>
-              <h3 class="text-[15px] font-bold text-[#172033]">{{ "planning.drawer.schedule.title" | t }}</h3>
+      <form
+        class="flex min-h-0 flex-1 flex-col"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+        novalidate
+      >
+        <div class="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
+          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+            <h3 class="mb-4 font-bold">
+              {{ "planning.drawer.schedule.title" | t }}
+            </h3>
+            <div class="grid gap-3 sm:grid-cols-3">
+              <label class="text-sm"
+                >{{ "planning.drawer.schedule.date" | t }} *<input
+                  type="date"
+                  formControlName="date"
+                  class="mt-1 w-full rounded-lg border p-2"
+              /></label>
+              <label class="text-sm"
+                >{{ "planning.drawer.schedule.start" | t }} *<input
+                  type="time"
+                  formControlName="startTime"
+                  class="mt-1 w-full rounded-lg border p-2"
+              /></label>
+              <label class="text-sm"
+                >{{ "planning.drawer.schedule.end" | t }} *<input
+                  type="time"
+                  formControlName="endTime"
+                  class="mt-1 w-full rounded-lg border p-2"
+              /></label>
             </div>
-
-            <div class="grid gap-4 sm:grid-cols-3">
-              <div>
-                <label for="planning-date" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.schedule.date" | t }} *</label>
-                <input id="planning-date" type="date" formControlName="date" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-                @if (showRequired("date")) { <p class="mt-1 text-[11px] text-red-600">{{ "planning.drawer.errors.required" | t }}</p> }
-              </div>
-              <div>
-                <label for="planning-start" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.schedule.start" | t }} *</label>
-                <input id="planning-start" type="time" formControlName="startTime" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              </div>
-              <div>
-                <label for="planning-end" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.schedule.end" | t }} *</label>
-                <input id="planning-end" type="time" formControlName="endTime" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              </div>
-            </div>
-            @if ((submitted() || form.controls.endTime.touched) && invalidPeriod()) {
-              <p class="mt-2 flex items-center gap-1.5 text-[11px] text-red-600"><i class="ph ph-warning-circle"></i>{{ "planning.drawer.errors.period" | t }}</p>
+            @if (
+              submitted() &&
+              (form.controls.date.invalid ||
+                form.controls.startTime.invalid ||
+                form.controls.endTime.invalid)
+            ) {
+              <p class="mt-2 text-sm text-red-700">
+                {{ "planning.drawer.errors.required" | t }}
+              </p>
             }
-            @if ((submitted() || form.controls.date.touched) && form.controls.date.value && !dayFromDate()) {
-              <p class="mt-2 flex items-center gap-1.5 text-[11px] text-red-600"><i class="ph ph-warning-circle"></i>{{ "planning.drawer.errors.weekday" | t }}</p>
-            }
-          </section>
-
-          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-            <div class="mb-4 flex items-center gap-2">
-              <i class="ph ph-list-checks text-[19px] text-[#2a64a2]"></i>
-              <h3 class="text-[15px] font-bold text-[#172033]">{{ "planning.drawer.details.title" | t }}</h3>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label for="planning-promotion" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.promotion" | t }} *</label>
-                <div class="relative">
-                  <select id="planning-promotion" formControlName="promotionId" class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]">
-                    @for (promotion of promotions; track promotion.id) { <option [value]="promotion.id">{{ promotion.name }}</option> }
-                  </select>
-                  <i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b]"></i>
-                </div>
-              </div>
-              <div>
-                <label for="planning-type" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.type" | t }} *</label>
-                <div class="relative">
-                  <select id="planning-type" formControlName="type" class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]">
-                    @for (type of types; track type) { <option [value]="type">{{ typeKey(type) | t }}</option> }
-                  </select>
-                  <i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b]"></i>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <label for="planning-title" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.eventTitle" | t }} *</label>
-              <input id="planning-title" formControlName="title" [placeholder]="'planning.drawer.details.eventTitlePlaceholder' | t" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              @if (showRequired("title")) { <p class="mt-1 text-[11px] text-red-600">{{ "planning.drawer.errors.required" | t }}</p> }
-            </div>
-
-            <div class="mt-4 grid gap-4 sm:grid-cols-2">
-              <div>
-                <label for="planning-responsible" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.responsible" | t }} *</label>
-                <input id="planning-responsible" formControlName="responsible" [placeholder]="'planning.drawer.details.responsiblePlaceholder' | t" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              </div>
-              <div>
-                <label for="planning-location" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.location" | t }}</label>
-                <input id="planning-location" formControlName="location" [placeholder]="'planning.drawer.details.locationPlaceholder' | t" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              </div>
-            </div>
-
-            @if (form.controls.type.value === "driving") {
-              <div class="mt-4">
-                <label for="planning-competence" class="mb-1.5 block text-[12px] font-semibold text-[#344054]">{{ "planning.drawer.details.competence" | t }}</label>
-                <input id="planning-competence" formControlName="competence" [placeholder]="'planning.drawer.details.competencePlaceholder' | t" class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] outline-none focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]" />
-              </div>
+            @if (submitted() && invalidPeriod()) {
+              <p class="mt-2 text-sm text-red-700">
+                {{ "planning.drawer.errors.period" | t }}
+              </p>
             }
           </section>
-
-          <section class="rounded-[17px] border border-[#cfe0f0] bg-[#eef5fc] p-4">
-            <div class="flex gap-3">
-              <span class="grid size-10 shrink-0 place-items-center rounded-full bg-white text-[#2a64a2] shadow-sm"><i class="ph ph-info text-[19px]"></i></span>
-              <p class="text-[11.5px] leading-[1.55] text-[#5f7186]">{{ "planning.drawer.help" | t }}</p>
+          <section class="rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+            <h3 class="mb-4 font-bold">
+              {{ "planning.drawer.details.title" | t }}
+            </h3>
+            <p class="mb-4 text-sm text-[#475569]">
+              {{ "planning.drawer.details.promotion" | t }} :
+              {{ cohortName() || ("planning.real.noCohort" | t) }}
+            </p>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="text-sm"
+                >{{ "planning.drawer.details.type" | t }} *<select
+                  formControlName="type"
+                  class="mt-1 w-full rounded-lg border bg-white p-2"
+                >
+                  @for (type of types; track type) {
+                    <option [value]="type">{{ typeKey(type) | t }}</option>
+                  }
+                </select></label
+              >
+              <label class="text-sm"
+                >{{ "sessions.form.modality" | t }} *<select
+                  formControlName="modality"
+                  class="mt-1 w-full rounded-lg border bg-white p-2"
+                >
+                  @for (modality of modalities; track modality) {
+                    <option [value]="modality">
+                      {{ "planning.real.modality." + modality | t }}
+                    </option>
+                  }
+                </select></label
+              >
             </div>
+            <label class="mt-4 block text-sm"
+              >{{ "planning.drawer.details.eventTitle" | t }} *<input
+                formControlName="title"
+                [placeholder]="
+                  'planning.drawer.details.eventTitlePlaceholder' | t
+                "
+                class="mt-1 w-full rounded-lg border p-2"
+            /></label>
+            @if (submitted() && form.controls.title.hasError("required")) {
+              <p class="text-sm text-red-700">
+                {{ "planning.drawer.errors.required" | t }}
+              </p>
+            }
+            @if (submitted() && form.controls.title.hasError("maxlength")) {
+              <p class="text-sm text-red-700">
+                {{ "planning.real.tooLong" | t }}
+              </p>
+            }
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <label class="text-sm"
+                >{{ "planning.drawer.details.responsible" | t
+                }}<input
+                  formControlName="responsible"
+                  class="mt-1 w-full rounded-lg border p-2"
+              /></label>
+              <label class="text-sm"
+                >{{ "planning.drawer.details.location" | t
+                }}<input
+                  formControlName="location"
+                  class="mt-1 w-full rounded-lg border p-2"
+              /></label>
+            </div>
+            <label class="mt-4 block text-sm"
+              >{{ "sessions.form.objectives" | t
+              }}<textarea
+                formControlName="objective"
+                rows="3"
+                class="mt-1 w-full rounded-lg border p-2"
+              ></textarea>
+            </label>
+            @if (
+              submitted() &&
+              (form.controls.responsible.invalid ||
+                form.controls.location.invalid ||
+                form.controls.objective.invalid)
+            ) {
+              <p class="text-sm text-red-700">
+                {{ "planning.real.tooLong" | t }}
+              </p>
+            }
           </section>
+          @if (error()) {
+            <p
+              role="alert"
+              class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+            >
+              {{ "planning.real.saveError" | t }}
+            </p>
+          }
         </div>
-
-        <footer class="flex items-center justify-end gap-2 border-t border-[#dfe5ec] bg-white px-6 py-4">
-          <button type="button" (click)="requestClose()" class="inline-flex h-[40px] items-center justify-center rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#475569] shadow-sm">{{ "planning.drawer.cancel" | t }}</button>
-          <button type="submit" class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"><i class="ph ph-calendar-plus text-[17px]"></i>{{ "planning.drawer.submit" | t }}</button>
+        <footer class="flex justify-end gap-2 border-t bg-white px-6 py-4">
+          <button
+            type="button"
+            (click)="requestClose()"
+            [disabled]="saving()"
+            class="rounded-lg border px-4 py-2"
+          >
+            {{ "planning.drawer.cancel" | t }}
+          </button>
+          <button
+            type="submit"
+            [disabled]="saving() || !cohortName()"
+            class="rounded-lg bg-[#2b66a4] px-4 py-2 font-semibold text-white disabled:opacity-50"
+          >
+            {{
+              (saving() ? "planning.real.saving" : "planning.drawer.submit") | t
+            }}
+          </button>
         </footer>
       </form>
     </aside>

@@ -28,17 +28,23 @@ export class CertificationComponent {
   readonly scheme = this.contextData.certificationScheme;
   readonly juryMembers = this.contextData.juryMembers;
   readonly program = this.contextData.program;
-  readonly readyCount = computed(() =>
-    this.contextData.certificationCandidates().filter((item) => item.ready).length,
+  readonly readyCount = computed(
+    () =>
+      this.contextData.certificationCandidates().filter((item) => item.ready)
+        .length,
   );
   readonly completionRate = computed(() => {
     const candidates = this.contextData.certificationCandidates();
-    return Math.round((this.readyCount() / Math.max(candidates.length, 1)) * 100);
+    return Math.round(
+      (this.readyCount() / Math.max(candidates.length, 1)) * 100,
+    );
   });
   readonly currentCandidate = computed(() => {
     const candidates = this.contextData.certificationCandidates();
     const studentId = this.sessionService.session()?.studentId;
-    return candidates.find((item) => item.studentId === studentId) ?? candidates[0];
+    return (
+      candidates.find((item) => item.studentId === studentId) ?? candidates[0]
+    );
   });
 
   get examSession() {
@@ -66,11 +72,18 @@ export class CertificationComponent {
   }
 
   readinessClasses(ready: boolean): string {
-    return ready ? "bg-[#d8f8df] text-[#18a547]" : "bg-[#fff0c9] text-[#8b5e00]";
+    return ready
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : "bg-[#fff0c9] text-[#8b5e00]";
   }
 
-  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
-    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+  unitStatus(
+    candidate: CertificationCandidate,
+    unitId: string,
+  ): CertificationUnitStatus {
+    const explicit = candidate.unitStatuses?.find(
+      (item) => item.unitId === unitId,
+    )?.status;
     if (explicit) return explicit;
     if (unitId === "ccp1") return candidate.ccp1;
     if (unitId === "ccp2") return candidate.ccp2;

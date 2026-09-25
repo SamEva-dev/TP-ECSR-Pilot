@@ -1,7 +1,8 @@
 // Extracted from the former mock-data contract. No runtime demo data lives here.
 // This file contains TypeScript contracts only and is safe in API-only mode.
 
-export type AttendanceStatus = "pending" | "present" | "late" | "absent" | "excused";
+export type AttendanceStatus =
+  "pending" | "present" | "late" | "absent" | "excused";
 
 export interface AttendanceStudent {
   id: string;

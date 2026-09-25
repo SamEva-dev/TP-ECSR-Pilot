@@ -79,12 +79,7 @@
     "rememberMe": "Keep me signed in",
     "registrationReady": "Your organisation has been created. Welcome to Pedagora Pilot.",
     "applicationAdded": "Pedagora Pilot has been added to your existing account.",
-    "registrationPending": "Your registration has been recorded. Complete account verification to continue.",
-    "demoTitle": "Demo sign in",
-    "demoSubtitle": "Choose a profile. Credentials are pre-filled, remain visible in the fields and can be edited before signing in.",
-    "demoCredentialsEditable": "Demo mode: these accounts use the real AuthGate and real Pedagora data stored in the database.",
-    "demoRegistrationDisabled": "Account creation is simulated in demo mode. Contact the Pedagora Pilot administrator to obtain real access or enable normal mode.",
-    "togglePassword": "Show or hide password"
+    "registrationPending": "Your registration has been recorded. Complete account verification to continue."
   },
   "home": {
     "greeting": "Hello {{name}}",
@@ -233,6 +228,24 @@
         "classroomDetail": "Intersections and priorities",
         "fullFile": "View my full record"
       }
+    },
+    "placeholderTitle": "Loading your workspace",
+    "placeholderBody": "Your organization data is being loaded.",
+    "real": {
+      "selectedCohort": "Selected cohort: {{name}}",
+      "loading": "Loading data…",
+      "noCohort": "No cohort selected. Select a cohort in your workspace.",
+      "failed": "Unable to load this data. Refresh the page and try again.",
+      "certificationObtained": "Certifications obtained",
+      "hoursProgress": "Training hours delivered",
+      "noPlannedHours": "No hours planned for this cohort.",
+      "workplaceCompleted": "Work placements completed",
+      "certificationEligible": "Eligible certification candidates",
+      "trainerSubtitle": "Your sessions today · {{name}}",
+      "noSessions": "No sessions are assigned to you today for this cohort.",
+      "studentSubtitle": "Your training progress",
+      "workspaceFailed": "Unable to load your workspace. Refresh the page and try again.",
+      "noDashboard": "No dashboard is available for this role."
     }
   },
   "common": {
@@ -270,7 +283,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "more": "More"
   },
   "nav": {
     "home": "Home",
@@ -357,16 +371,30 @@
       "requiredHint": "* Required fields",
       "cancel": "Cancel",
       "submit": "Add student",
-      "created": "{{name}} has been added to the list.",
       "errors": {
         "required": "This field is required.",
         "email": "Enter a valid email address."
       }
+    },
+    "api": {
+      "createFailed": "Enrollment was not saved. Check the details and try again.",
+      "invalidContext": "Select a valid cohort before enrolling this student.",
+      "refreshFailed": "Enrollment was saved, but the list could not be refreshed. Reload the page.",
+      "conflict": "This student is already enrolled in the cohort, or capacity has been reached.",
+      "forbidden": "You cannot enroll this student in this organization."
+    },
+    "enrollmentStatus": {
+      "pending": "Pending",
+      "active": "Enrolled",
+      "suspended": "Suspended",
+      "completed": "Completed",
+      "withdrawn": "Withdrawn",
+      "cancelled": "Cancelled"
     }
   },
   "planning": {
     "title": "Schedule",
-    "subtitle": "Week of 21 to 25 September 2026",
+    "subtitle": "Session calendar",
     "add": "Add to schedule",
     "filters": {
       "title": "Filters",
@@ -380,13 +408,6 @@
       "week": "Week",
       "month": "Month"
     },
-    "days": {
-      "monday": "Monday 21 September",
-      "tuesday": "Tuesday 22 September",
-      "wednesday": "Wednesday 23 September",
-      "thursday": "Thursday 24 September",
-      "friday": "Friday 25 September"
-    },
     "types": {
       "classroom": "Classroom",
       "driving": "Driving",
@@ -398,29 +419,29 @@
       "event": "Event",
       "distance": "Remote learning"
     },
-    "events": {
-      "intersections": "Intersections and priorities",
-      "bends": "Driving — bends and gradients",
-      "sheets30to34": "Presentations: sheets 30 to 34",
-      "questioningMethod": "Questioning method",
-      "c2Evaluation": "Intermediate C2 assessment",
-      "roadRiskAwareness": "Road risk awareness",
-      "motorwayMerging": "Driving — motorway merging",
-      "signsCatchup": "Catch-up — road signs",
-      "companyInternship": "Company internship",
-      "educationalCouncil": "Educational council",
-      "remoteClass": "Virtual class — reaction time and distances"
-    },
-    "people": {
-      "samFokam": "Sam Fokam",
-      "julieMoreau": "Julie Moreau",
-      "karimBenali": "Karim Benali"
-    },
     "programmed": {
       "classroomTitle": "Scheduled classroom sessions",
       "drivingTitle": "Scheduled driving sessions"
     },
     "emptyDay": "No session matches these filters.",
+    "real": {
+      "navigation": "Calendar navigation",
+      "previous": "Previous period",
+      "next": "Next period",
+      "today": "Today",
+      "loading": "Loading schedule…",
+      "loadError": "Unable to load the schedule. Check your connection and permissions.",
+      "noCohort": "Select a cohort to view its schedule.",
+      "saving": "Saving…",
+      "saveError": "Unable to save. Check the time range and daylight saving transition.",
+      "tooLong": "A field exceeds the allowed length.",
+      "modality": {
+        "onsite": "On site",
+        "remote-live": "Live remote",
+        "remote-async": "Self-paced remote",
+        "practical": "Practical"
+      }
+    },
     "drawer": {
       "title": "Add to schedule",
       "subtitle": "Schedule a lesson, assessment, internship or event.",
@@ -441,16 +462,16 @@
         "responsiblePlaceholder": "E.g. Marc Dupont",
         "location": "Room / location / details",
         "locationPlaceholder": "E.g. Room 2",
-        "competence": "Skill worked on"
+        "competence": "Skill worked on",
+        "competencePlaceholder": "Select a competency"
       },
-      "help": "The item is added immediately to the demo schedule. Once the backend is connected, it will be stored and synchronized with sessions and attendance.",
+      "help": "The session will be saved in the selected cohort.",
       "cancel": "Cancel",
       "submit": "Add to schedule",
       "created": "“{{title}}” has been added to the schedule.",
       "errors": {
         "required": "This field is required.",
-        "period": "End time must be after start time.",
-        "weekday": "The current demo view covers Monday to Friday only."
+        "period": "End time must be after start time."
       }
     },
     "workModes": {
@@ -554,13 +575,17 @@
         "all": "All",
         "active": "Active",
         "planned": "Upcoming",
-        "completed": "Completed"
+        "completed": "Completed",
+        "draft": "Drafts",
+        "cancelled": "Cancelled"
       },
       "filterHelp": "Displayed cohorts follow the current site and training program context.",
       "status": {
         "planned": "Upcoming",
         "active": "Active",
-        "completed": "Completed"
+        "completed": "Completed",
+        "draft": "Draft",
+        "cancelled": "Cancelled"
       },
       "planned": {
         "start": "Start date",
@@ -588,6 +613,21 @@
         "versionBindingTitle": "Framework version locked to the cohort",
         "versionBindingHelp": "The cohort remains linked to this framework version even if a newer version becomes active later."
       }
+    },
+    "api": {
+      "code": "Cohort code",
+      "name": "Cohort name",
+      "referential": "Curriculum version",
+      "selectReferential": "Select an active version",
+      "noReferential": "No active curriculum version is available for this program.",
+      "capacity": "Maximum capacity",
+      "learners": "Enrolled students",
+      "invalid": "Complete all fields and check the dates.",
+      "invalidContext": "The site, program or curriculum context is invalid.",
+      "createFailed": "The cohort was not saved. Check the code and dates, then try again.",
+      "refreshFailed": "The cohort was saved, but the list could not be refreshed. Reload the page.",
+      "conflict": "The code already exists or the program offering is unavailable.",
+      "forbidden": "You cannot create cohorts in this organization."
     }
   },
   "sessions": {
@@ -599,7 +639,10 @@
       "evaluation": "Assessment",
       "sensitization": "Awareness",
       "catchup": "Catch-up",
-      "event": "Event"
+      "event": "Event",
+      "distance": "Distance learning",
+      "driving": "Driving",
+      "internship": "Placement"
     },
     "form": {
       "title": "New teaching session",
@@ -666,11 +709,28 @@
       "remote-live": "Live remote",
       "remote-async": "Asynchronous remote",
       "practical": "Practical / vehicle"
+    },
+    "real": {
+      "loading": "Loading sessions…",
+      "loadError": "Unable to load sessions. Check your connection and access.",
+      "saveError": "Unable to create the session. Check the title, times and daylight-saving transition.",
+      "saving": "Creating…",
+      "empty": "No session has been scheduled for this cohort.",
+      "timezone": "Training site times: Europe/Paris. Ambiguous times during daylight-saving changes are rejected.",
+      "status": {
+        "planned": "Scheduled",
+        "inprogress": "In progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "complete": "Complete",
+      "cancel": "Cancel session",
+      "actionError": "Unable to update this session."
     }
   },
   "sheets": {
     "title": "Sheets / Presentations",
-    "subtitle": "{{student}} · 58 reference sheets",
+    "subtitle": "Pedagogical topics for {{student}}",
     "evaluate": "Assess a presentation",
     "kpi": {
       "prepared": "Prepared",
@@ -708,10 +768,6 @@
       "evaluator": "Evaluator",
       "status": "Status"
     },
-    "comments": {
-      "validated": "Good delivery; questioning method used effectively.",
-      "rework": "Structure needs review: introduction too long, RIP incomplete."
-    },
     "empty": {
       "title": "No sheets found",
       "subtitle": "Change the filters to display other sheets."
@@ -720,54 +776,9 @@
       "title": "Presentation assessment",
       "sheet": "Sheet",
       "duration": "Presentation duration",
-      "commentPlaceholder": "Evaluator's comments…",
       "save": "Save assessment",
-      "saved": "Assessment saved in demo mode.",
-      "level": {
-        "acquired": "Acquired",
-        "in_progress": "In progress",
-        "review": "Review"
-      },
-      "criteria": {
-        "structure": "Structure",
-        "introduction": "Introduction",
-        "hook": "Opening hook",
-        "objectives": "Objectives",
-        "content": "Content",
-        "regulation": "Regulations",
-        "questioningMethod": "Questioning method",
-        "animation": "Facilitation",
-        "timeManagement": "Time management",
-        "rip": "RIP",
-        "review": "Review"
-      },
-      "subtitle": "Assess a sheet presentation with a complete rubric and keep a useful pedagogical summary.",
       "close": "Close panel",
-      "contextTitle": "Assessment context",
-      "student": "Student",
-      "date": "Presentation date",
-      "evaluator": "Assessing trainer",
-      "gridTitle": "Detailed assessment grid",
-      "gridSubtitle": "Rate each criterion according to the level observed during the presentation.",
-      "summary": {
-        "acquired": "acquired",
-        "inProgress": "in progress",
-        "review": "to review"
-      },
-      "synthesisTitle": "Pedagogical summary",
-      "positivePoints": "Positive points",
-      "positivePlaceholder": "E.g. relevant hook, logical progression, good group participation…",
-      "improvements": "Points to improve",
-      "improvementsPlaceholder": "E.g. clarify regulations, incomplete RIP, time management…",
       "generalComment": "General comment",
-      "nextObjective": "Next objective",
-      "nextObjectivePlaceholder": "E.g. Rework the RIP and reformulate open questions before the next presentation.",
-      "decision": {
-        "title": "Pedagogical decision",
-        "subtitle": "Set the sheet status after the presentation.",
-        "validated": "Sheet validated",
-        "rework": "Needs rework"
-      },
       "cancel": "Cancel"
     },
     "titles": {
@@ -829,6 +840,20 @@
       "occupationalRoadRisk": "Occupational road risk",
       "pedagogicalCommunication": "Pedagogical communication",
       "endTrainingReview": "End-of-training review"
+    },
+    "real": {
+      "subtitle": "Individual progress through the training topics",
+      "workspaceFailed": "Unable to load your workspace.",
+      "loading": "Loading topics…",
+      "rosterFailed": "Unable to load learners in this cohort.",
+      "topicsFailed": "Unable to load this learner’s topics.",
+      "noStudents": "No learners are enrolled in this cohort.",
+      "noTopics": "No topics are configured in this framework.",
+      "unknownStatus": "Unknown status",
+      "savedFields": "Dates, status, duration and comments are saved to the learner’s record.",
+      "invalid": "Choose a status and provide a valid date and duration for a presented topic.",
+      "saveFailed": "Could not save. Check your access and try again.",
+      "saving": "Saving…"
     }
   },
   "skills": {
@@ -912,6 +937,30 @@
         "positive": "Very good cyclist management.",
         "workOn": "Anticipation around stopped buses.",
         "nextGoal": "Eco-driving in town."
+      }
+    },
+    "real": {
+      "subtitle": "Progress assessed against the training competency framework",
+      "loading": "Loading assessments…",
+      "failed": "Unable to load competencies. Check access and try again.",
+      "workspaceFailed": "Unable to load your workspace.",
+      "noStudents": "No learners are enrolled in this cohort.",
+      "definitionsUnavailable": "The detailed framework is unavailable; assessments remain visible.",
+      "noDefinitions": "No competencies are defined in this framework.",
+      "noCriteria": "No subcompetencies are defined.",
+      "criteria": "Subcompetencies",
+      "score": "Score: {{value}} / 100",
+      "drivingTitle": "Related driving evaluations",
+      "drivingFailed": "Unable to load driving evaluations.",
+      "noDriving": "No driving evaluation is linked to this competency.",
+      "positive": "Positive point",
+      "difficulty": "To work on",
+      "nextGoal": "Next goal",
+      "level": {
+        "acquired": "Acquired",
+        "in_progress": "In progress",
+        "rework": "Needs work",
+        "not_assessed": "Not assessed"
       }
     }
   },
@@ -1043,6 +1092,29 @@
         "difficulty": "Anticipation around stopped buses.",
         "nextGoal": "Eco-driving in the city."
       }
+    },
+    "real": {
+      "subtitle": "Actual driving skills evaluations",
+      "loading": "Loading learners and competency framework…",
+      "loadError": "Unable to load learners. Check your access and try again.",
+      "noStudents": "No learners in this cohort.",
+      "definitionsError": "Unable to load the competency framework.",
+      "noCompetencies": "No competencies are available in this framework.",
+      "historyLoading": "Loading evaluations…",
+      "historyError": "Unable to load driving evaluations.",
+      "noHistory": "No driving evaluation has been recorded.",
+      "criteriaHelp": "Select a level for each criterion before saving.",
+      "saving": "Saving…",
+      "saveError": "Unable to save. Check your access and try again.",
+      "levels": {
+        "not_assessed": "Not assessed",
+        "in_progress": "In progress",
+        "rework": "Needs work",
+        "acquired": "Acquired"
+      },
+      "linkedSession": "Linked driving session",
+      "noLinkedSession": "Evaluation without a scheduled session",
+      "sessionsError": "Scheduled sessions are unavailable; you can still save an evaluation without a link."
     }
   },
   "attendance": {
@@ -1057,7 +1129,7 @@
       "late": "Late",
       "absent": "Absent",
       "missedHours": "Missed hours",
-      "excusedHint": "including 1 excused"
+      "excusedHint": "including {{count}} excused"
     },
     "list": {
       "title": "Students",
@@ -1071,7 +1143,7 @@
       "excused": "Excused",
       "pending": "Pending"
     },
-    "studentMeta": "{{catchup}} h catch-up · {{absences}} absence(s)",
+    "studentMeta": "{{catchup}} h to make up for this session · {{absences}} absence(s) in this session",
     "fields": {
       "arrival": "Arrival",
       "departure": "Departure",
@@ -1094,6 +1166,15 @@
       "catchup": "Catch-up",
       "sessionTitle": "Session on 21 September 2026",
       "readOnlyHint": "Attendance is recorded by your trainer or training centre. Contact administration if something needs correcting."
+    },
+    "real": {
+      "loading": "Loading attendance…",
+      "failed": "Unable to load attendance for this session.",
+      "empty": "No sessions are available in the selected cohort.",
+      "noEntries": "No attendance has been recorded for this session.",
+      "chooseSession": "Session",
+      "saveFailed": "Could not save attendance. Check the times and try again.",
+      "sessionTitle": "Session and attendance"
     }
   },
   "internships": {
@@ -1115,7 +1196,8 @@
       "completed": "Completed",
       "incomplete": "Incomplete",
       "inProgress": "In progress",
-      "planned": "Planned"
+      "planned": "Planned",
+      "cancelled": "Cancelled"
     },
     "card": {
       "planned": "Planned hours",
@@ -1127,7 +1209,8 @@
     "observationsTitle": "Tutor observations and assessment",
     "activityStatus": {
       "done": "Done",
-      "pending": "To do"
+      "pending": "To do",
+      "notApplicable": "Not applicable"
     },
     "activities": {
       "observeDrivingLessons": "Observation of driving lessons",
@@ -1188,8 +1271,54 @@
         "required": "This field is required.",
         "email": "Enter a valid email address.",
         "dateRange": "The end date must be on or after the start date.",
-        "hours": "Planned hours must be between 1 and 1,000 hours."
+        "hours": "Hours must be greater than 0 and no more than 2,000."
       }
+    },
+    "real": {
+      "loadError": "Unable to load placements. Check your access and try again.",
+      "loading": "Loading placements…",
+      "typesError": "Unable to load placement types from the framework.",
+      "noTypes": "No placement type is defined for this framework.",
+      "empty": "No placement period has been recorded.",
+      "selectStudent": "Select a learner",
+      "periodType": "Placement type",
+      "selectPeriodType": "Select a type",
+      "createError": "Unable to create the period. Check the dates and details and try again.",
+      "saving": "Saving…",
+      "noActivities": "No activities are defined for this placement type.",
+      "documentsTitle": "Required documents",
+      "noDocuments": "No documents are required for this placement type.",
+      "noObservation": "No tutor observation.",
+      "documentStatus": {
+        "missing": "Missing",
+        "available": "Available",
+        "validated": "Validated"
+      }
+    },
+    "followup": {
+      "editHours": "Record hours and tutor notes",
+      "save": "Save",
+      "updateError": "Unable to update. Check the values, linked document and your access, then try again.",
+      "linkedDocument": "Linked document",
+      "noDocument": "No document linked",
+      "documentStatus": "Status",
+      "documentsError": "Documents are unavailable for linking.",
+      "addEvaluation": "Add an evaluation",
+      "kindLabel": "Evaluation type",
+      "kind": {
+        "tutor": "Tutor",
+        "trainer": "Trainer",
+        "selfassessment": "Self assessment",
+        "final": "Final"
+      },
+      "summary": "Summary",
+      "strengths": "Strengths",
+      "improvements": "Areas for improvement",
+      "validated": "Approved",
+      "undetermined": "Not decided",
+      "yes": "Yes",
+      "no": "No",
+      "activityComment": "Activity comment"
     }
   },
   "documents": {
@@ -1468,11 +1597,12 @@
       "suspend": "Suspend",
       "activate": "Activate",
       "delete": "Delete account",
-      "empty": "No account matches your filters.",
+      "empty": "No account is available for this organization.",
       "multiScopeTitle": "Users & access perimeters",
       "scopeRule": "Context-aware access",
       "searchExtended": "Search by name, email, site or program…",
-      "assignmentCount": "{{count}} assignment(s)"
+      "assignmentCount": "{{count}} assignment(s)",
+      "loading": "Loading accounts and access rights…"
     },
     "userDetails": {
       "marc": "Trainer · Driving · Competency C3",
@@ -1563,6 +1693,22 @@
         "cohort": "Cohort",
         "exam": "Exam session"
       }
+    },
+    "real": {
+      "subtitle": "Accounts and roles stored in AuthGate for your organization.",
+      "refresh": "Refresh",
+      "person": "Name",
+      "status": "Status",
+      "actions": "Actions",
+      "chooseRole": "Select a role",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate",
+      "previous": "Previous",
+      "next": "Next",
+      "failed": "The change failed. Refresh and try again.",
+      "forbidden": "You cannot manage these accounts.",
+      "lastAdmin": "The last organization administrator cannot be removed.",
+      "unavailable": "Could not load accounts."
     }
   },
   "administration": {
@@ -1794,6 +1940,58 @@
       "open": "Open exam file",
       "schedule": "Exam schedule",
       "notRegistered": "No certification session is assigned to this student yet."
+    },
+    "real": {
+      "loading": "Loading student record…",
+      "invalidId": "Invalid enrollment identifier.",
+      "forbidden": "You cannot view this record.",
+      "notFound": "No student record matches your account or this enrollment.",
+      "failed": "Could not load the record. Reload the page.",
+      "sectionFailed": "This section is temporarily unavailable.",
+      "sections": "Record sections",
+      "enrolledOn": "Enrollment date",
+      "status": "Enrollment status",
+      "birthDate": "Date of birth",
+      "topicsPresented": "Topics presented or validated",
+      "competenciesAssessed": "Competencies assessed",
+      "measuredHint": "These totals come from recorded topics and assessments.",
+      "score": "Score",
+      "positive": "Strengths",
+      "difficulty": "Areas to improve",
+      "nextGoal": "Next goal",
+      "tutor": "Tutor",
+      "emptyTopics": "No topics in this curriculum.",
+      "emptyCompetencies": "No competencies in this curriculum.",
+      "emptyDriving": "No driving assessments recorded.",
+      "emptyPeriods": "No workplace periods recorded.",
+      "tabs": {
+        "overview": "Overview",
+        "topics": "Learning topics",
+        "competencies": "Competencies",
+        "driving": "Driving",
+        "periods": "Workplace periods"
+      },
+      "topicStates": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "ready": "Ready",
+        "presented": "Presented",
+        "validated": "Validated",
+        "rework": "Needs work"
+      },
+      "levels": {
+        "not_assessed": "Not assessed",
+        "in_progress": "In progress",
+        "rework": "Needs work",
+        "acquired": "Acquired"
+      },
+      "periodStates": {
+        "planned": "Planned",
+        "completed": "Completed",
+        "incomplete": "Incomplete",
+        "cancelled": "Cancelled",
+        "inProgress": "In progress"
+      }
     }
   },
   "sheetConfig": {
@@ -3785,5 +3983,21 @@
     "REPORTING_FORBIDDEN": "You are not allowed to view this reporting data.",
     "AUDIT_ACTION_REQUIRED": "The audit action is required.",
     "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required."
+  },
+  "accessPolicy": {
+    "readOnly": "Read-only access"
+  },
+  "attention": {
+    "title": "Needs attention",
+    "subtitle": "Items that require your attention",
+    "empty": "Nothing requires attention.",
+    "markAllRead": "Mark all as read",
+    "open": "Open"
+  },
+  "globalSearch": {
+    "ariaLabel": "Search Pedagora Pilot",
+    "empty": "No results.",
+    "quickAccess": "Quick access",
+    "results": "Results"
   }
 }

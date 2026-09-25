@@ -14,10 +14,13 @@ export type TrainingSessionType =
   | "sensitization"
   | "event";
 
-export type TrainingSessionModality = "onsite" | "remote-live" | "remote-async" | "practical";
-export type TrainingSessionStatus = "planned" | "inprogress" | "completed" | "cancelled";
+export type TrainingSessionModality =
+  "onsite" | "remote-live" | "remote-async" | "practical";
+export type TrainingSessionStatus =
+  "planned" | "inprogress" | "completed" | "cancelled";
 export type SessionAudienceMode = "whole-cohort" | "selected-enrollments";
-export type AttendanceStatus = "pending" | "present" | "late" | "absent" | "excused";
+export type AttendanceStatus =
+  "pending" | "present" | "late" | "absent" | "excused";
 
 export interface TrainingSessionApi {
   id: string;
@@ -112,39 +115,70 @@ export class TrainingDeliveryApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/v1/training-sessions`;
 
-  list(cohortId?: string, fromUtc?: string, toUtc?: string): Promise<TrainingSessionApi[]> {
+  list(
+    cohortId?: string,
+    fromUtc?: string,
+    toUtc?: string,
+  ): Promise<TrainingSessionApi[]> {
     let params = new HttpParams();
     if (cohortId) params = params.set("cohortId", cohortId);
     if (fromUtc) params = params.set("fromUtc", fromUtc);
     if (toUtc) params = params.set("toUtc", toUtc);
-    return firstValueFrom(this.http.get<TrainingSessionApi[]>(this.baseUrl, { params }));
+    return firstValueFrom(
+      this.http.get<TrainingSessionApi[]>(this.baseUrl, { params }),
+    );
   }
 
   get(id: string): Promise<TrainingSessionApi> {
-    return firstValueFrom(this.http.get<TrainingSessionApi>(`${this.baseUrl}/${id}`));
+    return firstValueFrom(
+      this.http.get<TrainingSessionApi>(`${this.baseUrl}/${id}`),
+    );
   }
 
-  create(request: CreateTrainingSessionApiRequest): Promise<TrainingSessionApi> {
-    return firstValueFrom(this.http.post<TrainingSessionApi>(this.baseUrl, request));
+  create(
+    request: CreateTrainingSessionApiRequest,
+  ): Promise<TrainingSessionApi> {
+    return firstValueFrom(
+      this.http.post<TrainingSessionApi>(this.baseUrl, request),
+    );
   }
 
-  update(id: string, request: Omit<CreateTrainingSessionApiRequest, "cohortId" | "externalKey">): Promise<TrainingSessionApi> {
-    return firstValueFrom(this.http.put<TrainingSessionApi>(`${this.baseUrl}/${id}`, request));
+  update(
+    id: string,
+    request: Omit<CreateTrainingSessionApiRequest, "cohortId" | "externalKey">,
+  ): Promise<TrainingSessionApi> {
+    return firstValueFrom(
+      this.http.put<TrainingSessionApi>(`${this.baseUrl}/${id}`, request),
+    );
   }
 
   cancel(id: string): Promise<TrainingSessionApi> {
-    return firstValueFrom(this.http.post<TrainingSessionApi>(`${this.baseUrl}/${id}/cancel`, {}));
+    return firstValueFrom(
+      this.http.post<TrainingSessionApi>(`${this.baseUrl}/${id}/cancel`, {}),
+    );
   }
 
   complete(id: string): Promise<TrainingSessionApi> {
-    return firstValueFrom(this.http.post<TrainingSessionApi>(`${this.baseUrl}/${id}/complete`, {}));
+    return firstValueFrom(
+      this.http.post<TrainingSessionApi>(`${this.baseUrl}/${id}/complete`, {}),
+    );
   }
 
   getAttendance(id: string): Promise<AttendanceSheetApi> {
-    return firstValueFrom(this.http.get<AttendanceSheetApi>(`${this.baseUrl}/${id}/attendance`));
+    return firstValueFrom(
+      this.http.get<AttendanceSheetApi>(`${this.baseUrl}/${id}/attendance`),
+    );
   }
 
-  saveAttendance(id: string, request: SaveAttendanceApiRequest): Promise<AttendanceSheetApi> {
-    return firstValueFrom(this.http.put<AttendanceSheetApi>(`${this.baseUrl}/${id}/attendance`, request));
+  saveAttendance(
+    id: string,
+    request: SaveAttendanceApiRequest,
+  ): Promise<AttendanceSheetApi> {
+    return firstValueFrom(
+      this.http.put<AttendanceSheetApi>(
+        `${this.baseUrl}/${id}/attendance`,
+        request,
+      ),
+    );
   }
 }

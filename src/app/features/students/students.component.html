@@ -14,6 +14,7 @@
     <button
       type="button"
       (click)="openAddDrawer()"
+      [disabled]="saving() || !contextData.cohort()?.apiId"
       class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] sm:self-auto"
     >
       <i class="ph ph-user-plus text-[17px]"></i>
@@ -21,6 +22,11 @@
     </button>
   </div>
 
+  @if (error()) {
+    <p role="alert" class="mt-4 rounded-[12px] bg-red-50 p-3 text-red-700">
+      {{ error() | t }}
+    </p>
+  }
   @if (createdStudentName()) {
     <div
       class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"
@@ -80,9 +86,21 @@
           class="h-[40px] w-full appearance-none rounded-[12px] border border-[#dce3eb] bg-white pl-4 pr-10 text-[13px] text-[#475569] outline-none shadow-sm focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
         >
           <option value="all">{{ "students.filters.allStatuses" | t }}</option>
-          <option value="good">{{ "students.status.good" | t }}</option>
-          <option value="warning">{{ "students.status.warning" | t }}</option>
-          <option value="late">{{ "students.status.late" | t }}</option>
+          @for (
+            entry of [
+              "pending",
+              "active",
+              "suspended",
+              "completed",
+              "withdrawn",
+              "cancelled",
+            ];
+            track entry
+          ) {
+            <option [value]="entry">
+              {{ "students.enrollmentStatus." + entry | t }}
+            </option>
+          }
         </select>
         <i
           class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
@@ -95,7 +113,9 @@
     <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (student of filteredStudents(); track student.id) {
         <a
-          [routerLink]="['/stagiaires', student.id]"
+          [routerLink]="
+            student.enrollmentId ? ['/stagiaires', student.enrollmentId] : null
+          "
           class="group block rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cce2] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#8eb4db]"
         >
           <div class="flex items-start gap-3">
@@ -115,60 +135,11 @@
             <span
               [class]="
                 'inline-flex shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ' +
-                statusClasses(student.status)
+                statusClasses(student.enrollmentStatus)
               "
-              >{{ statusLabelKey(student.status) | t }}</span
+              >{{ statusLabelKey(student.enrollmentStatus) | t }}</span
             >
           </div>
-
-          <app-progress-bar
-            class="mt-4 block"
-            [value]="student.progress"
-            heightClass="h-[10px]"
-          />
-
-          <div class="mt-3 grid grid-cols-3 gap-2 text-center">
-            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
-              <p class="text-[14px] font-bold text-[#172033]">
-                {{ student.progress }} %
-              </p>
-              <p class="mt-0.5 text-[11px] text-[#718096]">
-                {{ "students.card.progress" | t }}
-              </p>
-            </div>
-            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
-              <p class="text-[14px] font-bold text-[#172033]">
-                {{ student.completedHours }} h
-              </p>
-              <p class="mt-0.5 text-[11px] text-[#718096]">
-                {{ "students.card.completed" | t }}
-              </p>
-            </div>
-            <div class="rounded-[14px] bg-[#f1f4f8] px-2 py-2.5">
-              <p
-                class="text-[14px] font-bold"
-                [class.text-red-600]="student.catchupHours >= 10"
-                [class.text-[#172033]]="student.catchupHours < 10"
-              >
-                {{ student.catchupHours }} h
-              </p>
-              <p class="mt-0.5 text-[11px] text-[#718096]">
-                {{ "students.card.catchup" | t }}
-              </p>
-            </div>
-          </div>
-
-          <p class="mt-3 truncate text-[11.5px] text-[#748094]">
-            {{
-              "students.card.sheets"
-                | t
-                  : {
-                      prepared: student.preparedSheets,
-                      presented: student.presentedSheets,
-                      validated: student.validatedSheets,
-                    }
-            }}
-          </p>
         </a>
       }
     </div>

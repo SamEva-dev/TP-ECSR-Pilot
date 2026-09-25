@@ -1,35 +1,343 @@
 @if (program(); as current) {
   <section class="mx-auto w-full max-w-[1450px]">
-    <a routerLink="/formations" class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#64748b] hover:text-[#2a64a2]"><i class="ph ph-arrow-left text-[15px]"></i>{{ 'programs.detail.back' | t }}</a>
-    <div class="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-      <div class="flex items-start gap-4"><span class="grid size-13 shrink-0 place-items-center rounded-[17px] bg-[#e7f1fb] text-[#2a64a2]"><i [class]="'ph text-[26px] ' + current.icon"></i></span><div><div class="flex flex-wrap items-center gap-2"><h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ current.name }}</h1><span [class]="'inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ' + statusClass(current.status)">{{ ('programs.status.' + current.status) | t }}</span></div><p class="mt-1 text-[13px] text-[#6c788b]">{{ current.code }} · {{ current.referenceVersion }} · {{ current.durationHours }} h</p></div></div>
-      <button type="button" (click)="edit()" class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d8e0e9] bg-white px-4 text-[12px] font-semibold text-[#526075] shadow-sm"><i class="ph ph-pencil-simple text-[15px]"></i>{{ 'programs.edit' | t }}</button>
+    <a
+      routerLink="/formations"
+      class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#64748b] hover:text-[#2a64a2]"
+      ><i class="ph ph-arrow-left text-[15px]"></i
+      >{{ "programs.detail.back" | t }}</a
+    >
+    <div
+      class="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
+    >
+      <div class="flex items-start gap-4">
+        <span
+          class="grid size-13 shrink-0 place-items-center rounded-[17px] bg-[#e7f1fb] text-[#2a64a2]"
+          ><i [class]="'ph text-[26px] ' + current.icon"></i
+        ></span>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1
+              class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]"
+            >
+              {{ current.name }}
+            </h1>
+            <span
+              [class]="
+                'inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ' +
+                statusClass(current.status)
+              "
+              >{{ "programs.status." + current.status | t }}</span
+            >
+          </div>
+          <p class="mt-1 text-[13px] text-[#6c788b]">
+            {{ current.code }} · {{ current.referenceVersion }} ·
+            {{ current.durationHours }} h
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="edit()"
+        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d8e0e9] bg-white px-4 text-[12px] font-semibold text-[#526075] shadow-sm"
+      >
+        <i class="ph ph-pencil-simple text-[15px]"></i>{{ "programs.edit" | t }}
+      </button>
     </div>
 
     <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.sites' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ enabledSiteCount() }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f1fb] text-[#2a64a2]"><i class="ph ph-buildings text-[19px]"></i></span></article>
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.students' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.students }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"><i class="ph ph-student text-[19px]"></i></span></article>
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.kpis.trainers' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.trainers }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#f1ecff] text-[#7653c6]"><i class="ph ph-chalkboard-teacher text-[19px]"></i></span></article>
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.cohorts' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.activeCohorts }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#fff1d4] text-[#9a6500]"><i class="ph ph-graduation-cap text-[19px]"></i></span></article>
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.modules' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.enabledModules.length }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"><i class="ph ph-squares-four text-[19px]"></i></span></article>
-      <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.success' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.successRate === null ? '—' : current.successRate + ' %' }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#2a64a2] text-white"><i class="ph ph-trophy text-[19px]"></i></span></article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.card.sites" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ enabledSiteCount() }}</p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f1fb] text-[#2a64a2]"
+          ><i class="ph ph-buildings text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.card.students" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ current.students }}</p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"
+          ><i class="ph ph-student text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.kpis.trainers" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ current.trainers }}</p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#f1ecff] text-[#7653c6]"
+          ><i class="ph ph-chalkboard-teacher text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.card.cohorts" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ current.activeCohorts }}
+        </p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#fff1d4] text-[#9a6500]"
+          ><i class="ph ph-graduation-cap text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.card.modules" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ current.enabledModules.length }}
+        </p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"
+          ><i class="ph ph-squares-four text-[19px]"></i
+        ></span>
+      </article>
+      <article
+        class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+      >
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
+          {{ "programs.card.success" | t }}
+        </p>
+        <p class="mt-2 text-[25px] font-extrabold">
+          {{ current.successRate === null ? "—" : current.successRate + " %" }}
+        </p>
+        <span
+          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#2a64a2] text-white"
+          ><i class="ph ph-trophy text-[19px]"></i
+        ></span>
+      </article>
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[1.2fr_1fr]">
-      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"><h2 class="text-[16px] font-bold">{{ 'programs.detail.modules.title' | t }}</h2><p class="mt-0.5 text-[12.5px] text-[#768295]">{{ 'programs.detail.modules.subtitle' | t }}</p><div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">@for (module of current.enabledModules; track module) {<div class="flex items-center gap-3 rounded-[13px] border border-[#dfe5ec] bg-[#fbfcfe] px-3.5 py-3"><span class="grid size-7 place-items-center rounded-full bg-[#e6f7ec] text-[#1b8f4d]"><i class="ph ph-check text-[13px]"></i></span><span class="text-[12px] font-semibold">{{ ('programs.modules.' + module) | t }}</span></div>}</div></article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "programs.detail.modules.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[12.5px] text-[#768295]">
+          {{ "programs.detail.modules.subtitle" | t }}
+        </p>
+        <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          @for (module of current.enabledModules; track module) {
+            <div
+              class="flex items-center gap-3 rounded-[13px] border border-[#dfe5ec] bg-[#fbfcfe] px-3.5 py-3"
+            >
+              <span
+                class="grid size-7 place-items-center rounded-full bg-[#e6f7ec] text-[#1b8f4d]"
+                ><i class="ph ph-check text-[13px]"></i></span
+              ><span class="text-[12px] font-semibold">{{
+                "programs.modules." + module | t
+              }}</span>
+            </div>
+          }
+        </div>
+      </article>
 
-      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"><h2 class="text-[16px] font-bold">{{ 'programs.detail.identity.title' | t }}</h2><p class="mt-3 text-[12.5px] leading-[1.55] text-[#667085]">{{ current.description | t }}</p><dl class="mt-4 space-y-3 text-[12.5px]"><div class="flex gap-3"><dt class="w-[120px] shrink-0 text-[#748095]">{{ 'programs.fields.category' | t }}</dt><dd class="font-semibold">{{ ('programs.categories.' + (current.category === 'heavy-vehicle' ? 'heavyVehicle' : current.category === 'passenger-transport' ? 'passengerTransport' : current.category)) | t }}</dd></div><div class="flex gap-3"><dt class="w-[120px] shrink-0 text-[#748095]">{{ 'programs.fields.referenceVersion' | t }}</dt><dd class="flex items-center gap-2">{{ current.referenceVersion }} @if (activeReferential(); as ref) {<a [routerLink]="['/referentiels', ref.id]" class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2a64a2] hover:underline">{{ 'referentials.detailLink' | t }}<i class="ph ph-arrow-up-right text-[12px]"></i></a>}</dd></div><div class="flex gap-3"><dt class="w-[120px] shrink-0 text-[#748095]">{{ 'programs.fields.duration' | t }}</dt><dd>{{ current.durationHours }} h</dd></div></dl></article>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">
+          {{ "programs.detail.identity.title" | t }}
+        </h2>
+        <p class="mt-3 text-[12.5px] leading-[1.55] text-[#667085]">
+          {{ current.description | t }}
+        </p>
+        <dl class="mt-4 space-y-3 text-[12.5px]">
+          <div class="flex gap-3">
+            <dt class="w-[120px] shrink-0 text-[#748095]">
+              {{ "programs.fields.category" | t }}
+            </dt>
+            <dd class="font-semibold">
+              {{
+                "programs.categories." +
+                  (current.category === "heavy-vehicle"
+                    ? "heavyVehicle"
+                    : current.category === "passenger-transport"
+                      ? "passengerTransport"
+                      : current.category) | t
+              }}
+            </dd>
+          </div>
+          <div class="flex gap-3">
+            <dt class="w-[120px] shrink-0 text-[#748095]">
+              {{ "programs.fields.referenceVersion" | t }}
+            </dt>
+            <dd class="flex items-center gap-2">
+              {{ current.referenceVersion }}
+              @if (activeReferential(); as ref) {
+                <a
+                  [routerLink]="['/referentiels', ref.id]"
+                  class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2a64a2] hover:underline"
+                  >{{ "referentials.detailLink" | t
+                  }}<i class="ph ph-arrow-up-right text-[12px]"></i
+                ></a>
+              }
+            </dd>
+          </div>
+          <div class="flex gap-3">
+            <dt class="w-[120px] shrink-0 text-[#748095]">
+              {{ "programs.fields.duration" | t }}
+            </dt>
+            <dd>{{ current.durationHours }} h</dd>
+          </div>
+        </dl>
+      </article>
     </div>
 
-    <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><div><h2 class="text-[16px] font-bold">{{ 'programs.detail.sites.title' | t }}</h2><p class="mt-0.5 text-[12.5px] text-[#768295]">{{ 'programs.detail.sites.subtitle' | t: { organization: workspace.organization()?.name ?? '' } }}</p></div><span class="text-[11.5px] text-[#748095]">{{ 'programs.detail.sites.hint' | t }}</span></div>
-      <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">@for (site of offeredSites(); track site.id) {<button type="button" (click)="toggleSite(site.id)" [class]="'flex items-center justify-between gap-3 rounded-[15px] border p-4 text-left transition ' + (site.enabled ? 'border-[#8fb6dc] bg-[#edf5fc]' : 'border-[#dfe5ec] bg-white hover:bg-[#f8fafc]')"><div><p class="text-[13px] font-bold">{{ site.name }}</p><p class="mt-1 text-[11px] text-[#748095]">{{ site.city }} · {{ site.code }}</p></div><span [class]="'grid size-8 shrink-0 place-items-center rounded-full ' + (site.enabled ? 'bg-[#2a64a2] text-white' : 'bg-[#eef1f5] text-[#98a2b3]')"><i [class]="'ph text-[15px] ' + (site.enabled ? 'ph-check' : 'ph-plus')"></i></span></button>}</div>
+    <article
+      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div
+        class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
+      >
+        <div>
+          <h2 class="text-[16px] font-bold">
+            {{ "programs.detail.sites.title" | t }}
+          </h2>
+          <p class="mt-0.5 text-[12.5px] text-[#768295]">
+            {{
+              "programs.detail.sites.subtitle"
+                | t: { organization: workspace.organization()?.name ?? "" }
+            }}
+          </p>
+        </div>
+        <span class="text-[11.5px] text-[#748095]">{{
+          "programs.detail.sites.hint" | t
+        }}</span>
+      </div>
+      <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        @for (site of offeredSites(); track site.id) {
+          <button
+            type="button"
+            (click)="toggleSite(site.id)"
+            [class]="
+              'flex items-center justify-between gap-3 rounded-[15px] border p-4 text-left transition ' +
+              (site.enabled
+                ? 'border-[#8fb6dc] bg-[#edf5fc]'
+                : 'border-[#dfe5ec] bg-white hover:bg-[#f8fafc]')
+            "
+          >
+            <div>
+              <p class="text-[13px] font-bold">{{ site.name }}</p>
+              <p class="mt-1 text-[11px] text-[#748095]">
+                {{ site.city }} · {{ site.code }}
+              </p>
+            </div>
+            <span
+              [class]="
+                'grid size-8 shrink-0 place-items-center rounded-full ' +
+                (site.enabled
+                  ? 'bg-[#2a64a2] text-white'
+                  : 'bg-[#eef1f5] text-[#98a2b3]')
+              "
+              ><i
+                [class]="
+                  'ph text-[15px] ' + (site.enabled ? 'ph-check' : 'ph-plus')
+                "
+              ></i
+            ></span>
+          </button>
+        }
+      </div>
     </article>
 
-    <article class="mt-4 overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white shadow-sm"><div class="px-5 py-4"><h2 class="text-[16px] font-bold">{{ 'programs.detail.cohorts.title' | t }}</h2><p class="mt-0.5 text-[12.5px] text-[#768295]">{{ 'programs.detail.cohorts.subtitle' | t }}</p></div><div class="overflow-x-auto px-5 pb-5"><table class="min-w-[700px] w-full text-left text-[12.5px]"><thead><tr class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"><th class="pb-2">{{ 'programs.detail.cohorts.name' | t }}</th><th class="pb-2">{{ 'programs.detail.cohorts.site' | t }}</th><th class="pb-2">{{ 'programs.detail.cohorts.period' | t }}</th><th class="pb-2">{{ 'programs.detail.cohorts.students' | t }}</th><th class="pb-2">{{ 'programs.detail.cohorts.status' | t }}</th></tr></thead><tbody>@for (cohort of cohorts(); track cohort.id) {<tr class="border-b border-[#edf1f5] last:border-0"><td class="py-3 pr-4 font-semibold">{{ cohort.name }}</td><td class="py-3 pr-4">{{ cohort.siteName }}</td><td class="py-3 pr-4 text-[#667085]">{{ cohort.start }} → {{ cohort.end }}</td><td class="py-3 pr-4">{{ cohort.studentCount }}</td><td class="py-3"><span class="rounded-full bg-[#e7f1fb] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]">{{ ('programs.detail.cohorts.statuses.' + cohort.status) | t }}</span></td></tr>} @empty {<tr><td colspan="5" class="py-8 text-center text-[#748095]">{{ 'programs.detail.cohorts.empty' | t }}</td></tr>}</tbody></table></div></article>
+    <article
+      class="mt-4 overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white shadow-sm"
+    >
+      <div class="px-5 py-4">
+        <h2 class="text-[16px] font-bold">
+          {{ "programs.detail.cohorts.title" | t }}
+        </h2>
+        <p class="mt-0.5 text-[12.5px] text-[#768295]">
+          {{ "programs.detail.cohorts.subtitle" | t }}
+        </p>
+      </div>
+      <div class="overflow-x-auto px-5 pb-5">
+        <table class="min-w-[700px] w-full text-left text-[12.5px]">
+          <thead>
+            <tr
+              class="border-b border-[#e2e7ed] text-[10.5px] uppercase text-[#687589]"
+            >
+              <th class="pb-2">{{ "programs.detail.cohorts.name" | t }}</th>
+              <th class="pb-2">{{ "programs.detail.cohorts.site" | t }}</th>
+              <th class="pb-2">{{ "programs.detail.cohorts.period" | t }}</th>
+              <th class="pb-2">{{ "programs.detail.cohorts.students" | t }}</th>
+              <th class="pb-2">{{ "programs.detail.cohorts.status" | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cohort of cohorts(); track cohort.id) {
+              <tr class="border-b border-[#edf1f5] last:border-0">
+                <td class="py-3 pr-4 font-semibold">{{ cohort.name }}</td>
+                <td class="py-3 pr-4">{{ cohort.siteName }}</td>
+                <td class="py-3 pr-4 text-[#667085]">
+                  {{ cohort.start }} → {{ cohort.end }}
+                </td>
+                <td class="py-3 pr-4">{{ cohort.studentCount }}</td>
+                <td class="py-3">
+                  <span
+                    class="rounded-full bg-[#e7f1fb] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
+                    >{{
+                      "programs.detail.cohorts.statuses." + cohort.status | t
+                    }}</span
+                  >
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="py-8 text-center text-[#748095]">
+                  {{ "programs.detail.cohorts.empty" | t }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
 
-    <app-program-drawer [open]="drawerOpen()" [program]="current" (closed)="drawerOpen.set(false)" (saved)="save($event)" />
+    <app-program-drawer
+      [open]="drawerOpen()"
+      [program]="current"
+      (closed)="drawerOpen.set(false)"
+      (saved)="save($event)"
+    />
   </section>
 } @else {
-  <section class="mx-auto max-w-[800px] rounded-[18px] border border-dashed border-[#cfd8e3] bg-white p-10 text-center"><span class="mx-auto grid size-12 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"><i class="ph ph-books text-[21px]"></i></span><h1 class="mt-3 text-[18px] font-bold">{{ 'programs.detail.notFound.title' | t }}</h1><p class="mt-1 text-[13px] text-[#748095]">{{ 'programs.detail.notFound.subtitle' | t }}</p><a routerLink="/formations" class="mt-4 inline-flex h-10 items-center rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white">{{ 'programs.detail.back' | t }}</a></section>
+  <section
+    class="mx-auto max-w-[800px] rounded-[18px] border border-dashed border-[#cfd8e3] bg-white p-10 text-center"
+  >
+    <span
+      class="mx-auto grid size-12 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"
+      ><i class="ph ph-books text-[21px]"></i
+    ></span>
+    <h1 class="mt-3 text-[18px] font-bold">
+      {{ "programs.detail.notFound.title" | t }}
+    </h1>
+    <p class="mt-1 text-[13px] text-[#748095]">
+      {{ "programs.detail.notFound.subtitle" | t }}
+    </p>
+    <a
+      routerLink="/formations"
+      class="mt-4 inline-flex h-10 items-center rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"
+      >{{ "programs.detail.back" | t }}</a
+    >
+  </section>
 }

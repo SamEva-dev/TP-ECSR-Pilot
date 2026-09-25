@@ -6,7 +6,16 @@ import {
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import { CENTER_COMPETENCIES, CENTER_PROMOTIONS, CENTER_RANKING, CENTER_STATUSES, SECRETARIAT_PRIORITIES, STUDENT_COMPETENCIES, TRAINER_COMPETENCIES, TRAINER_STUDENTS } from "../../core/api-data/runtime-data.store";
+import {
+  CENTER_COMPETENCIES,
+  CENTER_PROMOTIONS,
+  CENTER_RANKING,
+  CENTER_STATUSES,
+  SECRETARIAT_PRIORITIES,
+  STUDENT_COMPETENCIES,
+  TRAINER_COMPETENCIES,
+  TRAINER_STUDENTS,
+} from "../../core/api-data/runtime-data.store";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
 @Component({

@@ -1,191 +1,511 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <header class="flex flex-wrap items-end justify-between gap-3">
     <div>
-      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
+      <h1 class="text-[29px] font-extrabold text-[#172033]">
         {{ titleKey() | t }}
       </h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      <p class="text-sm text-[#6c788b]">
         {{ subtitleKey() | t: { count: periods().length } }}
       </p>
     </div>
-    @if (canCreate()) {
+    @if (canCreate() && !error() && !loading()) {
       <button
         type="button"
         (click)="openDrawer()"
-        class="inline-flex h-[39px] items-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm sm:self-auto"
+        [disabled]="!learners().length || !periodTypes().length"
+        class="rounded-[11px] bg-[#2b66a4] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
       >
-        <i class="ph ph-plus text-[17px]"></i>{{ "internships.newPeriod" | t }}
+        <i class="ph ph-plus"></i> {{ "internships.newPeriod" | t }}
       </button>
     }
-  </div>
+  </header>
 
-  <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
-    <article
-      class="relative min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
+  @if (workspace.remoteWorkspaceError() || error()) {
+    <p role="alert" class="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">
+      {{ "internships.real.loadError" | t }}
+    </p>
+  } @else if (!workspace.remoteWorkspaceLoaded() || loading()) {
+    <p
+      role="status"
+      class="mt-5 rounded-xl bg-white p-4 text-sm text-[#6c788b]"
     >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "internships.kpi.planned" | t }}
-      </p>
-      <p class="mt-2 text-[25px] font-extrabold">{{ totals().planned }} h</p>
-      <span
-        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
-        ><i class="ph ph-suitcase-simple text-[20px]"></i
-      ></span>
-    </article>
-    <article
-      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "internships.kpi.completed" | t }}
-      </p>
-      <p class="mt-2 text-[25px] font-extrabold">{{ totals().completed }} h</p>
-    </article>
-    <article
-      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "internships.kpi.remaining" | t }}
-      </p>
-      <p class="mt-2 text-[25px] font-extrabold">{{ totals().remaining }} h</p>
-    </article>
-    <article
-      class="min-h-[92px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "internships.kpi.incomplete" | t }}
-      </p>
-      <p class="mt-2 text-[25px] font-extrabold">{{ totals().incomplete }}</p>
-    </article>
-  </div>
-
-  <div class="mt-4 space-y-4">
-    @for (period of periods(); track period.id) {
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      {{ "internships.real.loading" | t }}
+    </p>
+  } @else {
+    @if (canCreate() && typesError()) {
+      <p
+        role="alert"
+        class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800"
       >
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        {{ "internships.real.typesError" | t }}
+      </p>
+    } @else if (canCreate() && !typesLoading() && !periodTypes().length) {
+      <p class="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+        {{ "internships.real.noTypes" | t }}
+      </p>
+    }
+    <div class="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4">
+        <p class="text-xs text-[#637083]">
+          {{ "internships.kpi.planned" | t }}
+        </p>
+        <p class="mt-2 text-2xl font-bold">{{ totals().planned }} h</p>
+      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4">
+        <p class="text-xs text-[#637083]">
+          {{ "internships.kpi.completed" | t }}
+        </p>
+        <p class="mt-2 text-2xl font-bold">{{ totals().completed }} h</p>
+      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4">
+        <p class="text-xs text-[#637083]">
+          {{ "internships.kpi.remaining" | t }}
+        </p>
+        <p class="mt-2 text-2xl font-bold">{{ totals().remaining }} h</p>
+      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4">
+        <p class="text-xs text-[#637083]">
+          {{ "internships.kpi.incomplete" | t }}
+        </p>
+        <p class="mt-2 text-2xl font-bold">{{ totals().incomplete }}</p>
+      </article>
+    </div>
+
+    @if (!periods().length) {
+      <p
+        class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 text-sm text-[#6c788b]"
+      >
+        {{ "internships.real.empty" | t }}
+      </p>
+    }
+    <div class="mt-4 space-y-4">
+      @for (period of periods(); track period.id) {
+        <article
+          class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
         >
-          <div>
-            <h2 class="text-[16px] font-bold text-[#172033]">
-              {{ period.studentName }} — {{ period.company }} —
-              {{ period.city }}
-            </h2>
-            <p class="mt-1 text-[13px] text-[#6f7b8e]">
-              {{
-                "internships.tutorLine"
-                  | t
-                    : {
-                        tutor: period.tutor,
-                        start: period.startDate,
-                        end: period.endDate,
-                      }
-              }}
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-[16px] font-bold text-[#172033]">
+                {{ period.learnerDisplayName }} · {{ period.company }} ·
+                {{ period.city }}
+              </h2>
+              <p class="mt-1 text-xs text-[#6f7b8e]">
+                {{ "internships.real.periodType" | t }} :
+                {{ period.periodTypeCode }}
+              </p>
+              <p class="mt-1 text-sm text-[#6f7b8e]">
+                {{
+                  "internships.tutorLine"
+                    | t
+                      : {
+                          tutor: period.tutorName,
+                          start: formatDate(period.startDate),
+                          end: formatDate(period.endDate),
+                        }
+                }}
+              </p>
+            </div>
+            <span
+              [class]="
+                'rounded-full px-3 py-1 text-xs font-semibold ' +
+                statusClass(period.status)
+              "
+            >
+              {{ "internships.status." + period.status | t }}
+            </span>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <p class="rounded-xl bg-[#f0f3f7] p-3 text-sm">
+              <span class="block text-xs text-[#748094]">{{
+                "internships.card.planned" | t
+              }}</span
+              >{{ period.plannedHours }} h
+            </p>
+            <p class="rounded-xl bg-[#f0f3f7] p-3 text-sm">
+              <span class="block text-xs text-[#748094]">{{
+                "internships.card.completed" | t
+              }}</span
+              >{{ period.completedHours }} h
+            </p>
+            <p class="rounded-xl bg-[#f0f3f7] p-3 text-sm">
+              <span class="block text-xs text-[#748094]">{{
+                "internships.card.remaining" | t
+              }}</span
+              >{{ remaining(period) }} h
+            </p>
+            <p class="rounded-xl bg-[#f0f3f7] p-3 text-sm">
+              <span class="block text-xs text-[#748094]">{{
+                "internships.card.progress" | t
+              }}</span
+              >{{ progress(period) }} %
             </p>
           </div>
-          <span
-            [class]="
-              'inline-flex self-start rounded-full px-3 py-1 text-[12px] font-semibold ' +
-              statusClass(period.status)
-            "
-            >{{ "internships.status." + period.status | t }}</span
-          >
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
-          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
-            <p class="text-[12px] text-[#748094]">
-              {{ "internships.card.planned" | t }}
-            </p>
-            <p class="mt-1 text-[20px] font-bold">
-              {{ period.plannedHours }} h
-            </p>
-          </div>
-          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
-            <p class="text-[12px] text-[#748094]">
-              {{ "internships.card.completed" | t }}
-            </p>
-            <p class="mt-1 text-[20px] font-bold">
-              {{ period.completedHours }} h
-            </p>
-          </div>
-          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
-            <p class="text-[12px] text-[#748094]">
-              {{ "internships.card.remaining" | t }}
-            </p>
-            <p class="mt-1 text-[20px] font-bold">{{ remaining(period) }} h</p>
-          </div>
-          <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">
-            <p class="text-[12px] text-[#748094]">
-              {{ "internships.card.progress" | t }}
-            </p>
-            <p class="mt-1 text-[20px] font-bold">{{ progress(period) }} %</p>
-          </div>
-        </div>
-
-        <app-progress-bar
-          class="mt-3 block"
-          [value]="progress(period)"
-          heightClass="h-[11px]"
-        />
-
-        <div class="mt-4 grid gap-4 xl:grid-cols-[1.05fr_1fr]">
-          <div>
-            <h3 class="text-[14px] font-bold">
-              {{ "internships.activitiesTitle" | t }}
-            </h3>
-            <div class="mt-2 space-y-2">
-              @for (activity of period.activities; track activity.labelKey) {
-                <div
-                  class="flex min-h-[38px] items-center justify-between gap-3 rounded-[13px] bg-[#f0f3f7] px-3 py-2"
-                >
-                  <span class="text-[13px] text-[#334155]">{{
-                    activity.labelKey | t
-                  }}</span>
-                  <span
-                    [class]="
-                      activity.status === 'done'
-                        ? 'shrink-0 rounded-full bg-[#d8f8df] px-3 py-1 text-[11px] font-semibold text-[#18a547]'
-                        : 'shrink-0 rounded-full bg-[#fff0c9] px-3 py-1 text-[11px] font-semibold text-[#8b5e00]'
-                    "
-                    >{{
-                      "internships.activityStatus." + activity.status | t
-                    }}</span
+          <app-progress-bar
+            class="mt-3 block"
+            [value]="progress(period)"
+            heightClass="h-[11px]"
+          />
+          @if (
+            canManage() &&
+            period.status !== "completed" &&
+            period.status !== "cancelled"
+          ) {
+            <button
+              type="button"
+              (click)="startHours(period)"
+              [disabled]="!!updatingId()"
+              class="mt-3 rounded-lg border border-[#dfe5ec] px-3 py-2 text-xs text-[#2b66a4]"
+            >
+              {{ "internships.followup.editHours" | t }}
+            </button>
+            @if (editHoursId() === period.id) {
+              <div
+                class="mt-3 grid gap-3 rounded-xl bg-[#f0f3f7] p-4 sm:grid-cols-2"
+              >
+                <label class="text-xs"
+                  >{{ "internships.kpi.completed" | t }}
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    [max]="period.plannedHours"
+                    [value]="completedDraft()"
+                    (input)="updateHoursDraft($event)"
+                    class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                  />
+                </label>
+                <label class="text-xs"
+                  >{{ "internships.observationsTitle" | t }}
+                  <textarea
+                    rows="2"
+                    maxlength="4000"
+                    [value]="observationDraft()"
+                    (input)="updateObservationDraft($event)"
+                    class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                  ></textarea>
+                </label>
+                <div class="flex gap-2 sm:col-span-2">
+                  <button
+                    type="button"
+                    (click)="saveHours(period)"
+                    [disabled]="!!updatingId()"
+                    class="rounded-lg bg-[#2b66a4] px-4 py-2 text-xs font-semibold text-white"
                   >
+                    {{ "internships.followup.save" | t }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="editHoursId.set('')"
+                    class="rounded-lg border border-[#dfe5ec] px-4 py-2 text-xs"
+                  >
+                    {{ "internships.drawer.cancel" | t }}
+                  </button>
+                </div>
+              </div>
+            }
+          }
+          @if (updateErrorId() === period.id) {
+            <p role="alert" class="mt-2 text-xs text-red-700">
+              {{ "internships.followup.updateError" | t }}
+            </p>
+          }
+          <div class="mt-4 grid gap-4 xl:grid-cols-2">
+            <div>
+              <h3 class="text-sm font-bold">
+                {{ "internships.activitiesTitle" | t }}
+              </h3>
+              @if (!period.activities.length) {
+                <p class="mt-2 text-xs text-[#6c788b]">
+                  {{ "internships.real.noActivities" | t }}
+                </p>
+              } @else {
+                @for (activity of period.activities; track activity.id) {
+                  <div
+                    class="mt-2 flex justify-between gap-2 rounded-xl bg-[#f0f3f7] p-3 text-xs"
+                  >
+                    <span>{{ activity.title }}</span>
+                    @if (canManage() && period.status !== "cancelled") {
+                      <select
+                        [value]="activity.status"
+                        (change)="updateActivity(period, activity, $event)"
+                        [disabled]="!!updatingId()"
+                        [attr.aria-label]="activity.title"
+                        class="max-w-36 rounded-lg border border-[#dfe5ec] bg-white p-1 text-xs"
+                      >
+                        @for (status of activityStatuses; track status) {
+                          <option [value]="status">
+                            {{ "internships.activityStatus." + status | t }}
+                          </option>
+                        }
+                      </select>
+                    } @else {
+                      <span>{{
+                        "internships.activityStatus." + activity.status | t
+                      }}</span>
+                    }
+                  </div>
+                  @if (canManage() && period.status !== "cancelled") {
+                    <div class="mt-1 flex gap-2">
+                      <input
+                        type="text"
+                        [value]="
+                          activityComments()[activity.id] ||
+                          activity.comment ||
+                          ''
+                        "
+                        (input)="updateActivityComment(activity.id, $event)"
+                        [disabled]="!!updatingId()"
+                        [attr.aria-label]="
+                          'internships.followup.activityComment' | t
+                        "
+                        class="min-w-0 flex-1 rounded-lg border border-[#dfe5ec] px-2 py-1 text-xs"
+                      />
+                      <button
+                        type="button"
+                        (click)="saveActivityComment(period, activity)"
+                        [disabled]="!!updatingId()"
+                        class="rounded-lg border border-[#dfe5ec] px-2 py-1 text-xs text-[#2b66a4]"
+                      >
+                        {{ "internships.followup.save" | t }}
+                      </button>
+                    </div>
+                  } @else if (activity.comment) {
+                    <p class="px-3 text-xs text-[#64748b]">
+                      {{ activity.comment }}
+                    </p>
+                  }
+                }
+              }
+            </div>
+            <div>
+              <h3 class="text-sm font-bold">
+                {{ "internships.real.documentsTitle" | t }}
+              </h3>
+              @if (!period.documents.length) {
+                <p class="mt-2 text-xs text-[#6c788b]">
+                  {{ "internships.real.noDocuments" | t }}
+                </p>
+              } @else {
+                @for (document of period.documents; track document.id) {
+                  <div class="mt-2 rounded-xl bg-[#f0f3f7] p-3 text-xs">
+                    <div class="flex justify-between gap-2">
+                      <span>{{ document.title }}</span>
+                      <span>{{
+                        "internships.real.documentStatus." + document.status | t
+                      }}</span>
+                    </div>
+                    @if (canManage() && period.status !== "cancelled") {
+                      <div class="mt-2 flex flex-wrap items-center gap-2">
+                        <label class="text-xs"
+                          >{{ "internships.followup.linkedDocument" | t }}
+                          <select
+                            [value]="
+                              documentSelection()[document.id] ||
+                              document.documentId ||
+                              ''
+                            "
+                            (change)="selectDocument(document.id, $event)"
+                            [disabled]="!!updatingId() || documentsError()"
+                            class="ml-1 max-w-56 rounded-lg border border-[#dfe5ec] bg-white p-1"
+                          >
+                            <option value="">
+                              {{ "internships.followup.noDocument" | t }}
+                            </option>
+                            @for (
+                              file of eligibleDocuments(period);
+                              track file.id
+                            ) {
+                              <option [value]="file.id">
+                                {{ file.title }}
+                              </option>
+                            }
+                          </select>
+                        </label>
+                        <label class="text-xs"
+                          >{{ "internships.followup.documentStatus" | t }}
+                          <select
+                            [value]="document.status"
+                            (change)="updateDocument(period, document, $event)"
+                            [disabled]="!!updatingId()"
+                            class="ml-1 rounded-lg border border-[#dfe5ec] bg-white p-1"
+                          >
+                            @for (status of documentStatuses; track status) {
+                              <option [value]="status">
+                                {{
+                                  "internships.real.documentStatus." + status
+                                    | t
+                                }}
+                              </option>
+                            }
+                          </select>
+                        </label>
+                      </div>
+                      @if (documentsError()) {
+                        <p role="alert" class="mt-2 text-xs text-red-700">
+                          {{ "internships.followup.documentsError" | t }}
+                        </p>
+                      }
+                    }
+                  </div>
+                }
+              }
+              <h3 class="mt-4 text-sm font-bold">
+                {{ "internships.observationsTitle" | t }}
+              </h3>
+              <p class="mt-2 text-xs text-[#475569]">
+                {{
+                  period.tutorObservation ||
+                    ("internships.real.noObservation" | t)
+                }}
+              </p>
+              @for (evaluation of period.evaluations; track evaluation.id) {
+                <div
+                  class="mt-2 rounded-xl bg-[#e5f2ff] p-3 text-xs text-[#245c97]"
+                >
+                  <p class="font-semibold">
+                    {{ evaluation.evaluatorDisplayName }} ·
+                    {{ formatDateTime(evaluation.evaluatedAtUtc) }} ·
+                    {{ "internships.followup.kind." + evaluation.kind | t }}
+                  </p>
+                  <p class="mt-1">{{ evaluation.summary }}</p>
+                  @if (evaluation.validated !== null) {
+                    <p class="mt-1">
+                      {{ "internships.followup.validated" | t }} :
+                      {{
+                        (evaluation.validated
+                          ? "internships.followup.yes"
+                          : "internships.followup.no"
+                        ) | t
+                      }}
+                    </p>
+                  }
+                  @if (evaluation.strengths) {
+                    <p class="mt-1">
+                      {{ "internships.followup.strengths" | t }} :
+                      {{ evaluation.strengths }}
+                    </p>
+                  }
+                  @if (evaluation.improvementAreas) {
+                    <p class="mt-1">
+                      {{ "internships.followup.improvements" | t }} :
+                      {{ evaluation.improvementAreas }}
+                    </p>
+                  }
                 </div>
               }
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-[14px] font-bold">
-              {{ "internships.observationsTitle" | t }}
-            </h3>
-            <div
-              class="mt-2 rounded-[15px] bg-[#e5f2ff] px-3 py-3 text-[13px] leading-[1.45] text-[#245c97]"
-            >
-              {{ period.tutorObservationKey | t }}
-            </div>
-            <div class="mt-3 flex flex-wrap gap-2">
-              @for (document of period.documents; track document.labelKey) {
-                <span
-                  [class]="
-                    'inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ' +
-                    documentClass(document)
-                  "
-                  >{{ document.labelKey | t }}</span
+              @if (canManage() && period.status !== "cancelled") {
+                <button
+                  type="button"
+                  (click)="startEvaluation(period)"
+                  [disabled]="!!updatingId()"
+                  class="mt-3 rounded-lg border border-[#dfe5ec] px-3 py-2 text-xs text-[#2b66a4]"
                 >
+                  {{ "internships.followup.addEvaluation" | t }}
+                </button>
+                @if (editEvaluationId() === period.id) {
+                  <div
+                    class="mt-3 space-y-2 rounded-xl bg-[#f0f3f7] p-4 text-xs"
+                  >
+                    <label class="block"
+                      >{{ "internships.followup.kindLabel" | t }}
+                      <select
+                        [value]="evaluationKind()"
+                        (change)="updateEvaluationKind($event)"
+                        class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                      >
+                        <option value="trainer">
+                          {{ "internships.followup.kind.trainer" | t }}
+                        </option>
+                        <option value="final">
+                          {{ "internships.followup.kind.final" | t }}
+                        </option>
+                      </select>
+                    </label>
+                    <label class="block"
+                      >{{ "internships.followup.summary" | t }} *
+                      <textarea
+                        rows="2"
+                        maxlength="4000"
+                        [value]="evaluationSummary()"
+                        (input)="updateEvaluation('evaluationSummary', $event)"
+                        class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                      ></textarea>
+                    </label>
+                    <label class="block"
+                      >{{ "internships.followup.strengths" | t }}
+                      <textarea
+                        rows="2"
+                        [value]="evaluationStrengths()"
+                        (input)="
+                          updateEvaluation('evaluationStrengths', $event)
+                        "
+                        class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                      ></textarea>
+                    </label>
+                    <label class="block"
+                      >{{ "internships.followup.improvements" | t }}
+                      <textarea
+                        rows="2"
+                        [value]="evaluationImprovements()"
+                        (input)="
+                          updateEvaluation('evaluationImprovements', $event)
+                        "
+                        class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                      ></textarea>
+                    </label>
+                    <label class="block"
+                      >{{ "internships.followup.validated" | t }}
+                      <select
+                        [value]="evaluationValidated()"
+                        (change)="updateEvaluationValidated($event)"
+                        class="mt-1 w-full rounded-lg border border-[#dfe5ec] bg-white p-2"
+                      >
+                        <option value="">
+                          {{ "internships.followup.undetermined" | t }}
+                        </option>
+                        <option value="yes">
+                          {{ "internships.followup.yes" | t }}
+                        </option>
+                        <option value="no">
+                          {{ "internships.followup.no" | t }}
+                        </option>
+                      </select>
+                    </label>
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        (click)="saveEvaluation(period)"
+                        [disabled]="
+                          !!updatingId() || !evaluationSummary().trim()
+                        "
+                        class="rounded-lg bg-[#2b66a4] px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                      >
+                        {{ "internships.followup.save" | t }}
+                      </button>
+                      <button
+                        type="button"
+                        (click)="editEvaluationId.set('')"
+                        class="rounded-lg border border-[#dfe5ec] px-4 py-2 text-xs"
+                      >
+                        {{ "internships.drawer.cancel" | t }}
+                      </button>
+                    </div>
+                  </div>
+                }
               }
             </div>
           </div>
-        </div>
-      </article>
-    }
-  </div>
+        </article>
+      }
+    </div>
+  }
 </section>
-
 <app-create-internship-drawer
   [open]="drawerOpen()"
+  [students]="learners()"
+  [periodTypes]="periodTypes()"
+  [saving]="saving()"
+  [saveError]="saveError()"
   (closed)="closeDrawer()"
   (periodCreated)="addPeriod($event)"
 />

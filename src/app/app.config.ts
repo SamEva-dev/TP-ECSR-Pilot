@@ -1,4 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from "@angular/core";
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+} from "@angular/core";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { provideRouter, withComponentInputBinding } from "@angular/router";
 import { routes } from "./app.routes";
@@ -9,11 +12,13 @@ import { idempotencyInterceptor } from "./core/http/idempotency.interceptor";
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([
-      authInterceptor,
-      idempotencyInterceptor,
-      apiErrorInterceptor,
-    ])),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        idempotencyInterceptor,
+        apiErrorInterceptor,
+      ]),
+    ),
     provideRouter(routes, withComponentInputBinding()),
   ],
 };

@@ -1,9 +1,9 @@
-import { Injectable, computed, signal } from "@angular/core";
+import { Injectable, computed, inject, signal } from "@angular/core";
 import type { DemoSession, UserRole } from "../models/app.models";
+import { AuthTokenStore } from "./auth-token.store";
 
 const STORAGE_KEY = "tp-ecsr-pilot.session";
 const LEGACY_KEY = "tp-ecsr-pilot.demo-session";
-
 
 type JwtPayload = Record<string, unknown> & {
   sub?: string;
@@ -16,10 +16,12 @@ type JwtPayload = Record<string, unknown> & {
   role?: string | string[];
   permissions?: string | string[];
   permission?: string | string[];
+  exp?: number;
 };
 
 @Injectable({ providedIn: "root" })
 export class SessionService {
+  private readonly tokens = inject(AuthTokenStore);
   private readonly sessionSignal = signal<DemoSession | null>(this.restore());
   private readonly promotionSignal = signal(
     this.sessionSignal()?.promotionId ?? "",
@@ -32,8 +34,38 @@ export class SessionService {
     () => this.sessionSignal()?.role ?? "direction",
   );
 
+  hasValidToken(): boolean {
+    const token = this.tokens.accessToken();
+    const payload = token ? this.decodeJwt(token) : {};
+    const session = this.sessionSignal();
+    return (
+      !!session &&
+      !!payload.exp &&
+      payload.exp * 1000 > Date.now() &&
+      session.userId === payload.sub &&
+      session.organizationId === (payload.org_id ?? payload.organization_id)
+    );
+  }
+
   connectAuthenticatedToken(accessToken: string): void {
     const payload = this.decodeJwt(accessToken);
+    if (
+      !payload.exp ||
+      payload.exp * 1000 <= Date.now() ||
+      typeof payload.sub !== "string" ||
+      typeof (payload.org_id ?? payload.organization_id) !== "string"
+    ) {
+      this.disconnect();
+      this.tokens.clear();
+      return;
+    }
+    this.connect(this.sessionFromPayload(payload, ""));
+  }
+
+  private sessionFromPayload(
+    payload: JwtPayload,
+    promotionId: string,
+  ): DemoSession {
     const roles = this.readClaimValues(payload.roles, payload.role);
     const permissions = this.readClaimValues(
       payload.permissions,
@@ -58,12 +90,11 @@ export class SessionService {
       roles,
       permissions,
       // The real cohort is selected from /api/v1/me/workspace after login.
-      promotionId: "",
+      promotionId,
     };
 
-    this.connect(session);
+    return session;
   }
-
 
   setPromotion(id: string): void {
     this.promotionSignal.set(id);
@@ -100,10 +131,26 @@ export class SessionService {
   private restore(): DemoSession | null {
     if (typeof localStorage === "undefined") return null;
 
+    const token = this.tokens.accessToken();
+    const payload = token ? this.decodeJwt(token) : {};
+    if (!payload.exp || payload.exp * 1000 <= Date.now()) {
+      localStorage.removeItem(STORAGE_KEY);
+      this.tokens.clear();
+      return null;
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        return JSON.parse(raw) as DemoSession;
+        const session = JSON.parse(raw) as DemoSession;
+        if (
+          session.authMode === "authgate" &&
+          session.userId === payload.sub &&
+          session.organizationId === (payload.org_id ?? payload.organization_id)
+        ) {
+          return this.sessionFromPayload(payload, session.promotionId ?? "");
+        }
+        localStorage.removeItem(STORAGE_KEY);
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
@@ -152,7 +199,8 @@ export class SessionService {
           const parsed = JSON.parse(raw) as unknown;
           if (Array.isArray(parsed)) {
             parsed.forEach((item) => {
-              if (typeof item === "string" && item.trim()) result.add(item.trim());
+              if (typeof item === "string" && item.trim())
+                result.add(item.trim());
             });
             continue;
           }
@@ -175,17 +223,27 @@ export class SessionService {
 
     if (normalized.some((role) => role.includes("jury"))) return "jury";
     if (normalized.some((role) => role.includes("student"))) return "stagiaire";
-    if (normalized.some((role) => role.includes("secretariat"))) return "secretariat";
+    if (normalized.some((role) => role.includes("secretariat")))
+      return "secretariat";
     if (
       normalized.some(
         (role) =>
-          role.includes("trainer") ||
-          role.includes("pedagogicalmanager"),
+          role.includes("trainer") || role.includes("pedagogicalmanager"),
       )
     ) {
       return "formateur";
     }
 
-    return "direction";
+    if (
+      normalized.some(
+        (role) =>
+          role.includes("organizationadministrator") ||
+          role.includes("organizationdirection") ||
+          role.includes("sitedirection") ||
+          role.includes("platformadministrator"),
+      )
+    )
+      return "direction";
+    return "stagiaire";
   }
 }

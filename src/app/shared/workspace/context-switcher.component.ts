@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  inject,
+  signal,
+} from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 

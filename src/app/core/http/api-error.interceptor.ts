@@ -13,9 +13,15 @@ export interface PedagoraApiError {
 export const apiErrorInterceptor: HttpInterceptorFn = (request, next) =>
   next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      const body = error.error && typeof error.error === "object" ? error.error : {};
+      const body =
+        error.error && typeof error.error === "object" ? error.error : {};
       const normalized: PedagoraApiError = {
-        code: typeof body.code === "string" ? body.code : error.status === 0 ? "NETWORK_UNAVAILABLE" : "UNEXPECTED_ERROR",
+        code:
+          typeof body.code === "string"
+            ? body.code
+            : error.status === 0
+              ? "NETWORK_UNAVAILABLE"
+              : "UNEXPECTED_ERROR",
         status: error.status,
         traceId: typeof body.traceId === "string" ? body.traceId : undefined,
         errors: body.errors,

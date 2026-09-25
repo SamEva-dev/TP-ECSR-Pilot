@@ -1,37 +1,184 @@
 <section class="mx-auto w-full max-w-[1450px]">
   @if (jury(); as currentJury) {
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+    >
       <div>
-        <p class="text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#2a64a2]">{{ 'jury.space' | t }}</p>
-        <h1 class="mt-1 text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'jury.greeting' | t: { name: currentJury.firstName } }}</h1>
-        <p class="mt-0.5 text-[13px] text-[#6c788b]">{{ 'jury.multiSubtitle' | t: { program: program()?.name ?? '—', scheme: scheme().code } }}</p>
+        <p
+          class="text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#2a64a2]"
+        >
+          {{ "jury.space" | t }}
+        </p>
+        <h1
+          class="mt-1 text-[30px] font-extrabold tracking-[-1px] text-[#172033]"
+        >
+          {{ "jury.greeting" | t: { name: currentJury.firstName } }}
+        </h1>
+        <p class="mt-0.5 text-[13px] text-[#6c788b]">
+          {{
+            "jury.multiSubtitle"
+              | t: { program: program()?.name ?? "—", scheme: scheme().code }
+          }}
+        </p>
       </div>
-      <span class="inline-flex w-fit items-center gap-2 rounded-full bg-[#e5f2ff] px-3 py-1.5 text-[11px] font-semibold text-[#2a64a2]"><i class="ph ph-gavel"></i>{{ currentJury.habilitation }}</span>
+      <span
+        class="inline-flex w-fit items-center gap-2 rounded-full bg-[#e5f2ff] px-3 py-1.5 text-[11px] font-semibold text-[#2a64a2]"
+        ><i class="ph ph-gavel"></i>{{ currentJury.habilitation }}</span
+      >
     </div>
 
-    <article class="mt-6 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div><div class="mb-2 flex flex-wrap gap-2"><span class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10px] font-semibold text-[#2a64a2]">{{ program()?.name }}</span><span class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10px] font-semibold text-[#8b5e00]">{{ scheme().code }}</span></div><h2 class="text-[18px] font-extrabold">{{ exam().name }}</h2><p class="mt-1 text-[12px] text-[#718096]">{{ exam().centre }} · {{ exam().location }}</p><p class="mt-1 text-[12px] text-[#718096]">{{ exam().startDate }} → {{ exam().endDate }}</p></div>
-        <span class="inline-flex w-fit rounded-full bg-[#fff0c9] px-3 py-1 text-[10.5px] font-semibold text-[#8b5e00]">{{ 'certification.sessionStatus.' + exam().status | t }}</span>
+    <article
+      class="mt-6 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+    >
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+      >
+        <div>
+          <div class="mb-2 flex flex-wrap gap-2">
+            <span
+              class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10px] font-semibold text-[#2a64a2]"
+              >{{ program()?.name }}</span
+            ><span
+              class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10px] font-semibold text-[#8b5e00]"
+              >{{ scheme().code }}</span
+            >
+          </div>
+          <h2 class="text-[18px] font-extrabold">{{ exam().name }}</h2>
+          <p class="mt-1 text-[12px] text-[#718096]">
+            {{ exam().centre }} · {{ exam().location }}
+          </p>
+          <p class="mt-1 text-[12px] text-[#718096]">
+            {{ exam().startDate }} → {{ exam().endDate }}
+          </p>
+        </div>
+        <span
+          class="inline-flex w-fit rounded-full bg-[#fff0c9] px-3 py-1 text-[10.5px] font-semibold text-[#8b5e00]"
+          >{{ "certification.sessionStatus." + exam().status | t }}</span
+        >
       </div>
       <div class="mt-4 grid gap-2 sm:grid-cols-4">
-        <div class="rounded-[14px] bg-[#f1f4f8] p-3"><p class="text-[10px] text-[#7b8798]">{{ 'jury.candidates' | t }}</p><p class="mt-1 text-[20px] font-extrabold">{{ candidates().length }}</p></div>
-        <div class="rounded-[14px] bg-[#f1f4f8] p-3"><p class="text-[10px] text-[#7b8798]">{{ 'jury.firstCandidate' | t }}</p><p class="mt-1 text-[20px] font-extrabold text-[#2a64a2]">{{ candidates()[0]?.examTime ?? '—' }}</p></div>
-        <div class="rounded-[14px] bg-[#f1f4f8] p-3"><p class="text-[10px] text-[#7b8798]">{{ 'jury.examSteps' | t }}</p><p class="mt-1 text-[20px] font-extrabold">{{ scheme().steps.length }}</p></div>
-        <div class="rounded-[14px] bg-[#f1f4f8] p-3"><p class="text-[10px] text-[#7b8798]">{{ 'jury.habilitationValidUntil' | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#18a547]">{{ currentJury.validUntil }}</p></div>
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">{{ "jury.candidates" | t }}</p>
+          <p class="mt-1 text-[20px] font-extrabold">
+            {{ candidates().length }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">
+            {{ "jury.firstCandidate" | t }}
+          </p>
+          <p class="mt-1 text-[20px] font-extrabold text-[#2a64a2]">
+            {{ candidates()[0]?.examTime ?? "—" }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">{{ "jury.examSteps" | t }}</p>
+          <p class="mt-1 text-[20px] font-extrabold">
+            {{ scheme().steps.length }}
+          </p>
+        </div>
+        <div class="rounded-[14px] bg-[#f1f4f8] p-3">
+          <p class="text-[10px] text-[#7b8798]">
+            {{ "jury.habilitationValidUntil" | t }}
+          </p>
+          <p class="mt-1 text-[15px] font-extrabold text-[#18a547]">
+            {{ currentJury.validUntil }}
+          </p>
+        </div>
       </div>
     </article>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[1.5fr_.5fr]">
-      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-        <h2 class="text-[16px] font-bold">{{ 'jury.myCandidates' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'jury.myCandidatesSubtitle' | t }}</p>
-        <div class="mt-4 space-y-2">@for (candidate of candidates(); track candidate.id) {<div class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"><span class="w-[52px] shrink-0 text-[14px] font-extrabold text-[#2a64a2]">{{ candidate.examTime }}</span><span class="grid size-[36px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white">{{ initials(candidate) }}</span><div class="min-w-0 flex-1"><p class="truncate text-[12.5px] font-bold">{{ candidate.firstName }} {{ candidate.lastName }}</p><p class="text-[10.5px] text-[#7b8798]">{{ candidate.candidateNumber }}</p></div><span [class]="'hidden rounded-full px-2.5 py-1 text-[10px] font-semibold sm:inline-flex ' + (candidate.ready ? 'bg-[#d8f8df] text-[#18a547]' : 'bg-[#fff0c9] text-[#8b5e00]')">{{ (candidate.ready ? 'certification.ready' : 'certification.incomplete') | t }}</span><a [routerLink]="['/certification/candidats', candidate.id]" class="inline-flex h-[32px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm">{{ 'common.open' | t }}</a></div>}</div>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">{{ "jury.myCandidates" | t }}</h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">
+          {{ "jury.myCandidatesSubtitle" | t }}
+        </p>
+        <div class="mt-4 space-y-2">
+          @for (candidate of candidates(); track candidate.id) {
+            <div
+              class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"
+            >
+              <span
+                class="w-[52px] shrink-0 text-[14px] font-extrabold text-[#2a64a2]"
+                >{{ candidate.examTime }}</span
+              ><span
+                class="grid size-[36px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white"
+                >{{ initials(candidate) }}</span
+              >
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-[12.5px] font-bold">
+                  {{ candidate.firstName }} {{ candidate.lastName }}
+                </p>
+                <p class="text-[10.5px] text-[#7b8798]">
+                  {{ candidate.candidateNumber }}
+                </p>
+              </div>
+              <span
+                [class]="
+                  'hidden rounded-full px-2.5 py-1 text-[10px] font-semibold sm:inline-flex ' +
+                  (candidate.ready
+                    ? 'bg-[#d8f8df] text-[#18a547]'
+                    : 'bg-[#fff0c9] text-[#8b5e00]')
+                "
+                >{{
+                  (candidate.ready
+                    ? "certification.ready"
+                    : "certification.incomplete"
+                  ) | t
+                }}</span
+              ><a
+                [routerLink]="['/certification/candidats', candidate.id]"
+                class="inline-flex h-[32px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
+                >{{ "common.open" | t }}</a
+              >
+            </div>
+          }
+        </div>
       </article>
 
-      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-        <h2 class="text-[16px] font-bold">{{ 'jury.schemeTitle' | t }}</h2><p class="mt-0.5 text-[11px] text-[#768295]">{{ scheme().nameKey | t }}</p>
-        <div class="mt-4 space-y-2">@for (step of scheme().steps; track step.id) {<div class="flex items-center gap-2 rounded-[11px] bg-[#f1f4f8] px-3 py-2.5"><span class="grid size-[28px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"><i class="ph ph-check-square text-[14px]"></i></span><div class="min-w-0"><p class="truncate text-[10.5px] font-semibold">{{ step.labelKey | t }}</p><p class="text-[9.5px] text-[#7b8798]">{{ step.duration }}</p></div></div>}</div>
-        <h3 class="mt-5 text-[12px] font-bold">{{ 'jury.rules.title' | t }}</h3><ul class="mt-3 space-y-3 text-[11px] text-[#64748b]"><li class="flex gap-2"><i class="ph ph-eye-slash mt-0.5 text-[15px] text-[#2a64a2]"></i><span>{{ 'jury.rules.neutral' | t }}</span></li><li class="flex gap-2"><i class="ph ph-lock-key mt-0.5 text-[15px] text-[#2a64a2]"></i><span>{{ 'jury.rules.lock' | t }}</span></li><li class="flex gap-2"><i class="ph ph-shield-check mt-0.5 text-[15px] text-[#2a64a2]"></i><span>{{ 'jury.rules.audit' | t }}</span></li></ul>
+      <article
+        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+      >
+        <h2 class="text-[16px] font-bold">{{ "jury.schemeTitle" | t }}</h2>
+        <p class="mt-0.5 text-[11px] text-[#768295]">
+          {{ scheme().nameKey | t }}
+        </p>
+        <div class="mt-4 space-y-2">
+          @for (step of scheme().steps; track step.id) {
+            <div
+              class="flex items-center gap-2 rounded-[11px] bg-[#f1f4f8] px-3 py-2.5"
+            >
+              <span
+                class="grid size-[28px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
+                ><i class="ph ph-check-square text-[14px]"></i
+              ></span>
+              <div class="min-w-0">
+                <p class="truncate text-[10.5px] font-semibold">
+                  {{ step.labelKey | t }}
+                </p>
+                <p class="text-[9.5px] text-[#7b8798]">{{ step.duration }}</p>
+              </div>
+            </div>
+          }
+        </div>
+        <h3 class="mt-5 text-[12px] font-bold">{{ "jury.rules.title" | t }}</h3>
+        <ul class="mt-3 space-y-3 text-[11px] text-[#64748b]">
+          <li class="flex gap-2">
+            <i class="ph ph-eye-slash mt-0.5 text-[15px] text-[#2a64a2]"></i
+            ><span>{{ "jury.rules.neutral" | t }}</span>
+          </li>
+          <li class="flex gap-2">
+            <i class="ph ph-lock-key mt-0.5 text-[15px] text-[#2a64a2]"></i
+            ><span>{{ "jury.rules.lock" | t }}</span>
+          </li>
+          <li class="flex gap-2">
+            <i class="ph ph-shield-check mt-0.5 text-[15px] text-[#2a64a2]"></i
+            ><span>{{ "jury.rules.audit" | t }}</span>
+          </li>
+        </ul>
       </article>
     </div>
   }

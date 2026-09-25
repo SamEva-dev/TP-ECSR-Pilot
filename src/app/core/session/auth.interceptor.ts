@@ -5,6 +5,7 @@ import { AuthTokenStore } from "./auth-token.store";
 
 const AUTHGATE_PROTECTED_PREFIXES = [
   "/api/Users",
+  "/api/pedagora/access",
   "/api/Roles",
   "/api/Permissions",
   "/api/admin",
@@ -22,7 +23,9 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     : "";
   const isProtectedAuthGateCall =
     isAuthGate &&
-    AUTHGATE_PROTECTED_PREFIXES.some((prefix) => authGatePath.startsWith(prefix));
+    AUTHGATE_PROTECTED_PREFIXES.some((prefix) =>
+      authGatePath.startsWith(prefix),
+    );
 
   // Public AuthGate endpoints (prelogin/login/register/refresh) deliberately stay token-free.
   if (!isPedagoraApi && !isProtectedAuthGateCall) return next(request);

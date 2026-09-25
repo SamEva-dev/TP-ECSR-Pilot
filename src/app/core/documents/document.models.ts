@@ -1,8 +1,14 @@
 export type ApiDocumentCategory =
-  | 'administrative' | 'pedagogical' | 'evaluation' | 'course'
-  | 'internship' | 'student' | 'certification' | 'other';
+  | "administrative"
+  | "pedagogical"
+  | "evaluation"
+  | "course"
+  | "internship"
+  | "student"
+  | "certification"
+  | "other";
 
-export type ApiDocumentVisibility = 'all' | 'staff' | 'student';
+export type ApiDocumentVisibility = "all" | "staff" | "student";
 
 export interface DocumentVersionDto {
   id: string;

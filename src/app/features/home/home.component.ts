@@ -2,105 +2,230 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
+  signal,
 } from "@angular/core";
-import { KeyValuePipe } from "@angular/common";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { RouterLink } from "@angular/router";
+import { firstValueFrom } from "rxjs";
+import { environment } from "../../environments/environment";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import { ALERTS, DRIVING_OBSERVATIONS, PROMOTION_METRICS, PROMOTIONS, SAM_TIMELINE, STUDENTS, TRAINER_AGENDA } from "../../core/api-data/runtime-data.store";
-import type { AlertLevel } from "../../core/models/app.models";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { ReportingApiService } from "../../core/reporting/reporting-api.service";
+import type { CohortDashboard } from "../../core/reporting/reporting.models";
+import {
+  StudentProfileApiService,
+  type LearnerProfileApi,
+  type TopicProgressApi,
+  type CompetencyProgressApi,
+} from "../../core/students/student-profile-api.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
-import { StatusPillComponent } from "../../shared/ui/status-pill.component";
-import { TypeBadgeComponent } from "../../shared/ui/type-badge.component";
+
+interface TrainerSession {
+  id: string;
+  title: string;
+  startsAtUtc: string;
+  endsAtUtc: string;
+  trainerAuthGateUserId: string | null;
+  location: string | null;
+  status: string;
+}
 
 @Component({
   selector: "app-home",
-  imports: [
-    RouterLink,
-    KeyValuePipe,
-    TranslatePipe,
-    ProgressBarComponent,
-    StatusPillComponent,
-    TypeBadgeComponent,
-  ],
+  imports: [RouterLink, TranslatePipe, ProgressBarComponent],
   templateUrl: "./home.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
   readonly sessionService = inject(SessionService);
-  readonly alerts = ALERTS;
-  readonly trainerAgenda = TRAINER_AGENDA;
-  readonly observations = DRIVING_OBSERVATIONS;
-  readonly timeline = SAM_TIMELINE;
-  readonly sam = STUDENTS[0];
+  readonly workspace = inject(WorkspaceContextService);
+  private readonly reporting = inject(ReportingApiService);
+  private readonly http = inject(HttpClient);
+  private readonly profileApi = inject(StudentProfileApiService);
 
-  readonly promotion = computed(
+  readonly dashboard = signal<CohortDashboard | null>(null);
+  readonly dashboardLoading = signal(false);
+  readonly dashboardError = signal(false);
+  readonly trainerSessions = signal<TrainerSession[]>([]);
+  readonly trainerLoading = signal(false);
+  readonly trainerError = signal(false);
+  readonly selfProfile = signal<LearnerProfileApi | null>(null);
+  readonly selfTopics = signal<TopicProgressApi[] | null>(null);
+  readonly selfCompetencies = signal<CompetencyProgressApi[] | null>(null);
+  readonly selfLoading = signal(false);
+  readonly selfError = signal("studentDetail.real.notFound");
+  readonly selfPresentedTopics = computed(
     () =>
-      PROMOTIONS.find((p) => p.id === this.sessionService.promotionId()) ??
-      PROMOTIONS[0],
+      this.selfTopics()?.filter((x) =>
+        ["presented", "validated"].includes(x.status.toLowerCase()),
+      ).length ?? 0,
   );
-  readonly students = computed(() =>
-    STUDENTS.filter((s) => s.promotionId === this.sessionService.promotionId()),
-  );
-  readonly metrics = computed(
+  readonly selfAssessedCompetencies = computed(
     () =>
-      PROMOTION_METRICS.find((item) => item.cohortId === this.sessionService.promotionId())
-      ?? PROMOTION_METRICS[0]
-      ?? { trainers: 0, attendanceRate: 0, completedHours: 0, remainingHours: 0, catchupHours: 0, progress: 0, totalPlannedHours: 0 },
+      this.selfCompetencies()?.filter(
+        (x) => x.level.toLowerCase() !== "not_assessed",
+      ).length ?? 0,
   );
-  readonly studentsToWatch = computed(() =>
-    [...this.students()]
-      .sort((a, b) => b.catchupHours - a.catchupHours)
-      .slice(0, 6),
+  readonly completionPercent = computed(() => {
+    const d = this.dashboard();
+    return d && d.plannedMinutes > 0
+      ? Math.min(100, Math.round((d.deliveredMinutes * 100) / d.plannedMinutes))
+      : 0;
+  });
+  readonly isDirection = computed(() =>
+    ["direction", "secretariat"].includes(this.sessionService.role()),
   );
-  readonly trainerStudents = computed(() => [...this.students()].slice(0, 6));
-  readonly statusCounts = computed(() => ({
-    good: this.students().filter((s) => s.status === "good").length,
-    warning: this.students().filter((s) => s.status === "warning").length,
-    late: this.students().filter((s) => s.status === "late").length,
-  }));
+  readonly isTrainer = computed(
+    () => this.sessionService.role() === "formateur",
+  );
+  private generation = 0;
 
-  fullName(s: { firstName: string; lastName: string }) {
-    return `${s.firstName} ${s.lastName}`;
+  constructor() {
+    effect((onCleanup) => {
+      const session = this.sessionService.session();
+      const cohort = this.workspace.cohort();
+      const workspaceLoaded = this.workspace.remoteWorkspaceLoaded();
+      const generation = ++this.generation;
+      this.dashboard.set(null);
+      this.dashboardError.set(false);
+      this.dashboardLoading.set(false);
+      this.trainerSessions.set([]);
+      this.trainerError.set(false);
+      this.trainerLoading.set(false);
+      this.selfProfile.set(null);
+      this.selfTopics.set(null);
+      this.selfCompetencies.set(null);
+      this.selfLoading.set(false);
+      if (!session) return;
+      if (session.role === "stagiaire") {
+        this.selfLoading.set(true);
+        void this.loadSelf(generation);
+      } else if (workspaceLoaded && cohort?.apiId) {
+        if (session.role === "formateur") {
+          this.trainerLoading.set(true);
+          void this.loadTrainerSessions(
+            cohort.apiId,
+            session.userId ?? "",
+            generation,
+          );
+        } else if (
+          session.role === "direction" ||
+          session.role === "secretariat"
+        ) {
+          this.dashboardLoading.set(true);
+          void this.loadDashboard(cohort.apiId, generation);
+        }
+      }
+      onCleanup(() => {
+        this.generation++;
+      });
+    });
   }
 
-  roleIsDirection() {
-    const r = this.sessionService.role();
-    return r === "direction" || r === "secretariat";
+  private async loadDashboard(
+    cohortId: string,
+    generation: number,
+  ): Promise<void> {
+    try {
+      const dashboard = await firstValueFrom(
+        this.reporting.cohortDashboard(cohortId),
+      );
+      if (generation === this.generation) this.dashboard.set(dashboard);
+    } catch {
+      if (generation === this.generation) this.dashboardError.set(true);
+    } finally {
+      if (generation === this.generation) this.dashboardLoading.set(false);
+    }
   }
 
-  roleIsTrainer() {
-    return this.sessionService.role() === "formateur";
+  private async loadTrainerSessions(
+    cohortId: string,
+    userId: string,
+    generation: number,
+  ): Promise<void> {
+    try {
+      const today = new Date();
+      const from = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+      );
+      const to = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + 1,
+      );
+      const params = new HttpParams()
+        .set("cohortId", cohortId)
+        .set("fromUtc", from.toISOString())
+        .set("toUtc", to.toISOString());
+      const sessions = await firstValueFrom(
+        this.http.get<TrainerSession[]>(
+          `${environment.apiBaseUrl}/api/v1/training-sessions`,
+          { params },
+        ),
+      );
+      if (generation === this.generation) {
+        this.trainerSessions.set(
+          sessions.filter(
+            (x) =>
+              x.trainerAuthGateUserId === userId &&
+              x.status.toLowerCase() !== "cancelled" &&
+              new Date(x.startsAtUtc) >= from &&
+              new Date(x.startsAtUtc) < to,
+          ),
+        );
+      }
+    } catch {
+      if (generation === this.generation) this.trainerError.set(true);
+    } finally {
+      if (generation === this.generation) this.trainerLoading.set(false);
+    }
   }
 
-  alertClasses(l: AlertLevel) {
-    return l === "danger"
-      ? "bg-[#fee3df]"
-      : l === "warning"
-        ? "bg-[#ffefc9]"
-        : "bg-[#e5f2ff]";
+  private async loadSelf(generation: number): Promise<void> {
+    try {
+      const profile = await firstValueFrom(this.profileApi.self());
+      if (generation !== this.generation) return;
+      this.selfProfile.set(profile);
+      const [topics, competencies] = await Promise.allSettled([
+        firstValueFrom(this.profileApi.topics(profile.enrollmentId)),
+        firstValueFrom(this.profileApi.competencies(profile.enrollmentId)),
+      ]);
+      if (generation !== this.generation) return;
+      if (topics.status === "fulfilled") this.selfTopics.set(topics.value);
+      if (competencies.status === "fulfilled")
+        this.selfCompetencies.set(competencies.value);
+    } catch (error) {
+      if (generation !== this.generation) return;
+      const status =
+        typeof error === "object" && error !== null && "status" in error
+          ? error.status
+          : 0;
+      this.selfError.set(
+        status === 404
+          ? "studentDetail.real.notFound"
+          : status === 403
+            ? "studentDetail.real.forbidden"
+            : "studentDetail.real.failed",
+      );
+    } finally {
+      if (generation === this.generation) this.selfLoading.set(false);
+    }
   }
 
-  alertIcon(l: AlertLevel) {
-    return l === "info" ? "ph-info" : "ph-warning";
+  hours(minutes: number): string {
+    return (minutes / 60).toLocaleString(undefined, {
+      maximumFractionDigits: 1,
+    });
   }
-
-  alertIconClass(l: AlertLevel) {
-    return l === "danger"
-      ? "text-[#f04438]"
-      : l === "warning"
-        ? "text-[#79550c]"
-        : "text-[#2b66a4]";
-  }
-
-  dot(s: "valid" | "absence" | "driving" | "classroom") {
-    return s === "valid"
-      ? "bg-[#22a84b]"
-      : s === "absence"
-        ? "bg-[#ed2e38]"
-        : s === "driving"
-          ? "bg-[#f8a11a]"
-          : "bg-[#2a64a2]";
+  time(value: string): string {
+    return new Date(value).toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 }

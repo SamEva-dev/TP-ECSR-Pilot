@@ -3,6 +3,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   input,
   output,
   signal,
@@ -13,19 +14,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { PEDAGOGICAL_TEAM } from "../../../core/api-data/runtime-data.store";
 import { TRAINING_REFERENTIALS } from "../../../core/api-data/runtime-data.store";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { WorkspaceCohort } from "../../../core/models/workspace.models";
 
 export interface CreatePromotionPayload {
+  code: string;
   name: string;
   startDate: string;
   endDate: string;
-  studentCount: number;
-  manager: string;
+  capacity: number;
   referentialVersionId: string;
-  status: WorkspaceCohort["status"];
 }
 
 @Component({
@@ -42,45 +40,57 @@ export class CreatePromotionDrawerComponent {
   readonly programName = input("—");
   readonly closed = output<void>();
   readonly promotionCreated = output<CreatePromotionPayload>();
-  readonly team = PEDAGOGICAL_TEAM;
   readonly submitted = signal(false);
-
   readonly referentials = computed(() =>
     TRAINING_REFERENTIALS.filter(
-      (item) => item.programId === this.programId() && item.status !== "archived",
+      (item) =>
+        item.programId === this.programId() &&
+        item.status === "active" &&
+        !!item.apiId,
     ),
   );
 
   readonly form = new FormGroup({
-    name: new FormControl("Promotion 2027–2028", {
+    code: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(40)],
+    }),
+    name: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(80)],
     }),
-    startDate: new FormControl("2027-09-01", {
+    startDate: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    endDate: new FormControl("2028-06-30", {
+    endDate: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    studentCount: new FormControl(18, {
+    capacity: new FormControl(1, {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)],
-    }),
-    manager: new FormControl("Claire Berthier", {
-      nonNullable: true,
-      validators: [Validators.required],
     }),
     referentialVersionId: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    status: new FormControl<WorkspaceCohort["status"]>("planned", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
   });
+
+  constructor() {
+    effect(() => {
+      if (this.open()) return;
+      this.form.reset({
+        code: "",
+        name: "",
+        startDate: "",
+        endDate: "",
+        capacity: 1,
+        referentialVersionId: this.referentials()[0]?.id ?? "",
+      });
+      this.submitted.set(false);
+    });
+  }
 
   @HostListener("document:keydown.escape")
   onEscape(): void {
@@ -88,62 +98,18 @@ export class CreatePromotionDrawerComponent {
   }
 
   requestClose(): void {
-    this.submitted.set(false);
     this.closed.emit();
   }
 
   submit(): void {
     this.submitted.set(true);
-    if (!this.form.controls.referentialVersionId.value && this.referentials().length) {
-      this.form.controls.referentialVersionId.setValue(this.referentials()[0].id);
-    }
-    if (this.form.invalid || this.hasInvalidDates()) {
+    if (
+      this.form.invalid ||
+      this.form.value.endDate! < this.form.value.startDate!
+    ) {
       this.form.markAllAsTouched();
       return;
     }
-
     this.promotionCreated.emit(this.form.getRawValue());
-    this.resetForm();
-  }
-
-  hasInvalidDates(): boolean {
-    const { startDate, endDate } = this.form.getRawValue();
-    return Boolean(startDate && endDate && endDate < startDate);
-  }
-
-  showRequired(
-    controlName:
-      | "name"
-      | "startDate"
-      | "endDate"
-      | "studentCount"
-      | "manager"
-      | "referentialVersionId"
-      | "status",
-  ): boolean {
-    const control = this.form.controls[controlName];
-    return (this.submitted() || control.touched) && control.hasError("required");
-  }
-
-  showStudentCountError(): boolean {
-    const control = this.form.controls.studentCount;
-    return (this.submitted() || control.touched) && control.hasError("min");
-  }
-
-  fullName(member: { firstName: string; lastName: string }): string {
-    return `${member.firstName} ${member.lastName}`;
-  }
-
-  private resetForm(): void {
-    this.form.reset({
-      name: "Promotion 2027–2028",
-      startDate: "2027-09-01",
-      endDate: "2028-06-30",
-      studentCount: 18,
-      manager: "Claire Berthier",
-      referentialVersionId: this.referentials()[0]?.id ?? "",
-      status: "planned",
-    });
-    this.submitted.set(false);
   }
 }

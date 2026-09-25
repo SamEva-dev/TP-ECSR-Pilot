@@ -20,12 +20,16 @@
     </nav>
     @if (sessionService.session(); as user) {
       <div class="mt-5 rounded-[17px] bg-[#2a5b93] px-3.5 py-3.5">
-        <p class="text-[13px] font-bold">{{ user.firstName }} {{ user.lastName }}</p>
+        <p class="text-[13px] font-bold">
+          {{ user.firstName }} {{ user.lastName }}
+        </p>
         <p class="mt-0.5 text-[12px] leading-[1.35] text-white/65">
           {{ roleLabelKey() | t }}
         </p>
         @if (access.isReadOnly()) {
-          <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold text-white/80">
+          <p
+            class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 text-[10px] font-semibold text-white/80"
+          >
             <i class="ph ph-eye"></i>{{ "accessPolicy.readOnly" | t }}
           </p>
         }
@@ -51,7 +55,11 @@
       class="fixed inset-y-0 left-0 z-50 flex w-[290px] flex-col bg-[#1d497d] px-[18px] py-6 text-white shadow-2xl lg:hidden"
     >
       <div class="flex items-center justify-between">
-        <a [routerLink]="homePath()" (click)="closeMobile()" class="block min-w-0">
+        <a
+          [routerLink]="homePath()"
+          (click)="closeMobile()"
+          class="block min-w-0"
+        >
           <app-program-logo [compact]="true" />
         </a>
         <button
@@ -108,9 +116,17 @@
         />
 
         @if (searchOpen()) {
-          <div class="absolute left-0 right-0 top-[46px] z-50 overflow-hidden rounded-[16px] border border-[#dfe5ec] bg-white shadow-[0_18px_45px_rgba(20,36,58,0.16)]">
-            <div class="border-b border-[#edf1f5] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#7b8798]">
-              {{ searchQuery() ? ("globalSearch.results" | t) : ("globalSearch.quickAccess" | t) }}
+          <div
+            class="absolute left-0 right-0 top-[46px] z-50 overflow-hidden rounded-[16px] border border-[#dfe5ec] bg-white shadow-[0_18px_45px_rgba(20,36,58,0.16)]"
+          >
+            <div
+              class="border-b border-[#edf1f5] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#7b8798]"
+            >
+              {{
+                searchQuery()
+                  ? ("globalSearch.results" | t)
+                  : ("globalSearch.quickAccess" | t)
+              }}
             </div>
             @if (searchResults().length) {
               <div class="max-h-[360px] overflow-y-auto p-1.5">
@@ -120,12 +136,19 @@
                     (click)="openSearchResult(result.path)"
                     class="flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left transition hover:bg-[#f2f6fa]"
                   >
-                    <span class="grid size-9 shrink-0 place-items-center rounded-[11px] bg-[#edf4fb] text-[#245c97]">
+                    <span
+                      class="grid size-9 shrink-0 place-items-center rounded-[11px] bg-[#edf4fb] text-[#245c97]"
+                    >
                       <i [class]="'ph ' + result.icon + ' text-[17px]'"></i>
                     </span>
                     <span class="min-w-0 flex-1">
-                      <span class="block truncate text-[13px] font-semibold text-[#172236]">{{ result.label }}</span>
-                      <span class="mt-0.5 block text-[11px] text-[#7b8798]">{{ result.metaKey | t }}</span>
+                      <span
+                        class="block truncate text-[13px] font-semibold text-[#172236]"
+                        >{{ result.label }}</span
+                      >
+                      <span class="mt-0.5 block text-[11px] text-[#7b8798]">{{
+                        result.metaKey | t
+                      }}</span>
                     </span>
                     <i class="ph ph-arrow-right text-[15px] text-[#9aa5b4]"></i>
                   </button>
@@ -134,7 +157,9 @@
             } @else {
               <div class="px-5 py-7 text-center">
                 <i class="ph ph-magnifying-glass text-2xl text-[#9aa5b4]"></i>
-                <p class="mt-2 text-[13px] font-semibold text-[#415069]">{{ "globalSearch.empty" | t }}</p>
+                <p class="mt-2 text-[13px] font-semibold text-[#415069]">
+                  {{ "globalSearch.empty" | t }}
+                </p>
               </div>
             }
           </div>
@@ -155,21 +180,35 @@
           >
             <i class="ph ph-bell text-[19px]"></i>
             @if (attention.unreadCount() > 0) {
-              <span class="absolute -right-0.5 -top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-[#e24a4a] px-1 text-[9px] font-bold leading-none text-white">
+              <span
+                class="absolute -right-0.5 -top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-[#e24a4a] px-1 text-[9px] font-bold leading-none text-white"
+              >
                 {{ attention.unreadCount() }}
               </span>
             }
           </button>
 
           @if (notificationsOpen()) {
-            <div class="absolute right-0 top-[48px] z-50 w-[min(360px,calc(100vw-24px))] overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white shadow-[0_18px_45px_rgba(20,36,58,0.16)]">
-              <div class="flex items-center justify-between border-b border-[#edf1f5] px-4 py-3">
+            <div
+              class="absolute right-0 top-[48px] z-50 w-[min(360px,calc(100vw-24px))] overflow-hidden rounded-[17px] border border-[#dfe5ec] bg-white shadow-[0_18px_45px_rgba(20,36,58,0.16)]"
+            >
+              <div
+                class="flex items-center justify-between border-b border-[#edf1f5] px-4 py-3"
+              >
                 <div>
-                  <p class="text-[13px] font-bold text-[#172236]">{{ "attention.title" | t }}</p>
-                  <p class="mt-0.5 text-[11px] text-[#7b8798]">{{ "attention.subtitle" | t }}</p>
+                  <p class="text-[13px] font-bold text-[#172236]">
+                    {{ "attention.title" | t }}
+                  </p>
+                  <p class="mt-0.5 text-[11px] text-[#7b8798]">
+                    {{ "attention.subtitle" | t }}
+                  </p>
                 </div>
                 @if (attention.unreadCount() > 0) {
-                  <button type="button" (click)="attention.markAllRead()" class="text-[11px] font-semibold text-[#245c97] hover:underline">
+                  <button
+                    type="button"
+                    (click)="attention.markAllRead()"
+                    class="text-[11px] font-semibold text-[#245c97] hover:underline"
+                  >
                     {{ "attention.markAllRead" | t }}
                   </button>
                 }
@@ -183,17 +222,30 @@
                       (click)="openAttention(item.id, item.path)"
                       class="flex w-full gap-3 rounded-[12px] px-3 py-3 text-left transition hover:bg-[#f5f8fc]"
                     >
-                      <span [class]="'mt-0.5 grid size-9 shrink-0 place-items-center rounded-[11px] ' + attentionToneClass(item.level)">
+                      <span
+                        [class]="
+                          'mt-0.5 grid size-9 shrink-0 place-items-center rounded-[11px] ' +
+                          attentionToneClass(item.level)
+                        "
+                      >
                         <i [class]="'ph ' + item.icon + ' text-[17px]'"></i>
                       </span>
                       <span class="min-w-0 flex-1">
                         <span class="flex items-center gap-2">
-                          <span class="truncate text-[12.5px] font-bold text-[#172236]">{{ item.titleKey | t }}</span>
+                          <span
+                            class="truncate text-[12.5px] font-bold text-[#172236]"
+                            >{{ item.titleKey | t }}</span
+                          >
                           @if (!item.read) {
-                            <span class="size-1.5 shrink-0 rounded-full bg-[#2a64a2]"></span>
+                            <span
+                              class="size-1.5 shrink-0 rounded-full bg-[#2a64a2]"
+                            ></span>
                           }
                         </span>
-                        <span class="mt-1 block text-[11px] leading-[1.4] text-[#6f7b8e]">{{ item.detailKey | t }}</span>
+                        <span
+                          class="mt-1 block text-[11px] leading-[1.4] text-[#6f7b8e]"
+                          >{{ item.detailKey | t }}</span
+                        >
                       </span>
                     </button>
                   }
@@ -201,14 +253,18 @@
               } @else {
                 <div class="px-5 py-8 text-center">
                   <i class="ph ph-check-circle text-2xl text-[#45a36b]"></i>
-                  <p class="mt-2 text-[12px] font-semibold text-[#526176]">{{ "attention.empty" | t }}</p>
+                  <p class="mt-2 text-[12px] font-semibold text-[#526176]">
+                    {{ "attention.empty" | t }}
+                  </p>
                 </div>
               }
             </div>
           }
         </div>
 
-        <div class="grid size-[40px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[14px] font-bold text-white">
+        <div
+          class="grid size-[40px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[14px] font-bold text-white"
+        >
           {{ sessionService.initials() }}
         </div>
       </div>
@@ -219,7 +275,9 @@
     </main>
   </div>
 
-  <nav class="fixed inset-x-0 bottom-0 z-30 flex border-t border-[#dfe5ec] bg-white lg:hidden">
+  <nav
+    class="fixed inset-x-0 bottom-0 z-30 flex border-t border-[#dfe5ec] bg-white lg:hidden"
+  >
     @for (item of mobileNavItems(); track item.path) {
       <a
         [routerLink]="item.path"

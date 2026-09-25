@@ -23,6 +23,10 @@ export interface BackendContract {
 export class BackendContractService {
   private readonly http = inject(HttpClient);
   load(): Promise<BackendContract> {
-    return firstValueFrom(this.http.get<BackendContract>(`${environment.apiBaseUrl}/api/v1/system/contracts`));
+    return firstValueFrom(
+      this.http.get<BackendContract>(
+        `${environment.apiBaseUrl}/api/v1/system/contracts`,
+      ),
+    );
   }
 }

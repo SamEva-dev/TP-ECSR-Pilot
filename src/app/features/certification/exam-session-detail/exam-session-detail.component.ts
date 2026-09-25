@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
@@ -17,8 +22,12 @@ export class ExamSessionDetailComponent {
   readonly juryMembers = this.contextData.juryMembers;
   readonly scheme = this.contextData.certificationScheme;
   readonly program = this.contextData.program;
-  readonly ready = computed(() => this.candidates().filter((item) => item.ready).length);
-  readonly readiness = computed(() => Math.round((this.ready() / Math.max(this.candidates().length, 1)) * 100));
+  readonly ready = computed(
+    () => this.candidates().filter((item) => item.ready).length,
+  );
+  readonly readiness = computed(() =>
+    Math.round((this.ready() / Math.max(this.candidates().length, 1)) * 100),
+  );
 
   initials(item: { firstName: string; lastName: string }): string {
     return `${item.firstName[0] ?? ""}${item.lastName[0] ?? ""}`.toUpperCase();

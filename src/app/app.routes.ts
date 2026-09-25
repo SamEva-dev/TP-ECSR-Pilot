@@ -44,7 +44,9 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { permission: "sites.view" },
         loadComponent: () =>
-          import("./features/sites/sites.component").then((m) => m.SitesComponent),
+          import("./features/sites/sites.component").then(
+            (m) => m.SitesComponent,
+          ),
       },
       {
         path: "etablissements/:id",

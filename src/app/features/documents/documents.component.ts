@@ -195,7 +195,9 @@ export class DocumentsComponent {
   private async loadRemoteDocuments(cohortId?: string) {
     try {
       const documents = await this.documentApi.list(cohortId);
-      this.remoteDocuments.set(documents.map((doc) => this.toLibraryDocument(doc)));
+      this.remoteDocuments.set(
+        documents.map((doc) => this.toLibraryDocument(doc)),
+      );
     } catch {
       this.remoteDocuments.set(null);
     }
@@ -207,16 +209,29 @@ export class DocumentsComponent {
     return {
       id: doc.id,
       title: doc.title,
-      date: Number.isNaN(date.valueOf()) ? "" : date.toLocaleDateString("fr-FR"),
+      date: Number.isNaN(date.valueOf())
+        ? ""
+        : date.toLocaleDateString("fr-FR"),
       author: doc.createdByDisplayName,
       size: this.formatBytes(version?.sizeBytes ?? 0),
-      category: (["administrative","pedagogical","evaluation","course","internship","student"].includes(doc.category)
+      category: ([
+        "administrative",
+        "pedagogical",
+        "evaluation",
+        "course",
+        "internship",
+        "student",
+      ].includes(doc.category)
         ? doc.category
         : "administrative") as DocumentCategory,
-      ownerStudentId: doc.ownerType === "enrollment" ? doc.ownerId ?? undefined : undefined,
-      visibleToStudent: doc.visibility === "all" || doc.visibility === "student",
+      ownerStudentId:
+        doc.ownerType === "enrollment" ? (doc.ownerId ?? undefined) : undefined,
+      visibleToStudent:
+        doc.visibility === "all" || doc.visibility === "student",
       fileName: version?.fileName ?? "",
-      format: (version?.fileName?.toLowerCase().endsWith(".docx") ? "DOCX" : "PDF") as DocumentFormat,
+      format: (version?.fileName?.toLowerCase().endsWith(".docx")
+        ? "DOCX"
+        : "PDF") as DocumentFormat,
       version: version ? `${version.versionNumber}.0` : "1.0",
       pages: 1,
       visibility: doc.visibility,
@@ -247,8 +262,10 @@ export class DocumentsComponent {
           fileName: `referentiel-${program.code.toLowerCase()}.pdf`,
         };
       }
-      if (doc.id === "d3") return { ...doc, title: `Grille évaluation — ${program.name}` };
-      if (doc.id === "d4") return { ...doc, title: `Support — ${program.name}` };
+      if (doc.id === "d3")
+        return { ...doc, title: `Grille évaluation — ${program.name}` };
+      if (doc.id === "d4")
+        return { ...doc, title: `Support — ${program.name}` };
       return doc;
     });
   });
@@ -370,8 +387,6 @@ export class DocumentsComponent {
     this.selectedDocument.set(null);
   }
 
-
-
   async uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -401,8 +416,9 @@ export class DocumentsComponent {
 
   async download(doc: LibraryDocument) {
     if (!this.remoteDocuments() || !doc.blobAvailable) return;
-    const apiDoc = (await this.documentApi.list(this.contextData.cohort()?.apiId))
-      .find((item) => item.id === doc.id);
+    const apiDoc = (
+      await this.documentApi.list(this.contextData.cohort()?.apiId)
+    ).find((item) => item.id === doc.id);
     if (apiDoc) await this.documentApi.download(apiDoc);
   }
 

@@ -79,12 +79,7 @@
     "rememberMe": "Rester connecté",
     "registrationReady": "Votre organisation a été créée. Bienvenue dans Pedagora Pilot.",
     "applicationAdded": "Pedagora Pilot a été ajouté à votre compte existant.",
-    "registrationPending": "Votre inscription est enregistrée. Finalisez la validation de votre compte pour continuer.",
-    "demoTitle": "Connexion de démonstration",
-    "demoSubtitle": "Choisissez un profil. Les identifiants sont préremplis, restent visibles dans les champs et peuvent être modifiés avant la connexion.",
-    "demoCredentialsEditable": "Mode démonstration : ces comptes utilisent le vrai AuthGate et les vraies données Pedagora stockées en base.",
-    "demoRegistrationDisabled": "La création de compte est simulée en mode démonstration. Contactez l’administrateur de Pedagora Pilot pour obtenir un accès réel ou activer le mode normal.",
-    "togglePassword": "Afficher ou masquer le mot de passe"
+    "registrationPending": "Votre inscription est enregistrée. Finalisez la validation de votre compte pour continuer."
   },
   "home": {
     "greeting": "Bonjour {{name}}",
@@ -233,6 +228,24 @@
         "classroomDetail": "Les intersections et les priorités",
         "fullFile": "Voir mon dossier complet"
       }
+    },
+    "placeholderTitle": "Chargement de votre espace",
+    "placeholderBody": "Les données de votre organisation sont en cours de chargement.",
+    "real": {
+      "selectedCohort": "Promotion sélectionnée : {{name}}",
+      "loading": "Chargement des données…",
+      "noCohort": "Aucune promotion sélectionnée. Sélectionnez une promotion dans votre espace.",
+      "failed": "Impossible de charger ces données. Réessayez après avoir actualisé la page.",
+      "certificationObtained": "Certifications obtenues",
+      "hoursProgress": "Volume horaire réalisé",
+      "noPlannedHours": "Aucune heure planifiée pour cette promotion.",
+      "workplaceCompleted": "Stages terminés",
+      "certificationEligible": "Candidats admissibles",
+      "trainerSubtitle": "Vos séances du jour · {{name}}",
+      "noSessions": "Aucune séance ne vous est attribuée aujourd’hui pour cette promotion.",
+      "studentSubtitle": "Suivi de votre formation",
+      "workspaceFailed": "Impossible de charger votre espace de travail. Actualisez la page pour réessayer.",
+      "noDashboard": "Aucun tableau de bord n’est disponible pour ce rôle."
     }
   },
   "common": {
@@ -270,7 +283,8 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "more": "Plus"
   },
   "nav": {
     "home": "Accueil",
@@ -357,16 +371,30 @@
       "requiredHint": "* Champs obligatoires",
       "cancel": "Annuler",
       "submit": "Ajouter le stagiaire",
-      "created": "{{name}} a été ajouté à la liste.",
       "errors": {
         "required": "Ce champ est obligatoire.",
         "email": "Saisissez une adresse email valide."
       }
+    },
+    "api": {
+      "createFailed": "L'inscription n'a pas été enregistrée. Vérifiez les informations et réessayez.",
+      "invalidContext": "Sélectionnez une promotion valide avant d'inscrire ce stagiaire.",
+      "refreshFailed": "L'inscription est enregistrée, mais la liste n'a pas pu être rechargée. Actualisez la page.",
+      "conflict": "Ce stagiaire est déjà inscrit dans cette promotion ou la capacité est atteinte.",
+      "forbidden": "Vous ne pouvez pas inscrire ce stagiaire dans cette organisation."
+    },
+    "enrollmentStatus": {
+      "pending": "En attente",
+      "active": "Inscrit",
+      "suspended": "Suspendu",
+      "completed": "Terminé",
+      "withdrawn": "Désinscrit",
+      "cancelled": "Annulé"
     }
   },
   "planning": {
     "title": "Planning",
-    "subtitle": "Semaine du 21 au 25 septembre 2026",
+    "subtitle": "Calendrier des séances",
     "add": "Ajouter au planning",
     "filters": {
       "title": "Filtres",
@@ -380,13 +408,6 @@
       "week": "Semaine",
       "month": "Mois"
     },
-    "days": {
-      "monday": "Lundi 21 septembre",
-      "tuesday": "Mardi 22 septembre",
-      "wednesday": "Mercredi 23 septembre",
-      "thursday": "Jeudi 24 septembre",
-      "friday": "Vendredi 25 septembre"
-    },
     "types": {
       "classroom": "Cours salle",
       "driving": "Conduite",
@@ -398,29 +419,29 @@
       "event": "Événement",
       "distance": "Distanciel"
     },
-    "events": {
-      "intersections": "Les intersections et les priorités",
-      "bends": "Conduite — virages et déclivité",
-      "sheets30to34": "Présentations fiches 30 à 34",
-      "questioningMethod": "La méthode interrogative",
-      "c2Evaluation": "Évaluation intermédiaire C2",
-      "roadRiskAwareness": "Sensibilisation aux risques routiers",
-      "motorwayMerging": "Conduite — insertion autoroute",
-      "signsCatchup": "Rattrapage — la signalisation",
-      "companyInternship": "Stage en entreprise",
-      "educationalCouncil": "Conseil pédagogique",
-      "remoteClass": "Classe virtuelle — temps de réaction et distances"
-    },
-    "people": {
-      "samFokam": "Sam Fokam",
-      "julieMoreau": "Julie Moreau",
-      "karimBenali": "Karim Benali"
-    },
     "programmed": {
       "classroomTitle": "Séances en salle programmées",
       "drivingTitle": "Séances de conduite programmées"
     },
     "emptyDay": "Aucune séance avec ces filtres.",
+    "real": {
+      "navigation": "Navigation du calendrier",
+      "previous": "Période précédente",
+      "next": "Période suivante",
+      "today": "Aujourd’hui",
+      "loading": "Chargement du planning…",
+      "loadError": "Impossible de charger le planning. Vérifiez votre connexion et vos droits.",
+      "noCohort": "Sélectionnez une promotion pour afficher son planning.",
+      "saving": "Enregistrement…",
+      "saveError": "Enregistrement impossible. Vérifiez les horaires et le passage à l’heure d’été ou d’hiver.",
+      "tooLong": "Un champ dépasse la longueur autorisée.",
+      "modality": {
+        "onsite": "Sur site",
+        "remote-live": "À distance en direct",
+        "remote-async": "À distance en autonomie",
+        "practical": "Pratique"
+      }
+    },
     "drawer": {
       "title": "Ajouter au planning",
       "subtitle": "Planifiez une séance, une évaluation, un stage ou un événement.",
@@ -441,16 +462,16 @@
         "responsiblePlaceholder": "Ex. Marc Dupont",
         "location": "Salle / lieu / précision",
         "locationPlaceholder": "Ex. Salle 2",
-        "competence": "Compétence travaillée"
+        "competence": "Compétence travaillée",
+        "competencePlaceholder": "Sélectionner une compétence"
       },
-      "help": "L’élément est ajouté immédiatement au planning de démonstration. Lors du branchement au backend, il sera enregistré et synchronisé avec les séances et les présences.",
+      "help": "La séance sera enregistrée dans la promotion sélectionnée.",
       "cancel": "Annuler",
       "submit": "Ajouter au planning",
       "created": "« {{title}} » a été ajouté au planning.",
       "errors": {
         "required": "Ce champ est obligatoire.",
-        "period": "L’heure de fin doit être postérieure à l’heure de début.",
-        "weekday": "La vue de démonstration actuelle couvre uniquement du lundi au vendredi."
+        "period": "L’heure de fin doit être postérieure à l’heure de début."
       }
     },
     "workModes": {
@@ -554,13 +575,17 @@
         "all": "Toutes",
         "active": "En cours",
         "planned": "À venir",
-        "completed": "Terminées"
+        "completed": "Terminées",
+        "draft": "Brouillons",
+        "cancelled": "Annulées"
       },
       "filterHelp": "Les promotions affichées suivent le site et la formation du contexte courant.",
       "status": {
         "planned": "À venir",
         "active": "En cours",
-        "completed": "Terminée"
+        "completed": "Terminée",
+        "draft": "Brouillon",
+        "cancelled": "Annulée"
       },
       "planned": {
         "start": "Démarrage",
@@ -588,6 +613,21 @@
         "versionBindingTitle": "Référentiel figé pour la promotion",
         "versionBindingHelp": "La promotion restera liée à cette version du référentiel, même si une nouvelle version devient active plus tard."
       }
+    },
+    "api": {
+      "code": "Code de la promotion",
+      "name": "Nom de la promotion",
+      "referential": "Version du référentiel",
+      "selectReferential": "Choisir une version active",
+      "noReferential": "Aucune version active du référentiel n'est disponible pour cette formation.",
+      "capacity": "Capacité maximale",
+      "learners": "Stagiaires inscrits",
+      "invalid": "Renseignez tous les champs et vérifiez les dates.",
+      "invalidContext": "Le contexte établissement, formation ou référentiel n'est pas valide.",
+      "createFailed": "La promotion n'a pas été enregistrée. Vérifiez le code et les dates, puis réessayez.",
+      "refreshFailed": "La promotion est enregistrée, mais la liste n'a pas pu être rechargée. Actualisez la page.",
+      "conflict": "Ce code existe déjà ou l'offre de formation n'est pas disponible.",
+      "forbidden": "Vous ne pouvez pas créer de promotion dans cette organisation."
     }
   },
   "sessions": {
@@ -599,7 +639,10 @@
       "evaluation": "Évaluation",
       "sensitization": "Sensibilisation",
       "catchup": "Rattrapage",
-      "event": "Événement"
+      "event": "Événement",
+      "distance": "Distanciel",
+      "driving": "Conduite",
+      "internship": "Stage"
     },
     "form": {
       "title": "Nouvelle séance pédagogique",
@@ -666,11 +709,28 @@
       "remote-live": "Distanciel synchrone",
       "remote-async": "Distanciel asynchrone",
       "practical": "Pratique / véhicule"
+    },
+    "real": {
+      "loading": "Chargement des séances…",
+      "loadError": "Impossible de charger les séances. Vérifiez votre connexion et vos droits.",
+      "saveError": "Création impossible. Vérifiez le titre, les horaires et le passage à l’heure d’été ou d’hiver.",
+      "saving": "Création…",
+      "empty": "Aucune séance programmée dans cette promotion.",
+      "timezone": "Heures du centre : Europe/Paris. Les horaires ambigus lors du changement d’heure sont refusés.",
+      "status": {
+        "planned": "Planifiée",
+        "inprogress": "En cours",
+        "completed": "Terminée",
+        "cancelled": "Annulée"
+      },
+      "complete": "Terminer",
+      "cancel": "Annuler la séance",
+      "actionError": "Impossible de modifier le statut de cette séance."
     }
   },
   "sheets": {
     "title": "Fiches / Exposés",
-    "subtitle": "{{student}} · 58 fiches au référentiel",
+    "subtitle": "Fiches pédagogiques de {{student}}",
     "evaluate": "Évaluer un exposé",
     "kpi": {
       "prepared": "Préparées",
@@ -708,10 +768,6 @@
       "evaluator": "Évaluateur",
       "status": "Statut"
     },
-    "comments": {
-      "validated": "Bonne animation, méthode interrogative bien utilisée.",
-      "rework": "Structure à revoir : introduction trop longue, RIP incomplet."
-    },
     "empty": {
       "title": "Aucune fiche trouvée",
       "subtitle": "Modifiez les filtres pour afficher d'autres fiches."
@@ -720,54 +776,9 @@
       "title": "Évaluation d'un exposé",
       "sheet": "Fiche",
       "duration": "Durée de présentation",
-      "commentPlaceholder": "Commentaire du formateur évaluateur…",
       "save": "Enregistrer l'évaluation",
-      "saved": "Évaluation enregistrée dans la démonstration.",
-      "level": {
-        "acquired": "Acquis",
-        "in_progress": "En cours",
-        "review": "À revoir"
-      },
-      "criteria": {
-        "structure": "Structure",
-        "introduction": "Introduction",
-        "hook": "Accroche",
-        "objectives": "Objectifs",
-        "content": "Contenu",
-        "regulation": "Réglementation",
-        "questioningMethod": "Méthode interrogative",
-        "animation": "Animation",
-        "timeManagement": "Gestion du temps",
-        "rip": "RIP",
-        "review": "Bilan"
-      },
-      "subtitle": "Évaluez la présentation d'une fiche avec une grille complète et conservez une synthèse pédagogique exploitable.",
       "close": "Fermer le panneau",
-      "contextTitle": "Contexte de l'évaluation",
-      "student": "Stagiaire",
-      "date": "Date de présentation",
-      "evaluator": "Formateur évaluateur",
-      "gridTitle": "Grille d'évaluation détaillée",
-      "gridSubtitle": "Positionnez chaque critère selon le niveau observé pendant l'exposé.",
-      "summary": {
-        "acquired": "acquis",
-        "inProgress": "en cours",
-        "review": "à revoir"
-      },
-      "synthesisTitle": "Synthèse pédagogique",
-      "positivePoints": "Points positifs",
-      "positivePlaceholder": "Ex. Accroche pertinente, progression logique, participation du groupe…",
-      "improvements": "Points à améliorer",
-      "improvementsPlaceholder": "Ex. Réglementation à préciser, RIP incomplet, gestion du temps…",
       "generalComment": "Commentaire général",
-      "nextObjective": "Prochain objectif",
-      "nextObjectivePlaceholder": "Ex. Reprendre le RIP et reformuler les questions ouvertes avant la prochaine présentation.",
-      "decision": {
-        "title": "Décision pédagogique",
-        "subtitle": "Déterminez le statut de la fiche à l'issue de la présentation.",
-        "validated": "Fiche validée",
-        "rework": "À retravailler"
-      },
       "cancel": "Annuler"
     },
     "titles": {
@@ -829,6 +840,20 @@
       "occupationalRoadRisk": "Le risque routier professionnel",
       "pedagogicalCommunication": "La communication pédagogique",
       "endTrainingReview": "Le bilan de fin de formation"
+    },
+    "real": {
+      "subtitle": "Suivi individuel des fiches du référentiel",
+      "workspaceFailed": "Impossible de charger votre espace de travail.",
+      "loading": "Chargement des fiches…",
+      "rosterFailed": "Impossible de charger les stagiaires de cette promotion.",
+      "topicsFailed": "Impossible de charger les fiches de ce stagiaire.",
+      "noStudents": "Aucun stagiaire inscrit dans cette promotion.",
+      "noTopics": "Aucune fiche configurée dans ce référentiel.",
+      "unknownStatus": "Statut inconnu",
+      "savedFields": "Les dates, le statut, la durée et le commentaire seront enregistrés dans le dossier du stagiaire.",
+      "invalid": "Choisissez un statut et renseignez une date et une durée valides pour une fiche présentée.",
+      "saveFailed": "Échec de l’enregistrement. Vérifiez vos droits et réessayez.",
+      "saving": "Enregistrement…"
     }
   },
   "skills": {
@@ -912,6 +937,30 @@
         "positive": "Très bonne gestion des cyclistes.",
         "workOn": "Anticipation des bus à l'arrêt.",
         "nextGoal": "Conduite économique en ville."
+      }
+    },
+    "real": {
+      "subtitle": "Progression évaluée à partir du référentiel de la formation",
+      "loading": "Chargement des évaluations…",
+      "failed": "Impossible de charger les compétences. Vérifiez vos droits et réessayez.",
+      "workspaceFailed": "Impossible de charger votre espace de travail.",
+      "noStudents": "Aucun stagiaire inscrit dans cette promotion.",
+      "definitionsUnavailable": "Le référentiel détaillé est indisponible ; les évaluations restent visibles.",
+      "noDefinitions": "Aucune compétence définie dans ce référentiel.",
+      "noCriteria": "Aucune sous-compétence définie.",
+      "criteria": "Sous-compétences",
+      "score": "Score : {{value}} / 100",
+      "drivingTitle": "Évaluations de conduite liées",
+      "drivingFailed": "Impossible de charger les évaluations de conduite.",
+      "noDriving": "Aucune évaluation de conduite liée à cette compétence.",
+      "positive": "Point positif",
+      "difficulty": "À travailler",
+      "nextGoal": "Prochain objectif",
+      "level": {
+        "acquired": "Acquis",
+        "in_progress": "En cours",
+        "rework": "À retravailler",
+        "not_assessed": "Non évalué"
       }
     }
   },
@@ -1043,6 +1092,29 @@
         "difficulty": "Anticipation des bus à l’arrêt.",
         "nextGoal": "Conduite économique en ville."
       }
+    },
+    "real": {
+      "subtitle": "Évaluations réelles des compétences de conduite",
+      "loading": "Chargement du dossier et du référentiel…",
+      "loadError": "Impossible de charger les stagiaires. Réessayez après avoir vérifié votre accès.",
+      "noStudents": "Aucun stagiaire dans cette promotion.",
+      "definitionsError": "Impossible de charger le référentiel des compétences.",
+      "noCompetencies": "Aucune compétence disponible dans ce référentiel.",
+      "historyLoading": "Chargement des évaluations…",
+      "historyError": "Impossible de charger les évaluations de conduite.",
+      "noHistory": "Aucune évaluation de conduite enregistrée.",
+      "criteriaHelp": "Choisissez un niveau pour chaque critère avant de valider.",
+      "saving": "Enregistrement…",
+      "saveError": "L’enregistrement a échoué. Vérifiez votre accès et réessayez.",
+      "levels": {
+        "not_assessed": "Non évalué",
+        "in_progress": "En cours",
+        "rework": "À retravailler",
+        "acquired": "Acquis"
+      },
+      "linkedSession": "Séance de conduite associée",
+      "noLinkedSession": "Évaluation sans séance planifiée",
+      "sessionsError": "Séances planifiées indisponibles ; vous pouvez enregistrer une évaluation sans liaison."
     }
   },
   "attendance": {
@@ -1057,7 +1129,7 @@
       "late": "Retards",
       "absent": "Absents",
       "missedHours": "Heures manquées",
-      "excusedHint": "dont 1 excusé(s)"
+      "excusedHint": "dont {{count}} excusé(s)"
     },
     "list": {
       "title": "Liste des stagiaires",
@@ -1071,7 +1143,7 @@
       "excused": "Excusé",
       "pending": "À renseigner"
     },
-    "studentMeta": "{{catchup}} h à rattraper · {{absences}} absence(s)",
+    "studentMeta": "{{catchup}} h à rattraper pour cette séance · {{absences}} absence(s) sur cette séance",
     "fields": {
       "arrival": "Arrivée",
       "departure": "Départ",
@@ -1094,6 +1166,15 @@
       "catchup": "À rattraper",
       "sessionTitle": "Séance du 21 septembre 2026",
       "readOnlyHint": "Les présences sont renseignées par votre formateur ou le centre. Contactez le secrétariat si une information doit être corrigée."
+    },
+    "real": {
+      "loading": "Chargement des présences…",
+      "failed": "Impossible de charger les présences de cette séance.",
+      "empty": "Aucune séance disponible dans la promotion sélectionnée.",
+      "noEntries": "Aucune présence renseignée pour cette séance.",
+      "chooseSession": "Séance",
+      "saveFailed": "L’enregistrement a échoué. Vérifiez les horaires et réessayez.",
+      "sessionTitle": "Séance et présence"
     }
   },
   "internships": {
@@ -1115,7 +1196,8 @@
       "completed": "Terminé",
       "incomplete": "Incomplet",
       "inProgress": "En cours",
-      "planned": "Planifié"
+      "planned": "Planifié",
+      "cancelled": "Annulé"
     },
     "card": {
       "planned": "Heures prévues",
@@ -1127,7 +1209,8 @@
     "observationsTitle": "Observations et évaluation du tuteur",
     "activityStatus": {
       "done": "Fait",
-      "pending": "À faire"
+      "pending": "À faire",
+      "notApplicable": "Sans objet"
     },
     "activities": {
       "observeDrivingLessons": "Observation de leçons de conduite",
@@ -1188,8 +1271,54 @@
         "required": "Ce champ est obligatoire.",
         "email": "Saisissez une adresse e-mail valide.",
         "dateRange": "La date de fin doit être postérieure ou égale à la date de début.",
-        "hours": "Le volume horaire doit être compris entre 1 et 1 000 heures."
+        "hours": "Le volume horaire doit être supérieur à 0 et inférieur ou égal à 2 000 heures."
       }
+    },
+    "real": {
+      "loadError": "Impossible de charger les stages. Vérifiez votre accès et réessayez.",
+      "loading": "Chargement des stages…",
+      "typesError": "Impossible de charger les types de stage du référentiel.",
+      "noTypes": "Aucun type de stage défini pour ce référentiel.",
+      "empty": "Aucune période de stage enregistrée.",
+      "selectStudent": "Sélectionner un stagiaire",
+      "periodType": "Type de stage",
+      "selectPeriodType": "Sélectionner un type",
+      "createError": "Création impossible. Vérifiez les dates et les informations puis réessayez.",
+      "saving": "Enregistrement…",
+      "noActivities": "Aucune activité prévue pour ce type de stage.",
+      "documentsTitle": "Documents à fournir",
+      "noDocuments": "Aucun document requis pour ce type de stage.",
+      "noObservation": "Aucune observation du tuteur.",
+      "documentStatus": {
+        "missing": "Manquant",
+        "available": "Disponible",
+        "validated": "Validé"
+      }
+    },
+    "followup": {
+      "editHours": "Renseigner les heures et l’observation",
+      "save": "Enregistrer",
+      "updateError": "Mise à jour impossible. Vérifiez les valeurs, le document associé et vos droits, puis réessayez.",
+      "linkedDocument": "Document associé",
+      "noDocument": "Aucun document associé",
+      "documentStatus": "État",
+      "documentsError": "Les documents ne sont pas disponibles pour la liaison.",
+      "addEvaluation": "Ajouter une évaluation",
+      "kindLabel": "Type d’évaluation",
+      "kind": {
+        "tutor": "Tuteur",
+        "trainer": "Formateur",
+        "selfassessment": "Autoévaluation",
+        "final": "Finale"
+      },
+      "summary": "Bilan",
+      "strengths": "Points forts",
+      "improvements": "Axes de progrès",
+      "validated": "Validation",
+      "undetermined": "Non déterminé",
+      "yes": "Oui",
+      "no": "Non",
+      "activityComment": "Commentaire de l’activité"
     }
   },
   "documents": {
@@ -1468,11 +1597,12 @@
       "suspend": "Suspendre",
       "activate": "Activer",
       "delete": "Supprimer le compte",
-      "empty": "Aucun compte ne correspond à vos filtres.",
+      "empty": "Aucun compte n’est disponible pour cette organisation.",
       "multiScopeTitle": "Utilisateurs & périmètres d’accès",
       "scopeRule": "Droits contextualisés",
       "searchExtended": "Rechercher un nom, email, site ou formation…",
-      "assignmentCount": "{{count}} affectation(s)"
+      "assignmentCount": "{{count}} affectation(s)",
+      "loading": "Chargement des comptes et des accès…"
     },
     "userDetails": {
       "marc": "Formateur · Conduite · Compétence C3",
@@ -1563,6 +1693,22 @@
         "cohort": "Promotion",
         "exam": "Session d’examen"
       }
+    },
+    "real": {
+      "subtitle": "Comptes et rôles enregistrés dans AuthGate pour votre organisation.",
+      "refresh": "Actualiser",
+      "person": "Nom",
+      "status": "Statut",
+      "actions": "Actions",
+      "chooseRole": "Sélectionner un rôle",
+      "suspend": "Suspendre",
+      "reactivate": "Réactiver",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "failed": "La modification a échoué. Actualisez puis réessayez.",
+      "forbidden": "Vous ne disposez pas des droits nécessaires pour gérer ces accès.",
+      "lastAdmin": "Le dernier administrateur de l’organisation ne peut pas être retiré.",
+      "unavailable": "Impossible de charger les comptes."
     }
   },
   "administration": {
@@ -1794,6 +1940,58 @@
       "open": "Ouvrir le dossier examen",
       "schedule": "Planning des épreuves",
       "notRegistered": "Aucune session de certification n’est encore affectée à ce stagiaire."
+    },
+    "real": {
+      "loading": "Chargement du dossier du stagiaire…",
+      "invalidId": "Identifiant d’inscription invalide.",
+      "forbidden": "Vous ne pouvez pas consulter ce dossier.",
+      "notFound": "Aucun dossier de stagiaire ne correspond à votre compte ou à cette inscription.",
+      "failed": "Impossible de charger le dossier. Actualisez la page.",
+      "sectionFailed": "Cette rubrique est momentanément indisponible.",
+      "sections": "Rubriques du dossier",
+      "enrolledOn": "Date d’inscription",
+      "status": "Situation de l’inscription",
+      "birthDate": "Date de naissance",
+      "topicsPresented": "Fiches présentées ou validées",
+      "competenciesAssessed": "Compétences évaluées",
+      "measuredHint": "Ces totaux proviennent des fiches et évaluations enregistrées.",
+      "score": "Note",
+      "positive": "Points positifs",
+      "difficulty": "Points à travailler",
+      "nextGoal": "Prochain objectif",
+      "tutor": "Tuteur",
+      "emptyTopics": "Aucune fiche pédagogique dans ce référentiel.",
+      "emptyCompetencies": "Aucune compétence dans ce référentiel.",
+      "emptyDriving": "Aucune évaluation de conduite enregistrée.",
+      "emptyPeriods": "Aucune période en entreprise enregistrée.",
+      "tabs": {
+        "overview": "Vue d’ensemble",
+        "topics": "Fiches pédagogiques",
+        "competencies": "Compétences",
+        "driving": "Conduite",
+        "periods": "Périodes en entreprise"
+      },
+      "topicStates": {
+        "not_started": "Non commencée",
+        "in_progress": "En cours",
+        "ready": "Prête",
+        "presented": "Présentée",
+        "validated": "Validée",
+        "rework": "À retravailler"
+      },
+      "levels": {
+        "not_assessed": "Non évaluée",
+        "in_progress": "En cours",
+        "rework": "À retravailler",
+        "acquired": "Acquise"
+      },
+      "periodStates": {
+        "planned": "Planifiée",
+        "completed": "Terminée",
+        "incomplete": "Incomplète",
+        "cancelled": "Annulée",
+        "inProgress": "En cours"
+      }
     }
   },
   "sheetConfig": {
@@ -3785,5 +3983,21 @@
     "REPORTING_FORBIDDEN": "Vous n’êtes pas autorisé à consulter ces données de reporting.",
     "AUDIT_ACTION_REQUIRED": "L’action d’audit est obligatoire.",
     "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire."
+  },
+  "accessPolicy": {
+    "readOnly": "Accès en lecture seule"
+  },
+  "attention": {
+    "title": "À traiter",
+    "subtitle": "Éléments qui nécessitent votre attention",
+    "empty": "Aucun élément à traiter.",
+    "markAllRead": "Tout marquer comme lu",
+    "open": "Ouvrir"
+  },
+  "globalSearch": {
+    "ariaLabel": "Rechercher dans Pedagora Pilot",
+    "empty": "Aucun résultat.",
+    "quickAccess": "Accès rapide",
+    "results": "Résultats"
   }
 }

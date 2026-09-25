@@ -1,9 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { TRAINING_PROGRAMS, TRAINING_SITES } from "../../core/api-data/runtime-data.store";
+import {
+  TRAINING_PROGRAMS,
+  TRAINING_SITES,
+} from "../../core/api-data/runtime-data.store";
 import { SUCCESS_ANALYTICS_RECORDS } from "../../core/api-data/runtime-data.store";
-import type { SuccessAnalyticsRecord, SuccessCandidateDetail, SuccessOutcome } from "../../core/models/success-analytics.models";
+import type {
+  SuccessAnalyticsRecord,
+  SuccessCandidateDetail,
+  SuccessOutcome,
+} from "../../core/models/success-analytics.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
@@ -44,13 +57,18 @@ export class SuccessComponent {
   readonly candidateFilter = signal<CandidateFilter>("all");
 
   readonly accessibleRecords = computed(() => {
-    const organizationIds = new Set(this.workspace.organizations().map((item) => item.id));
-    return SUCCESS_ANALYTICS_RECORDS.filter((item) => organizationIds.has(item.organizationId));
+    const organizationIds = new Set(
+      this.workspace.organizations().map((item) => item.id),
+    );
+    return SUCCESS_ANALYTICS_RECORDS.filter((item) =>
+      organizationIds.has(item.organizationId),
+    );
   });
 
   readonly organizationRecords = computed(() =>
     this.accessibleRecords().filter(
-      (item) => item.organizationId === this.workspace.selection().organizationId,
+      (item) =>
+        item.organizationId === this.workspace.selection().organizationId,
     ),
   );
 
@@ -69,7 +87,9 @@ export class SuccessComponent {
   readonly detailRecord = computed(() => {
     const requested = this.selectedRecordId();
     if (requested) {
-      return this.accessibleRecords().find((item) => item.id === requested) ?? null;
+      return (
+        this.accessibleRecords().find((item) => item.id === requested) ?? null
+      );
     }
     if (this.scope() === "cohort") return this.programRecords()[0] ?? null;
     return null;
@@ -93,12 +113,15 @@ export class SuccessComponent {
   readonly summary = computed(() => this.aggregate(this.scopedRecords()));
 
   readonly promotionRows = computed(() => {
-    const rows = this.scope() === "organization"
-      ? this.organizationRecords()
-      : this.scope() === "site"
-        ? this.siteRecords()
-        : this.programRecords();
-    return [...rows].sort((a, b) => b.year.localeCompare(a.year) || b.rate - a.rate);
+    const rows =
+      this.scope() === "organization"
+        ? this.organizationRecords()
+        : this.scope() === "site"
+          ? this.siteRecords()
+          : this.programRecords();
+    return [...rows].sort(
+      (a, b) => b.year.localeCompare(a.year) || b.rate - a.rate,
+    );
   });
 
   readonly siteBreakdown = computed<BreakdownItem[]>(() => {
@@ -116,10 +139,16 @@ export class SuccessComponent {
   });
 
   readonly programBreakdown = computed<BreakdownItem[]>(() => {
-    const source = this.scope() === "organization" ? this.organizationRecords() : this.siteRecords();
+    const source =
+      this.scope() === "organization"
+        ? this.organizationRecords()
+        : this.siteRecords();
     const groups = new Map<string, SuccessAnalyticsRecord[]>();
     for (const record of source) {
-      groups.set(record.programId, [...(groups.get(record.programId) ?? []), record]);
+      groups.set(record.programId, [
+        ...(groups.get(record.programId) ?? []),
+        record,
+      ]);
     }
     return [...groups.entries()]
       .map(([id, records]) => ({
@@ -143,7 +172,11 @@ export class SuccessComponent {
   readonly previousDelta = computed(() => {
     const trend = this.trend();
     if (trend.length < 2) return null;
-    return Math.round((trend[trend.length - 1].rate - trend[trend.length - 2].rate) * 10) / 10;
+    return (
+      Math.round(
+        (trend[trend.length - 1].rate - trend[trend.length - 2].rate) * 10,
+      ) / 10
+    );
   });
 
   readonly candidateCounts = computed(() => {
@@ -160,7 +193,9 @@ export class SuccessComponent {
   readonly filteredCandidates = computed(() => {
     const candidates = this.detailRecord()?.candidates ?? [];
     const filter = this.candidateFilter();
-    return filter === "all" ? candidates : candidates.filter((item) => item.result === filter);
+    return filter === "all"
+      ? candidates
+      : candidates.filter((item) => item.result === filter);
   });
 
   selectScope(scope: SuccessScope): void {
@@ -197,19 +232,27 @@ export class SuccessComponent {
 
   resultClass(result: SuccessOutcome): string {
     switch (result) {
-      case "obtained": return "bg-[#d8f8df] text-[#178a3d]";
-      case "partial": return "bg-[#fff0c9] text-[#8b5e00]";
-      case "failed": return "bg-[#ffe1df] text-[#d92d20]";
-      default: return "bg-[#eef2f6] text-[#637083]";
+      case "obtained":
+        return "bg-[#d8f8df] text-[#178a3d]";
+      case "partial":
+        return "bg-[#fff0c9] text-[#8b5e00]";
+      case "failed":
+        return "bg-[#ffe1df] text-[#d92d20]";
+      default:
+        return "bg-[#eef2f6] text-[#637083]";
     }
   }
 
   resultIcon(result: SuccessOutcome): string {
     switch (result) {
-      case "obtained": return "ph-check-circle";
-      case "partial": return "ph-circle-half";
-      case "failed": return "ph-x-circle";
-      default: return "ph-minus-circle";
+      case "obtained":
+        return "ph-check-circle";
+      case "partial":
+        return "ph-circle-half";
+      case "failed":
+        return "ph-x-circle";
+      default:
+        return "ph-minus-circle";
     }
   }
 

@@ -190,7 +190,9 @@ export class AuthComponent {
       );
 
       if (result.requiresMfa) {
-        this.error.set(this.translate.instant("auth.errors.mfaNotYetSupported"));
+        this.error.set(
+          this.translate.instant("auth.errors.mfaNotYetSupported"),
+        );
         return;
       }
 
@@ -281,7 +283,9 @@ export class AuthComponent {
       );
 
       if (result.requiresMfa) {
-        this.error.set(this.translate.instant("auth.errors.mfaNotYetSupported"));
+        this.error.set(
+          this.translate.instant("auth.errors.mfaNotYetSupported"),
+        );
         return;
       }
 
@@ -395,11 +399,7 @@ export class AuthComponent {
     const status = (result.status ?? "").toLowerCase();
 
     if (result.accessToken) {
-      this.tokens.setTokens(
-        result.accessToken,
-        result.refreshToken,
-        true,
-      );
+      this.tokens.setTokens(result.accessToken, result.refreshToken, true);
       this.session.connectAuthenticatedToken(result.accessToken);
       this.message.set(
         result.message || this.translate.instant("auth.registrationReady"),

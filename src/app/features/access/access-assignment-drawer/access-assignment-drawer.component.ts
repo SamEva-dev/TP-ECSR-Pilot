@@ -1,9 +1,25 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import type { AccessAccount } from "../../../core/models/access.models";
-import { ORGANIZATIONS, PROGRAM_OFFERINGS, TRAINING_PROGRAMS, TRAINING_SITES, WORKSPACE_COHORTS } from "../../../core/api-data/runtime-data.store";
-import type { MembershipRole, MembershipScope, WorkspaceMembership } from "../../../core/models/workspace.models";
+import {
+  ORGANIZATIONS,
+  PROGRAM_OFFERINGS,
+  TRAINING_PROGRAMS,
+  TRAINING_SITES,
+  WORKSPACE_COHORTS,
+} from "../../../core/api-data/runtime-data.store";
+import type {
+  MembershipRole,
+  MembershipScope,
+  WorkspaceMembership,
+} from "../../../core/models/workspace.models";
 
 @Component({
   selector: "app-access-assignment-drawer",
@@ -30,21 +46,29 @@ export class AccessAssignmentDrawerComponent {
   readonly showCreate = signal(false);
 
   sites() {
-    return TRAINING_SITES.filter((site) => site.organizationId === this.organizationId);
+    return TRAINING_SITES.filter(
+      (site) => site.organizationId === this.organizationId,
+    );
   }
 
   availablePrograms() {
-    const offeringProgramIds = PROGRAM_OFFERINGS
-      .filter((offering) => offering.siteId === this.siteId && offering.active)
-      .map((offering) => offering.programId);
-    return TRAINING_PROGRAMS.filter((program) => offeringProgramIds.includes(program.id));
+    const offeringProgramIds = PROGRAM_OFFERINGS.filter(
+      (offering) => offering.siteId === this.siteId && offering.active,
+    ).map((offering) => offering.programId);
+    return TRAINING_PROGRAMS.filter((program) =>
+      offeringProgramIds.includes(program.id),
+    );
   }
 
   cohorts() {
-    const offeringIds = PROGRAM_OFFERINGS
-      .filter((offering) => offering.siteId === this.siteId && offering.programId === this.programId)
-      .map((offering) => offering.id);
-    return WORKSPACE_COHORTS.filter((cohort) => offeringIds.includes(cohort.offeringId));
+    const offeringIds = PROGRAM_OFFERINGS.filter(
+      (offering) =>
+        offering.siteId === this.siteId &&
+        offering.programId === this.programId,
+    ).map((offering) => offering.id);
+    return WORKSPACE_COHORTS.filter((cohort) =>
+      offeringIds.includes(cohort.offeringId),
+    );
   }
 
   roleKey(role: MembershipRole): string {
@@ -92,10 +116,17 @@ export class AccessAssignmentDrawerComponent {
       role: this.role,
       scope: this.scope,
       active: true,
-      organizationId: this.scope === "platform" ? undefined : this.organizationId,
-      siteId: ["site", "program", "cohort", "exam"].includes(this.scope) ? this.siteId : undefined,
-      programId: ["program", "cohort", "exam"].includes(this.scope) ? this.programId : undefined,
-      cohortId: ["cohort", "exam"].includes(this.scope) ? this.cohortId : undefined,
+      organizationId:
+        this.scope === "platform" ? undefined : this.organizationId,
+      siteId: ["site", "program", "cohort", "exam"].includes(this.scope)
+        ? this.siteId
+        : undefined,
+      programId: ["program", "cohort", "exam"].includes(this.scope)
+        ? this.programId
+        : undefined,
+      cohortId: ["cohort", "exam"].includes(this.scope)
+        ? this.cohortId
+        : undefined,
       examSessionId: this.scope === "exam" ? this.examSessionId : undefined,
     };
     this.assignmentAdded.emit(membership);

@@ -6,7 +6,9 @@ const REMEMBER_KEY = "pedagora-pilot.auth.remember";
 
 @Injectable({ providedIn: "root" })
 export class AuthTokenStore {
-  private readonly accessTokenSignal = signal<string | null>(this.restoreAccessToken());
+  private readonly accessTokenSignal = signal<string | null>(
+    this.restoreAccessToken(),
+  );
   readonly accessToken = this.accessTokenSignal.asReadonly();
 
   setTokens(

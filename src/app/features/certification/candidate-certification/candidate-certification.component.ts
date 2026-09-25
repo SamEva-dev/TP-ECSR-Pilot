@@ -32,19 +32,30 @@ export class CandidateCertificationComponent {
   readonly program = this.contextData.program;
   readonly exam = this.contextData.examSession;
 
-  private readonly requestedCandidateId = this.route.snapshot.paramMap.get("id") ?? "";
-  private readonly ownStudentId = this.sessionService.session()?.studentId ?? "";
+  private readonly requestedCandidateId =
+    this.route.snapshot.paramMap.get("id") ?? "";
+  private readonly ownStudentId =
+    this.sessionService.session()?.studentId ?? "";
 
   readonly candidate = computed<CertificationCandidate>(() => {
     const candidates = this.contextData.certificationCandidates();
-    const wanted = this.sessionService.role() === "stagiaire" ? this.ownStudentId : this.requestedCandidateId;
-    return candidates.find((item) => item.id === wanted || item.studentId === wanted) ?? candidates[0]!;
+    const wanted =
+      this.sessionService.role() === "stagiaire"
+        ? this.ownStudentId
+        : this.requestedCandidateId;
+    return (
+      candidates.find(
+        (item) => item.id === wanted || item.studentId === wanted,
+      ) ?? candidates[0]!
+    );
   });
 
   readonly isJury = computed(() => this.sessionService.role() === "jury");
   readonly readiness = computed(() => {
     const candidate = this.candidate();
-    return Math.round((candidate.completedHours / Math.max(candidate.plannedHours, 1)) * 100);
+    return Math.round(
+      (candidate.completedHours / Math.max(candidate.plannedHours, 1)) * 100,
+    );
   });
   readonly evaluationSaved = signal(false);
   readonly evaluationLocked = signal(false);
@@ -72,7 +83,9 @@ export class CandidateCertificationComponent {
 
   unitStatus(unitId: string): CertificationUnitStatus {
     const candidate = this.candidate();
-    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+    const explicit = candidate.unitStatuses?.find(
+      (item) => item.unitId === unitId,
+    )?.status;
     if (explicit) return explicit;
     if (unitId === "ccp1") return candidate.ccp1;
     if (unitId === "ccp2") return candidate.ccp2;

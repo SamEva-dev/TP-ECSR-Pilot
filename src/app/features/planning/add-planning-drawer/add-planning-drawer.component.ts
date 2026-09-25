@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
-  inject,
   input,
   output,
   signal,
@@ -14,22 +13,22 @@ import {
   Validators,
 } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
+import { parisInstant } from "../../../core/training-delivery/paris-time";
 import type {
-  PlanningEvent,
-  PlanningType,
-} from "../../../core/models/planning.models";
+  TrainingSessionModality,
+  TrainingSessionType,
+} from "../../../core/training-delivery/training-delivery-api.service";
 
 export interface AddPlanningPayload {
   date: string;
   startTime: string;
   endTime: string;
-  promotionId: string;
-  type: PlanningType;
+  type: TrainingSessionType;
+  modality: TrainingSessionModality;
   title: string;
   responsible: string;
   location: string;
-  competence: string;
+  objective: string;
 }
 
 @Component({
@@ -40,13 +39,13 @@ export interface AddPlanningPayload {
 })
 export class AddPlanningDrawerComponent {
   readonly open = input(false);
+  readonly saving = input(false);
+  readonly error = input(false);
+  readonly cohortName = input("");
   readonly closed = output<void>();
   readonly eventCreated = output<AddPlanningPayload>();
-  private readonly workspace = inject(WorkspaceContextService);
-  readonly promotions = this.workspace.cohorts;
   readonly submitted = signal(false);
-
-  readonly types: PlanningType[] = [
+  readonly types: TrainingSessionType[] = [
     "classroom",
     "distance",
     "driving",
@@ -57,25 +56,30 @@ export class AddPlanningDrawerComponent {
     "sensitization",
     "event",
   ];
-
+  readonly modalities: TrainingSessionModality[] = [
+    "onsite",
+    "remote-live",
+    "remote-async",
+    "practical",
+  ];
   readonly form = new FormGroup({
-    date: new FormControl("2026-09-25", {
+    date: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    startTime: new FormControl("09:00", {
+    startTime: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    endTime: new FormControl("12:00", {
+    endTime: new FormControl("", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    promotionId: new FormControl("", {
+    type: new FormControl<TrainingSessionType>("classroom", {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    type: new FormControl<PlanningType>("classroom", {
+    modality: new FormControl<TrainingSessionModality>("onsite", {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -85,84 +89,53 @@ export class AddPlanningDrawerComponent {
     }),
     responsible: new FormControl("", {
       nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
+      validators: [Validators.maxLength(100)],
     }),
     location: new FormControl("", {
       nonNullable: true,
       validators: [Validators.maxLength(100)],
     }),
-    competence: new FormControl("", {
+    objective: new FormControl("", {
       nonNullable: true,
-      validators: [Validators.maxLength(20)],
+      validators: [Validators.maxLength(2000)],
     }),
   });
-
-  constructor() {
-    this.form.controls.promotionId.setValue(this.workspace.selection().cohortId);
-  }
-
   @HostListener("document:keydown.escape")
   onEscape(): void {
     if (this.open()) this.requestClose();
   }
-
   requestClose(): void {
-    this.submitted.set(false);
-    this.closed.emit();
+    if (!this.saving()) this.closed.emit();
   }
-
   submit(): void {
     this.submitted.set(true);
-    if (this.form.invalid || this.invalidPeriod() || !this.dayFromDate()) {
+    if (this.form.invalid || this.invalidPeriod() || !this.cohortName()) {
       this.form.markAllAsTouched();
       return;
     }
-
     this.eventCreated.emit(this.form.getRawValue());
-    this.reset();
   }
-
   invalidPeriod(): boolean {
-    const { startTime, endTime } = this.form.getRawValue();
-    return Boolean(startTime && endTime && endTime <= startTime);
+    const { date, startTime, endTime } = this.form.getRawValue();
+    if (!date || !startTime || !endTime) return false;
+    const start = parisInstant(date, startTime);
+    const end = parisInstant(date, endTime);
+    return !start || !end || end <= start;
   }
-
-  dayFromDate(date = this.form.controls.date.value): PlanningEvent["day"] | null {
-    if (!date) return null;
-    const day = new Date(`${date}T12:00:00`).getDay();
-    return (
-      {
-        1: "monday",
-        2: "tuesday",
-        3: "wednesday",
-        4: "thursday",
-        5: "friday",
-      } as Record<number, PlanningEvent["day"]>
-    )[day] ?? null;
-  }
-
-  showRequired(
-    name: "date" | "startTime" | "endTime" | "promotionId" | "type" | "title" | "responsible",
-  ): boolean {
-    const control = this.form.controls[name];
-    return (this.submitted() || control.touched) && control.hasError("required");
-  }
-
-  typeKey(type: PlanningType): string {
+  typeKey(type: TrainingSessionType): string {
     return `planning.types.${type}`;
   }
-
-  private reset(): void {
+  reset(): void {
     this.form.reset({
-      date: "2026-09-25",
-      startTime: "09:00",
-      endTime: "12:00",
-      promotionId: this.workspace.selection().cohortId,
+      date: "",
+      startTime: "",
+      endTime: "",
       type: "classroom",
+      modality: "onsite",
       title: "",
       responsible: "",
       location: "",
-      competence: "",
+      objective: "",
     });
     this.submitted.set(false);
   }

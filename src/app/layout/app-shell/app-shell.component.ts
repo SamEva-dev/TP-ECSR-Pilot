@@ -15,7 +15,10 @@ import {
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { AttentionService } from "../../core/attention/attention.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { APP_NAV_ITEMS } from "../../core/navigation/app-navigation.config";
+import {
+  APP_NAV_ITEMS,
+  navItemVisibleForRole,
+} from "../../core/navigation/app-navigation.config";
 import { GlobalSearchService } from "../../core/search/global-search.service";
 import { SessionService } from "../../core/session/session.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
@@ -62,6 +65,7 @@ export class AppShellComponent {
     const modules = this.workspace.program()?.enabledModules ?? [];
     return APP_NAV_ITEMS.filter(
       (item) =>
+        navItemVisibleForRole(item, this.sessionService.role()) &&
         this.access.can(item.permission) &&
         (!item.module || modules.includes(item.module)),
     );

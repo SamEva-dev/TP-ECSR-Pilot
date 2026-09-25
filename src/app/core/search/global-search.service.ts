@@ -4,7 +4,10 @@ import type { AppPermission } from "../access/access.models";
 import { TranslateService } from "../i18n/translate.service";
 import { DEFAULT_SHEET_CATALOG } from "../api-data/runtime-data.store";
 import { STUDENT_DIRECTORY } from "../api-data/runtime-data.store";
-import { APP_NAV_ITEMS } from "../navigation/app-navigation.config";
+import {
+  APP_NAV_ITEMS,
+  navItemVisibleForRole,
+} from "../navigation/app-navigation.config";
 import { SessionService } from "../session/session.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
@@ -32,6 +35,7 @@ export class GlobalSearchService {
 
     const navigation: GlobalSearchResult[] = APP_NAV_ITEMS.filter(
       (item) =>
+        navItemVisibleForRole(item, this.sessionService.role()) &&
         this.access.can(item.permission) &&
         (!item.module || modules.includes(item.module)),
     ).map((item) => ({
@@ -43,20 +47,25 @@ export class GlobalSearchService {
       permission: item.permission,
     }));
 
-    const ownStudentId = this.sessionService.session()?.studentId;
+    const ownEmail = this.sessionService.session()?.email?.toLowerCase();
     const students: GlobalSearchResult[] = this.access.can("studentDetail.view")
       ? STUDENT_DIRECTORY.filter(
           (student) =>
             student.promotionId === cohort?.id &&
-            (this.sessionService.role() !== "stagiaire" || student.id === ownStudentId),
+            !!student.enrollmentId &&
+            (this.sessionService.role() !== "stagiaire" ||
+              student.email?.toLowerCase() === ownEmail),
         ).map((student) => ({
-            id: `student:${student.id}`,
-            label: `${student.firstName} ${student.lastName}`,
-            metaKey: "globalSearch.types.student",
-            icon: "ph-user",
-            path: `/stagiaires/${student.id}`,
-            permission: "studentDetail.view" as const,
-          }))
+          id: `student:${student.id}`,
+          label: `${student.firstName} ${student.lastName}`,
+          metaKey: "globalSearch.types.student",
+          icon: "ph-user",
+          path:
+            this.sessionService.role() === "stagiaire"
+              ? "/stagiaires/me"
+              : `/stagiaires/${student.enrollmentId}`,
+          permission: "studentDetail.view" as const,
+        }))
       : [];
 
     const cohorts: GlobalSearchResult[] = this.access.can("promotions.view")
@@ -94,28 +103,38 @@ export class GlobalSearchService {
 
     const sheets: GlobalSearchResult[] =
       modules.includes("sheets") && this.access.can("sheets.view")
-        ? DEFAULT_SHEET_CATALOG.filter((sheet) => sheet.active).map((sheet) => ({
-            id: `sheet:${sheet.id}`,
-            label: `${sheet.number}. ${sheet.titleKey ? this.i18n.instant(sheet.titleKey) : sheet.customTitle ?? ""}`,
-            metaKey: "globalSearch.types.sheet",
-            icon: "ph-presentation-chart",
-            path: "/fiches",
-            permission: "sheets.view" as const,
-          }))
+        ? DEFAULT_SHEET_CATALOG.filter((sheet) => sheet.active).map(
+            (sheet) => ({
+              id: `sheet:${sheet.id}`,
+              label: `${sheet.number}. ${sheet.titleKey ? this.i18n.instant(sheet.titleKey) : (sheet.customTitle ?? "")}`,
+              metaKey: "globalSearch.types.sheet",
+              icon: "ph-presentation-chart",
+              path: "/fiches",
+              permission: "sheets.view" as const,
+            }),
+          )
         : [];
 
     if (!normalizedQuery) return navigation.slice(0, limit);
 
-    const results = [...students, ...cohorts, ...sites, ...programs, ...sheets, ...navigation];
+    const results = [
+      ...students,
+      ...cohorts,
+      ...sites,
+      ...programs,
+      ...sheets,
+      ...navigation,
+    ];
     const unique = results.filter(
-      (item, index, array) => array.findIndex((candidate) => candidate.id === item.id) === index,
+      (item, index, array) =>
+        array.findIndex((candidate) => candidate.id === item.id) === index,
     );
 
     return unique
       .filter((item) =>
-        this.normalize(`${item.label} ${this.i18n.instant(item.metaKey)}`).includes(
-          normalizedQuery,
-        ),
+        this.normalize(
+          `${item.label} ${this.i18n.instant(item.metaKey)}`,
+        ).includes(normalizedQuery),
       )
       .slice(0, limit);
   }

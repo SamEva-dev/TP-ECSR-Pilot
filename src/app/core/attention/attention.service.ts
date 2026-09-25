@@ -21,10 +21,15 @@ export class AttentionService {
       if (item.programIds && !item.programIds.includes(programId)) return false;
       if (item.cohortIds && !item.cohortIds.includes(cohortId)) return false;
       return this.access.can(item.permission);
-    }).map((item) => ({ ...item, read: this.readIds().has(this.contextualId(item.id)) }));
+    }).map((item) => ({
+      ...item,
+      read: this.readIds().has(this.contextualId(item.id)),
+    }));
   });
 
-  readonly unreadCount = computed(() => this.items().filter((item) => !item.read).length);
+  readonly unreadCount = computed(
+    () => this.items().filter((item) => !item.read).length,
+  );
 
   markRead(id: string): void {
     const contextualId = this.contextualId(id);

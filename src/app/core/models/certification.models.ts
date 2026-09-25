@@ -114,7 +114,8 @@ export interface SuccessPromotion {
   rate: number;
 }
 
-export type SuccessCandidateResult = "obtained" | "partial" | "failed" | "absent";
+export type SuccessCandidateResult =
+  "obtained" | "partial" | "failed" | "absent";
 
 export interface SuccessCandidateDetail {
   id: string;

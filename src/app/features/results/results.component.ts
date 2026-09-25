@@ -67,8 +67,13 @@ export class ResultsComponent {
     return "bg-[#e5f2ff] text-[#2a64a2]";
   }
 
-  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
-    const explicit = candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status;
+  unitStatus(
+    candidate: CertificationCandidate,
+    unitId: string,
+  ): CertificationUnitStatus {
+    const explicit = candidate.unitStatuses?.find(
+      (item) => item.unitId === unitId,
+    )?.status;
     if (explicit) return explicit;
     if (unitId === "ccp1") return candidate.ccp1;
     if (unitId === "ccp2") return candidate.ccp2;

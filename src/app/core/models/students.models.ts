@@ -5,6 +5,7 @@ import type { StudentStatus } from "./app.models";
 
 export interface StudentDirectoryItem {
   id: string;
+  enrollmentId?: string;
   firstName: string;
   lastName: string;
   promotionId: string;
@@ -16,4 +17,11 @@ export interface StudentDirectoryItem {
   presentedSheets: number;
   validatedSheets: number;
   status: StudentStatus;
+  enrollmentStatus?:
+    | "pending"
+    | "active"
+    | "suspended"
+    | "completed"
+    | "withdrawn"
+    | "cancelled";
 }

@@ -44,7 +44,12 @@ export interface OrganizationModuleSetting {
 }
 
 export interface OrganizationPreference {
-  id: "absenceAlerts" | "certificationAlerts" | "weeklyDigest" | "autoArchive" | "strictAudit";
+  id:
+    | "absenceAlerts"
+    | "certificationAlerts"
+    | "weeklyDigest"
+    | "autoArchive"
+    | "strictAudit";
   icon: string;
   labelKey: string;
   descriptionKey: string;

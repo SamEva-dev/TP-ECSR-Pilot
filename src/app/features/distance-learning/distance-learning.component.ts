@@ -1,13 +1,42 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from "@angular/core";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { DistanceLearningApiService } from "../../core/distance-learning/distance-learning-api.service";
-import type { AsyncLearningModuleApi, DistanceLearningSessionApi } from "../../core/distance-learning/distance-learning.models";
+import type {
+  AsyncLearningModuleApi,
+  DistanceLearningSessionApi,
+} from "../../core/distance-learning/distance-learning.models";
 import { RealtimeService } from "../../core/realtime/realtime.service";
-import { DISTANCE_ASYNC_MODULES, DISTANCE_INTERACTIONS, DISTANCE_LIVE_SESSIONS, DISTANCE_RESOURCES, DISTANCE_SITE_METRICS } from "../../core/api-data/runtime-data.store";
-import type { DistanceAsyncModule, DistanceAttendanceStatus, DistanceInteractionType, DistanceLiveSession, DistanceModuleStatus, DistancePlatform, DistanceResourceType } from "../../core/models/distance-learning.models";
+import {
+  DISTANCE_ASYNC_MODULES,
+  DISTANCE_INTERACTIONS,
+  DISTANCE_LIVE_SESSIONS,
+  DISTANCE_RESOURCES,
+  DISTANCE_SITE_METRICS,
+} from "../../core/api-data/runtime-data.store";
+import type {
+  DistanceAsyncModule,
+  DistanceAttendanceStatus,
+  DistanceInteractionType,
+  DistanceLiveSession,
+  DistanceModuleStatus,
+  DistancePlatform,
+  DistanceResourceType,
+} from "../../core/models/distance-learning.models";
 
 @Component({
   selector: "app-distance-learning",
@@ -22,14 +51,20 @@ export class DistanceLearningComponent {
   private readonly realtime = inject(RealtimeService);
   readonly apiConnected = signal(false);
 
-  readonly sessions = signal(DISTANCE_LIVE_SESSIONS.map((item) => ({
-    ...item,
-    participants: item.participants.map((participant) => ({ ...participant })),
-  })));
-  readonly modules = signal(DISTANCE_ASYNC_MODULES.map((item) => ({
-    ...item,
-    steps: item.steps.map((step) => ({ ...step })),
-  })));
+  readonly sessions = signal(
+    DISTANCE_LIVE_SESSIONS.map((item) => ({
+      ...item,
+      participants: item.participants.map((participant) => ({
+        ...participant,
+      })),
+    })),
+  );
+  readonly modules = signal(
+    DISTANCE_ASYNC_MODULES.map((item) => ({
+      ...item,
+      steps: item.steps.map((step) => ({ ...step })),
+    })),
+  );
 
   readonly drawerOpen = signal(false);
   readonly selectedLiveId = signal("dl-live-ecsr-1");
@@ -40,36 +75,44 @@ export class DistanceLearningComponent {
   readonly isDirection = computed(() => this.session.role() === "direction");
   readonly isTrainer = computed(() => this.session.role() === "formateur");
   readonly isStudent = computed(() => this.session.role() === "stagiaire");
-  readonly isSecretariat = computed(() => this.session.role() === "secretariat");
-  readonly canCreate = computed(() => this.isDirection() || this.isTrainer() || this.isSecretariat());
+  readonly isSecretariat = computed(
+    () => this.session.role() === "secretariat",
+  );
+  readonly canCreate = computed(
+    () => this.isDirection() || this.isTrainer() || this.isSecretariat(),
+  );
 
   readonly contextSessions = computed<DistanceLiveSession[]>(() => {
     const cohort = this.workspace.cohort();
     const site = this.workspace.site();
     const program = this.workspace.program();
     if (!cohort || !site || !program) return [];
-    const matches = this.sessions().filter((item) => item.cohortId === cohort.id);
+    const matches = this.sessions().filter(
+      (item) => item.cohortId === cohort.id,
+    );
     if (matches.length) return matches;
-    return [{
-      id: `dl-generated-${cohort.id}`,
-      organizationId: site.organizationId,
-      siteId: site.id,
-      programId: program.id,
-      cohortId: cohort.id,
-      titleKey: "distanceLearning.demo.sessions.genericTheory",
-      trainer: "Marc Dupont",
-      date: cohort.status === "planned" ? "15/01/2027" : "25/09/2026",
-      start: "09:00",
-      end: "11:00",
-      platform: "teams",
-      joinUrl: "https://teams.microsoft.com/l/meetup-join/demo-generic",
-      status: "scheduled",
-      expected: cohort.studentCount,
-      objectivesKey: "distanceLearning.demo.sessions.genericObjectives",
-      participants: [],
-      resourceIds: [],
-      interactionIds: [],
-    }];
+    return [
+      {
+        id: `dl-generated-${cohort.id}`,
+        organizationId: site.organizationId,
+        siteId: site.id,
+        programId: program.id,
+        cohortId: cohort.id,
+        titleKey: "distanceLearning.demo.sessions.genericTheory",
+        trainer: "Marc Dupont",
+        date: cohort.status === "planned" ? "15/01/2027" : "25/09/2026",
+        start: "09:00",
+        end: "11:00",
+        platform: "teams",
+        joinUrl: "https://teams.microsoft.com/l/meetup-join/demo-generic",
+        status: "scheduled",
+        expected: cohort.studentCount,
+        objectivesKey: "distanceLearning.demo.sessions.genericObjectives",
+        participants: [],
+        resourceIds: [],
+        interactionIds: [],
+      },
+    ];
   });
 
   readonly contextModules = computed<DistanceAsyncModule[]>(() => {
@@ -77,88 +120,144 @@ export class DistanceLearningComponent {
     const site = this.workspace.site();
     const program = this.workspace.program();
     if (!cohort || !site || !program) return [];
-    const matches = this.modules().filter((item) => item.cohortId === cohort.id);
+    const matches = this.modules().filter(
+      (item) => item.cohortId === cohort.id,
+    );
     if (matches.length) return matches;
-    return [{
-      id: `dam-generated-${cohort.id}`,
-      organizationId: site.organizationId,
-      siteId: site.id,
-      programId: program.id,
-      cohortId: cohort.id,
-      titleKey: "distanceLearning.demo.modules.generic",
-      descriptionKey: "distanceLearning.demo.modules.genericDescription",
-      estimatedMinutes: 90,
-      dueDate: cohort.status === "planned" ? "22/01/2027" : "30/09/2026",
-      trainer: "Claire Berthier",
-      status: "not-started",
-      progress: 0,
-      completedStudents: 0,
-      expectedStudents: cohort.studentCount,
-      steps: [
-        { id: "s1", labelKey: "distanceLearning.steps.readCourse", completed: false },
-        { id: "s2", labelKey: "distanceLearning.steps.watchVideo", completed: false },
-        { id: "s3", labelKey: "distanceLearning.steps.exercise", completed: false },
-        { id: "s4", labelKey: "distanceLearning.steps.quiz", completed: false },
-      ],
-    }];
+    return [
+      {
+        id: `dam-generated-${cohort.id}`,
+        organizationId: site.organizationId,
+        siteId: site.id,
+        programId: program.id,
+        cohortId: cohort.id,
+        titleKey: "distanceLearning.demo.modules.generic",
+        descriptionKey: "distanceLearning.demo.modules.genericDescription",
+        estimatedMinutes: 90,
+        dueDate: cohort.status === "planned" ? "22/01/2027" : "30/09/2026",
+        trainer: "Claire Berthier",
+        status: "not-started",
+        progress: 0,
+        completedStudents: 0,
+        expectedStudents: cohort.studentCount,
+        steps: [
+          {
+            id: "s1",
+            labelKey: "distanceLearning.steps.readCourse",
+            completed: false,
+          },
+          {
+            id: "s2",
+            labelKey: "distanceLearning.steps.watchVideo",
+            completed: false,
+          },
+          {
+            id: "s3",
+            labelKey: "distanceLearning.steps.exercise",
+            completed: false,
+          },
+          {
+            id: "s4",
+            labelKey: "distanceLearning.steps.quiz",
+            completed: false,
+          },
+        ],
+      },
+    ];
   });
 
   readonly filteredModules = computed(() => {
     const filter = this.moduleFilter();
-    return this.contextModules().filter((item) => filter === "all" || item.status === filter);
+    return this.contextModules().filter(
+      (item) => filter === "all" || item.status === filter,
+    );
   });
 
   readonly selectedLive = computed<DistanceLiveSession | null>(() => {
     const list = this.contextSessions();
-    return list.find((item) => item.id === this.selectedLiveId()) ?? list[0] ?? null;
+    return (
+      list.find((item) => item.id === this.selectedLiveId()) ?? list[0] ?? null
+    );
   });
 
-  readonly selectedParticipants = computed(() => this.selectedLive()?.participants ?? []);
+  readonly selectedParticipants = computed(
+    () => this.selectedLive()?.participants ?? [],
+  );
   readonly selectedResources = computed(() => {
     const session = this.selectedLive();
-    return session ? DISTANCE_RESOURCES.filter((item) => session.resourceIds.includes(item.id)) : [];
+    return session
+      ? DISTANCE_RESOURCES.filter((item) =>
+          session.resourceIds.includes(item.id),
+        )
+      : [];
   });
   readonly selectedInteractions = computed(() => {
     const session = this.selectedLive();
-    return session ? DISTANCE_INTERACTIONS.filter((item) => session.interactionIds.includes(item.id)) : [];
+    return session
+      ? DISTANCE_INTERACTIONS.filter((item) =>
+          session.interactionIds.includes(item.id),
+        )
+      : [];
   });
 
-  readonly presentCount = computed(() =>
-    this.selectedParticipants().filter((item) => item.attendance === "present").length,
+  readonly presentCount = computed(
+    () =>
+      this.selectedParticipants().filter(
+        (item) => item.attendance === "present",
+      ).length,
   );
-  readonly lateCount = computed(() =>
-    this.selectedParticipants().filter((item) => item.attendance === "late").length,
+  readonly lateCount = computed(
+    () =>
+      this.selectedParticipants().filter((item) => item.attendance === "late")
+        .length,
   );
-  readonly absentCount = computed(() =>
-    this.selectedParticipants().filter((item) => item.attendance === "absent").length,
+  readonly absentCount = computed(
+    () =>
+      this.selectedParticipants().filter((item) => item.attendance === "absent")
+        .length,
   );
 
   readonly currentSiteMetric = computed(() => {
     const siteId = this.workspace.site()?.id;
-    return DISTANCE_SITE_METRICS.find((item) => item.siteId === siteId) ?? {
-      siteId: siteId ?? "",
-      liveHours: 36,
-      asyncHours: 18,
-      activeStudents: this.workspace.cohort()?.studentCount ?? 0,
-      completionRate: 79,
-      lateModules: 3,
-    };
+    return (
+      DISTANCE_SITE_METRICS.find((item) => item.siteId === siteId) ?? {
+        siteId: siteId ?? "",
+        liveHours: 36,
+        asyncHours: 18,
+        activeStudents: this.workspace.cohort()?.studentCount ?? 0,
+        completionRate: 79,
+        lateModules: 3,
+      }
+    );
   });
 
   readonly liveSessionCount = computed(() => this.contextSessions().length);
   readonly totalLiveHours = computed(() => this.currentSiteMetric().liveHours);
-  readonly totalAsyncHours = computed(() => this.currentSiteMetric().asyncHours);
-  readonly lateModuleCount = computed(() => this.contextModules().filter((item) => item.status === "late").length);
+  readonly totalAsyncHours = computed(
+    () => this.currentSiteMetric().asyncHours,
+  );
+  readonly lateModuleCount = computed(
+    () => this.contextModules().filter((item) => item.status === "late").length,
+  );
   readonly completionRate = computed(() => {
     const modules = this.contextModules();
     if (!modules.length) return 0;
-    return Math.round(modules.reduce((total, item) => total + item.progress, 0) / modules.length);
+    return Math.round(
+      modules.reduce((total, item) => total + item.progress, 0) /
+        modules.length,
+    );
   });
 
   readonly createForm = new FormGroup({
     kind: new FormControl<"live" | "async">("live", { nonNullable: true }),
-    title: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    date: new FormControl("2026-09-28", { nonNullable: true, validators: [Validators.required] }),
+    title: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    date: new FormControl("2026-09-28", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     start: new FormControl("09:00", { nonNullable: true }),
     end: new FormControl("12:00", { nonNullable: true }),
     platform: new FormControl<DistancePlatform>("teams", { nonNullable: true }),
@@ -166,7 +265,6 @@ export class DistanceLearningComponent {
     estimatedMinutes: new FormControl(90, { nonNullable: true }),
     dueDate: new FormControl("2026-10-02", { nonNullable: true }),
   });
-
 
   constructor() {
     void this.reloadFromApi();
@@ -179,20 +277,28 @@ export class DistanceLearningComponent {
     });
   }
 
-  private backendId(value: { id: string; apiId?: string } | null): string | undefined {
+  private backendId(
+    value: { id: string; apiId?: string } | null,
+  ): string | undefined {
     if (!value) return undefined;
     return value.apiId ?? value.id;
   }
 
   private isUuid(value?: string): value is string {
-    return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+    return Boolean(
+      value &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        value,
+      ),
+    );
   }
 
   private async reloadFromApi(): Promise<void> {
     const cohort = this.workspace.cohort();
     if (!cohort) return;
 
-    const cohortId = (cohort as typeof cohort & { apiId?: string }).apiId ?? cohort.id;
+    const cohortId =
+      (cohort as typeof cohort & { apiId?: string }).apiId ?? cohort.id;
     if (!this.isUuid(cohortId)) {
       this.apiConnected.set(false);
       return;
@@ -217,11 +323,12 @@ export class DistanceLearningComponent {
   private mapSession(item: DistanceLearningSessionApi): DistanceLiveSession {
     const starts = new Date(item.startsAtUtc);
     const ends = new Date(item.endsAtUtc);
-    const status = item.status.toLowerCase() === "live"
-      ? "live"
-      : item.status.toLowerCase() === "scheduled"
-        ? "scheduled"
-        : "closed";
+    const status =
+      item.status.toLowerCase() === "live"
+        ? "live"
+        : item.status.toLowerCase() === "scheduled"
+          ? "scheduled"
+          : "closed";
 
     return {
       id: item.id,
@@ -232,18 +339,26 @@ export class DistanceLearningComponent {
       titleKey: item.title,
       trainer: item.trainerDisplayName,
       date: starts.toLocaleDateString("fr-FR"),
-      start: starts.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-      end: ends.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+      start: starts.toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      end: ends.toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       platform: item.platform.toLowerCase() as DistancePlatform,
       joinUrl: item.joinUrl,
       status,
       expected: item.participants.length,
-      objectivesKey: item.objectives ?? "distanceLearning.demo.sessions.genericObjectives",
+      objectivesKey:
+        item.objectives ?? "distanceLearning.demo.sessions.genericObjectives",
       participants: item.participants.map((participant) => ({
         id: participant.id,
         studentId: participant.enrollmentId,
         name: participant.displayName,
-        attendance: participant.attendance.toLowerCase() as DistanceAttendanceStatus,
+        attendance:
+          participant.attendance.toLowerCase() as DistanceAttendanceStatus,
         connectedAt: participant.connectedAtUtc ?? undefined,
         disconnectedAt: participant.disconnectedAtUtc ?? undefined,
         connectedMinutes: participant.connectedMinutes,
@@ -272,7 +387,8 @@ export class DistanceLearningComponent {
       programId: item.programId,
       cohortId: item.cohortId,
       titleKey: item.title,
-      descriptionKey: item.description ?? "distanceLearning.demo.modules.genericDescription",
+      descriptionKey:
+        item.description ?? "distanceLearning.demo.modules.genericDescription",
       estimatedMinutes: item.estimatedMinutes,
       dueDate: new Date(`${item.dueDate}T00:00:00`).toLocaleDateString("fr-FR"),
       trainer: item.trainerDisplayName,
@@ -281,7 +397,11 @@ export class DistanceLearningComponent {
       completedStudents: item.completedStudents,
       expectedStudents: item.expectedStudents,
       score: item.averageScore ?? undefined,
-      steps: item.steps.map((step) => ({ id: step.id, labelKey: step.label, completed: false })),
+      steps: item.steps.map((step) => ({
+        id: step.id,
+        labelKey: step.label,
+        completed: false,
+      })),
     };
   }
 
@@ -307,9 +427,14 @@ export class DistanceLearningComponent {
 
     const siteId = this.backendId(site);
     const programId = this.backendId(program);
-    const cohortId = (cohort as typeof cohort & { apiId?: string }).apiId ?? cohort.id;
+    const cohortId =
+      (cohort as typeof cohort & { apiId?: string }).apiId ?? cohort.id;
 
-    if (this.isUuid(siteId) && this.isUuid(programId) && this.isUuid(cohortId)) {
+    if (
+      this.isUuid(siteId) &&
+      this.isUuid(programId) &&
+      this.isUuid(cohortId)
+    ) {
       try {
         if (value.kind === "live") {
           const created = await this.api.createSession({
@@ -318,14 +443,19 @@ export class DistanceLearningComponent {
             cohortId,
             title: value.title.trim(),
             trainerDisplayName: this.currentUserName(),
-            startsAtUtc: new Date(`${value.date}T${value.start}:00`).toISOString(),
+            startsAtUtc: new Date(
+              `${value.date}T${value.start}:00`,
+            ).toISOString(),
             endsAtUtc: new Date(`${value.date}T${value.end}:00`).toISOString(),
             platform: value.platform,
             joinUrl: value.joinUrl || "https://example.invalid/classroom",
             objectives: null,
           });
           const mapped = this.mapSession(created);
-          this.sessions.update((items) => [mapped, ...items.filter((item) => item.id !== mapped.id)]);
+          this.sessions.update((items) => [
+            mapped,
+            ...items.filter((item) => item.id !== mapped.id),
+          ]);
           this.selectedLiveId.set(mapped.id);
         } else {
           const created = await this.api.createModule({
@@ -340,13 +470,20 @@ export class DistanceLearningComponent {
             expectedStudents: cohort.studentCount,
             steps: [
               { code: "READ_COURSE", label: "Lire le cours", sortOrder: 10 },
-              { code: "WATCH_VIDEO", label: "Regarder la vidéo", sortOrder: 20 },
+              {
+                code: "WATCH_VIDEO",
+                label: "Regarder la vidéo",
+                sortOrder: 20,
+              },
               { code: "EXERCISE", label: "Réaliser l'exercice", sortOrder: 30 },
               { code: "QUIZ", label: "Répondre au quiz", sortOrder: 40 },
             ],
           });
           const mapped = this.mapModule(created);
-          this.modules.update((items) => [mapped, ...items.filter((item) => item.id !== mapped.id)]);
+          this.modules.update((items) => [
+            mapped,
+            ...items.filter((item) => item.id !== mapped.id),
+          ]);
         }
 
         this.apiConnected.set(true);
@@ -400,10 +537,26 @@ export class DistanceLearningComponent {
         completedStudents: 0,
         expectedStudents: cohort.studentCount,
         steps: [
-          { id: "s1", labelKey: "distanceLearning.steps.readCourse", completed: false },
-          { id: "s2", labelKey: "distanceLearning.steps.watchVideo", completed: false },
-          { id: "s3", labelKey: "distanceLearning.steps.exercise", completed: false },
-          { id: "s4", labelKey: "distanceLearning.steps.quiz", completed: false },
+          {
+            id: "s1",
+            labelKey: "distanceLearning.steps.readCourse",
+            completed: false,
+          },
+          {
+            id: "s2",
+            labelKey: "distanceLearning.steps.watchVideo",
+            completed: false,
+          },
+          {
+            id: "s3",
+            labelKey: "distanceLearning.steps.exercise",
+            completed: false,
+          },
+          {
+            id: "s4",
+            labelKey: "distanceLearning.steps.quiz",
+            completed: false,
+          },
         ],
       };
       this.modules.update((items) => [created, ...items]);
@@ -427,16 +580,34 @@ export class DistanceLearningComponent {
   async cycleAttendance(participantId: string): Promise<void> {
     const activeSession = this.selectedLive();
     if (!activeSession) return;
-    const order: DistanceAttendanceStatus[] = ["present", "late", "disconnected", "absent"];
-    let updatedParticipant = activeSession.participants.find((participant) => participant.id === participantId);
+    const order: DistanceAttendanceStatus[] = [
+      "present",
+      "late",
+      "disconnected",
+      "absent",
+    ];
+    let updatedParticipant = activeSession.participants.find(
+      (participant) => participant.id === participantId,
+    );
     if (!updatedParticipant) return;
-    const nextStatus = order[(order.indexOf(updatedParticipant.attendance) + 1) % order.length];
+    const nextStatus =
+      order[(order.indexOf(updatedParticipant.attendance) + 1) % order.length];
     updatedParticipant = { ...updatedParticipant, attendance: nextStatus };
 
-    this.sessions.update((sessions) => sessions.map((item) => item.id !== activeSession.id ? item : {
-      ...item,
-      participants: item.participants.map((participant) => participant.id === participantId ? updatedParticipant! : participant),
-    }));
+    this.sessions.update((sessions) =>
+      sessions.map((item) =>
+        item.id !== activeSession.id
+          ? item
+          : {
+              ...item,
+              participants: item.participants.map((participant) =>
+                participant.id === participantId
+                  ? updatedParticipant!
+                  : participant,
+              ),
+            },
+      ),
+    );
 
     if (this.isUuid(activeSession.id) && this.isUuid(participantId)) {
       try {
@@ -456,18 +627,27 @@ export class DistanceLearningComponent {
   }
 
   async toggleModuleStep(moduleId: string, stepId: string): Promise<void> {
-    this.modules.update((items) => items.map((item) => {
-      if (item.id !== moduleId) return item;
-      const steps = item.steps.map((step) => step.id === stepId ? { ...step, completed: !step.completed } : step);
-      const done = steps.filter((step) => step.completed).length;
-      const progress = Math.round((done / Math.max(steps.length, 1)) * 100);
-      return {
-        ...item,
-        steps,
-        progress,
-        status: progress === 100 ? "completed" : progress > 0 ? "in-progress" : "not-started",
-      };
-    }));
+    this.modules.update((items) =>
+      items.map((item) => {
+        if (item.id !== moduleId) return item;
+        const steps = item.steps.map((step) =>
+          step.id === stepId ? { ...step, completed: !step.completed } : step,
+        );
+        const done = steps.filter((step) => step.completed).length;
+        const progress = Math.round((done / Math.max(steps.length, 1)) * 100);
+        return {
+          ...item,
+          steps,
+          progress,
+          status:
+            progress === 100
+              ? "completed"
+              : progress > 0
+                ? "in-progress"
+                : "not-started",
+        };
+      }),
+    );
 
     const module = this.modules().find((item) => item.id === moduleId);
     if (module && this.isUuid(moduleId)) {
@@ -484,7 +664,9 @@ export class DistanceLearningComponent {
   }
 
   updateModuleFilter(event: Event): void {
-    this.moduleFilter.set((event.target as HTMLSelectElement).value as "all" | DistanceModuleStatus);
+    this.moduleFilter.set(
+      (event.target as HTMLSelectElement).value as "all" | DistanceModuleStatus,
+    );
   }
 
   currentUserName(): string {

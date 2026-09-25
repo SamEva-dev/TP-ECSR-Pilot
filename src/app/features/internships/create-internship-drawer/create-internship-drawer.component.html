@@ -71,8 +71,11 @@
                 formControlName="studentId"
                 class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
               >
-                @for (student of students; track student.id) {
-                  <option [value]="student.id">
+                <option value="">
+                  {{ "internships.real.selectStudent" | t }}
+                </option>
+                @for (student of students(); track student.enrollmentId) {
+                  <option [value]="student.enrollmentId">
                     {{ student.firstName }} {{ student.lastName }}
                   </option>
                 }
@@ -81,6 +84,33 @@
                 class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
               ></i>
             </div>
+            @if (showRequired("studentId")) {
+              <p class="mt-1 text-xs text-red-600">
+                {{ "internships.drawer.errors.required" | t }}
+              </p>
+            }
+            <label
+              for="internship-period-type"
+              class="mt-4 mb-1.5 block text-[12px] font-semibold text-[#344054]"
+              >{{ "internships.real.periodType" | t }} *</label
+            >
+            <select
+              id="internship-period-type"
+              formControlName="periodTypeCode"
+              class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px]"
+            >
+              <option value="">
+                {{ "internships.real.selectPeriodType" | t }}
+              </option>
+              @for (type of periodTypes(); track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+            @if (showRequired("periodTypeCode")) {
+              <p class="mt-1 text-xs text-red-600">
+                {{ "internships.drawer.errors.required" | t }}
+              </p>
+            }
           </section>
 
           <section
@@ -331,8 +361,13 @@
         <footer
           class="flex items-center justify-between gap-3 border-t border-[#dfe5ec] bg-white px-6 py-4"
         >
-          <p class="hidden text-[11px] text-[#7a8698] sm:block">
-            {{ "internships.drawer.requiredHint" | t }}
+          <p class="text-[11px] text-[#7a8698]">
+            {{
+              (saveError()
+                ? "internships.real.createError"
+                : "internships.drawer.requiredHint"
+              ) | t
+            }}
           </p>
           <div class="ml-auto flex gap-2">
             <button
@@ -344,10 +379,18 @@
             </button>
             <button
               type="submit"
+              [disabled]="
+                saving() || !students().length || !periodTypes().length
+              "
               class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f]"
             >
               <i class="ph ph-plus text-[17px]"></i
-              >{{ "internships.drawer.submit" | t }}
+              >{{
+                (saving()
+                  ? "internships.real.saving"
+                  : "internships.drawer.submit"
+                ) | t
+              }}
             </button>
           </div>
         </footer>

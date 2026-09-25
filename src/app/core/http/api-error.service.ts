@@ -16,6 +16,8 @@ export class ApiErrorService {
     const code = error?.code || "COMMON_UNEXPECTED_ERROR";
     const key = `backendErrors.${code}`;
     const translated = this.translate.instant(key, error?.parameters);
-    return translated === key ? this.translate.instant("backendErrors.COMMON_UNEXPECTED_ERROR") : translated;
+    return translated === key
+      ? this.translate.instant("backendErrors.COMMON_UNEXPECTED_ERROR")
+      : translated;
   }
 }

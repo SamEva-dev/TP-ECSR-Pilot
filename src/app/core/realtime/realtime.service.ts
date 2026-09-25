@@ -1,5 +1,10 @@
 import { Injectable, inject, signal } from "@angular/core";
-import { HubConnection, HubConnectionBuilder, HttpTransportType, LogLevel } from "@microsoft/signalr";
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  HttpTransportType,
+  LogLevel,
+} from "@microsoft/signalr";
 import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "../session/auth-token.store";
 
@@ -27,10 +32,14 @@ export class RealtimeService {
         transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-      .configureLogging(environment.production ? LogLevel.Warning : LogLevel.Information)
+      .configureLogging(
+        environment.production ? LogLevel.Warning : LogLevel.Information,
+      )
       .build();
 
-    this.connection.on("domainEvent", (event: PedagoraRealtimeEvent) => this.lastEvent.set(event));
+    this.connection.on("domainEvent", (event: PedagoraRealtimeEvent) =>
+      this.lastEvent.set(event),
+    );
     this.connection.onreconnected(() => this.connected.set(true));
     this.connection.onreconnecting(() => this.connected.set(false));
     this.connection.onclose(() => this.connected.set(false));

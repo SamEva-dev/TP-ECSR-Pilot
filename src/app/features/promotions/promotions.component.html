@@ -1,120 +1,123 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+  <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-[#6f7d90]">
-        <span class="rounded-full bg-[#e7f2ff] px-2.5 py-1 text-[#2a64a2]">{{ workspace.organization()?.shortName }}</span>
-        <i class="ph ph-caret-right text-[11px]"></i>
-        <span>{{ workspace.site()?.city }}</span>
-        <i class="ph ph-caret-right text-[11px]"></i>
-        <span>{{ workspace.program()?.name }}</span>
-      </div>
-      <h1 class="mt-2 text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ "promotions.contextual.title" | t }}</h1>
-      <p class="mt-0.5 text-[13px] text-[#6c788b]">{{ "promotions.contextual.subtitle" | t: { site: workspace.site()?.city ?? "—", program: workspace.program()?.name ?? "—" } }}</p>
+      <h1 class="text-[30px] font-extrabold text-[#172033]">
+        {{ "promotions.contextual.title" | t }}
+      </h1>
+      <p class="text-[13px] text-[#6c788b]">
+        {{ workspace.site()?.name }} · {{ workspace.program()?.name }}
+      </p>
     </div>
-    <button type="button" (click)="openCreateDrawer()" class="inline-flex h-[40px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] xl:self-auto"><i class="ph ph-plus text-[17px]"></i>{{ "promotions.create" | t }}</button>
+    <button
+      type="button"
+      (click)="drawerOpen.set(true)"
+      [disabled]="saving() || !workspace.program()"
+      class="rounded-[11px] bg-[#2b66a4] px-4 py-2 text-white disabled:opacity-50"
+    >
+      {{ "promotions.create" | t }}
+    </button>
   </div>
-
-  @if (createdPromotionName()) {
-    <div class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"><i class="ph ph-check-circle text-[18px]"></i><span>{{ "promotions.drawer.created" | t: { name: createdPromotionName() } }}</span></div>
+  @if (error()) {
+    <p role="alert" class="mt-4 rounded bg-red-50 p-3 text-red-700">
+      {{ error() | t }}
+    </p>
   }
-
-  <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-    <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
-      <div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#7a8698]">{{ "promotions.contextual.kpi.total" | t }}</p><p class="mt-1 text-[24px] font-extrabold text-[#172033]">{{ counts().all }}</p></div><span class="grid size-10 place-items-center rounded-full bg-[#e7f2ff] text-[#2a64a2]"><i class="ph ph-stack text-[20px]"></i></span></div>
+  @if (createdPromotionName()) {
+    <p role="status" class="mt-4 rounded bg-green-50 p-3 text-green-800">
+      {{ "promotions.drawer.created" | t: { name: createdPromotionName() } }}
+    </p>
+  }
+  <div class="mt-5 grid gap-3 sm:grid-cols-3">
+    <article class="rounded-[16px] border bg-white p-4">
+      <p class="text-[12px] text-[#637083]">
+        {{ "promotions.contextual.kpi.total" | t }}
+      </p>
+      <strong class="text-[24px]">{{ promotions().length }}</strong>
     </article>
-    <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
-      <div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#7a8698]">{{ "promotions.contextual.kpi.active" | t }}</p><p class="mt-1 text-[24px] font-extrabold text-[#172033]">{{ counts().active }}</p></div><span class="grid size-10 place-items-center rounded-full bg-[#dff7e5] text-[#178344]"><i class="ph ph-play-circle text-[20px]"></i></span></div>
+    <article class="rounded-[16px] border bg-white p-4">
+      <p class="text-[12px] text-[#637083]">
+        {{ "promotions.contextual.kpi.active" | t }}
+      </p>
+      <strong class="text-[24px]">{{ activeCount() }}</strong>
     </article>
-    <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
-      <div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#7a8698]">{{ "promotions.contextual.kpi.activeStudents" | t }}</p><p class="mt-1 text-[24px] font-extrabold text-[#172033]">{{ activeStudents() }}</p></div><span class="grid size-10 place-items-center rounded-full bg-[#fff1d3] text-[#9b6b00]"><i class="ph ph-users-three text-[20px]"></i></span></div>
-    </article>
-    <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
-      <div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#7a8698]">{{ "promotions.contextual.kpi.referential" | t }}</p><p class="mt-1 max-w-[210px] truncate text-[15px] font-extrabold text-[#172033]">{{ referentialLabel() }}</p></div><span class="grid size-10 place-items-center rounded-full bg-[#f0ebff] text-[#7253b7]"><i class="ph ph-books text-[20px]"></i></span></div>
+    <article class="rounded-[16px] border bg-white p-4">
+      <p class="text-[12px] text-[#637083]">
+        {{ "promotions.api.learners" | t }}
+      </p>
+      <strong class="text-[24px]">{{ learnerCount() }}</strong>
     </article>
   </div>
-
-  <div class="mt-4 flex flex-col gap-3 rounded-[16px] border border-[#dfe5ec] bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex flex-wrap gap-1.5">
-      @for (filter of [{id:'all',label:'promotions.contextual.filters.all',count:counts().all},{id:'active',label:'promotions.contextual.filters.active',count:counts().active},{id:'planned',label:'promotions.contextual.filters.planned',count:counts().planned},{id:'completed',label:'promotions.contextual.filters.completed',count:counts().completed}]; track filter.id) {
-        <button type="button" (click)="setStatusFilter($any(filter.id))" [class]="'inline-flex h-8 items-center gap-2 rounded-[10px] px-3 text-[11.5px] font-semibold transition ' + (statusFilter() === filter.id ? 'bg-[#2b66a4] text-white' : 'bg-[#f4f6f9] text-[#5d6878] hover:bg-[#e9eef4]')"><span>{{ filter.label | t }}</span><span [class]="'rounded-full px-1.5 py-0.5 text-[9.5px] ' + (statusFilter() === filter.id ? 'bg-white/20 text-white' : 'bg-white text-[#718096]')">{{ filter.count }}</span></button>
-      }
-    </div>
-    <div class="flex items-center gap-2 text-[11px] text-[#718096]"><i class="ph ph-info text-[15px] text-[#2a64a2]"></i><span>{{ "promotions.contextual.filterHelp" | t }}</span></div>
-  </div>
-
-  <div class="mt-4 space-y-4">
-    @for (promotion of filteredPromotions(); track promotion.id) {
-      <article class="overflow-hidden rounded-[18px] border border-[#dfe5ec] bg-white shadow-sm">
-        <div class="p-4 sm:p-5">
-          <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <span [class]="'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold ' + statusClass(promotion.status)"><i [class]="'ph ' + statusIcon(promotion.status)"></i>{{ ('promotions.contextual.status.' + promotion.status) | t }}</span>
-                <span class="inline-flex items-center gap-1 rounded-full bg-[#f2f4f7] px-2.5 py-1 text-[10px] font-semibold text-[#617084]"><i [class]="'ph ' + promotion.programIcon"></i>{{ promotion.programName }}</span>
-                <span class="rounded-full bg-[#fff3d8] px-2.5 py-1 text-[10px] font-semibold text-[#8b650e]">{{ promotion.siteCity }}</span>
-              </div>
-              <h2 class="mt-3 truncate text-[17px] font-extrabold text-[#263143]">{{ promotion.name }}</h2>
-              <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-[#758196]"><span>{{ formatDate(promotion.start) }} → {{ formatDate(promotion.end) }}</span><span class="text-[#c0c7d0]">•</span><span>{{ "promotions.manager" | t }} : {{ promotion.manager }}</span></p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2 xl:justify-end">
-              <span class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] border border-[#dce5ee] bg-[#f8fafc] px-3 text-[10.5px] font-semibold text-[#526176]"><i class="ph ph-book-open-text text-[14px] text-[#7253b7]"></i>{{ promotion.referentialVersion }}</span>
-              <span class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] bg-[#2b66a4] px-3 text-[10.5px] font-semibold text-white"><i class="ph ph-student text-[14px]"></i>{{ "promotions.studentCount" | t: { count: promotion.studentCount } }}</span>
-              @if (workspace.cohort()?.id !== promotion.id) {
-                <button type="button" (click)="selectPromotion(promotion)" class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[10.5px] font-semibold text-[#445269] shadow-sm transition hover:bg-[#f8fafc]"><i class="ph ph-crosshair text-[14px]"></i>{{ "promotions.contextual.setContext" | t }}</button>
-              } @else {
-                <span class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] bg-[#e8f6ec] px-3 text-[10.5px] font-semibold text-[#178344]"><i class="ph ph-check-circle text-[14px]"></i>{{ "promotions.contextual.currentContext" | t }}</span>
-              }
-            </div>
-          </div>
-
-          @if (promotion.status !== 'planned') {
-            <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-              <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.planned" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.plannedHours, ' h') }}</p></div>
-              <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.completed" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.completedHours, ' h') }}</p></div>
-              <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.remaining" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.remainingHours, ' h') }}</p></div>
-              <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.catchup" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.catchupHours, ' h') }}</p></div>
-              <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.attendance" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.attendanceRate, ' %') }}</p></div>
-            </div>
-
-            <div class="mt-4">
-              <div class="mb-1.5 flex items-center justify-between gap-3"><p class="text-[11.5px] font-bold text-[#263143]">{{ "promotions.averageProgress" | t }}</p><span class="text-[11.5px] font-bold text-[#2b66a4]">{{ promotion.averageProgress }} %</span></div>
-              <app-progress-bar [value]="promotion.averageProgress" heightClass="h-[9px]" />
-            </div>
-          } @else {
-            <div class="mt-4 grid gap-3 sm:grid-cols-3">
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.start" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ formatDate(promotion.start) }}</p></div>
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.capacity" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.studentCount }} {{ "promotions.contextual.planned.students" | t }}</p></div>
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.volume" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.plannedHours / promotion.studentCount }} h / {{ "promotions.contextual.planned.student" | t }}</p></div>
-            </div>
-          }
-
-          @if (promotion.exam; as exam) {
-            @if (exam.successRate !== undefined) {
-              <div class="mt-4 grid gap-3 rounded-[15px] border border-[#dbe7f2] bg-[#f7fbff] p-4 sm:grid-cols-[1fr_auto]">
-                <div><p class="text-[10.5px] font-semibold uppercase text-[#5b7491]">{{ "promotions.exam.finalResults" | t }}</p><div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px]"><span><strong>{{ exam.presented }}</strong> {{ "promotions.exam.presented" | t }}</span><span class="text-[#18a547]"><strong>{{ exam.graduated }}</strong> {{ "promotions.exam.graduated" | t }}</span><span class="text-[#8b5e00]"><strong>{{ exam.partial }}</strong> {{ "promotions.exam.partial" | t }}</span><span class="text-[#f22b2b]"><strong>{{ exam.failed }}</strong> {{ "promotions.exam.failed" | t }}</span></div></div>
-                <div class="flex items-center gap-3"><div class="text-right"><p class="text-[10px] uppercase text-[#718096]">{{ "promotions.exam.successRate" | t }}</p><p class="text-[24px] font-extrabold text-[#2a64a2]">{{ exam.successRate }} %</p></div><a [routerLink]="['/reussites', promotion.id]" class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[10.5px] font-semibold shadow-sm"><i class="ph ph-trophy"></i>{{ "promotions.exam.details" | t }}</a></div>
-              </div>
-            } @else {
-              <div class="mt-4 flex flex-col gap-3 rounded-[15px] border border-[#ead8a4] bg-[#fff9e9] p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div><p class="text-[10.5px] font-semibold uppercase text-[#87641a]">{{ "promotions.exam.upcoming" | t }}</p><p class="mt-1 text-[12px] font-bold text-[#5f4a1c]">{{ "promotions.exam.scheduled" | t: { date: exam.scheduled ?? "—" } }}</p><p class="mt-1 text-[10.5px] text-[#7b6a43]">{{ "promotions.exam.ready" | t: { ready: exam.ready ?? 0, total: promotion.studentCount } }}</p></div><a routerLink="/certification" class="inline-flex h-[35px] items-center gap-2 self-start rounded-[10px] bg-[#2b66a4] px-3 text-[10.5px] font-semibold text-white sm:self-auto"><i class="ph ph-certificate"></i>{{ "promotions.contextual.exam.open" | t }}</a>
-              </div>
-            }
-          }
-        </div>
-      </article>
-    } @empty {
-      <div class="rounded-[18px] border border-dashed border-[#cad5e1] bg-white px-6 py-12 text-center"><span class="mx-auto grid size-12 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"><i class="ph ph-graduation-cap text-[23px]"></i></span><h2 class="mt-3 text-[15px] font-bold text-[#263143]">{{ "promotions.contextual.empty.title" | t }}</h2><p class="mx-auto mt-1 max-w-[520px] text-[12px] leading-[1.5] text-[#748094]">{{ "promotions.contextual.empty.description" | t }}</p><button type="button" (click)="openCreateDrawer()" class="mt-4 inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"><i class="ph ph-plus"></i>{{ "promotions.create" | t }}</button></div>
+  <div class="mt-4 flex flex-wrap gap-2">
+    @for (
+      status of ["all", "draft", "planned", "active", "completed", "cancelled"];
+      track status
+    ) {
+      <button
+        type="button"
+        (click)="statusFilter.set($any(status))"
+        [class]="
+          statusFilter() === status
+            ? 'rounded bg-[#2b66a4] px-3 py-2 text-white'
+            : 'rounded bg-white px-3 py-2 text-[#465568]'
+        "
+      >
+        {{ "promotions.contextual.filters." + status | t }}
+      </button>
     }
   </div>
-
+  <div class="mt-4 space-y-3">
+    @for (cohort of filtered(); track cohort.id) {
+      <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-5">
+        <div class="flex flex-wrap justify-between gap-4">
+          <div>
+            <h2 class="text-[17px] font-bold">{{ cohort.name }}</h2>
+            <p class="text-[12px] text-[#64748b]">
+              {{ cohort.shortName }} · {{ formatDate(cohort.start) }} →
+              {{ formatDate(cohort.end) }}
+            </p>
+          </div>
+          <span
+            class="rounded bg-[#e8f3ff] px-3 py-1 text-[12px] text-[#2a64a2]"
+            >{{ "promotions.contextual.status." + cohort.status | t }}</span
+          >
+        </div>
+        <div class="mt-3 flex flex-wrap items-center gap-4 text-[12px]">
+          <span
+            >{{ "promotions.api.capacity" | t }} :
+            {{ cohort.capacity ?? "—" }}</span
+          >
+          <span
+            >{{ "promotions.api.learners" | t }} :
+            {{ cohort.studentCount }}</span
+          >
+          <span
+            >{{ "promotions.api.referential" | t }} :
+            {{ referenceName(cohort) }}</span
+          >
+        </div>
+        @if (workspace.cohort()?.id !== cohort.id) {
+          <button
+            type="button"
+            class="mt-3 rounded border px-3 py-2 text-[#2b66a4]"
+            (click)="selectPromotion(cohort)"
+          >
+            {{ "promotions.contextual.setContext" | t }}
+          </button>
+        }
+      </article>
+    } @empty {
+      <p class="rounded-[16px] border border-dashed bg-white p-8 text-center">
+        {{ "promotions.contextual.empty.title" | t }}
+      </p>
+    }
+  </div>
   <app-create-promotion-drawer
     [open]="drawerOpen()"
     [organizationName]="workspace.organization()?.name ?? '—'"
     [siteName]="workspace.site()?.name ?? '—'"
     [programId]="workspace.program()?.id ?? ''"
     [programName]="workspace.program()?.name ?? '—'"
-    (closed)="closeCreateDrawer()"
+    (closed)="drawerOpen.set(false)"
     (promotionCreated)="createPromotion($event)"
   />
 </section>
