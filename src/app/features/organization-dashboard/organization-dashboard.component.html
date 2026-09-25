@@ -41,7 +41,7 @@
         {{ "organizationDashboard.kpis.sites" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().sites }}
+        {{ kpis()?.sites }}
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
@@ -57,7 +57,7 @@
         {{ "organizationDashboard.kpis.programs" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().activePrograms }}
+        {{ kpis()?.activePrograms }}
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
@@ -71,7 +71,7 @@
         {{ "organizationDashboard.kpis.students" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().students }}
+        {{ kpis()?.students }}
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"
@@ -85,7 +85,7 @@
         {{ "organizationDashboard.kpis.trainers" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().trainers }}
+        {{ kpis()?.trainers }}
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#f1ecff] text-[#7653c6]"
@@ -101,7 +101,7 @@
         {{ "organizationDashboard.kpis.cohorts" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().activeCohorts }}
+        {{ kpis()?.activeCohorts }}
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff1d4] text-[#9a6500]"
@@ -117,7 +117,7 @@
         {{ "organizationDashboard.kpis.success" | t }}
       </p>
       <p class="mt-2 text-[26px] font-extrabold text-[#172033]">
-        {{ kpis().successRate }} %
+        {{ kpis()?.successRate }} %
       </p>
       <span
         class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
@@ -252,7 +252,7 @@
             "organizationDashboard.global.attendance" | t
           }}</span>
           <p class="mt-2 text-[28px] font-extrabold text-[#2a64a2]">
-            {{ kpis().attendanceRate }} %
+            {{ kpis()?.attendanceRate }} %
           </p>
         </div>
         <div class="rounded-[16px] bg-[#fff4df] p-4">
@@ -260,7 +260,7 @@
             "organizationDashboard.global.success" | t
           }}</span>
           <p class="mt-2 text-[28px] font-extrabold text-[#b87500]">
-            {{ kpis().successRate }} %
+            {{ kpis()?.successRate }} %
           </p>
         </div>
       </div>
@@ -271,7 +271,7 @@
               {{ "organizationDashboard.global.hours" | t }}
             </p>
             <p class="mt-1 text-[23px] font-extrabold text-[#172033]">
-              {{ number(kpis().completedHours) }} h
+              {{ number(kpis()?.completedHours) }} h
             </p>
           </div>
           <span

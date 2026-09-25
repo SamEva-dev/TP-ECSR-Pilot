@@ -175,6 +175,7 @@ export class WorkspaceContextService {
     this.remoteWorkspaceError.set(false);
     try {
       const dto = await this.workspaceApi.load();
+      console.log("Workspace bootstrap data loaded", dto);
       if (sequence !== this.loadSequence || key !== this.sessionKey) return;
       const organizations = dto.organizations.map((item) => ({
         id: item.key,
