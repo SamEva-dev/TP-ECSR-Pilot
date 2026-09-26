@@ -6,11 +6,12 @@ import {
   signal,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { StudentApiStoreService } from "../../core/api-data/student-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import type { StudentStatus } from "../../core/models/app.models";
 import type { StudentDirectoryItem } from "../../core/models/students.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
-import { TrainingCatalogApiService } from "../../core/training/training-catalog-api.service";
-import { firstValueFrom } from "rxjs";
+import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import {
   AddStudentDrawerComponent,
   type CreateStudentPayload,
@@ -18,29 +19,30 @@ import {
 
 @Component({
   selector: "app-students",
-  imports: [RouterLink, TranslatePipe, AddStudentDrawerComponent],
+  imports: [
+    RouterLink,
+    TranslatePipe,
+    ProgressBarComponent,
+    AddStudentDrawerComponent,
+  ],
   templateUrl: "./students.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
-  private readonly api = inject(TrainingCatalogApiService);
-  readonly saving = signal(false);
-  readonly error = signal("");
+  readonly store = inject(StudentApiStoreService);
   readonly drawerOpen = signal(false);
   readonly createdStudentName = signal("");
   readonly search = signal("");
   readonly promotionId = signal("all");
-  readonly status = signal<
-    "all" | NonNullable<StudentDirectoryItem["enrollmentStatus"]>
-  >("all");
+  readonly status = signal<"all" | StudentStatus>("all");
 
   readonly promotions = computed(() => {
     const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id, name: cohort.name }] : [];
+    return cohort ? [{ id: cohort.id ?? "", name: cohort.name ?? "" }] : [];
   });
 
-  readonly students = this.contextData.students;
+  readonly students = computed(() => this.store.students());
 
   readonly filteredStudents = computed(() => {
     const query = this.search().trim().toLocaleLowerCase("fr");
@@ -48,104 +50,60 @@ export class StudentsComponent {
     const status = this.status();
 
     return this.students().filter((student) => {
-      const fullName =
-        `${student.firstName} ${student.lastName}`.toLocaleLowerCase("fr");
+      const fullName = `${student.firstName ?? ""} ${student.lastName ?? ""}`.toLocaleLowerCase("fr");
       const matchesSearch = !query || fullName.includes(query);
-      const matchesPromotion =
-        promotionId === "all" || student.promotionId === promotionId;
-      const matchesStatus =
-        status === "all" || student.enrollmentStatus === status;
+      const matchesPromotion = promotionId === "all" || (student.promotionId ?? "") === promotionId;
+      const matchesStatus = status === "all" || student.status === status;
       return matchesSearch && matchesPromotion && matchesStatus;
     });
   });
 
   readonly total = computed(() => this.students().length);
 
-  openAddDrawer() {
+  openAddDrawer(): void {
     this.drawerOpen.set(true);
   }
 
-  closeAddDrawer() {
+  closeAddDrawer(): void {
     this.drawerOpen.set(false);
   }
 
   async createStudent(payload: CreateStudentPayload): Promise<void> {
-    const cohort = this.contextData.cohort();
-    if (this.saving()) return;
-    if (!cohort?.apiId || cohort.id !== payload.promotionId) {
-      this.error.set("students.api.invalidContext");
-      return;
-    }
-    this.saving.set(true);
-    this.error.set("");
-    try {
-      await firstValueFrom(
-        this.api.enroll(cohort.apiId, {
-          firstName: payload.firstName.trim(),
-          lastName: payload.lastName.trim(),
-          email: payload.email.trim().toLowerCase(),
-          phone: payload.phone.trim() || null,
-          birthDate: payload.birthDate || null,
-          enrolledOn: payload.startDate,
-          authGateUserId: null,
-          personExternalKey: null,
-          learnerExternalKey: null,
-          enrollmentExternalKey: null,
-        }),
-      );
-      await this.contextData.workspace.reload();
-      if (!this.contextData.workspace.remoteWorkspaceLoaded())
-        this.error.set("students.api.refreshFailed");
-      this.createdStudentName.set(
-        `${payload.firstName.trim()} ${payload.lastName.trim()}`,
-      );
-      this.drawerOpen.set(false);
-      setTimeout(() => this.createdStudentName.set(""), 3500);
-    } catch (error) {
-      const status =
-        typeof error === "object" && error !== null && "status" in error
-          ? error.status
-          : 0;
-      this.error.set(
-        status === 409
-          ? "students.api.conflict"
-          : status === 403
-            ? "students.api.forbidden"
-            : "students.api.createFailed",
-      );
-    } finally {
-      this.saving.set(false);
-    }
+    const student = await this.store.create(payload);
+    if (!student) return;
+
+    this.createdStudentName.set(`${student.firstName} ${student.lastName}`.trim());
+    this.drawerOpen.set(false);
+    setTimeout(() => this.createdStudentName.set(""), 3500);
   }
 
-  updateSearch(event: Event) {
-    this.search.set((event.target as HTMLInputElement).value);
+  updateSearch(event: Event): void {
+    this.search.set((event.target as HTMLInputElement).value ?? "");
   }
 
-  updatePromotion(event: Event) {
-    this.promotionId.set((event.target as HTMLSelectElement).value);
+  updatePromotion(event: Event): void {
+    this.promotionId.set((event.target as HTMLSelectElement).value ?? "all");
   }
 
-  updateStatus(event: Event) {
-    this.status.set(
-      (event.target as HTMLSelectElement).value as
-        "all" | NonNullable<StudentDirectoryItem["enrollmentStatus"]>,
-    );
+  updateStatus(event: Event): void {
+    this.status.set(((event.target as HTMLSelectElement).value || "all") as "all" | StudentStatus);
   }
 
-  initials(student: StudentDirectoryItem) {
-    return `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`.toUpperCase();
+  initials(student: StudentDirectoryItem): string {
+    const first = student.firstName?.charAt(0) ?? "";
+    const last = student.lastName?.charAt(0) ?? "";
+    return `${first}${last}`.toUpperCase();
   }
 
-  statusLabelKey(status: StudentDirectoryItem["enrollmentStatus"]) {
-    return `students.enrollmentStatus.${status ?? "pending"}`;
+  statusLabelKey(status: StudentStatus): string {
+    return `students.status.${status}`;
   }
 
-  statusClasses(status: StudentDirectoryItem["enrollmentStatus"]) {
-    return status === "active"
+  statusClasses(status: StudentStatus): string {
+    return status === "good"
       ? "bg-[#d8f8df] text-[#18a547]"
-      : status === "completed"
-        ? "bg-[#e7f2ff] text-[#2a64a2]"
-        : "bg-[#fff0c9] text-[#8b5e00]";
+      : status === "warning"
+        ? "bg-[#fff1d2] text-[#a16a00]"
+        : "bg-[#ffe3e3] text-[#c33c3c]";
   }
 }

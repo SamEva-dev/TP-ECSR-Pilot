@@ -3,172 +3,17 @@ import {
   Component,
   HostListener,
   computed,
-  effect,
   inject,
   signal,
 } from "@angular/core";
+import {
+  DocumentApiStoreService,
+  type DocumentLibraryCategory,
+  type DocumentLibraryItem,
+  type DocumentLibraryVisibility,
+} from "../../core/api-data/document-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
-import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
-import { DocumentApiService } from "../../core/documents/document-api.service";
-import type { DocumentDto } from "../../core/documents/document.models";
-
-type DocumentCategory =
-  | "administrative"
-  | "pedagogical"
-  | "evaluation"
-  | "course"
-  | "internship"
-  | "student";
-
-type DocumentVisibility = "all" | "staff" | "student";
-type DocumentFormat = "PDF" | "DOCX";
-
-interface LibraryDocument {
-  id: string;
-  title: string;
-  date: string;
-  author: string;
-  size: string;
-  category: DocumentCategory;
-  ownerStudentId?: string;
-  ownerName?: string;
-  visibleToStudent?: boolean;
-  fileName: string;
-  format: DocumentFormat;
-  version: string;
-  pages: number;
-  visibility: DocumentVisibility;
-  descriptionKey: string;
-  blobAvailable?: boolean;
-}
-
-const DOCUMENTS: LibraryDocument[] = [
-  {
-    id: "d1",
-    title: "Convention de stage — Sam Fokam",
-    date: "28/05/2026",
-    author: "Secrétariat",
-    size: "182 Ko",
-    category: "internship",
-    ownerStudentId: "s1",
-    ownerName: "Sam Fokam",
-    visibleToStudent: true,
-    fileName: "convention-stage-sam-fokam.pdf",
-    format: "PDF",
-    version: "1.0",
-    pages: 4,
-    visibility: "student",
-    descriptionKey: "documents.descriptions.internshipAgreement",
-  },
-  {
-    id: "d2",
-    title: "Référentiel REMC 2026",
-    date: "01/09/2026",
-    author: "Claire Berthier",
-    size: "1,4 Mo",
-    category: "pedagogical",
-    visibleToStudent: true,
-    fileName: "referentiel-remc-2026.pdf",
-    format: "PDF",
-    version: "2026.1",
-    pages: 86,
-    visibility: "all",
-    descriptionKey: "documents.descriptions.remc",
-  },
-  {
-    id: "d3",
-    title: "Grille évaluation conduite",
-    date: "04/09/2026",
-    author: "Marc Dupont",
-    size: "96 Ko",
-    category: "evaluation",
-    visibleToStudent: true,
-    fileName: "grille-evaluation-conduite.pdf",
-    format: "PDF",
-    version: "2.1",
-    pages: 2,
-    visibility: "all",
-    descriptionKey: "documents.descriptions.drivingEvaluation",
-  },
-  {
-    id: "d4",
-    title: "Support — Les intersections",
-    date: "18/09/2026",
-    author: "Yanis Morel",
-    size: "3,2 Mo",
-    category: "course",
-    visibleToStudent: true,
-    fileName: "support-intersections.pdf",
-    format: "PDF",
-    version: "1.2",
-    pages: 22,
-    visibility: "all",
-    descriptionKey: "documents.descriptions.intersections",
-  },
-  {
-    id: "d5",
-    title: "Règlement intérieur du centre",
-    date: "25/08/2026",
-    author: "Direction",
-    size: "240 Ko",
-    category: "administrative",
-    visibleToStudent: true,
-    fileName: "reglement-interieur.pdf",
-    format: "PDF",
-    version: "2026.1",
-    pages: 12,
-    visibility: "all",
-    descriptionKey: "documents.descriptions.rules",
-  },
-  {
-    id: "d6",
-    title: "Attestation d'assiduité — Julie Moreau",
-    date: "15/09/2026",
-    author: "Secrétariat",
-    size: "78 Ko",
-    category: "student",
-    ownerStudentId: "s2",
-    ownerName: "Julie Moreau",
-    fileName: "attestation-assiduite-julie-moreau.pdf",
-    format: "PDF",
-    version: "1.0",
-    pages: 1,
-    visibility: "student",
-    descriptionKey: "documents.descriptions.attendanceCertificate",
-  },
-  {
-    id: "d7",
-    title: "Support — Méthode interrogative",
-    date: "10/09/2026",
-    author: "Claire Berthier",
-    size: "2,1 Mo",
-    category: "course",
-    visibleToStudent: true,
-    fileName: "methode-interrogative.docx",
-    format: "DOCX",
-    version: "3.0",
-    pages: 18,
-    visibility: "all",
-    descriptionKey: "documents.descriptions.interrogativeMethod",
-  },
-  {
-    id: "d8",
-    title: "Bilan de stage — Julie Moreau",
-    date: "18/07/2026",
-    author: "Paul Nguyen",
-    size: "310 Ko",
-    category: "evaluation",
-    ownerStudentId: "s2",
-    ownerName: "Julie Moreau",
-    fileName: "bilan-stage-julie-moreau.pdf",
-    format: "PDF",
-    version: "1.0",
-    pages: 5,
-    visibility: "staff",
-    descriptionKey: "documents.descriptions.internshipAssessment",
-  },
-];
 
 @Component({
   selector: "app-documents",
@@ -178,97 +23,13 @@ const DOCUMENTS: LibraryDocument[] = [
 })
 export class DocumentsComponent {
   readonly sessionService = inject(SessionService);
-  readonly contextData = inject(ContextualTrainingDataService);
-  readonly documentApi = inject(DocumentApiService);
-  readonly remoteDocuments = signal<LibraryDocument[] | null>(null);
+  readonly store = inject(DocumentApiStoreService);
   readonly search = signal("");
-  readonly category = signal<"all" | DocumentCategory>("all");
-  readonly selectedDocument = signal<LibraryDocument | null>(null);
-
-  constructor() {
-    effect(() => {
-      const cohortId = this.contextData.cohort()?.apiId;
-      void this.loadRemoteDocuments(cohortId);
-    });
-  }
-
-  private async loadRemoteDocuments(cohortId?: string) {
-    try {
-      const documents = await this.documentApi.list(cohortId);
-      this.remoteDocuments.set(
-        documents.map((doc) => this.toLibraryDocument(doc)),
-      );
-    } catch {
-      this.remoteDocuments.set(null);
-    }
-  }
-
-  private toLibraryDocument(doc: DocumentDto): LibraryDocument {
-    const version = doc.versions[0];
-    const date = new Date(doc.updatedAtUtc);
-    return {
-      id: doc.id,
-      title: doc.title,
-      date: Number.isNaN(date.valueOf())
-        ? ""
-        : date.toLocaleDateString("fr-FR"),
-      author: doc.createdByDisplayName,
-      size: this.formatBytes(version?.sizeBytes ?? 0),
-      category: ([
-        "administrative",
-        "pedagogical",
-        "evaluation",
-        "course",
-        "internship",
-        "student",
-      ].includes(doc.category)
-        ? doc.category
-        : "administrative") as DocumentCategory,
-      ownerStudentId:
-        doc.ownerType === "enrollment" ? (doc.ownerId ?? undefined) : undefined,
-      visibleToStudent:
-        doc.visibility === "all" || doc.visibility === "student",
-      fileName: version?.fileName ?? "",
-      format: (version?.fileName?.toLowerCase().endsWith(".docx")
-        ? "DOCX"
-        : "PDF") as DocumentFormat,
-      version: version ? `${version.versionNumber}.0` : "1.0",
-      pages: 1,
-      visibility: doc.visibility,
-      descriptionKey: "documents.descriptions.generic",
-      blobAvailable: version?.blobAvailable ?? false,
-    };
-  }
-
-  private formatBytes(value: number) {
-    if (value < 1024) return `${value} o`;
-    if (value < 1024 * 1024) return `${Math.round(value / 1024)} Ko`;
-    return `${(value / 1024 / 1024).toFixed(1).replace(".", ",")} Mo`;
-  }
+  readonly category = signal<"all" | DocumentLibraryCategory>("all");
+  readonly selectedDocument = signal<DocumentLibraryItem | null>(null);
 
   readonly role = this.sessionService.role;
-  readonly contextualDocuments = computed<LibraryDocument[]>(() => {
-    const remote = this.remoteDocuments();
-    if (remote) return remote;
-
-    const program = this.contextData.program();
-    const referential = this.contextData.referential();
-    if (!program || program.id === "program-ecsr") return DOCUMENTS;
-    return DOCUMENTS.map((doc) => {
-      if (doc.id === "d2") {
-        return {
-          ...doc,
-          title: `Référentiel ${program.name} — ${referential?.version ?? "actif"}`,
-          fileName: `referentiel-${program.code.toLowerCase()}.pdf`,
-        };
-      }
-      if (doc.id === "d3")
-        return { ...doc, title: `Grille évaluation — ${program.name}` };
-      if (doc.id === "d4")
-        return { ...doc, title: `Support — ${program.name}` };
-      return doc;
-    });
-  });
+  readonly contextualDocuments = computed<DocumentLibraryItem[]>(() => this.store.documents());
 
   readonly canImport = computed(() => this.role() !== "stagiaire");
   readonly canManageDocument = computed(
@@ -277,14 +38,10 @@ export class DocumentsComponent {
 
   readonly visibleDocuments = computed(() => {
     const role = this.role();
-    if (role === "stagiaire") {
-      return this.contextualDocuments().filter(
-        (d) => d.ownerStudentId === "s1" || d.visibleToStudent === true,
-      );
-    }
+    if (role === "stagiaire") return this.contextualDocuments();
     if (role === "formateur") {
       return this.contextualDocuments().filter(
-        (d) => d.category !== "administrative" || d.visibleToStudent === true,
+        (document) => document.category !== "administrative" || document.visibleToStudent,
       );
     }
     return this.contextualDocuments();
@@ -297,7 +54,7 @@ export class DocumentsComponent {
       const matchesCategory = category === "all" || doc.category === category;
       const matchesSearch =
         !query ||
-        `${doc.title} ${doc.author} ${doc.fileName}`
+        `${doc.title ?? ""} ${doc.author ?? ""} ${doc.fileName ?? ""}`
           .toLowerCase()
           .includes(query);
       return matchesCategory && matchesSearch;
@@ -306,8 +63,8 @@ export class DocumentsComponent {
 
   readonly categories = computed(() => {
     const docs = this.visibleDocuments();
-    const count = (category: DocumentCategory) =>
-      docs.filter((d) => d.category === category).length;
+    const count = (category: DocumentLibraryCategory) =>
+      docs.filter((document) => document.category === category).length;
     return [
       {
         key: "all" as const,
@@ -344,10 +101,20 @@ export class DocumentsComponent {
         labelKey: "documents.categories.student",
         count: count("student"),
       },
+      {
+        key: "certification" as const,
+        labelKey: "documents.categories.certification",
+        count: count("certification"),
+      },
+      {
+        key: "other" as const,
+        labelKey: "documents.categories.other",
+        count: count("other"),
+      },
     ].filter((item) => item.key === "all" || item.count > 0);
   });
 
-  titleKey() {
+  titleKey(): string {
     return this.role() === "stagiaire"
       ? "documents.studentTitle"
       : this.role() === "formateur"
@@ -355,7 +122,7 @@ export class DocumentsComponent {
         : "documents.title";
   }
 
-  subtitleKey() {
+  subtitleKey(): string {
     return this.role() === "stagiaire"
       ? "documents.studentSubtitle"
       : this.role() === "formateur"
@@ -363,69 +130,49 @@ export class DocumentsComponent {
         : "documents.subtitle";
   }
 
-  setSearch(event: Event) {
-    this.search.set((event.target as HTMLInputElement).value);
+  setSearch(event: Event): void {
+    this.search.set((event.target as HTMLInputElement | null)?.value ?? "");
   }
 
-  setCategory(category: "all" | DocumentCategory) {
+  setCategory(category: "all" | DocumentLibraryCategory): void {
     this.category.set(category);
   }
 
-  categoryLabelKey(category: DocumentCategory) {
+  categoryLabelKey(category: DocumentLibraryCategory): string {
     return `documents.categories.${category}`;
   }
 
-  visibilityLabelKey(visibility: DocumentVisibility) {
+  visibilityLabelKey(visibility: DocumentLibraryVisibility): string {
     return `documents.visibility.${visibility}`;
   }
 
-  openPreview(doc: LibraryDocument) {
+  openPreview(doc: DocumentLibraryItem): void {
     this.selectedDocument.set(doc);
   }
 
-  closePreview() {
+  closePreview(): void {
     this.selectedDocument.set(null);
   }
 
-  async uploadFile(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    const cohort = this.contextData.cohort();
-    const site = this.contextData.site();
-    const program = this.contextData.program();
-    const form = new FormData();
-    form.append("title", file.name.replace(/\.[^.]+$/, ""));
-    form.append("category", "administrative");
-    form.append("visibility", "staff");
-    form.append("ownerType", "none");
-    form.append("authorDisplayName", "Utilisateur");
-    if (cohort?.apiId) form.append("cohortId", cohort.apiId);
-    if (site?.apiId) form.append("siteId", site.apiId);
-    if (program?.apiId) form.append("programId", program.apiId);
-    form.append("file", file, file.name);
-
-    try {
-      await this.documentApi.upload(form);
-      await this.loadRemoteDocuments(cohort?.apiId);
-    } finally {
-      input.value = "";
-    }
+  async importDocument(): Promise<void> {
+    await this.store.importFile();
   }
 
-  async download(doc: LibraryDocument) {
-    if (!this.remoteDocuments() || !doc.blobAvailable) return;
-    const apiDoc = (
-      await this.documentApi.list(this.contextData.cohort()?.apiId)
-    ).find((item) => item.id === doc.id);
-    if (apiDoc) await this.documentApi.download(apiDoc);
+  async downloadDocument(doc: DocumentLibraryItem): Promise<void> {
+    await this.store.download(doc);
+  }
+
+  async replaceDocument(doc: DocumentLibraryItem): Promise<void> {
+    const updated = await this.store.replace(doc);
+    if (updated) this.selectedDocument.set(updated);
+  }
+
+  async deleteDocument(doc: DocumentLibraryItem): Promise<void> {
+    if (await this.store.delete(doc)) this.closePreview();
   }
 
   @HostListener("document:keydown.escape")
-  onEscape() {
-    if (this.selectedDocument()) {
-      this.closePreview();
-    }
+  onEscape(): void {
+    if (this.selectedDocument()) this.closePreview();
   }
 }

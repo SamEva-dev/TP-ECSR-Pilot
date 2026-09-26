@@ -6,277 +6,98 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import { SkillsApiStoreService, type SkillStudentOption } from "../../core/api-data/skills-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import type { SkillCriterionLevel, SkillDefinition } from "../../core/models/skills.models";
 import { SessionService } from "../../core/session/session.service";
-import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
-import {
-  StudentProfileApiService,
-  type LearnerProfileApi,
-  type CompetencyDefinitionApi,
-  type CompetencyProgressApi,
-  type CohortCompetencyRowApi,
-  type DrivingEvaluationApi,
-} from "../../core/students/student-profile-api.service";
+import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
-interface SkillGroup {
-  definition: CompetencyDefinitionApi;
-  criteria: CompetencyDefinitionApi[];
-}
+const EMPTY_STUDENT: SkillStudentOption = { id: "", firstName: "", lastName: "" };
+const EMPTY_DEFINITION: SkillDefinition = {
+  definitionId: "",
+  code: "",
+  titleKey: "",
+  criteria: [],
+};
 
 @Component({
   selector: "app-skills",
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, ProgressBarComponent],
   templateUrl: "./skills.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkillsComponent {
-  readonly session = inject(SessionService);
-  readonly workspace = inject(WorkspaceContextService);
-  private readonly api = inject(StudentProfileApiService);
-  readonly isStudent = computed(() => this.session.role() === "stagiaire");
-  readonly profile = signal<LearnerProfileApi | null>(null);
-  readonly matrix = signal<CohortCompetencyRowApi[]>([]);
-  readonly definitions = signal<CompetencyDefinitionApi[]>([]);
-  readonly selectedEnrollmentId = signal("");
-  readonly selectedDefinitionId = signal("");
-  readonly driving = signal<DrivingEvaluationApi[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal(false);
-  readonly drivingLoading = signal(false);
-  readonly drivingError = signal(false);
-  readonly definitionsError = signal(false);
-  readonly selectedStudent = computed(
-    () =>
-      this.matrix().find(
-        (x) => x.enrollmentId === this.selectedEnrollmentId(),
-      ) ?? null,
+  readonly sessionService = inject(SessionService);
+  readonly store = inject(SkillsApiStoreService);
+  readonly students = this.store.students;
+  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly selectedStudentId = signal("");
+  readonly selectedSkill = signal("");
+
+  readonly definitions = computed<SkillDefinition[]>(() =>
+    this.store.definitionsFor(this.selectedStudentId()),
   );
-  readonly selectedProgress = computed(
-    () => this.selectedStudent()?.competencies ?? [],
-  );
-  readonly progressIndex = computed(
-    () =>
-      new Map<string, Map<string, CompetencyProgressApi>>(
-        this.matrix().map(
-          (student) =>
-            [
-              student.enrollmentId,
-              new Map<string, CompetencyProgressApi>(
-                student.competencies.map(
-                  (item) => [item.competencyDefinitionId, item] as const,
-                ),
-              ),
-            ] as const,
-        ),
-      ),
-  );
-  readonly groups = computed<SkillGroup[]>(() => {
-    const definitions = this.definitions();
-    if (!definitions.length) {
-      return this.selectedProgress().map((item) => ({
-        definition: {
-          id: item.competencyDefinitionId,
-          parentId: null,
-          code: item.code,
-          title: item.title,
-          kind: "",
-          sortOrder: 0,
-          active: true,
-        },
-        criteria: [],
-      }));
-    }
-    const ids = new Set(definitions.map((x) => x.id));
-    const children = new Map<string, CompetencyDefinitionApi[]>();
-    for (const definition of definitions) {
-      if (!definition.parentId) continue;
-      const existing = children.get(definition.parentId) ?? [];
-      existing.push(definition);
-      children.set(definition.parentId, existing);
-    }
-    return definitions
-      .filter((x) => !x.parentId || !ids.has(x.parentId))
-      .map((definition) => ({
-        definition,
-        criteria: children.get(definition.id) ?? [],
-      }));
-  });
-  readonly selectedGroup = computed(
-    () =>
-      this.groups().find(
-        (x) => x.definition.id === this.selectedDefinitionId(),
-      ) ??
-      this.groups()[0] ??
-      null,
-  );
-  readonly linkedDriving = computed(() => {
-    const group = this.selectedGroup();
-    if (!group) return [];
-    const ids = new Set([
-      group.definition.id,
-      ...group.criteria.map((x) => x.id),
-    ]);
-    return this.driving().filter((item) =>
-      ids.has(item.competencyDefinitionId),
-    );
-  });
-  private generation = 0;
-  private drivingGeneration = 0;
 
   constructor() {
-    effect((onCleanup) => {
-      const user = this.session.session();
-      const cohort = this.workspace.cohort();
-      const loaded = this.workspace.remoteWorkspaceLoaded();
-      const generation = ++this.generation;
-      this.profile.set(null);
-      this.matrix.set([]);
-      this.definitions.set([]);
-      this.selectedEnrollmentId.set("");
-      this.selectedDefinitionId.set("");
-      this.loading.set(false);
-      this.error.set(false);
-      this.definitionsError.set(false);
-      if (user && loaded) {
-        this.loading.set(true);
-        if (user.role === "stagiaire") void this.loadSelf(generation);
-        else if (cohort?.apiId)
-          void this.loadCohort(
-            cohort.apiId,
-            cohort.referentialVersionId ?? "",
-            generation,
-          );
-        else this.loading.set(false);
-      }
-      onCleanup(() => {
-        this.generation++;
-      });
+    effect(() => {
+      const students = this.students();
+      const current = this.selectedStudentId();
+      const selected = students.some((student) => student.id === current)
+        ? current
+        : (students[0]?.id ?? "");
+      if (selected !== current) this.selectedStudentId.set(selected);
+      this.store.selectStudent(selected);
     });
-    effect((onCleanup) => {
-      const id = this.selectedEnrollmentId();
-      const generation = ++this.drivingGeneration;
-      this.driving.set([]);
-      this.drivingLoading.set(false);
-      this.drivingError.set(false);
-      if (id) {
-        this.drivingLoading.set(true);
-        void this.loadDriving(id, generation);
+
+    effect(() => {
+      const definitions = this.definitions();
+      if (!definitions.some((definition) => definition.code === this.selectedSkill())) {
+        this.selectedSkill.set(definitions[0]?.code ?? "");
       }
-      onCleanup(() => {
-        this.drivingGeneration++;
-      });
     });
   }
 
-  private async loadSelf(generation: number): Promise<void> {
-    try {
-      const profile = await firstValueFrom(this.api.self());
-      const rows = await firstValueFrom(
-        this.api.competencies(profile.enrollmentId),
-      );
-      if (generation !== this.generation) return;
-      this.profile.set(profile);
-      this.matrix.set([
-        {
-          enrollmentId: profile.enrollmentId,
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          competencies: rows,
-        },
-      ]);
-      this.selectedEnrollmentId.set(profile.enrollmentId);
-      const version = this.workspace.cohortReferentialVersionByApiId(
-        profile.cohortId,
-      );
-      if (version) await this.loadDefinitions(version, generation);
-      else this.definitionsError.set(true);
-    } catch {
-      if (generation === this.generation) this.error.set(true);
-    } finally {
-      if (generation === this.generation) this.loading.set(false);
-    }
+  readonly selectedStudent = computed(
+    () => this.students().find((student) => student.id === this.selectedStudentId()) ?? EMPTY_STUDENT,
+  );
+
+  readonly selectedDefinition = computed(
+    () => this.definitions().find((item) => item.code === this.selectedSkill()) ?? EMPTY_DEFINITION,
+  );
+
+  readonly linkedSessions = computed(() =>
+    this.store.linkedSessions(this.selectedStudentId(), this.selectedSkill()),
+  );
+
+  selectSkill(code: string): void {
+    this.selectedSkill.set(code ?? "");
   }
 
-  private async loadCohort(
-    cohortId: string,
-    version: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const rows = await firstValueFrom(this.api.cohortCompetencies(cohortId));
-      if (generation !== this.generation) return;
-      this.matrix.set(rows);
-      this.selectedEnrollmentId.set(rows[0]?.enrollmentId ?? "");
-      if (version) await this.loadDefinitions(version, generation);
-      else this.definitionsError.set(true);
-    } catch {
-      if (generation === this.generation) this.error.set(true);
-    } finally {
-      if (generation === this.generation) this.loading.set(false);
-    }
-  }
-
-  private async loadDefinitions(
-    version: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const definitions = await firstValueFrom(
-        this.api.competencyDefinitions(version),
-      );
-      if (generation === this.generation) this.definitions.set(definitions);
-    } catch {
-      if (generation === this.generation) this.definitionsError.set(true);
-    }
-  }
-
-  private async loadDriving(
-    enrollmentId: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const records = await firstValueFrom(this.api.driving(enrollmentId));
-      if (generation === this.drivingGeneration) this.driving.set(records);
-    } catch {
-      if (generation === this.drivingGeneration) this.drivingError.set(true);
-    } finally {
-      if (generation === this.drivingGeneration) this.drivingLoading.set(false);
-    }
-  }
-
-  selectSkill(id: string): void {
-    this.selectedDefinitionId.set(id);
-  }
   updateStudent(event: Event): void {
-    this.selectedEnrollmentId.set((event.target as HTMLSelectElement).value);
-  }
-  isSelectedGroup(definitionId: string): boolean {
-    return this.selectedGroup()?.definition?.id === definitionId;
-  }
-
-  progressFor(
-    definitionId: string,
-    enrollmentId = this.selectedEnrollmentId(),
-  ): CompetencyProgressApi | null {
-    return this.progressIndex().get(enrollmentId)?.get(definitionId) ?? null;
+    const value = (event.target as HTMLSelectElement).value ?? "";
+    this.selectedStudentId.set(value);
+    this.store.selectStudent(value);
   }
 
-  levelKey(level: string | undefined): string {
-    const normalized = level?.toLowerCase() ?? "";
-    return ["acquired", "in_progress", "rework", "not_assessed"].includes(
-      normalized,
-    )
-      ? "skills.real.level." + normalized
-      : "skills.real.level.not_assessed";
+  skillValue(code: string, student = this.selectedStudent()): number {
+    return this.store.skillValue(code ?? "", student?.id ?? "");
   }
-  formatDate(value: string): string {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? "—"
-      : new Intl.DateTimeFormat(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(date);
+
+  criterionLabelKey(level: SkillCriterionLevel): string {
+    return `skills.level.${level}`;
+  }
+
+  criterionClasses(level: SkillCriterionLevel): string {
+    return level === "acquired"
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : level === "in_progress" || level === "not_assessed"
+        ? "bg-[#fff0c9] text-[#8b5e00]"
+        : "bg-[#ffe1df] text-[#f04438]";
+  }
+
+  cardClasses(code: string): string {
+    return code === this.selectedSkill()
+      ? "border-[#79aee3] bg-[#eaf4ff] shadow-sm"
+      : "border-[#dfe5ec] bg-white shadow-sm hover:border-[#b8cee5]";
   }
 }

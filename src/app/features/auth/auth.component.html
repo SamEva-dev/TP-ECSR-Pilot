@@ -213,11 +213,11 @@
               <input
                 formControlName="email"
                 type="email"
-                [readOnly]="loginStep() === 'password'"
+                [readOnly]="loginStep() !== 'email'"
                 class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
                 [placeholder]="'auth.emailPlaceholder' | t"
               />
-              @if (loginStep() === "password") {
+              @if (loginStep() !== "email") {
                 <button
                   type="button"
                   (click)="changeLoginEmail()"
@@ -228,15 +228,16 @@
               }
             </div>
 
-            @if (loginStep() === "password") {
+            @if (loginStep() !== "email") {
               <div>
                 <label class="mb-2 block text-sm font-semibold text-[#263b55]">
-                  {{ "auth.password" | t }}
+                  {{ (loginStep() === "mfa" ? "auth.mfaCode" : loginStep() === "password-change" ? "auth.newPassword" : "auth.password") | t }}
                 </label>
                 <div class="relative">
                   <input
                     formControlName="password"
-                    [type]="showPassword() ? 'text' : 'password'"
+                    [type]="loginStep() === 'mfa' ? 'text' : (showPassword() ? 'text' : 'password')"
+                    [attr.inputmode]="loginStep() === 'mfa' ? 'numeric' : null"
                     class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 pr-12 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
                   />
                   <button
@@ -251,10 +252,12 @@
                 </div>
               </div>
 
-              <label class="flex items-center gap-2 text-sm text-[#58687a]">
-                <input type="checkbox" formControlName="rememberMe" />
-                {{ "auth.rememberMe" | t }}
-              </label>
+              @if (loginStep() === "password") {
+                <label class="flex items-center gap-2 text-sm text-[#58687a]">
+                  <input type="checkbox" formControlName="rememberMe" />
+                  {{ "auth.rememberMe" | t }}
+                </label>
+              }
             }
 
             <button
@@ -268,7 +271,11 @@
               {{
                 loginStep() === "email"
                   ? ("auth.continue" | t)
-                  : ("auth.signIn" | t)
+                  : loginStep() === "mfa"
+                    ? ("auth.verifyMfa" | t)
+                    : loginStep() === "password-change"
+                      ? ("auth.changePassword" | t)
+                      : ("auth.signIn" | t)
               }}
             </button>
           </form>

@@ -1,15 +1,7 @@
-// Extracted from the former mock-data contract. No runtime demo data lives here.
-// This file contains TypeScript contracts only and is safe in API-only mode.
-
-export type RemoteWorkStatus =
-  "requested" | "approved" | "rejected" | "completed";
-
+export type RemoteWorkStatus = "requested" | "approved" | "rejected" | "completed" | "cancelled";
 export type RemoteWorkPeriod = "full-day" | "morning" | "afternoon" | "custom";
-
 export type RemoteActivityStatus = "todo" | "in-progress" | "done";
-
-export type WorkMode =
-  "onsite" | "remote" | "field" | "travel" | "leave" | "absence";
+export type WorkMode = "onsite" | "remote" | "field" | "travel" | "leave" | "absence";
 
 export interface RemoteWorkPolicy {
   enabled: boolean;
@@ -32,8 +24,8 @@ export interface RemoteWorkRequest {
   status: RemoteWorkStatus;
   activityCount: number;
   completedActivities: number;
-  comment?: string;
-  approver?: string;
+  comment: string;
+  approver: string;
 }
 
 export interface RemoteWorkActivity {
@@ -42,7 +34,7 @@ export interface RemoteWorkActivity {
   titleKey: string;
   typeKey: string;
   relatedType?: "sheet" | "student" | "session" | "document";
-  relatedLabel?: string;
+  relatedLabel: string;
   status: RemoteActivityStatus;
 }
 

@@ -48,6 +48,14 @@ export class SessionService {
   }
 
   connectAuthenticatedToken(accessToken: string): void {
+    this.applyAuthenticatedToken(accessToken, "");
+  }
+
+  updateAuthenticatedToken(accessToken: string): void {
+    this.applyAuthenticatedToken(accessToken, this.promotionSignal());
+  }
+
+  private applyAuthenticatedToken(accessToken: string, promotionId: string): void {
     const payload = this.decodeJwt(accessToken);
     if (
       !payload.exp ||
@@ -59,7 +67,7 @@ export class SessionService {
       this.tokens.clear();
       return;
     }
-    this.connect(this.sessionFromPayload(payload, ""));
+    this.connect(this.sessionFromPayload(payload, promotionId));
   }
 
   private sessionFromPayload(
@@ -114,7 +122,7 @@ export class SessionService {
 
   initials(): string {
     const s = this.sessionSignal();
-    if (!s) return "--";
+    if (!s) return "";
 
     const first = s.firstName?.[0] ?? "";
     const last = s.lastName?.[0] ?? "";
@@ -134,8 +142,8 @@ export class SessionService {
     const token = this.tokens.accessToken();
     const payload = token ? this.decodeJwt(token) : {};
     if (!payload.exp || payload.exp * 1000 <= Date.now()) {
+      // Keep the refresh token available so authGuard can renew the session.
       localStorage.removeItem(STORAGE_KEY);
-      this.tokens.clear();
       return null;
     }
 

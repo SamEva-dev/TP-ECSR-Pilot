@@ -43,7 +43,10 @@
       "invalidCredentials": "Adresse e-mail ou mot de passe incorrect.",
       "loginFailed": "La connexion n’a pas pu être finalisée.",
       "technical": "Le service d’authentification est momentanément indisponible.",
-      "mfaNotYetSupported": "Ce compte exige une validation MFA. L’écran MFA Pedagora Pilot sera branché dans l’étape suivante."
+      "mfaNotYetSupported": "Ce compte exige une validation MFA. L’écran MFA Pedagora Pilot sera branché dans l’étape suivante.",
+      "invalidMfaCode": "Saisissez un code de vérification à 6 chiffres.",
+      "passwordTooShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+      "logoutFailed": "La session distante n’a pas pu être révoquée. La connexion locale a été fermée."
     },
     "demo": {
       "title": "Connexion",
@@ -79,7 +82,17 @@
     "rememberMe": "Rester connecté",
     "registrationReady": "Votre organisation a été créée. Bienvenue dans Pedagora Pilot.",
     "applicationAdded": "Pedagora Pilot a été ajouté à votre compte existant.",
-    "registrationPending": "Votre inscription est enregistrée. Finalisez la validation de votre compte pour continuer."
+    "registrationPending": "Votre inscription est enregistrée. Finalisez la validation de votre compte pour continuer.",
+    "demoCredentialsEditable": "Identifiants de démonstration modifiables avant connexion.",
+    "demoSubtitle": "Choisissez un profil de démonstration puis connectez-vous avec AuthGate.",
+    "demoTitle": "Connexion de démonstration",
+    "togglePassword": "Afficher ou masquer le mot de passe",
+    "mfaCode": "Code de vérification",
+    "verifyMfa": "Vérifier le code",
+    "mfaPrompt": "Saisissez le code à 6 chiffres de votre application d’authentification.",
+    "newPassword": "Nouveau mot de passe",
+    "changePassword": "Mettre à jour le mot de passe",
+    "passwordChangePrompt": "Votre mot de passe doit être remplacé avant de continuer."
   },
   "home": {
     "greeting": "Bonjour {{name}}",
@@ -130,6 +143,16 @@
         "internship": {
           "title": "1 convention de stage à signer",
           "detail": "Drive Académie — Thomas Roussel"
+        },
+        "real": {
+          "catchup": {
+            "title": "{{count}} stagiaire(s) ont plus de 10 h à rattraper",
+            "detail": "{{names}}"
+          },
+          "open": {
+            "title": "{{count}} alerte(s) ouverte(s)",
+            "detail": "Consultez les modules concernés pour traiter les alertes ouvertes."
+          }
         }
       },
       "watch": {
@@ -233,8 +256,8 @@
     "placeholderBody": "Les données de votre organisation sont en cours de chargement.",
     "real": {
       "selectedCohort": "Promotion sélectionnée : {{name}}",
-      "loading": "Chargement des données…",
-      "noCohort": "Aucune promotion sélectionnée. Sélectionnez une promotion dans votre espace.",
+      "loading": "Chargement de l’accueil…",
+      "noCohort": "Sélectionnez une promotion pour afficher ses données.",
       "failed": "Impossible de charger ces données. Réessayez après avoir actualisé la page.",
       "certificationObtained": "Certifications obtenues",
       "hoursProgress": "Volume horaire réalisé",
@@ -245,7 +268,31 @@
       "noSessions": "Aucune séance ne vous est attribuée aujourd’hui pour cette promotion.",
       "studentSubtitle": "Suivi de votre formation",
       "workspaceFailed": "Impossible de charger votre espace de travail. Actualisez la page pour réessayer.",
-      "noDashboard": "Aucun tableau de bord n’est disponible pour ce rôle."
+      "noDashboard": "Aucun tableau de bord n’est disponible pour ce rôle.",
+      "loadError": "Certaines données de l’accueil n’ont pas pu être chargées. Réessayez.",
+      "retry": "Réessayer",
+      "exportCohort": "Exporter les inscrits (CSV)",
+      "exportError": "Export impossible. Vérifiez vos droits et réessayez.",
+      "upcoming": "Prochaines séances",
+      "emptySessions": "Aucune séance à venir.",
+      "emptyLearners": "Aucun stagiaire inscrit dans cette promotion.",
+      "emptyObservations": "Aucune observation enregistrée.",
+      "enrollment": "Inscription",
+      "open": "Dossier",
+      "competencies": "Compétences acquises",
+      "nextSessions": "Séances à venir",
+      "actions": "Actions du formateur",
+      "juryHome": "Accédez aux sessions et dossiers du jury depuis votre espace dédié.",
+      "openJury": "Ouvrir l’espace jury"
+    },
+    "api": {
+      "loadFailed": "Impossible de charger les données de l’accueil. Vérifiez votre connexion et réessayez.",
+      "learnersFailed": "Impossible de charger les stagiaires de la promotion.",
+      "sessionsFailed": "Impossible de charger les séances de la promotion.",
+      "metricsFailed": "Impossible de charger les indicateurs de la promotion.",
+      "observationsFailed": "Impossible de charger les observations de conduite.",
+      "studentFailed": "Impossible de charger votre suivi stagiaire.",
+      "timelineFailed": "Impossible de charger votre historique pédagogique."
     }
   },
   "common": {
@@ -374,14 +421,17 @@
       "errors": {
         "required": "Ce champ est obligatoire.",
         "email": "Saisissez une adresse email valide."
-      }
+      },
+      "created": "Le stagiaire a été créé."
     },
     "api": {
       "createFailed": "L'inscription n'a pas été enregistrée. Vérifiez les informations et réessayez.",
       "invalidContext": "Sélectionnez une promotion valide avant d'inscrire ce stagiaire.",
       "refreshFailed": "L'inscription est enregistrée, mais la liste n'a pas pu être rechargée. Actualisez la page.",
       "conflict": "Ce stagiaire est déjà inscrit dans cette promotion ou la capacité est atteinte.",
-      "forbidden": "Vous ne pouvez pas inscrire ce stagiaire dans cette organisation."
+      "forbidden": "Vous ne pouvez pas inscrire ce stagiaire dans cette organisation.",
+      "loadFailed": "Impossible de charger les stagiaires. Vérifiez votre connexion et vos droits, puis réessayez.",
+      "metricsFailed": "Les stagiaires ont été chargés, mais leurs indicateurs n'ont pas pu être récupérés."
     },
     "enrollmentStatus": {
       "pending": "En attente",
@@ -471,7 +521,8 @@
       "created": "« {{title}} » a été ajouté au planning.",
       "errors": {
         "required": "Ce champ est obligatoire.",
-        "period": "L’heure de fin doit être postérieure à l’heure de début."
+        "period": "L’heure de fin doit être postérieure à l’heure de début.",
+        "weekday": "La séance doit être planifiée sur un jour valide."
       }
     },
     "workModes": {
@@ -627,7 +678,18 @@
       "createFailed": "La promotion n'a pas été enregistrée. Vérifiez le code et les dates, puis réessayez.",
       "refreshFailed": "La promotion est enregistrée, mais la liste n'a pas pu être rechargée. Actualisez la page.",
       "conflict": "Ce code existe déjà ou l'offre de formation n'est pas disponible.",
-      "forbidden": "Vous ne pouvez pas créer de promotion dans cette organisation."
+      "forbidden": "Vous ne pouvez pas créer de promotion dans cette organisation.",
+      "edit": "Modifier",
+      "save": "Enregistrer les modifications",
+      "status": "Statut",
+      "updated": "La promotion {{name}} a été mise à jour.",
+      "updateFailed": "La modification n’a pas été enregistrée. Vérifiez la capacité et le statut, puis réessayez.",
+      "referentialUnavailable": "Version du référentiel indisponible",
+      "referentialsError": "Impossible de charger les référentiels.",
+      "retry": "Réessayer",
+      "loading": "Chargement des promotions…",
+      "loadFailed": "Impossible de charger les promotions.",
+      "metricsFailed": "Certaines métriques de promotion n’ont pas pu être chargées. Les valeurs indisponibles sont affichées à 0."
     }
   },
   "sessions": {
@@ -779,7 +841,34 @@
       "save": "Enregistrer l'évaluation",
       "close": "Fermer le panneau",
       "generalComment": "Commentaire général",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "commentPlaceholder": "Ajouter un commentaire général…",
+      "contextTitle": "Contexte de l’évaluation",
+      "date": "Date",
+      "decision": {
+        "rework": "À retravailler",
+        "subtitle": "Choisissez la décision correspondant à la présentation.",
+        "title": "Décision",
+        "validated": "Validée"
+      },
+      "evaluator": "Évaluateur",
+      "gridSubtitle": "Évaluez chaque critère de la présentation.",
+      "gridTitle": "Grille d’évaluation",
+      "improvements": "Axes d’amélioration",
+      "improvementsPlaceholder": "Indiquer les points à améliorer…",
+      "nextObjective": "Prochain objectif",
+      "nextObjectivePlaceholder": "Définir le prochain objectif pédagogique…",
+      "positivePlaceholder": "Indiquer les points positifs…",
+      "positivePoints": "Points positifs",
+      "saved": "Évaluation enregistrée.",
+      "student": "Stagiaire",
+      "subtitle": "Renseignez la grille puis validez la décision.",
+      "summary": {
+        "acquired": "Acquis",
+        "inProgress": "En cours",
+        "review": "À revoir"
+      },
+      "synthesisTitle": "Synthèse"
     },
     "titles": {
       "verticalSigns": "La signalisation verticale",
@@ -863,7 +952,8 @@
     "level": {
       "acquired": "Acquis",
       "in_progress": "En cours",
-      "rework": "À travailler"
+      "rework": "À travailler",
+      "not_assessed": "Non évalué"
     },
     "definitions": {
       "C1": {
@@ -1341,7 +1431,9 @@
       "evaluation": "Évaluations",
       "course": "Supports de cours",
       "internship": "Conventions de stage",
-      "student": "Documents stagiaire"
+      "student": "Documents stagiaire",
+      "certification": "Certification",
+      "other": "Autres documents"
     },
     "details": {
       "title": "Détail du document",
@@ -1379,6 +1471,14 @@
       "interrogativeMethod": "Support méthodologique pour préparer et animer une séquence pédagogique en utilisant la méthode interrogative.",
       "internshipAssessment": "Bilan pédagogique de la période en entreprise avec les activités réalisées, les observations du tuteur et les points de progression.",
       "generic": "Document géré par Pedagora Pilot."
+    },
+    "real": {
+      "loadError": "Impossible de charger les documents. Vérifiez votre accès et réessayez.",
+      "uploadError": "Import du document impossible. Vérifiez le format du fichier et réessayez.",
+      "downloadError": "Téléchargement du document impossible.",
+      "replaceError": "Remplacement du document impossible. Vérifiez le format du fichier et réessayez.",
+      "deleteError": "Suppression du document impossible.",
+      "confirmDelete": "Supprimer ce document ? Cette action est définitive."
     }
   },
   "reports": {
@@ -1432,7 +1532,7 @@
       "catchupHours": "Heures à rattraper",
       "averageProgress": "Progression moyenne"
     },
-    "dynamicHint": "Cette vue sera alimentée par les données métier du backend. La sélection du type de rapport est déjà prête côté front.",
+    "dynamicHint": "Synthèse calculée à partir des données réelles de la promotion sélectionnée.",
     "audit": {
       "title": "Journal des modifications",
       "subtitle": "Traçabilité complète des saisies",
@@ -1457,6 +1557,11 @@
         "medicalCertificate": "Certificat médical.",
         "none": "—"
       }
+    },
+    "api": {
+      "loadFailed": "Impossible de charger les données du rapport.",
+      "auditFailed": "Impossible de charger le journal d’audit.",
+      "exportFailed": "Impossible d’exporter le rapport."
     }
   },
   "statistics": {
@@ -1473,74 +1578,16 @@
       "completedHours": "Heures réalisées",
       "catchupHours": "Heures à rattraper"
     },
-    "promotionProgress": {
-      "title": "Progression par promotion",
-      "detail": "{{completed}} h réalisées sur {{planned}} h · présence {{attendance}} % · {{catchup}} h à rattraper"
-    },
-    "competencyAverage": {
-      "title": "Niveau moyen par compétence"
-    },
-    "competencies": {
-      "c1": "Accompagner un élève dans son apprentissage de la conduite",
-      "c2": "Animer des actions de formation théorique",
-      "c3": "Maîtriser la conduite et la sécurité routière",
-      "c4": "Sensibiliser à la sécurité routière et aux risques"
-    },
-    "sheets": {
-      "title": "Fiches et exposés",
-      "subtitle": "325 fiches validées sur 870 attendues",
-      "prepared": "Préparées",
-      "presented": "Présentées",
-      "validated": "Validées",
-      "rework": "À retravailler"
-    },
-    "statuses": {
-      "title": "Répartition des statuts",
-      "subtitle": "Suivi des stagiaires du centre",
-      "good": "Bonne progression",
-      "warning": "À surveiller",
-      "late": "En retard",
-      "finished": "Terminé"
-    },
-    "ranking": {
-      "title": "Classement par progression"
-    },
-    "trainer": {
-      "kpi": {
-        "averageProgress": "Progression moyenne",
-        "sessions": "Séances réalisées",
-        "students": "Stagiaires suivis"
-      },
-      "studentsTitle": "Progression de mes stagiaires",
-      "competenciesTitle": "Niveau moyen par compétence",
-      "sheetsTitle": "Fiches et exposés évalués",
-      "followUpTitle": "Situation de mes stagiaires",
-      "goodProgress": "stagiaires en bonne progression",
-      "watch": "stagiaire à surveiller",
-      "late": "stagiaire en retard"
-    },
-    "secretariat": {
-      "kpi": {
-        "toRegularize": "Situations à régulariser"
-      },
-      "promotionsTitle": "Assiduité et heures par promotion",
-      "prioritiesTitle": "Priorités administratives",
-      "catchupShort": "à rattraper",
-      "priorities": {
-        "catchup": "Heures à rattraper",
-        "absence": "Absences à régulariser"
-      }
-    },
     "student": {
-      "kpi": {
-        "progress": "Progression globale"
-      },
       "competenciesTitle": "Ma progression par compétence",
       "sheetsTitle": "Mes fiches et exposés",
+      "kpi": {
+        "progress": "Ma progression"
+      },
       "hoursTitle": "Répartition de mes heures",
       "attendanceTitle": "Mon assiduité",
       "hours": {
-        "classroom": "Cours en salle",
+        "classroom": "Salle / théorie",
         "driving": "Conduite",
         "internship": "Stage en entreprise"
       },
@@ -1549,6 +1596,91 @@
         "late": "Retards",
         "absent": "Absences",
         "excused": "Absences excusées"
+      }
+    },
+    "real": {
+      "refresh": "Actualiser",
+      "retry": "Réessayer",
+      "loadingWorkspace": "Chargement du contexte…",
+      "workspaceError": "Impossible de charger le contexte de formation.",
+      "loading": "Chargement des statistiques du serveur…",
+      "partialError": "Une partie des statistiques est indisponible.",
+      "personalOnly": "Vos résultats personnels, accessibles uniquement avec votre compte.",
+      "validatedTopics": "Fiches validées",
+      "acquiredCompetencies": "Compétences acquises",
+      "topicProgress": "Progression des fiches",
+      "noTopics": "Aucune fiche disponible.",
+      "noCompetencies": "Aucune compétence disponible.",
+      "noProfile": "Aucun dossier stagiaire associé à ce compte.",
+      "noScore": "Non évaluée",
+      "selectedCohort": "Promotion sélectionnée",
+      "noSelection": "Aucune sélection",
+      "noCohortData": "Aucun indicateur disponible pour cette promotion.",
+      "competencyProgress": "Progression moyenne des compétences",
+      "certified": "Certifications obtenues",
+      "plannedHours": "Heures planifiées",
+      "attendanceTrend": "Évolution des présences",
+      "lastThirtyDays": "Sur les 30 derniers jours, lorsque des présences ont été enregistrées.",
+      "noTrend": "Aucune présence enregistrée sur cette période.",
+      "siteCohorts": "Promotions du site sélectionné",
+      "enrollments": "inscriptions"
+    },
+    "promotionProgress": {
+      "title": "Progression par promotion",
+      "detail": "{{completed}} h réalisées / {{planned}} h prévues · {{attendance}} % de présence · {{catchup}} h à rattraper"
+    },
+    "competencyAverage": {
+      "title": "Moyenne par compétence"
+    },
+    "sheets": {
+      "title": "Fiches pédagogiques",
+      "subtitle": "Suivi des fiches préparées, présentées et validées",
+      "prepared": "Préparées",
+      "presented": "Présentées",
+      "validated": "Validées",
+      "rework": "À retravailler"
+    },
+    "statuses": {
+      "title": "Situation des stagiaires",
+      "subtitle": "Répartition selon l’état actuel du suivi",
+      "good": "Dans le rythme",
+      "warning": "À surveiller",
+      "late": "En retard",
+      "finished": "Terminé"
+    },
+    "ranking": {
+      "title": "Classement de progression"
+    },
+    "competencies": {
+      "c1": "Construire et préparer le scénario d’une séance individuelle ou collective",
+      "c2": "Animer une séance collective de formation à la sécurité routière",
+      "c3": "Animer une séance individuelle ou collective en véhicule",
+      "c4": "Évaluer les acquis et accompagner la progression"
+    },
+    "trainer": {
+      "kpi": {
+        "averageProgress": "Progression moyenne",
+        "sessions": "Séances",
+        "students": "Stagiaires"
+      },
+      "studentsTitle": "Progression de mes stagiaires",
+      "competenciesTitle": "Progression moyenne par compétence",
+      "sheetsTitle": "Fiches suivies",
+      "followUpTitle": "Situation des stagiaires",
+      "goodProgress": "stagiaires dans le rythme",
+      "watch": "stagiaire à surveiller",
+      "late": "stagiaire en retard"
+    },
+    "secretariat": {
+      "kpi": {
+        "toRegularize": "À régulariser"
+      },
+      "promotionsTitle": "Assiduité par promotion",
+      "prioritiesTitle": "Priorités administratives",
+      "catchupShort": "à rattraper",
+      "priorities": {
+        "catchup": "Heures à rattraper",
+        "absence": "Absences à régulariser"
       }
     }
   },
@@ -1709,6 +1841,15 @@
       "forbidden": "Vous ne disposez pas des droits nécessaires pour gérer ces accès.",
       "lastAdmin": "Le dernier administrateur de l’organisation ne peut pas être retiré.",
       "unavailable": "Impossible de charger les comptes."
+    },
+    "api": {
+      "loadError": "Impossible de charger les comptes et accès PedagoraPilot.",
+      "updateError": "Impossible de modifier l’état d’accès de ce compte.",
+      "deleteError": "Impossible de révoquer cet accès.",
+      "permissionError": "Impossible d’enregistrer cette permission.",
+      "assignmentError": "Impossible d’enregistrer cette affectation.",
+      "inviteError": "Impossible d’envoyer cette invitation.",
+      "pendingActionError": "Cette action sera disponible après acceptation de l’invitation."
     }
   },
   "administration": {
@@ -1992,6 +2133,10 @@
         "cancelled": "Annulée",
         "inProgress": "En cours"
       }
+    },
+    "api": {
+      "loadFailed": "Impossible de charger le dossier du stagiaire.",
+      "documentDownloadFailed": "Impossible de télécharger le document."
     }
   },
   "sheetConfig": {
@@ -2075,6 +2220,11 @@
       "defaultObjective": "Être capable de présenter le thème « {{title}} », d’en expliquer les enjeux de sécurité routière et de faire participer les apprenants.",
       "defaultExample": "Préparez une présentation structurée sur « {{title}} ». Commencez par une situation concrète ou une question d’accroche, faites émerger les représentations du groupe, puis développez les connaissances utiles avant un bilan final.",
       "defaultCorrection": "Trame de correction proposée pour « {{title}} » :\n\n1. Accroche : partir d’une situation concrète et questionner le groupe.\n2. Objectifs : annoncer clairement 2 à 3 objectifs observables.\n3. Développement : définitions, réglementation, risques, comportements et exemples pratiques.\n4. Méthode interrogative : alterner questions ouvertes et fermées pour faire participer les apprenants.\n5. RIP : identifier les risques, influences et pressions en lien avec le thème.\n6. Bilan : vérifier les acquis avec quelques questions et annoncer une suite possible.\n7. Références : citer les textes et sources pédagogiques utilisés."
+    },
+    "api": {
+      "loadError": "Impossible de charger le catalogue des fiches pédagogiques.",
+      "saveError": "Impossible d’enregistrer la fiche pédagogique.",
+      "deleteError": "Impossible de supprimer la fiche pédagogique."
     },
     "delete": {
       "title": "Supprimer cette fiche ?",
@@ -2299,6 +2449,11 @@
         "vehiclePreparation": "Préparation du véhicule",
         "passengerSafety": "Sécurité et prise en charge des voyageurs"
       }
+    },
+    "api": {
+      "loadFailed": "Impossible de charger les données de certification.",
+      "candidatesLoadFailed": "Impossible de charger les candidats à la certification.",
+      "saveFailed": "Impossible d’enregistrer l’évaluation de certification."
     }
   },
   "jury": {
@@ -2327,7 +2482,7 @@
     "back": "Certification",
     "publish": "Publier les résultats",
     "published": "Résultats publiés",
-    "publishSuccess": "Les résultats sont maintenant marqués comme publiés dans cette maquette.",
+    "publishSuccess": "Les résultats ont été publiés avec succès.",
     "kpi": {
       "candidates": "Candidats",
       "obtained": "Titre obtenu",
@@ -2350,7 +2505,12 @@
       "published": "Publié",
       "draft": "Brouillon"
     },
-    "multiTableSubtitle": "Décisions et unités de validation selon le schéma {{scheme}}."
+    "multiTableSubtitle": "Décisions et unités de validation selon le schéma {{scheme}}.",
+    "api": {
+      "publishFailed": "Impossible de publier les résultats de certification.",
+      "exportFailed": "Impossible d’exporter les résultats de certification.",
+      "loadFailed": "Impossible de charger les résultats de certification."
+    }
   },
   "success": {
     "title": "Réussites",
@@ -2424,6 +2584,10 @@
       "units": "Unités / blocs",
       "noResults": "Aucun résultat de certification disponible pour ce périmètre.",
       "noCandidates": "Aucun candidat ne correspond à ce filtre."
+    },
+    "api": {
+      "loadFailed": "Impossible de charger les résultats de certification.",
+      "exportFailed": "Impossible de générer l’export des résultats."
     }
   },
   "workspace": {
@@ -2439,113 +2603,92 @@
       "site": "Établissement",
       "program": "Formation",
       "cohort": "Promotion"
+    },
+    "api": {
+      "partialLoadFailed": "Certaines données du contexte n’ont pas pu être chargées.",
+      "loadFailed": "Le contexte de travail n’a pas pu être chargé."
     }
   },
   "organizationDashboard": {
     "badge": "Pilotage organisation",
     "subtitle": "Vue consolidée de vos établissements, formations et performances.",
-    "period": "Année pédagogique 2026–2027",
-    "openStatistics": "Ouvrir les statistiques",
     "kpis": {
       "sites": "Établissements",
       "programs": "Formations actives",
       "students": "Stagiaires",
-      "trainers": "Formateurs",
       "cohorts": "Promotions actives",
-      "success": "Réussite globale"
+      "trainers": "Formateurs",
+      "success": "Réussite certification"
     },
     "sites": {
       "title": "Performance des établissements",
-      "subtitle": "Vue consolidée par site. Cliquez sur un établissement pour basculer le contexte.",
-      "hint": "Cliquez sur un site",
+      "subtitle": "Indicateurs consolidés par établissement",
+      "hint": "Cliquez pour ouvrir",
       "students": "Stagiaires",
       "trainers": "Formateurs",
-      "attendance": "Présence",
+      "attendance": "Assiduité",
       "success": "Réussite",
       "programs": "formations",
       "cohorts": "promotions",
       "alerts": "alertes"
     },
     "global": {
+      "attendance": "Assiduité",
       "title": "Vue globale",
       "subtitle": "Indicateurs consolidés de l’organisation",
-      "attendance": "Taux de présence",
-      "success": "Taux de réussite",
+      "success": "Réussite",
       "hours": "Heures réalisées",
-      "context": "Contexte opérationnel actif",
-      "contextHelp": "Le dashboard organisation reste consolidé. Le contexte actif est utilisé lorsque vous ouvrez les écrans opérationnels."
+      "context": "Contexte actif",
+      "contextHelp": "Les indicateurs affichés respectent le périmètre auquel vous avez accès."
     },
     "programs": {
-      "title": "Performance par formation",
-      "subtitle": "Effectifs, présence et réussite sur l’ensemble des établissements.",
       "program": "Formation",
+      "open": "Ouvrir",
+      "title": "Performance par formation",
+      "subtitle": "Indicateurs agrégés des promotions accessibles",
       "students": "Stagiaires",
       "cohorts": "Promotions",
-      "attendance": "Présence",
-      "success": "Réussite",
-      "open": "Ouvrir"
+      "attendance": "Assiduité",
+      "success": "Réussite"
     },
-    "alerts": {
-      "title": "Alertes réseau",
-      "subtitle": "Points nécessitant une attention au niveau de l’organisation",
-      "catchup": {
-        "title": "7 stagiaires dépassent 10 h à rattraper",
-        "detail": "Principalement sur Marseille et Nice. Vérifier les plans de rattrapage."
-      },
-      "documents": {
-        "title": "5 dossiers administratifs incomplets",
-        "detail": "Documents manquants avant les prochaines périodes de stage."
-      },
-      "certification": {
-        "title": "2 sessions de certification à finaliser",
-        "detail": "Affectation jury ou dossier candidat encore incomplet."
-      },
-      "capacity": {
-        "title": "Capacité bientôt atteinte à Nice",
-        "detail": "La promotion Poids lourd de janvier est proche de sa capacité maximale."
-      },
-      "ecf": {
-        "title": "2 promotions nécessitent une vérification",
-        "detail": "Présences et pièces administratives à régulariser."
-      },
-      "horizon": {
-        "title": "Une certification à préparer",
-        "detail": "Le dossier de session doit être finalisé avant publication."
+    "real": {
+      "noOrganization": "Aucune organisation sélectionnée",
+      "refresh": "Actualiser",
+      "loading": "Chargement des données du serveur…",
+      "error": "Impossible de charger les indicateurs. Réessayez.",
+      "progress": "Progression moyenne",
+      "certification": "Réussite à la certification",
+      "sitesSubtitle": "Indicateurs des établissements auxquels vous avez accès.",
+      "siteError": "Certains indicateurs des établissements sont indisponibles.",
+      "siteUnavailable": "Indicateurs indisponibles",
+      "noSites": "Aucun établissement accessible.",
+      "programsTitle": "Formations du site sélectionné",
+      "programsSubtitle": "Formations accessibles pour :",
+      "code": "Code",
+      "action": "Action",
+      "noPrograms": "Aucune formation accessible pour ce site.",
+      "alerts": {
+        "open": {
+          "title": "Alertes ouvertes",
+          "detail": "Des alertes sont ouvertes dans cette organisation. Consultez les modules concernés pour les traiter."
+        }
       }
+    },
+    "openStatistics": "Ouvrir les statistiques",
+    "api": {
+      "loadFailed": "Impossible de charger les indicateurs de l’organisation.",
+      "sessionsFailed": "Impossible de charger les séances de l’organisation.",
+      "activityFailed": "Impossible de charger l’activité récente de l’organisation.",
+      "detailsFailed": "Certains indicateurs d’établissement ou de promotion n’ont pas pu être chargés."
+    },
+    "period": "Vue actuelle",
+    "alerts": {
+      "title": "Alertes",
+      "subtitle": "Points nécessitant une attention"
     },
     "activity": {
       "title": "Activité récente",
-      "subtitle": "Événements importants remontés des établissements",
-      "item1": {
-        "title": "Nouvelle promotion créée",
-        "detail": "AFTRAL Nice · Poids lourd · Janvier 2027",
-        "when": "Aujourd’hui"
-      },
-      "item2": {
-        "title": "Session de certification mise à jour",
-        "detail": "TP ECSR · Nice · 18 candidats",
-        "when": "Il y a 2 h"
-      },
-      "item3": {
-        "title": "Nouvelle affectation formateur",
-        "detail": "Marc Dupont est maintenant affecté à Moto · Nice",
-        "when": "Hier"
-      },
-      "item4": {
-        "title": "Mise à jour établissement",
-        "detail": "AFTRAL Marseille · paramètres pédagogiques actualisés",
-        "when": "Hier"
-      },
-      "ecf": {
-        "title": "Nouvelle promotion créée",
-        "detail": "ECF Nice · TP ECSR 2026–2027",
-        "when": "Aujourd’hui"
-      },
-      "horizon": {
-        "title": "Certification planifiée",
-        "detail": "Horizon Nice · prochaine session préparée",
-        "when": "Aujourd’hui"
-      }
+      "subtitle": "Dernières actions enregistrées dans l’organisation"
     }
   },
   "sites": {
@@ -2553,7 +2696,7 @@
     "title": "Établissements",
     "subtitle": "Pilotez les établissements de {{organization}} et leurs performances locales.",
     "add": "Ajouter un établissement",
-    "search": "Rechercher un établissement, une ville, un responsable…",
+    "search": "Rechercher un établissement ou une ville…",
     "edit": "Modifier l’établissement",
     "open": "Ouvrir",
     "kpis": {
@@ -2649,7 +2792,7 @@
         }
       },
       "cohorts": {
-        "title": "Promotions & sessions",
+        "title": "Promotions",
         "subtitle": "Promotions rattachées aux formations de ce site",
         "name": "Promotion",
         "program": "Formation",
@@ -2659,13 +2802,28 @@
         "statuses": {
           "planned": "Planifiée",
           "active": "En cours",
-          "completed": "Terminée"
+          "completed": "Terminée",
+          "draft": "Brouillon",
+          "cancelled": "Annulée"
         }
       },
       "notFound": {
         "title": "Établissement introuvable",
-        "subtitle": "Ce site n’existe pas dans les données de démonstration ou n’est plus disponible."
+        "subtitle": "Cet établissement est absent ou inaccessible."
       }
+    },
+    "real": {
+      "loading": "Chargement des établissements…",
+      "refreshing": "Actualisation des indicateurs…",
+      "metricsError": "Certains indicateurs ne sont pas disponibles.",
+      "saveError": "Enregistrement refusé ou indisponible. Corrigez les données et réessayez.",
+      "saving": "Enregistrement…",
+      "required": "Renseignez les champs obligatoires et respectez leur longueur maximale.",
+      "empty": "Aucun établissement accessible.",
+      "noPrograms": "Aucune formation accessible pour cet établissement.",
+      "noCohorts": "Aucune promotion accessible pour cet établissement.",
+      "workspaceError": "Impossible de charger les établissements.",
+      "retry": "Réessayer"
     }
   },
   "programs": {
@@ -2690,7 +2848,9 @@
       "teacher": "Enseignement de la conduite",
       "motorcycle": "Moto",
       "heavyVehicle": "Poids lourd",
-      "passengerTransport": "Transport voyageurs"
+      "passengerTransport": "Transport voyageurs",
+      "ambulance": "Transport sanitaire",
+      "firstAid": "Premiers secours"
     },
     "status": {
       "active": "Active",
@@ -2767,16 +2927,18 @@
         "period": "Période",
         "students": "Stagiaires",
         "status": "Statut",
-        "empty": "Aucune promotion de démonstration pour cette formation.",
+        "empty": "Aucune promotion rattachée à cette formation.",
         "statuses": {
           "planned": "Planifiée",
           "active": "En cours",
-          "completed": "Terminée"
+          "completed": "Terminée",
+          "draft": "Brouillon",
+          "cancelled": "Annulée"
         }
       },
       "notFound": {
         "title": "Formation introuvable",
-        "subtitle": "Cette formation n’existe pas dans les données de démonstration."
+        "subtitle": "Cette formation est absente ou inaccessible."
       }
     },
     "demo": {
@@ -2784,6 +2946,27 @@
       "motoDescription": "Parcours pédagogique dédié à la formation deux-roues avec suivi plateau, circulation, compétences et certification.",
       "plDescription": "Formation poids lourd avec séances de conduite, travail sur plateau, suivi des compétences, stages et évaluation finale.",
       "busDescription": "Formation transport de voyageurs intégrant conduite, plateau, compétences professionnelles, stages et certification."
+    },
+    "real": {
+      "workspaceLoading": "Chargement du contexte…",
+      "loading": "Chargement des formations…",
+      "loadError": "Impossible de charger les formations.",
+      "retry": "Réessayer",
+      "saveError": "Enregistrement refusé ou indisponible. Vérifiez les données et réessayez.",
+      "saving": "Enregistrement…",
+      "required": "Vérifiez les champs obligatoires et sélectionnez au moins un module.",
+      "empty": "Aucune formation disponible.",
+      "enrollments": "Inscriptions aux promotions",
+      "noReferential": "Aucun référentiel publié",
+      "noModules": "Aucun module activé.",
+      "sitesHelp": "Disponibilité enregistrée pour les établissements accessibles.",
+      "offeringError": "Impossible de modifier la disponibilité. Une promotion ouverte peut bloquer la désactivation.",
+      "enabled": "Activée",
+      "disabled": "Désactivée",
+      "noSites": "Aucun établissement accessible.",
+      "noCohorts": "Aucune promotion rattachée à cette formation.",
+      "notFound": "Cette formation est absente ou inaccessible.",
+      "workspaceError": "Impossible de charger le contexte des formations."
     }
   },
   "referentials": {
@@ -2998,16 +3181,26 @@
     "versionDrawer": {
       "eyebrow": "Nouvelle version",
       "title": "Créer une version de référentiel",
-      "subtitle": "Dupliquez une version existante puis adaptez-la sans modifier les promotions déjà engagées.",
+      "subtitle": "Créez une nouvelle version brouillon à partir des paramètres de la version sélectionnée.",
       "program": "Formation",
       "source": "Version source",
-      "sourceHint": "Les compétences, volumes, stages et épreuves seront copiés depuis cette version.",
+      "sourceHint": "Le volume horaire, les fiches, les documents requis et les modules sont repris. Les contenus pédagogiques sont gérés séparément.",
       "version": "Nom de version",
       "code": "Code",
       "effectiveFrom": "Applicable à partir du",
       "status": "Statut initial",
-      "info": "Cette action reste entièrement mockée dans le front. La nouvelle version est conservée uniquement pendant la session courante.",
+      "info": "La version est enregistrée en brouillon dans la base. Publiez-la ensuite depuis sa fiche.",
       "create": "Créer la version"
+    },
+    "api": {
+      "loading": "Chargement des référentiels…",
+      "loadError": "Impossible de charger les référentiels.",
+      "retry": "Réessayer",
+      "saveError": "Impossible de créer la version. Vérifiez les informations et vos droits, puis réessayez.",
+      "publishError": "Impossible de publier cette version. Vérifiez vos droits et sa date de prise d’effet.",
+      "publish": "Publier la version",
+      "noModules": "Aucun module activé.",
+      "certificationCode": "Code de certification"
     }
   },
   "workspaceOperational": {
@@ -3240,9 +3433,33 @@
       "maxDays": "Nombre maximum de jours par semaine",
       "maxDaysHint": "Limite indicative appliquée lors de la saisie des demandes.",
       "save": "Enregistrer la politique"
+    },
+    "api": {
+      "loadError": "Impossible de charger les paramètres de l’organisation.",
+      "saveError": "Impossible d’enregistrer les paramètres de l’organisation.",
+      "remoteWorkSaveError": "Impossible d’enregistrer la politique de télétravail.",
+      "reportingError": "Impossible de charger les indicateurs de l’organisation.",
+      "auditError": "Impossible de charger l’historique d’audit de l’organisation."
     }
   },
   "remoteWork": {
+    "real": {
+      "loading": "Chargement des demandes de télétravail…",
+      "loadError": "Impossible de charger les demandes. Vérifiez la connexion et vos droits.",
+      "actionError": "Action impossible. Vérifiez les données saisies et réessayez.",
+      "noSite": "Sélectionnez un site pour afficher les demandes.",
+      "emptyRequests": "Aucune demande de télétravail pour ce site et ces filtres.",
+      "emptyActivities": "Aucune activité prévue pour cette journée.",
+      "noRequest": "Aucune demande aujourd’hui",
+      "noRemoteDay": "Aucune journée de télétravail validée",
+      "weekTitle": "Télétravail validé cette semaine",
+      "weekHint": "Seules les demandes de télétravail approuvées figurent ici.",
+      "monthlyApproved": "Journées approuvées ce mois",
+      "dateRequired": "Indiquez une date.",
+      "tooLong": "Le commentaire est trop long (2 000 caractères maximum).",
+      "saving": "Enregistrement…",
+      "close": "Fermer le panneau"
+    },
     "title": "Télétravail",
     "managerSubtitle": "Pilotez les demandes, la présence et l'organisation du travail à distance.",
     "employeeSubtitle": "Planifiez vos journées à distance et suivez vos activités.",
@@ -3280,7 +3497,8 @@
       "requested": "À valider",
       "approved": "Validé",
       "rejected": "Refusé",
-      "completed": "Terminée"
+      "completed": "Terminée",
+      "cancelled": "Annulée"
     },
     "periods": {
       "full-day": "Journée complète",
@@ -3538,6 +3756,12 @@
         "generic": "Module théorique à distance",
         "genericDescription": "Parcours autonome composé de ressources, activités et évaluation."
       }
+    },
+    "api": {
+      "loadFailed": "Impossible de charger les données de formation à distance.",
+      "createFailed": "Impossible d’enregistrer cet élément de formation à distance.",
+      "attendanceFailed": "Impossible d’enregistrer la présence distancielle.",
+      "progressFailed": "Impossible d’enregistrer la progression du module."
     }
   },
   "backendErrors": {
@@ -3555,7 +3779,17 @@
     "ORGANIZATION_NOT_FOUND": "L’organisation demandée est introuvable.",
     "ORGANIZATION_CODE_INVALID": "Le code de l’organisation n’est pas valide.",
     "ORGANIZATION_OWNER_REQUIRED": "Le responsable de l’organisation est obligatoire.",
-    "ORGANIZATION_COUNTRY_CODE_INVALID": "Le code pays de l’organisation doit contenir deux lettres."
+    "ORGANIZATION_COUNTRY_CODE_INVALID": "Le code pays de l’organisation doit contenir deux lettres.",
+    "TOPIC_EVALUATION_PROGRESS_REQUIRED": "La progression de la fiche est obligatoire pour enregistrer son évaluation.",
+    "TOPIC_EVALUATION_CRITERION_CODE_REQUIRED": "Le code du critère d’évaluation est obligatoire.",
+    "TOPIC_EVALUATION_CRITERION_CODE_INVALID": "Le code du critère d’évaluation est invalide.",
+    "TOPIC_EVALUATION_CRITERIA_INVALID": "La grille d’évaluation de la fiche est invalide.",
+    "DRIVING_SESSION_INVALID": "La séance de conduite sélectionnée n’est pas valide pour cette évaluation.",
+    "DRIVING_CRITERIA_INVALID": "Les critères de l’évaluation de conduite sont invalides.",
+    "SESSION_TRAINER_IDENTITY_INVALID": "L’identité du formateur associée à la séance est invalide.",
+    "WORKPLACE_PERIOD_TYPE_INVALID": "Le type de période en entreprise est invalide.",
+    "WORKPLACE_DOCUMENT_REQUIRED": "Le document requis pour cette période en entreprise est obligatoire.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -3655,6 +3889,8 @@
     "COMPETENCY_LEVEL_INVALID": "Le niveau de compétence est invalide.",
     "COMPETENCY_REFERENTIAL_MISMATCH": "Cette compétence n’appartient pas au référentiel de la promotion de l’apprenant.",
     "PEDAGOGICAL_TOPIC_NOT_FOUND": "La fiche ou le sujet pédagogique demandé est introuvable.",
+    "PEDAGOGICAL_TOPIC_NUMBER_CONFLICT": "Ce numéro de fiche est déjà utilisé dans ce référentiel.",
+    "PEDAGOGICAL_TOPIC_IN_USE": "Cette fiche est déjà utilisée dans le suivi d’un apprenant et ne peut pas être supprimée.",
     "TOPIC_REFERENTIAL_VERSION_REQUIRED": "Une version de référentiel est obligatoire pour la fiche pédagogique.",
     "TOPIC_CODE_REQUIRED": "Le code de la fiche pédagogique est obligatoire.",
     "TOPIC_TITLE_REQUIRED": "Le titre de la fiche pédagogique est obligatoire.",
@@ -3758,7 +3994,18 @@
     "REPORTING_NO_DATA": "Aucune donnée n’est disponible pour ce rapport.",
     "REPORTING_FORBIDDEN": "Vous n’êtes pas autorisé à consulter ces données de reporting.",
     "AUDIT_ACTION_REQUIRED": "L’action d’audit est obligatoire.",
-    "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire."
+    "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire.",
+    "PROGRAM_OFFERING_ACTIVE_COHORTS": "Impossible de désactiver cette offre : des promotions sont encore ouvertes.",
+    "TOPIC_EVALUATION_PROGRESS_REQUIRED": "La progression de la fiche est obligatoire pour enregistrer son évaluation.",
+    "TOPIC_EVALUATION_CRITERION_CODE_REQUIRED": "Le code du critère d’évaluation est obligatoire.",
+    "TOPIC_EVALUATION_CRITERION_CODE_INVALID": "Le code du critère d’évaluation est invalide.",
+    "TOPIC_EVALUATION_CRITERIA_INVALID": "La grille d’évaluation de la fiche est invalide.",
+    "DRIVING_SESSION_INVALID": "La séance de conduite sélectionnée n’est pas valide pour cette évaluation.",
+    "DRIVING_CRITERIA_INVALID": "Les critères de l’évaluation de conduite sont invalides.",
+    "SESSION_TRAINER_IDENTITY_INVALID": "L’identité du formateur associée à la séance est invalide.",
+    "WORKPLACE_PERIOD_TYPE_INVALID": "Le type de période en entreprise est invalide.",
+    "WORKPLACE_DOCUMENT_REQUIRED": "Le document requis pour cette période en entreprise est obligatoire.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -3879,6 +4126,8 @@
     "COMPETENCY_LEVEL_INVALID": "Le niveau de compétence est invalide.",
     "COMPETENCY_REFERENTIAL_MISMATCH": "Cette compétence n’appartient pas au référentiel de la promotion de l’apprenant.",
     "PEDAGOGICAL_TOPIC_NOT_FOUND": "La fiche ou le sujet pédagogique demandé est introuvable.",
+    "PEDAGOGICAL_TOPIC_NUMBER_CONFLICT": "Ce numéro de fiche est déjà utilisé dans ce référentiel.",
+    "PEDAGOGICAL_TOPIC_IN_USE": "Cette fiche est déjà utilisée dans le suivi d’un apprenant et ne peut pas être supprimée.",
     "TOPIC_REFERENTIAL_VERSION_REQUIRED": "Une version de référentiel est obligatoire pour la fiche pédagogique.",
     "TOPIC_CODE_REQUIRED": "Le code de la fiche pédagogique est obligatoire.",
     "TOPIC_TITLE_REQUIRED": "Le titre de la fiche pédagogique est obligatoire.",
@@ -3982,7 +4231,9 @@
     "REPORTING_NO_DATA": "Aucune donnée n’est disponible pour ce rapport.",
     "REPORTING_FORBIDDEN": "Vous n’êtes pas autorisé à consulter ces données de reporting.",
     "AUDIT_ACTION_REQUIRED": "L’action d’audit est obligatoire.",
-    "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire."
+    "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire.",
+    "PROGRAM_OFFERING_ACTIVE_COHORTS": "Impossible de désactiver cette offre : des promotions sont encore ouvertes.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
   },
   "accessPolicy": {
     "readOnly": "Accès en lecture seule"

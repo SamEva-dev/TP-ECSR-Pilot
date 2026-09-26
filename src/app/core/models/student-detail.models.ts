@@ -73,6 +73,7 @@ export interface StudentDetailProfile extends StudentDirectoryItem {
   absences: number;
   delays: number;
   reworkSheets: number;
+  totalSheets: number;
   skills: Record<"C1" | "C2" | "C3" | "C4", number>;
   hours: StudentHourRow[];
   attendance: StudentAttendanceRow[];

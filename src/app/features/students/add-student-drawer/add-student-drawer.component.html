@@ -247,6 +247,28 @@
               </div>
             </div>
           </section>
+
+          <section
+            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
+          >
+            <div class="flex items-start gap-3">
+              <input
+                id="send-invitation"
+                type="checkbox"
+                formControlName="sendInvitation"
+                class="mt-0.5 size-4 rounded border-[#b8c5d3] text-[#2a64a2] accent-[#2a64a2]"
+              />
+              <label for="send-invitation" class="cursor-pointer">
+                <span class="block text-[13px] font-semibold text-[#172033]">{{
+                  "students.drawer.access.sendInvitation" | t
+                }}</span>
+                <span
+                  class="mt-0.5 block text-[11.5px] leading-[1.45] text-[#718096]"
+                  >{{ "students.drawer.access.sendInvitationHelp" | t }}</span
+                >
+              </label>
+            </div>
+          </section>
         </div>
 
         <footer

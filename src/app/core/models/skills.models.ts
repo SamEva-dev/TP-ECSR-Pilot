@@ -1,24 +1,23 @@
-// Extracted from the former mock-data contract. No runtime demo data lives here.
-// This file contains TypeScript contracts only and is safe in API-only mode.
+// UI contracts for the competency screen. Runtime business data comes from PedagoraPilot.Api.
 
-export type SkillCode = "C1" | "C2" | "C3" | "C4";
-
-export type SkillCriterionLevel = "acquired" | "in_progress" | "rework";
+export type SkillCriterionLevel = "not_assessed" | "acquired" | "in_progress" | "rework";
 
 export interface SkillCriterion {
+  definitionId: string;
   labelKey: string;
   level: SkillCriterionLevel;
 }
 
 export interface SkillDefinition {
-  code: SkillCode;
+  definitionId: string;
+  code: string;
   titleKey: string;
   criteria: SkillCriterion[];
 }
 
 export interface SkillLinkedSession {
   id: string;
-  skill: SkillCode;
+  skill: string;
   date: string;
   studentName: string;
   subjectKey: string;

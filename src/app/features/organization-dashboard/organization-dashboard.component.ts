@@ -1,19 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
+import { OrganizationDashboardApiStoreService } from "../../core/api-data/organization-dashboard-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import {
-  ORGANIZATION_ACTIVITY,
-  ORGANIZATION_ALERTS,
-  ORGANIZATION_KPIS,
-  PROGRAM_PERFORMANCES,
-  SITE_PERFORMANCES,
-} from "../../core/api-data/runtime-data.store";
-import { PROGRAM_OFFERINGS } from "../../core/api-data/runtime-data.store";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
 @Component({
@@ -25,53 +13,25 @@ import { WorkspaceContextService } from "../../core/workspace/workspace-context.
 export class OrganizationDashboardComponent {
   private readonly router = inject(Router);
   readonly workspace = inject(WorkspaceContextService);
+  private readonly dashboard = inject(OrganizationDashboardApiStoreService);
 
-  readonly organizationId = computed(
-    () => this.workspace.organization()?.id ?? "org-aftral",
-  );
-  readonly kpis = computed(
-    () =>
-      ORGANIZATION_KPIS.find(
-        (item) => item.organizationId === this.organizationId(),
-      ) ?? ORGANIZATION_KPIS[0],
-  );
-  readonly sites = computed(() =>
-    SITE_PERFORMANCES.filter(
-      (item) => item.organizationId === this.organizationId(),
-    ),
-  );
-  readonly programs = computed(() =>
-    PROGRAM_PERFORMANCES.filter(
-      (item) => item.organizationId === this.organizationId(),
-    ),
-  );
-  readonly alerts = computed(() =>
-    ORGANIZATION_ALERTS.filter(
-      (item) => item.organizationId === this.organizationId(),
-    ),
-  );
-  readonly activity = computed(() =>
-    ORGANIZATION_ACTIVITY.filter(
-      (item) => item.organizationId === this.organizationId(),
-    ),
-  );
+  readonly kpis = this.dashboard.kpis;
+  readonly sites = this.dashboard.sites;
+  readonly programs = this.dashboard.programs;
+  readonly alerts = this.dashboard.alerts;
+  readonly activity = this.dashboard.activity;
 
   openSite(siteId: string): void {
+    if (!siteId) return;
     this.workspace.selectSite(siteId);
     void this.router.navigate(["/etablissements", siteId]);
   }
 
   openProgram(programId: string): void {
-    const accessibleSite = this.workspace
-      .sites()
-      .find((site) =>
-        PROGRAM_OFFERINGS.some(
-          (offering) =>
-            offering.siteId === site.id &&
-            offering.programId === programId &&
-            offering.active,
-        ),
-      );
+    if (!programId) return;
+    const accessibleSite = this.workspace.sites().find((site) =>
+      this.workspace.sitePrograms(site.id).some((program) => program.id === programId),
+    );
     if (!accessibleSite) return;
     this.workspace.selectSite(accessibleSite.id);
     this.workspace.selectProgram(programId);
@@ -91,6 +51,6 @@ export class OrganizationDashboardComponent {
   }
 
   number(value: number): string {
-    return new Intl.NumberFormat("fr-FR").format(value);
+    return new Intl.NumberFormat("fr-FR").format(Number.isFinite(value) ? value : 0);
   }
 }

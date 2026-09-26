@@ -2,12 +2,22 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
-import type { RemoteWorkRequestApi } from "./workforce.models";
+import type {
+  CreateRemoteWorkRequestApi,
+  RemoteWorkPolicyApi,
+  RemoteWorkRequestApi,
+} from "./workforce.models";
 
 @Injectable({ providedIn: "root" })
 export class WorkforceApiService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiBaseUrl}/api/v1/workforce/remote-work`;
+
+  policy(): Promise<RemoteWorkPolicyApi> {
+    return firstValueFrom(
+      this.http.get<RemoteWorkPolicyApi>(`${this.base}/policy`),
+    );
+  }
 
   list(siteId?: string, mineOnly = false): Promise<RemoteWorkRequestApi[]> {
     let params = new HttpParams().set("mineOnly", mineOnly);
@@ -17,7 +27,7 @@ export class WorkforceApiService {
     );
   }
 
-  create(payload: unknown): Promise<RemoteWorkRequestApi> {
+  create(payload: CreateRemoteWorkRequestApi): Promise<RemoteWorkRequestApi> {
     return firstValueFrom(
       this.http.post<RemoteWorkRequestApi>(this.base, payload),
     );

@@ -5,13 +5,14 @@ import {
   inject,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { CertificationApiStoreService } from "../../core/api-data/certification-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { SessionService } from "../../core/session/session.service";
 import type {
   CertificationCandidate,
   CertificationUnitStatus,
 } from "../../core/models/certification.models";
-import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { SessionService } from "../../core/session/session.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
 @Component({
@@ -22,37 +23,35 @@ import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 })
 export class CertificationComponent {
   readonly sessionService = inject(SessionService);
-  readonly contextData = inject(ContextualTrainingDataService);
+  readonly store = inject(CertificationApiStoreService);
+  readonly workspace = inject(WorkspaceContextService);
 
   readonly role = computed(() => this.sessionService.role());
-  readonly scheme = this.contextData.certificationScheme;
-  readonly juryMembers = this.contextData.juryMembers;
-  readonly program = this.contextData.program;
-  readonly readyCount = computed(
-    () =>
-      this.contextData.certificationCandidates().filter((item) => item.ready)
-        .length,
+  readonly scheme = this.store.scheme;
+  readonly juryMembers = this.store.juryMembers;
+  readonly program = this.workspace.program;
+  readonly readyCount = computed(() =>
+    this.store.candidates().filter((item) => item.ready).length,
   );
   readonly completionRate = computed(() => {
-    const candidates = this.contextData.certificationCandidates();
-    return Math.round(
-      (this.readyCount() / Math.max(candidates.length, 1)) * 100,
-    );
+    const candidates = this.store.candidates();
+    return Math.round((this.readyCount() / Math.max(candidates.length, 1)) * 100);
   });
   readonly currentCandidate = computed(() => {
-    const candidates = this.contextData.certificationCandidates();
-    const studentId = this.sessionService.session()?.studentId;
-    return (
-      candidates.find((item) => item.studentId === studentId) ?? candidates[0]
-    );
+    const candidates = this.store.candidates();
+    const selfEnrollmentId = this.store.selfEnrollmentId();
+    return candidates.find((item) => {
+      const raw = this.store.rawCandidate(item.id);
+      return raw?.enrollmentId === selfEnrollmentId;
+    }) ?? candidates[0] ?? null;
   });
 
   get examSession() {
-    return this.contextData.examSession();
+    return this.store.examSession();
   }
 
   get candidates() {
-    return this.contextData.certificationCandidates();
+    return this.store.candidates();
   }
 
   isManagement(): boolean {
@@ -68,26 +67,15 @@ export class CertificationComponent {
   }
 
   initials(item: { firstName: string; lastName: string }): string {
-    return `${item.firstName[0] ?? ""}${item.lastName[0] ?? ""}`.toUpperCase();
+    return `${item.firstName?.[0] ?? ""}${item.lastName?.[0] ?? ""}`.toUpperCase();
   }
 
   readinessClasses(ready: boolean): string {
-    return ready
-      ? "bg-[#d8f8df] text-[#18a547]"
-      : "bg-[#fff0c9] text-[#8b5e00]";
+    return ready ? "bg-[#d8f8df] text-[#18a547]" : "bg-[#fff0c9] text-[#8b5e00]";
   }
 
-  unitStatus(
-    candidate: CertificationCandidate,
-    unitId: string,
-  ): CertificationUnitStatus {
-    const explicit = candidate.unitStatuses?.find(
-      (item) => item.unitId === unitId,
-    )?.status;
-    if (explicit) return explicit;
-    if (unitId === "ccp1") return candidate.ccp1;
-    if (unitId === "ccp2") return candidate.ccp2;
-    return candidate.ready ? "validated" : "pending";
+  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
+    return candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status ?? "pending";
   }
 
   unitClasses(status: CertificationUnitStatus): string {

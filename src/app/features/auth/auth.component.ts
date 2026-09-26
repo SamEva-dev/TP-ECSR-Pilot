@@ -18,6 +18,7 @@ import { TranslateService } from "../../core/i18n/translate.service";
 import type { UserRole } from "../../core/models/app.models";
 import {
   AuthGateService,
+  type AuthGateLoginResponse,
   type AuthGateRegistrationResponse,
 } from "../../core/session/auth-gate.service";
 import { AuthTokenStore } from "../../core/session/auth-token.store";
@@ -52,13 +53,15 @@ export class AuthComponent {
   );
   readonly isRegister = computed(() => this.mode() === "register");
 
-  readonly loginStep = signal<"email" | "password">("email");
+  readonly loginStep = signal<"email" | "password" | "mfa" | "password-change">("email");
   readonly loading = signal(false);
   readonly message = signal("");
   readonly error = signal("");
   readonly showPassword = signal(false);
   readonly showConfirmPassword = signal(false);
   readonly submitted = signal(false);
+  private pendingMfaToken = "";
+  private pendingCurrentPassword = "";
 
   readonly demoProfiles: readonly DemoProfile[] = [
     {
@@ -232,8 +235,9 @@ export class AuthComponent {
     }
 
     const email = emailControl.value.trim().toLowerCase();
+    const step = this.loginStep();
 
-    if (this.loginStep() === "email") {
+    if (step === "email") {
       this.loading.set(true);
       try {
         const result = await firstValueFrom(this.authGate.prelogin(email));
@@ -266,43 +270,116 @@ export class AuthComponent {
       return;
     }
 
-    if (this.loginForm.controls.password.invalid) {
-      this.loginForm.controls.password.markAsTouched();
+    const passwordControl = this.loginForm.controls.password;
+    if (passwordControl.invalid) {
+      passwordControl.markAsTouched();
       return;
     }
 
     this.loading.set(true);
     try {
+      if (step === "mfa") {
+        const code = passwordControl.value.trim();
+        if (!/^\d{6}$/.test(code) || !this.pendingMfaToken) {
+          this.error.set(this.translate.instant("auth.errors.invalidMfaCode"));
+          return;
+        }
+
+        const result = await firstValueFrom(
+          this.authGate.verifyMfa(
+            {
+              mfaToken: this.pendingMfaToken,
+              code,
+              rememberDevice: this.loginForm.controls.rememberMe.value,
+              deviceFingerprint: this.deviceFingerprint(),
+            },
+            this.loginForm.controls.rememberMe.value,
+          ),
+        );
+        await this.handleAuthenticatedLogin(result, this.pendingCurrentPassword);
+        return;
+      }
+
+      if (step === "password-change") {
+        const newPassword = passwordControl.value;
+        if (newPassword.length < 8 || !this.pendingCurrentPassword) {
+          this.error.set(this.translate.instant("auth.errors.passwordTooShort"));
+          return;
+        }
+
+        const result = await firstValueFrom(
+          this.authGate.changePassword(
+            this.pendingCurrentPassword,
+            newPassword,
+            this.loginForm.controls.rememberMe.value,
+          ),
+        );
+        this.pendingCurrentPassword = "";
+        this.pendingMfaToken = "";
+        this.session.connectAuthenticatedToken(result.accessToken);
+        await this.router.navigateByUrl(
+          this.session.role() === "jury" ? "/jury" : "/accueil",
+        );
+        return;
+      }
+
+      const currentPassword = passwordControl.value;
       const result = await firstValueFrom(
         this.authGate.login({
           email,
-          password: this.loginForm.controls.password.value,
+          password: currentPassword,
           rememberMe: this.loginForm.controls.rememberMe.value,
           deviceFingerprint: this.deviceFingerprint(),
         }),
       );
 
       if (result.requiresMfa) {
-        this.error.set(
-          this.translate.instant("auth.errors.mfaNotYetSupported"),
-        );
+        this.pendingMfaToken = result.mfaToken ?? "";
+        this.pendingCurrentPassword = currentPassword;
+        if (!this.pendingMfaToken) {
+          this.error.set(this.translate.instant("auth.errors.loginFailed"));
+          return;
+        }
+        passwordControl.reset();
+        this.loginStep.set("mfa");
+        this.message.set(this.translate.instant("auth.mfaPrompt"));
+        this.submitted.set(false);
         return;
       }
 
-      if (!result.accessToken) {
-        this.error.set(this.translate.instant("auth.errors.loginFailed"));
-        return;
-      }
-
-      this.session.connectAuthenticatedToken(result.accessToken);
-      await this.router.navigateByUrl(
-        this.session.role() === "jury" ? "/jury" : "/accueil",
-      );
+      await this.handleAuthenticatedLogin(result, currentPassword);
     } catch (e) {
       this.error.set(this.backendMessage(e));
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private async handleAuthenticatedLogin(
+    result: AuthGateLoginResponse,
+    currentPassword: string,
+  ): Promise<void> {
+    if (!result.accessToken) {
+      this.error.set(this.translate.instant("auth.errors.loginFailed"));
+      return;
+    }
+
+    if (result.passwordChangeRequired) {
+      this.pendingCurrentPassword = currentPassword;
+      this.pendingMfaToken = "";
+      this.loginForm.controls.password.reset();
+      this.loginStep.set("password-change");
+      this.message.set(this.translate.instant("auth.passwordChangePrompt"));
+      this.submitted.set(false);
+      return;
+    }
+
+    this.pendingCurrentPassword = "";
+    this.pendingMfaToken = "";
+    this.session.connectAuthenticatedToken(result.accessToken);
+    await this.router.navigateByUrl(
+      this.session.role() === "jury" ? "/jury" : "/accueil",
+    );
   }
 
   async submitRegister(): Promise<void> {
@@ -374,7 +451,12 @@ export class AuthComponent {
   changeLoginEmail(): void {
     this.loginStep.set("email");
     this.loginForm.controls.password.reset();
+    this.pendingMfaToken = "";
+    this.pendingCurrentPassword = "";
+    this.authGate.logout();
+    this.session.disconnect();
     this.error.set("");
+    this.message.set("");
   }
 
   togglePassword(): void {

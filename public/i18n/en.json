@@ -43,7 +43,10 @@
       "invalidCredentials": "Invalid email address or password.",
       "loginFailed": "Sign-in could not be completed.",
       "technical": "The authentication service is temporarily unavailable.",
-      "mfaNotYetSupported": "This account requires MFA validation. The Pedagora Pilot MFA screen will be connected in the next step."
+      "mfaNotYetSupported": "This account requires MFA validation. The Pedagora Pilot MFA screen will be connected in the next step.",
+      "invalidMfaCode": "Enter a 6-digit verification code.",
+      "passwordTooShort": "The new password must contain at least 8 characters.",
+      "logoutFailed": "The remote session could not be revoked. The local session was closed."
     },
     "demo": {
       "title": "Sign in",
@@ -79,7 +82,17 @@
     "rememberMe": "Keep me signed in",
     "registrationReady": "Your organisation has been created. Welcome to Pedagora Pilot.",
     "applicationAdded": "Pedagora Pilot has been added to your existing account.",
-    "registrationPending": "Your registration has been recorded. Complete account verification to continue."
+    "registrationPending": "Your registration has been recorded. Complete account verification to continue.",
+    "demoCredentialsEditable": "Demo credentials can be edited before signing in.",
+    "demoSubtitle": "Choose a demo profile, then sign in through AuthGate.",
+    "demoTitle": "Demo sign-in",
+    "togglePassword": "Show or hide password",
+    "mfaCode": "Verification code",
+    "verifyMfa": "Verify code",
+    "mfaPrompt": "Enter the 6-digit code from your authenticator app.",
+    "newPassword": "New password",
+    "changePassword": "Update password",
+    "passwordChangePrompt": "You must change your password before continuing."
   },
   "home": {
     "greeting": "Hello {{name}}",
@@ -130,6 +143,16 @@
         "internship": {
           "title": "1 internship agreement to sign",
           "detail": "Drive Académie — Thomas Roussel"
+        },
+        "real": {
+          "catchup": {
+            "title": "{{count}} learner(s) have more than 10 hours to catch up",
+            "detail": "{{names}}"
+          },
+          "open": {
+            "title": "{{count}} open alert(s)",
+            "detail": "Open the relevant modules to review and resolve these alerts."
+          }
         }
       },
       "watch": {
@@ -233,8 +256,8 @@
     "placeholderBody": "Your organization data is being loaded.",
     "real": {
       "selectedCohort": "Selected cohort: {{name}}",
-      "loading": "Loading data…",
-      "noCohort": "No cohort selected. Select a cohort in your workspace.",
+      "loading": "Loading home page…",
+      "noCohort": "Select a cohort to view its data.",
       "failed": "Unable to load this data. Refresh the page and try again.",
       "certificationObtained": "Certifications obtained",
       "hoursProgress": "Training hours delivered",
@@ -245,7 +268,31 @@
       "noSessions": "No sessions are assigned to you today for this cohort.",
       "studentSubtitle": "Your training progress",
       "workspaceFailed": "Unable to load your workspace. Refresh the page and try again.",
-      "noDashboard": "No dashboard is available for this role."
+      "noDashboard": "No dashboard is available for this role.",
+      "loadError": "Some home page data could not be loaded. Please try again.",
+      "retry": "Try again",
+      "exportCohort": "Export enrollments (CSV)",
+      "exportError": "Unable to export. Check your permissions and try again.",
+      "upcoming": "Upcoming sessions",
+      "emptySessions": "No upcoming sessions.",
+      "emptyLearners": "No learners enrolled in this cohort.",
+      "emptyObservations": "No observations recorded.",
+      "enrollment": "Enrollment",
+      "open": "Record",
+      "competencies": "Competencies acquired",
+      "nextSessions": "Upcoming sessions",
+      "actions": "Trainer actions",
+      "juryHome": "Open your jury area to view sessions and candidate records.",
+      "openJury": "Open jury area"
+    },
+    "api": {
+      "loadFailed": "Unable to load home data. Check your connection and try again.",
+      "learnersFailed": "Unable to load cohort learners.",
+      "sessionsFailed": "Unable to load cohort sessions.",
+      "metricsFailed": "Unable to load cohort indicators.",
+      "observationsFailed": "Unable to load driving observations.",
+      "studentFailed": "Unable to load your learner progress.",
+      "timelineFailed": "Unable to load your learning history."
     }
   },
   "common": {
@@ -374,14 +421,17 @@
       "errors": {
         "required": "This field is required.",
         "email": "Enter a valid email address."
-      }
+      },
+      "created": "The learner was created."
     },
     "api": {
       "createFailed": "Enrollment was not saved. Check the details and try again.",
       "invalidContext": "Select a valid cohort before enrolling this student.",
       "refreshFailed": "Enrollment was saved, but the list could not be refreshed. Reload the page.",
       "conflict": "This student is already enrolled in the cohort, or capacity has been reached.",
-      "forbidden": "You cannot enroll this student in this organization."
+      "forbidden": "You cannot enroll this student in this organization.",
+      "loadFailed": "Unable to load students. Check your connection and permissions, then try again.",
+      "metricsFailed": "Learners were loaded, but their metrics could not be retrieved."
     },
     "enrollmentStatus": {
       "pending": "Pending",
@@ -471,7 +521,8 @@
       "created": "“{{title}}” has been added to the schedule.",
       "errors": {
         "required": "This field is required.",
-        "period": "End time must be after start time."
+        "period": "End time must be after start time.",
+        "weekday": "The session must be scheduled on a valid weekday."
       }
     },
     "workModes": {
@@ -627,7 +678,18 @@
       "createFailed": "The cohort was not saved. Check the code and dates, then try again.",
       "refreshFailed": "The cohort was saved, but the list could not be refreshed. Reload the page.",
       "conflict": "The code already exists or the program offering is unavailable.",
-      "forbidden": "You cannot create cohorts in this organization."
+      "forbidden": "You cannot create cohorts in this organization.",
+      "edit": "Edit",
+      "save": "Save changes",
+      "status": "Status",
+      "updated": "Cohort {{name}} was updated.",
+      "updateFailed": "Unable to save changes. Check the capacity and status, then retry.",
+      "referentialUnavailable": "Framework version unavailable",
+      "referentialsError": "Unable to load framework versions.",
+      "retry": "Try again",
+      "loading": "Loading cohorts…",
+      "loadFailed": "Unable to load cohorts.",
+      "metricsFailed": "Some cohort metrics could not be loaded. Unavailable values are displayed as 0."
     }
   },
   "sessions": {
@@ -779,7 +841,34 @@
       "save": "Save assessment",
       "close": "Close panel",
       "generalComment": "General comment",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "commentPlaceholder": "Add an overall comment…",
+      "contextTitle": "Evaluation context",
+      "date": "Date",
+      "decision": {
+        "rework": "Needs rework",
+        "subtitle": "Choose the decision that matches the presentation.",
+        "title": "Decision",
+        "validated": "Validated"
+      },
+      "evaluator": "Evaluator",
+      "gridSubtitle": "Evaluate each presentation criterion.",
+      "gridTitle": "Evaluation grid",
+      "improvements": "Areas for improvement",
+      "improvementsPlaceholder": "Describe areas for improvement…",
+      "nextObjective": "Next objective",
+      "nextObjectivePlaceholder": "Define the next learning objective…",
+      "positivePlaceholder": "Describe positive points…",
+      "positivePoints": "Positive points",
+      "saved": "Evaluation saved.",
+      "student": "Learner",
+      "subtitle": "Complete the grid, then confirm the decision.",
+      "summary": {
+        "acquired": "Acquired",
+        "inProgress": "In progress",
+        "review": "Review"
+      },
+      "synthesisTitle": "Summary"
     },
     "titles": {
       "verticalSigns": "Vertical road signs",
@@ -863,7 +952,8 @@
     "level": {
       "acquired": "Acquired",
       "in_progress": "In progress",
-      "rework": "To work on"
+      "rework": "To work on",
+      "not_assessed": "Not assessed"
     },
     "definitions": {
       "C1": {
@@ -1341,7 +1431,9 @@
       "evaluation": "Assessments",
       "course": "Course materials",
       "internship": "Internship agreements",
-      "student": "Student documents"
+      "student": "Student documents",
+      "certification": "Certification",
+      "other": "Other documents"
     },
     "details": {
       "title": "Document details",
@@ -1379,6 +1471,14 @@
       "interrogativeMethod": "Methodological material for preparing and delivering teaching sessions using the questioning method.",
       "internshipAssessment": "Teaching assessment of the workplace placement including completed activities, tutor observations and progress areas.",
       "generic": "Document managed by Pedagora Pilot."
+    },
+    "real": {
+      "loadError": "Unable to load documents. Check your access and try again.",
+      "uploadError": "Unable to upload the document. Check the file format and try again.",
+      "downloadError": "Unable to download the document.",
+      "replaceError": "Unable to replace the document. Check the file format and try again.",
+      "deleteError": "Unable to delete the document.",
+      "confirmDelete": "Delete this document? This action cannot be undone."
     }
   },
   "reports": {
@@ -1432,7 +1532,7 @@
       "catchupHours": "Catch-up hours",
       "averageProgress": "Average progress"
     },
-    "dynamicHint": "This view will be driven by backend business data. Report type selection is already implemented in the front end.",
+    "dynamicHint": "Summary calculated from the live data of the selected cohort.",
     "audit": {
       "title": "Change log",
       "subtitle": "Full traceability of data changes",
@@ -1457,6 +1557,11 @@
         "medicalCertificate": "Medical certificate.",
         "none": "—"
       }
+    },
+    "api": {
+      "loadFailed": "Could not load report data.",
+      "auditFailed": "Could not load the audit log.",
+      "exportFailed": "Could not export the report."
     }
   },
   "statistics": {
@@ -1473,82 +1578,109 @@
       "completedHours": "Completed hours",
       "catchupHours": "Catch-up hours"
     },
-    "promotionProgress": {
-      "title": "Progress by cohort",
-      "detail": "{{completed}} h completed out of {{planned}} h · attendance {{attendance}}% · {{catchup}} h catch-up"
-    },
-    "competencyAverage": {
-      "title": "Average level by competency"
-    },
-    "competencies": {
-      "c1": "Support a learner in learning to drive",
-      "c2": "Deliver theoretical training activities",
-      "c3": "Master driving and road safety",
-      "c4": "Raise awareness of road safety and risks"
-    },
-    "sheets": {
-      "title": "Sheets and presentations",
-      "subtitle": "325 validated sheets out of 870 expected",
-      "prepared": "Prepared",
-      "presented": "Presented",
-      "validated": "Validated",
-      "rework": "To rework"
-    },
-    "statuses": {
-      "title": "Status distribution",
-      "subtitle": "Training center student tracking",
-      "good": "Good progress",
-      "warning": "To monitor",
-      "late": "Behind",
-      "finished": "Completed"
-    },
-    "ranking": {
-      "title": "Progress ranking"
-    },
-    "trainer": {
-      "kpi": {
-        "averageProgress": "Average progress",
-        "sessions": "Sessions completed",
-        "students": "Students followed"
-      },
-      "studentsTitle": "My students’ progress",
-      "competenciesTitle": "Average level by competency",
-      "sheetsTitle": "Sheets and presentations assessed",
-      "followUpTitle": "Student situation",
-      "goodProgress": "students making good progress",
-      "watch": "student to monitor",
-      "late": "student behind"
-    },
-    "secretariat": {
-      "kpi": {
-        "toRegularize": "Items to regularize"
-      },
-      "promotionsTitle": "Attendance and hours by cohort",
-      "prioritiesTitle": "Administrative priorities",
-      "catchupShort": "catch-up",
-      "priorities": {
-        "catchup": "Catch-up hours",
-        "absence": "Absences to regularize"
-      }
-    },
     "student": {
-      "kpi": {
-        "progress": "Overall progress"
-      },
       "competenciesTitle": "My progress by competency",
       "sheetsTitle": "My sheets and presentations",
+      "kpi": {
+        "progress": "My progress"
+      },
       "hoursTitle": "My hours breakdown",
       "attendanceTitle": "My attendance",
       "hours": {
-        "classroom": "Classroom",
+        "classroom": "Classroom / theory",
         "driving": "Driving",
-        "internship": "Internship"
+        "internship": "Work placement"
       },
       "attendance": {
         "present": "Attendance",
         "late": "Late arrivals",
         "absent": "Absences",
         "excused": "Excused absences"
+      }
+    },
+    "real": {
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "loadingWorkspace": "Loading workspace…",
+      "workspaceError": "Could not load the training workspace.",
+      "loading": "Loading server statistics…",
+      "partialError": "Some statistics are unavailable.",
+      "personalOnly": "Your personal results, available only to your account.",
+      "validatedTopics": "Validated topics",
+      "acquiredCompetencies": "Acquired competencies",
+      "topicProgress": "Topic completion",
+      "noTopics": "No topics available.",
+      "noCompetencies": "No competencies available.",
+      "noProfile": "No learner record associated with this account.",
+      "noScore": "Not assessed",
+      "selectedCohort": "Selected cohort",
+      "noSelection": "Nothing selected",
+      "noCohortData": "No indicators available for this cohort.",
+      "competencyProgress": "Average competency progress",
+      "certified": "Certifications obtained",
+      "plannedHours": "Planned hours",
+      "attendanceTrend": "Attendance trend",
+      "lastThirtyDays": "Over the last 30 days when attendance was recorded.",
+      "noTrend": "No attendance recorded during this period.",
+      "siteCohorts": "Cohorts at the selected site",
+      "enrollments": "enrollments"
+    },
+    "promotionProgress": {
+      "title": "Progress by cohort",
+      "detail": "{{completed}} h completed / {{planned}} h planned · {{attendance}}% attendance · {{catchup}} h catch-up"
+    },
+    "competencyAverage": {
+      "title": "Average by competency"
+    },
+    "sheets": {
+      "title": "Teaching topics",
+      "subtitle": "Tracking prepared, presented and validated topics",
+      "prepared": "Prepared",
+      "presented": "Presented",
+      "validated": "Validated",
+      "rework": "To rework"
+    },
+    "statuses": {
+      "title": "Learner status",
+      "subtitle": "Distribution by current follow-up status",
+      "good": "On track",
+      "warning": "Watch",
+      "late": "Behind",
+      "finished": "Completed"
+    },
+    "ranking": {
+      "title": "Progress ranking"
+    },
+    "competencies": {
+      "c1": "Build and prepare an individual or group lesson scenario",
+      "c2": "Lead a group road-safety training session",
+      "c3": "Lead an individual or group in-vehicle session",
+      "c4": "Assess learning and support progress"
+    },
+    "trainer": {
+      "kpi": {
+        "averageProgress": "Average progress",
+        "sessions": "Sessions",
+        "students": "Learners"
+      },
+      "studentsTitle": "My learners’ progress",
+      "competenciesTitle": "Average progress by competency",
+      "sheetsTitle": "Topics followed",
+      "followUpTitle": "Learner follow-up",
+      "goodProgress": "learners on track",
+      "watch": "learner to watch",
+      "late": "learner behind"
+    },
+    "secretariat": {
+      "kpi": {
+        "toRegularize": "To regularize"
+      },
+      "promotionsTitle": "Attendance by cohort",
+      "prioritiesTitle": "Administrative priorities",
+      "catchupShort": "catch-up",
+      "priorities": {
+        "catchup": "Catch-up hours",
+        "absence": "Absences to regularize"
       }
     }
   },
@@ -1709,6 +1841,15 @@
       "forbidden": "You cannot manage these accounts.",
       "lastAdmin": "The last organization administrator cannot be removed.",
       "unavailable": "Could not load accounts."
+    },
+    "api": {
+      "loadError": "Unable to load PedagoraPilot accounts and access settings.",
+      "updateError": "Unable to update this account access status.",
+      "deleteError": "Unable to revoke this access.",
+      "permissionError": "Unable to save this permission.",
+      "assignmentError": "Unable to save this assignment.",
+      "inviteError": "Unable to send this invitation.",
+      "pendingActionError": "This action will be available after the invitation is accepted."
     }
   },
   "administration": {
@@ -1992,6 +2133,10 @@
         "cancelled": "Cancelled",
         "inProgress": "In progress"
       }
+    },
+    "api": {
+      "loadFailed": "Unable to load the learner record.",
+      "documentDownloadFailed": "Unable to download the document."
     }
   },
   "sheetConfig": {
@@ -2075,6 +2220,11 @@
       "defaultObjective": "Be able to present the topic “{{title}}”, explain its road-safety implications and involve learners.",
       "defaultExample": "Prepare a structured presentation on “{{title}}”. Start with a concrete situation or hook question, explore the group’s prior ideas, then develop the useful knowledge before a final review.",
       "defaultCorrection": "Suggested correction outline for “{{title}}”:\n\n1. Hook: start from a concrete situation and question the group.\n2. Objectives: clearly state 2 to 3 observable objectives.\n3. Development: definitions, regulations, risks, behaviours and practical examples.\n4. Questioning method: alternate open and closed questions to involve learners.\n5. RIP: identify risks, influences and pressures related to the topic.\n6. Review: check learning with a few questions and announce a possible follow-up.\n7. References: cite the legal and pedagogical sources used."
+    },
+    "api": {
+      "loadError": "Unable to load the pedagogical sheet catalogue.",
+      "saveError": "Unable to save the pedagogical sheet.",
+      "deleteError": "Unable to delete the pedagogical sheet."
     },
     "delete": {
       "title": "Delete this sheet?",
@@ -2299,6 +2449,11 @@
         "vehiclePreparation": "Vehicle preparation",
         "passengerSafety": "Passenger safety and care"
       }
+    },
+    "api": {
+      "loadFailed": "Unable to load certification data.",
+      "candidatesLoadFailed": "Unable to load certification candidates.",
+      "saveFailed": "Unable to save the certification assessment."
     }
   },
   "jury": {
@@ -2327,7 +2482,7 @@
     "back": "Certification",
     "publish": "Publish results",
     "published": "Results published",
-    "publishSuccess": "Results are now marked as published in this prototype.",
+    "publishSuccess": "The results were published successfully.",
     "kpi": {
       "candidates": "Candidates",
       "obtained": "Title obtained",
@@ -2350,7 +2505,12 @@
       "published": "Published",
       "draft": "Draft"
     },
-    "multiTableSubtitle": "Decisions and validation units based on scheme {{scheme}}."
+    "multiTableSubtitle": "Decisions and validation units based on scheme {{scheme}}.",
+    "api": {
+      "publishFailed": "Unable to publish the certification results.",
+      "exportFailed": "Unable to export the certification results.",
+      "loadFailed": "Unable to load the certification results."
+    }
   },
   "success": {
     "title": "Success rates",
@@ -2424,6 +2584,10 @@
       "units": "Units / blocks",
       "noResults": "No certification results are available for this scope.",
       "noCandidates": "No candidate matches this filter."
+    },
+    "api": {
+      "loadFailed": "Unable to load certification results.",
+      "exportFailed": "Unable to generate the results export."
     }
   },
   "workspace": {
@@ -2439,26 +2603,28 @@
       "site": "Site",
       "program": "Training",
       "cohort": "Cohort"
+    },
+    "api": {
+      "partialLoadFailed": "Some workspace data could not be loaded.",
+      "loadFailed": "The workspace context could not be loaded."
     }
   },
   "organizationDashboard": {
     "badge": "Organization overview",
     "subtitle": "Consolidated view of your sites, training programs and performance.",
-    "period": "2026–2027 academic year",
-    "openStatistics": "Open statistics",
     "kpis": {
       "sites": "Sites",
       "programs": "Active programs",
       "students": "Students",
-      "trainers": "Trainers",
       "cohorts": "Active cohorts",
-      "success": "Overall success"
+      "trainers": "Trainers",
+      "success": "Certification success"
     },
     "sites": {
       "title": "Site performance",
-      "subtitle": "Consolidated view by site. Click a site to switch the active context.",
-      "hint": "Click a site",
-      "students": "Students",
+      "subtitle": "Consolidated indicators by site",
+      "hint": "Click to open",
+      "students": "Learners",
       "trainers": "Trainers",
       "attendance": "Attendance",
       "success": "Success",
@@ -2467,85 +2633,62 @@
       "alerts": "alerts"
     },
     "global": {
-      "title": "Global overview",
+      "attendance": "Attendance",
+      "title": "Organization overview",
       "subtitle": "Consolidated organization indicators",
-      "attendance": "Attendance rate",
-      "success": "Success rate",
+      "success": "Success",
       "hours": "Completed hours",
-      "context": "Active operational context",
-      "contextHelp": "The organization dashboard stays consolidated. The active context is used when you open operational screens."
+      "context": "Active context",
+      "contextHelp": "Displayed indicators respect the scope you are allowed to access."
     },
     "programs": {
-      "title": "Performance by program",
-      "subtitle": "Enrollment, attendance and success across all sites.",
       "program": "Program",
-      "students": "Students",
+      "open": "Open",
+      "title": "Performance by program",
+      "subtitle": "Aggregated indicators for accessible cohorts",
+      "students": "Learners",
       "cohorts": "Cohorts",
       "attendance": "Attendance",
-      "success": "Success",
-      "open": "Open"
+      "success": "Success"
     },
-    "alerts": {
-      "title": "Network alerts",
-      "subtitle": "Items requiring attention at organization level",
-      "catchup": {
-        "title": "7 students have more than 10 catch-up hours",
-        "detail": "Mostly in Marseille and Nice. Review catch-up plans."
-      },
-      "documents": {
-        "title": "5 administrative files are incomplete",
-        "detail": "Missing documents before the next internship periods."
-      },
-      "certification": {
-        "title": "2 certification sessions need finalization",
-        "detail": "Jury assignment or candidate files are still incomplete."
-      },
-      "capacity": {
-        "title": "Nice is nearing capacity",
-        "detail": "The January heavy-vehicle cohort is close to its maximum capacity."
-      },
-      "ecf": {
-        "title": "2 cohorts require review",
-        "detail": "Attendance and administrative documents need regularization."
-      },
-      "horizon": {
-        "title": "One certification needs preparation",
-        "detail": "The session file must be finalized before publication."
+    "real": {
+      "noOrganization": "No organization selected",
+      "refresh": "Refresh",
+      "loading": "Loading server data…",
+      "error": "Could not load the indicators. Please try again.",
+      "progress": "Average progress",
+      "certification": "Certification success",
+      "sitesSubtitle": "Indicators for the sites you can access.",
+      "siteError": "Some site indicators are unavailable.",
+      "siteUnavailable": "Indicators unavailable",
+      "noSites": "No accessible sites.",
+      "programsTitle": "Programs at the selected site",
+      "programsSubtitle": "Accessible programs for:",
+      "code": "Code",
+      "action": "Action",
+      "noPrograms": "No accessible programs at this site.",
+      "alerts": {
+        "open": {
+          "title": "Open alerts",
+          "detail": "There are open alerts in this organization. Open the relevant modules to resolve them."
+        }
       }
+    },
+    "openStatistics": "Open statistics",
+    "api": {
+      "loadFailed": "Unable to load organization indicators.",
+      "sessionsFailed": "Unable to load organization sessions.",
+      "activityFailed": "Unable to load recent organization activity.",
+      "detailsFailed": "Some site or cohort indicators could not be loaded."
+    },
+    "period": "Current view",
+    "alerts": {
+      "title": "Alerts",
+      "subtitle": "Items requiring attention"
     },
     "activity": {
       "title": "Recent activity",
-      "subtitle": "Important events reported by sites",
-      "item1": {
-        "title": "New cohort created",
-        "detail": "AFTRAL Nice · Heavy vehicle · January 2027",
-        "when": "Today"
-      },
-      "item2": {
-        "title": "Certification session updated",
-        "detail": "TP ECSR · Nice · 18 candidates",
-        "when": "2 hours ago"
-      },
-      "item3": {
-        "title": "New trainer assignment",
-        "detail": "Marc Dupont is now assigned to Motorcycle · Nice",
-        "when": "Yesterday"
-      },
-      "item4": {
-        "title": "Site updated",
-        "detail": "AFTRAL Marseille · training settings updated",
-        "when": "Yesterday"
-      },
-      "ecf": {
-        "title": "New cohort created",
-        "detail": "ECF Nice · TP ECSR 2026–2027",
-        "when": "Today"
-      },
-      "horizon": {
-        "title": "Certification scheduled",
-        "detail": "Horizon Nice · next session prepared",
-        "when": "Today"
-      }
+      "subtitle": "Latest actions recorded in the organization"
     }
   },
   "sites": {
@@ -2553,7 +2696,7 @@
     "title": "Sites",
     "subtitle": "Manage {{organization}} sites and their local performance.",
     "add": "Add a site",
-    "search": "Search by site, city or manager…",
+    "search": "Search a site or city…",
     "edit": "Edit site",
     "open": "Open",
     "kpis": {
@@ -2649,7 +2792,7 @@
         }
       },
       "cohorts": {
-        "title": "Cohorts & sessions",
+        "title": "Cohorts",
         "subtitle": "Cohorts linked to this site programs",
         "name": "Cohort",
         "program": "Program",
@@ -2659,13 +2802,28 @@
         "statuses": {
           "planned": "Planned",
           "active": "Active",
-          "completed": "Completed"
+          "completed": "Completed",
+          "draft": "Draft",
+          "cancelled": "Cancelled"
         }
       },
       "notFound": {
         "title": "Site not found",
-        "subtitle": "This site does not exist in the demo data or is no longer available."
+        "subtitle": "This site is unavailable or inaccessible."
       }
+    },
+    "real": {
+      "loading": "Loading sites…",
+      "refreshing": "Updating indicators…",
+      "metricsError": "Some indicators are unavailable.",
+      "saveError": "Save rejected or unavailable. Check the information and try again.",
+      "saving": "Saving…",
+      "required": "Complete the required fields and respect the maximum lengths.",
+      "empty": "No accessible sites.",
+      "noPrograms": "No accessible programs at this site.",
+      "noCohorts": "No accessible cohorts at this site.",
+      "workspaceError": "Could not load the sites.",
+      "retry": "Retry"
     }
   },
   "programs": {
@@ -2690,7 +2848,9 @@
       "teacher": "Driving instruction",
       "motorcycle": "Motorcycle",
       "heavyVehicle": "Heavy vehicle",
-      "passengerTransport": "Passenger transport"
+      "passengerTransport": "Passenger transport",
+      "ambulance": "Ambulance",
+      "firstAid": "First aid"
     },
     "status": {
       "active": "Active",
@@ -2767,16 +2927,18 @@
         "period": "Period",
         "students": "Students",
         "status": "Status",
-        "empty": "No demo cohort for this program.",
+        "empty": "No cohorts attached to this program.",
         "statuses": {
           "planned": "Planned",
           "active": "Active",
-          "completed": "Completed"
+          "completed": "Completed",
+          "draft": "Draft",
+          "cancelled": "Cancelled"
         }
       },
       "notFound": {
         "title": "Program not found",
-        "subtitle": "This program does not exist in the demo data."
+        "subtitle": "This program is unavailable or inaccessible."
       }
     },
     "demo": {
@@ -2784,6 +2946,27 @@
       "motoDescription": "Training path dedicated to two-wheel instruction with training-yard, road, skills and certification tracking.",
       "plDescription": "Heavy-vehicle training with driving sessions, training-yard work, skills tracking, internships and final assessment.",
       "busDescription": "Passenger-transport training combining driving, training-yard practice, professional skills, internships and certification."
+    },
+    "real": {
+      "workspaceLoading": "Loading workspace…",
+      "loading": "Loading programs…",
+      "loadError": "Could not load programs.",
+      "retry": "Retry",
+      "saveError": "Save rejected or unavailable. Check the information and try again.",
+      "saving": "Saving…",
+      "required": "Check required fields and select at least one module.",
+      "empty": "No programs available.",
+      "enrollments": "Cohort enrollments",
+      "noReferential": "No published referential",
+      "noModules": "No enabled modules.",
+      "sitesHelp": "Saved availability for accessible sites.",
+      "offeringError": "Could not change availability. An open cohort may prevent deactivation.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "noSites": "No accessible sites.",
+      "noCohorts": "No cohorts attached to this program.",
+      "notFound": "This program is unavailable or inaccessible.",
+      "workspaceError": "Could not load the program workspace."
     }
   },
   "referentials": {
@@ -2998,16 +3181,26 @@
     "versionDrawer": {
       "eyebrow": "New version",
       "title": "Create a framework version",
-      "subtitle": "Duplicate an existing version and adapt it without changing cohorts that are already in progress.",
+      "subtitle": "Create a new draft version using the selected version settings.",
       "program": "Program",
       "source": "Source version",
-      "sourceHint": "Competencies, hours, placements and assessments will be copied from this version.",
+      "sourceHint": "Training hours, sheets, required documents and modules are copied. Learning content is managed separately.",
       "version": "Version name",
       "code": "Code",
       "effectiveFrom": "Effective from",
       "status": "Initial status",
-      "info": "This action remains fully mocked in the front end. The new version is kept only for the current session.",
+      "info": "The version is saved as a draft in the database. Publish it from its details page.",
       "create": "Create version"
+    },
+    "api": {
+      "loading": "Loading frameworks…",
+      "loadError": "Unable to load frameworks.",
+      "retry": "Try again",
+      "saveError": "Unable to create this version. Check the details and your access, then retry.",
+      "publishError": "Unable to publish this version. Check your access and effective date.",
+      "publish": "Publish version",
+      "noModules": "No enabled modules.",
+      "certificationCode": "Certification code"
     }
   },
   "workspaceOperational": {
@@ -3240,9 +3433,33 @@
       "maxDays": "Maximum days per week",
       "maxDaysHint": "Indicative limit applied when requests are entered.",
       "save": "Save policy"
+    },
+    "api": {
+      "loadError": "Unable to load organization settings.",
+      "saveError": "Unable to save organization settings.",
+      "remoteWorkSaveError": "Unable to save the remote-work policy.",
+      "reportingError": "Unable to load the organization metrics.",
+      "auditError": "Unable to load the organization audit history."
     }
   },
   "remoteWork": {
+    "real": {
+      "loading": "Loading remote work requests…",
+      "loadError": "Unable to load requests. Check your connection and permissions.",
+      "actionError": "Unable to complete the action. Check the information and try again.",
+      "noSite": "Select a site to view requests.",
+      "emptyRequests": "No remote work requests for this site and these filters.",
+      "emptyActivities": "No activities planned for this day.",
+      "noRequest": "No request today",
+      "noRemoteDay": "No approved remote work",
+      "weekTitle": "Approved remote work this week",
+      "weekHint": "Only approved remote work requests are shown here.",
+      "monthlyApproved": "Approved days this month",
+      "dateRequired": "Enter a date.",
+      "tooLong": "Comment is too long (2,000 characters maximum).",
+      "saving": "Saving…",
+      "close": "Close panel"
+    },
     "title": "Remote work",
     "managerSubtitle": "Manage requests, attendance and remote work organization.",
     "employeeSubtitle": "Plan your remote days and track your activities.",
@@ -3280,7 +3497,8 @@
       "requested": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
-      "completed": "Completed"
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     },
     "periods": {
       "full-day": "Full day",
@@ -3538,6 +3756,12 @@
         "generic": "Remote theory module",
         "genericDescription": "Self-paced path made of resources, activities and assessment."
       }
+    },
+    "api": {
+      "loadFailed": "Unable to load distance-learning data.",
+      "createFailed": "Unable to save this distance-learning item.",
+      "attendanceFailed": "Unable to save distance-learning attendance.",
+      "progressFailed": "Unable to save module progress."
     }
   },
   "backendErrors": {
@@ -3555,7 +3779,17 @@
     "ORGANIZATION_NOT_FOUND": "The requested organization was not found.",
     "ORGANIZATION_CODE_INVALID": "The organization code is invalid.",
     "ORGANIZATION_OWNER_REQUIRED": "An organization owner is required.",
-    "ORGANIZATION_COUNTRY_CODE_INVALID": "The organization country code must contain two letters."
+    "ORGANIZATION_COUNTRY_CODE_INVALID": "The organization country code must contain two letters.",
+    "TOPIC_EVALUATION_PROGRESS_REQUIRED": "Topic progress is required to save its evaluation.",
+    "TOPIC_EVALUATION_CRITERION_CODE_REQUIRED": "The evaluation criterion code is required.",
+    "TOPIC_EVALUATION_CRITERION_CODE_INVALID": "The evaluation criterion code is invalid.",
+    "TOPIC_EVALUATION_CRITERIA_INVALID": "The topic evaluation grid is invalid.",
+    "DRIVING_SESSION_INVALID": "The selected driving session is not valid for this evaluation.",
+    "DRIVING_CRITERIA_INVALID": "The driving evaluation criteria are invalid.",
+    "SESSION_TRAINER_IDENTITY_INVALID": "The trainer identity associated with the session is invalid.",
+    "WORKPLACE_PERIOD_TYPE_INVALID": "The workplace period type is invalid.",
+    "WORKPLACE_DOCUMENT_REQUIRED": "The required document for this workplace period is mandatory.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -3655,6 +3889,8 @@
     "COMPETENCY_LEVEL_INVALID": "The competency level is invalid.",
     "COMPETENCY_REFERENTIAL_MISMATCH": "This competency does not belong to the learner cohort referential.",
     "PEDAGOGICAL_TOPIC_NOT_FOUND": "The requested pedagogical topic was not found.",
+    "PEDAGOGICAL_TOPIC_NUMBER_CONFLICT": "This sheet number is already used in this framework.",
+    "PEDAGOGICAL_TOPIC_IN_USE": "This sheet is already used in learner tracking and cannot be deleted.",
     "TOPIC_REFERENTIAL_VERSION_REQUIRED": "A referential version is required for the pedagogical topic.",
     "TOPIC_CODE_REQUIRED": "The pedagogical topic code is required.",
     "TOPIC_TITLE_REQUIRED": "The pedagogical topic title is required.",
@@ -3758,7 +3994,18 @@
     "REPORTING_NO_DATA": "No data is available for this report.",
     "REPORTING_FORBIDDEN": "You are not allowed to view this reporting data.",
     "AUDIT_ACTION_REQUIRED": "The audit action is required.",
-    "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required."
+    "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required.",
+    "PROGRAM_OFFERING_ACTIVE_COHORTS": "Cannot deactivate this offering while cohorts remain open.",
+    "TOPIC_EVALUATION_PROGRESS_REQUIRED": "Topic progress is required to save its evaluation.",
+    "TOPIC_EVALUATION_CRITERION_CODE_REQUIRED": "The evaluation criterion code is required.",
+    "TOPIC_EVALUATION_CRITERION_CODE_INVALID": "The evaluation criterion code is invalid.",
+    "TOPIC_EVALUATION_CRITERIA_INVALID": "The topic evaluation grid is invalid.",
+    "DRIVING_SESSION_INVALID": "The selected driving session is not valid for this evaluation.",
+    "DRIVING_CRITERIA_INVALID": "The driving evaluation criteria are invalid.",
+    "SESSION_TRAINER_IDENTITY_INVALID": "The trainer identity associated with the session is invalid.",
+    "WORKPLACE_PERIOD_TYPE_INVALID": "The workplace period type is invalid.",
+    "WORKPLACE_DOCUMENT_REQUIRED": "The required document for this workplace period is mandatory.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -3879,6 +4126,8 @@
     "COMPETENCY_LEVEL_INVALID": "The competency level is invalid.",
     "COMPETENCY_REFERENTIAL_MISMATCH": "This competency does not belong to the learner cohort referential.",
     "PEDAGOGICAL_TOPIC_NOT_FOUND": "The requested pedagogical topic was not found.",
+    "PEDAGOGICAL_TOPIC_NUMBER_CONFLICT": "This sheet number is already used in this framework.",
+    "PEDAGOGICAL_TOPIC_IN_USE": "This sheet is already used in learner tracking and cannot be deleted.",
     "TOPIC_REFERENTIAL_VERSION_REQUIRED": "A referential version is required for the pedagogical topic.",
     "TOPIC_CODE_REQUIRED": "The pedagogical topic code is required.",
     "TOPIC_TITLE_REQUIRED": "The pedagogical topic title is required.",
@@ -3982,7 +4231,9 @@
     "REPORTING_NO_DATA": "No data is available for this report.",
     "REPORTING_FORBIDDEN": "You are not allowed to view this reporting data.",
     "AUDIT_ACTION_REQUIRED": "The audit action is required.",
-    "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required."
+    "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required.",
+    "PROGRAM_OFFERING_ACTIVE_COHORTS": "Cannot deactivate this offering while cohorts remain open.",
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
   },
   "accessPolicy": {
     "readOnly": "Read-only access"

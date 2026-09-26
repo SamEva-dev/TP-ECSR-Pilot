@@ -1,26 +1,19 @@
-import { SiteApiStoreService } from "../../../core/api-data/site-api-store.service";
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
+import { SiteApiStoreService } from "../../../core/api-data/site-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-
-import {
-  SITE_ALERTS,
-  SITE_PROGRAM_METRICS,
-} from "../../../core/api-data/runtime-data.store";
 import type { SiteFormValue } from "../../../core/models/sites.models";
-import {
-  PROGRAM_OFFERINGS,
-  TRAINING_PROGRAMS,
-  WORKSPACE_COHORTS,
-} from "../../../core/api-data/runtime-data.store";
+import { ApplicationNotificationService } from "../../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "../site-drawer/site-drawer.component";
+
+interface SiteAlertViewModel {
+  id: string;
+  level: "danger" | "warning" | "info";
+  titleKey: string;
+  detailKey: string;
+}
 
 @Component({
   selector: "app-site-detail",
@@ -30,58 +23,60 @@ import { SiteDrawerComponent } from "../site-drawer/site-drawer.component";
 })
 export class SiteDetailComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly notifications = inject(ApplicationNotificationService);
   readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(SiteApiStoreService);
+  readonly programStore = inject(ProgramApiStoreService);
   readonly drawerOpen = signal(false);
   readonly siteId = this.route.snapshot.paramMap.get("id") ?? "";
   readonly site = computed(() => this.store.byId(this.siteId) ?? null);
-  readonly alerts = computed(() =>
-    SITE_ALERTS.filter((item) => item.siteId === this.siteId),
-  );
+  readonly alerts = computed<SiteAlertViewModel[]>(() => []);
 
   readonly programs = computed(() => {
-    const offeringProgramIds = PROGRAM_OFFERINGS.filter(
-      (offering) => offering.siteId === this.siteId && offering.active,
-    ).map((offering) => offering.programId);
-    return TRAINING_PROGRAMS.filter((program) =>
-      offeringProgramIds.includes(program.id),
-    ).map((program) => ({
-      ...program,
-      metric: SITE_PROGRAM_METRICS.find(
-        (metric) =>
-          metric.siteId === this.siteId && metric.programId === program.id,
-      ),
-    }));
+    const cohorts = this.workspace.siteCohorts(this.siteId);
+    return this.programStore.programs()
+      .filter((program) => program.siteIds.includes(this.siteId))
+      .map((program) => {
+        const programCohorts = cohorts.filter((cohort) => cohort.programId === program.id);
+        return {
+          ...program,
+          metric: {
+            students: programCohorts.reduce((sum, cohort) => sum + (cohort.studentCount ?? 0), 0),
+            trainers: 0,
+            activeCohorts: programCohorts.filter((cohort) => cohort.status === "active").length,
+            attendanceRate: 0,
+            successRate: 0,
+          },
+        };
+      });
   });
 
-  readonly cohorts = computed(() => {
-    const offeringIds = PROGRAM_OFFERINGS.filter(
-      (offering) => offering.siteId === this.siteId,
-    ).map((offering) => offering.id);
-    return WORKSPACE_COHORTS.filter((cohort) =>
-      offeringIds.includes(cohort.offeringId),
-    ).map((cohort) => {
-      const offering = PROGRAM_OFFERINGS.find(
-        (item) => item.id === cohort.offeringId,
-      );
-      const program = TRAINING_PROGRAMS.find(
-        (item) => item.id === offering?.programId,
-      );
-      return { ...cohort, programName: program?.name ?? "—" };
-    });
-  });
+  readonly cohorts = computed(() =>
+    this.workspace.siteCohorts(this.siteId).map((cohort) => ({
+      ...cohort,
+      programName: cohort.programName ?? "",
+      name: cohort.name ?? "",
+      shortName: cohort.shortName ?? "",
+      start: cohort.start ?? "",
+      end: cohort.end ?? "",
+      studentCount: cohort.studentCount ?? 0,
+    })),
+  );
 
   constructor() {
     queueMicrotask(() => this.workspace.selectSite(this.siteId));
+    effect(() => {
+      if (this.workspace.remoteWorkspaceError())
+        this.notifications.error("sites.real.workspaceError", `/etablissements/${this.siteId}`);
+    });
   }
 
   edit(): void {
     this.drawerOpen.set(true);
   }
 
-  save(value: SiteFormValue): void {
-    this.store.update(this.siteId, value);
-    this.drawerOpen.set(false);
+  async save(value: SiteFormValue): Promise<void> {
+    if (await this.store.update(this.siteId, value)) this.drawerOpen.set(false);
   }
 
   statusClass(status: string): string {

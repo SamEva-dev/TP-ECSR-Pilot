@@ -18,7 +18,7 @@ export interface DrivingHistoryItem {
   studentId: string;
   studentName: string;
   date: string;
-  competence: "C1" | "C2" | "C3" | "C4";
+  competence: string;
   trainer: string;
   subjectKey: string;
   positiveKey: string;

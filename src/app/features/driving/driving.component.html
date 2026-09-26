@@ -1,370 +1,136 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <header class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[29px] font-extrabold text-[#172033]">
-        {{ "drivingSession.title" | t }}
-      </h1>
-      <p class="text-[14px] text-[#6c788b]">
-        {{ "drivingSession.real.subtitle" | t }}
-      </p>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'drivingSession.title' | t }}</h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">{{ 'drivingSession.subtitle' | t }}</p>
     </div>
-    <button
-      type="button"
-      (click)="scrollToHistory()"
-      class="rounded-[11px] border border-[#dfe5ec] bg-white px-4 py-2 text-[13px] text-[#2b66a4]"
-    >
-      <i class="ph ph-clock-counter-clockwise"></i>
-      {{ "drivingSession.actions.history" | t }}
-    </button>
-  </header>
+    @if (canEdit()) {
+      <button type="button" (click)="save()" class="inline-flex h-[39px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm">
+        <i [class]="saved() ? 'ph ph-check-circle text-[17px]' : 'ph ph-steering-wheel text-[17px]'"></i>
+        {{ (saved() ? 'drivingSession.actions.saved' : 'drivingSession.actions.validate') | t }}
+      </button>
+    } @else {
+      <button type="button" (click)="scrollToHistory()" class="inline-flex h-[39px] items-center justify-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#2b66a4] shadow-sm">
+        <i class="ph ph-clock-counter-clockwise text-[17px]"></i>{{ 'drivingSession.actions.history' | t }}
+      </button>
+    }
+  </div>
 
-  @if (workspace.remoteWorkspaceError() || rosterError()) {
-    <p role="alert" class="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">
-      {{ "drivingSession.real.loadError" | t }}
-    </p>
-  } @else if (!workspace.remoteWorkspaceLoaded() || rosterLoading()) {
-    <p
-      role="status"
-      class="mt-5 rounded-xl bg-white p-4 text-sm text-[#6c788b]"
-    >
-      {{ "drivingSession.real.loading" | t }}
-    </p>
-  } @else {
-    <article
-      class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-    >
-      <label
-        for="driving-student"
-        class="block text-[12px] font-semibold text-[#334155]"
-        >{{ "drivingSession.information.student" | t }}</label
-      >
-      <select
-        id="driving-student"
-        [value]="selectedEnrollmentId()"
-        (change)="updateStudent($event)"
-        [disabled]="isStudent() || !students().length"
-        class="mt-2 h-10 w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-sm disabled:bg-[#f5f7fa]"
-      >
-        @if (!students().length) {
-          <option value="">{{ "drivingSession.real.noStudents" | t }}</option>
-        }
-        @for (student of students(); track student.enrollmentId) {
-          <option [value]="student.enrollmentId">
-            {{ student.firstName }} {{ student.lastName }}
-          </option>
-        }
-      </select>
+  <article class="mt-5 rounded-[17px] border border-[#bdd7ef] bg-[#e6f3ff] p-4 shadow-sm">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px] font-bold text-[#334155]">{{ (isStudent() ? 'drivingSession.lastSession.mine' : 'drivingSession.lastSession.student') | t }}</p>
+        <p class="mt-0.5 text-[12px] text-[#687589]">{{ latestHistory().date }} · {{ latestHistory().subjectKey | t }}</p>
+      </div>
+      <button type="button" (click)="scrollToHistory()" class="inline-flex h-[29px] shrink-0 items-center gap-1.5 rounded-full bg-[#2b66a4] px-3 text-[11px] font-semibold text-white"><i class="ph ph-clock-counter-clockwise text-[13px]"></i>{{ 'drivingSession.actions.history' | t }}</button>
+    </div>
+    <div class="mt-3 grid gap-2 text-[12px] lg:grid-cols-2">
+      <p><span class="font-semibold text-[#334155]">{{ 'drivingSession.lastSession.goalReached' | t }} :</span> {{ latestHistory().subjectKey | t }}</p>
+      <p><span class="font-semibold text-[#22a84b]">{{ 'common.positive' | t }} :</span> {{ latestHistory().positiveKey | t }}</p>
+      <p><span class="font-semibold text-[#ef2f2f]">{{ 'common.toWorkOn' | t }} :</span> {{ latestHistory().difficultyKey | t }}</p>
+      <p><span class="font-semibold text-[#2a64a2]">{{ 'common.nextGoal' | t }} :</span> {{ latestHistory().nextGoalKey | t }}</p>
+    </div>
+  </article>
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-[1.03fr_1fr]">
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <h2 class="text-[16px] font-bold">{{ 'drivingSession.information.title' | t }}</h2>
+
+      <div class="mt-4">
+        <label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.student' | t }}</label>
+        <select [value]="selectedStudentId()" (change)="updateStudent($event)" [disabled]="isStudent()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none disabled:cursor-not-allowed disabled:bg-[#f5f7fa] disabled:text-[#687589]">
+          @for (student of students; track student.id) {<option [value]="student.id">{{ student.name }}</option>}
+        </select>
+      </div>
+
+      <div class="mt-3 grid gap-3 sm:grid-cols-2">
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.trainer' | t }}</label>
+          <select [value]="selectedTrainerId()" (change)="updateTrainer($event)" [disabled]="isTrainer() || isStudent()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none disabled:cursor-not-allowed disabled:bg-[#f5f7fa] disabled:text-[#687589]">
+            @for (trainer of trainers; track trainer.id) {<option [value]="trainer.id">{{ trainer.name }}</option>}
+          </select>
+        </div>
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.vehicle' | t }}</label>
+          <select [value]="selectedVehicleId()" (change)="updateVehicle($event)" [disabled]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none disabled:cursor-not-allowed disabled:bg-[#f5f7fa] disabled:text-[#687589]">
+            @for (vehicle of vehicles; track vehicle.id) {<option [value]="vehicle.id">{{ vehicle.label }}</option>}
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="col-span-2 sm:col-span-1"><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.date' | t }}</label><input type="date" [value]="date()" (input)="updateText(date,$event)" [readonly]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none read-only:bg-[#f5f7fa]" /></div>
+        <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.start' | t }}</label><input type="time" [value]="start()" (input)="updateText(start,$event)" [readonly]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none read-only:bg-[#f5f7fa]" /></div>
+        <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.end' | t }}</label><input type="time" [value]="end()" (input)="updateText(end,$event)" [readonly]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none read-only:bg-[#f5f7fa]" /></div>
+        <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.duration' | t }}</label><input type="text" [value]="duration()" (input)="updateText(duration,$event)" [readonly]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none read-only:bg-[#f5f7fa]" /></div>
+      </div>
+
+      <div class="mt-4">
+        <p class="text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.competence' | t }}</p>
+        <div class="mt-2 flex flex-wrap gap-2">@for (competence of competencies; track competence.id) {<button type="button" (click)="selectCompetence(competence.id)" [disabled]="!canEdit()" [class]="selectedCompetence() === competence.id ? 'rounded-full bg-[#2b66a4] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-semibold text-[#334155] disabled:cursor-default'">{{ competence.id }}</button>}</div>
+        <p class="mt-2 text-[11px] text-[#718096]">{{ selectedCompetenceInfo().descriptionKey | t }}</p>
+      </div>
+
+      <div class="mt-4">
+        <p class="text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.subSkill' | t }}</p>
+        <div class="mt-2 flex flex-wrap gap-2">@for (skill of subSkills(); track skill.id) {<button type="button" (click)="selectSubSkill(skill.id)" [disabled]="!canEdit()" [class]="selectedSubSkill() === skill.id ? 'rounded-full bg-[#f6a51e] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-medium text-[#334155] disabled:cursor-default'">{{ skill.labelKey | t }}</button>}</div>
+      </div>
+
+      <div class="mt-4">
+        <label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.objective' | t }}</label>
+        <input type="text" [value]="objective() | t" (input)="updateText(objective,$event)" [readonly]="!canEdit()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none read-only:bg-[#f5f7fa]" />
+      </div>
     </article>
 
-    @if (selectedEnrollmentId()) {
-      @if (historyError()) {
-        <p
-          role="alert"
-          class="mt-4 rounded-xl bg-red-50 p-4 text-sm text-red-700"
-        >
-          {{ "drivingSession.real.historyError" | t }}
-        </p>
-      } @else if (historyLoading()) {
-        <p
-          role="status"
-          class="mt-4 rounded-xl bg-white p-4 text-sm text-[#6c788b]"
-        >
-          {{ "drivingSession.real.historyLoading" | t }}
-        </p>
-      } @else if (latestHistory(); as last) {
-        <article
-          class="mt-4 rounded-[17px] border border-[#bdd7ef] bg-[#e6f3ff] p-4"
-        >
-          <h2 class="text-[13px] font-bold text-[#334155]">
-            {{
-              (isStudent()
-                ? "drivingSession.lastSession.mine"
-                : "drivingSession.lastSession.student"
-              ) | t
-            }}
-          </h2>
-          <p class="mt-1 text-sm">
-            {{ formatDate(last.evaluatedAtUtc) }} · {{ last.subject }}
-          </p>
-          <p class="mt-2 text-xs text-[#334155]">
-            {{ "drivingSession.information.trainer" | t }} :
-            {{ last.trainerDisplayName }}
-          </p>
-        </article>
-      } @else {
-        <p class="mt-4 rounded-xl bg-[#e6f3ff] p-4 text-sm text-[#334155]">
-          {{ "drivingSession.real.noHistory" | t }}
-        </p>
-      }
-
-      @if (canEdit()) {
-        <div class="mt-4 grid gap-4 xl:grid-cols-2">
-          <article
-            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-          >
-            <h2 class="text-[16px] font-bold">
-              {{ "drivingSession.information.title" | t }}
-            </h2>
-            <label
-              for="driving-session"
-              class="mt-4 block text-[12px] font-semibold text-[#334155]"
-              >{{ "drivingSession.real.linkedSession" | t }}</label
-            >
-            <select
-              id="driving-session"
-              [value]="selectedSessionId()"
-              (change)="updateSession($event)"
-              class="mt-2 h-10 w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-sm"
-            >
-              <option value="">
-                {{ "drivingSession.real.noLinkedSession" | t }}
-              </option>
-              @for (training of eligibleSessions(); track training.id) {
-                <option [value]="training.id">
-                  {{ formatDate(training.startsAtUtc) }} · {{ training.title }}
-                </option>
-              }
-            </select>
-            @if (sessionsError()) {
-              <p role="alert" class="mt-2 text-xs text-red-700">
-                {{ "drivingSession.real.sessionsError" | t }}
-              </p>
-            }
-            <p class="mt-4 text-[12px] font-semibold text-[#334155]">
-              {{ "drivingSession.information.competence" | t }}
-            </p>
-            @if (definitionsError()) {
-              <p role="alert" class="mt-2 text-sm text-red-700">
-                {{ "drivingSession.real.definitionsError" | t }}
-              </p>
-            } @else if (!competencyGroups().length) {
-              <p class="mt-2 text-sm text-[#6c788b]">
-                {{ "drivingSession.real.noCompetencies" | t }}
-              </p>
-            } @else {
-              <div class="mt-2 flex flex-wrap gap-2">
-                @for (definition of competencyGroups(); track definition.id) {
-                  <button
-                    type="button"
-                    (click)="selectDefinition(definition.id)"
-                    [attr.aria-pressed]="
-                      selectedDefinitionId() === definition.id
-                    "
-                    [class]="
-                      selectedDefinitionId() === definition.id
-                        ? 'rounded-full bg-[#2b66a4] px-3 py-2 text-xs text-white'
-                        : 'rounded-full border border-[#dfe5ec] px-3 py-2 text-xs text-[#334155]'
-                    "
-                  >
-                    {{ definition.code }} · {{ definition.title }}
-                  </button>
-                }
-              </div>
-            }
-            <label
-              for="driving-subject"
-              class="mt-5 block text-[12px] font-semibold text-[#334155]"
-              >{{ "drivingSession.information.objective" | t }}</label
-            >
-            <input
-              id="driving-subject"
-              type="text"
-              maxlength="500"
-              [value]="subject()"
-              (input)="updateText('subject', $event)"
-              class="mt-2 h-10 w-full rounded-[11px] border border-[#dfe5ec] px-3 text-sm"
-            />
-            <h3 class="mt-5 text-[14px] font-bold">
-              {{ "drivingSession.observations.title" | t }}
-            </h3>
-            <div class="mt-2 grid gap-3">
-              <label class="text-xs"
-                >{{ "drivingSession.observations.positive" | t }}
-                <textarea
-                  rows="2"
-                  maxlength="2000"
-                  [value]="positive()"
-                  (input)="updateText('positive', $event)"
-                  class="mt-1 w-full rounded-[11px] border border-[#dfe5ec] p-3 text-sm"
-                ></textarea>
-              </label>
-              <label class="text-xs"
-                >{{ "drivingSession.observations.difficulties" | t }}
-                <textarea
-                  rows="2"
-                  maxlength="2000"
-                  [value]="difficulty()"
-                  (input)="updateText('difficulty', $event)"
-                  class="mt-1 w-full rounded-[11px] border border-[#dfe5ec] p-3 text-sm"
-                ></textarea>
-              </label>
-              <label class="text-xs"
-                >{{ "drivingSession.observations.nextGoal" | t }}
-                <textarea
-                  rows="2"
-                  maxlength="2000"
-                  [value]="nextGoal()"
-                  (input)="updateText('nextGoal', $event)"
-                  class="mt-1 w-full rounded-[11px] border border-[#dfe5ec] p-3 text-sm"
-                ></textarea>
-              </label>
-              <label class="text-xs"
-                >{{ "drivingSession.observations.free" | t }}
-                <textarea
-                  rows="2"
-                  maxlength="4000"
-                  [value]="freeObservation()"
-                  (input)="updateText('freeObservation', $event)"
-                  class="mt-1 w-full rounded-[11px] border border-[#dfe5ec] p-3 text-sm"
-                ></textarea>
-              </label>
-            </div>
-          </article>
-          <article
-            class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-          >
-            <h2 class="text-[16px] font-bold">
-              {{ "drivingSession.evaluation.title" | t }}
-            </h2>
-            <p class="mt-1 text-xs text-[#6c788b]">
-              {{ "drivingSession.real.criteriaHelp" | t }}
-            </p>
-            @for (criterion of criteria(); track criterion.id) {
-              <div class="mt-3 rounded-[13px] bg-[#f1f4f8] p-3">
-                <p class="text-xs font-semibold">
-                  {{ criterion.code }} · {{ criterion.title }}
-                </p>
-                <div class="mt-2 flex flex-wrap gap-2">
-                  @for (level of levels; track level) {
-                    <button
-                      type="button"
-                      (click)="setLevel(criterion.code, level)"
-                      [attr.aria-pressed]="
-                        evaluation()[criterion.code] === level
-                      "
-                      [class]="
-                        'rounded-[11px] border px-3 py-2 text-xs font-semibold ' +
-                        levelClasses(criterion.code, level)
-                      "
-                    >
-                      {{ "drivingSession.real.levels." + level | t }}
-                    </button>
-                  }
-                </div>
-              </div>
-            }
-            @if (saveError()) {
-              <p role="alert" class="mt-4 text-sm text-red-700">
-                {{ "drivingSession.real.saveError" | t }}
-              </p>
-            }
-            @if (saved()) {
-              <p role="status" class="mt-4 text-sm text-green-700">
-                {{ "drivingSession.actions.saved" | t }}
-              </p>
-            }
-            <button
-              type="button"
-              (click)="save()"
-              [disabled]="!valid() || saving()"
-              class="mt-5 w-full rounded-[11px] bg-[#2b66a4] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {{
-                (saving()
-                  ? "drivingSession.real.saving"
-                  : "drivingSession.actions.validate"
-                ) | t
-              }}
-            </button>
-          </article>
-        </div>
-      }
-    }
-  }
-
-  <article
-    id="driving-history"
-    class="mt-4 scroll-mt-24 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-  >
-    <h2 class="text-[16px] font-bold">
-      {{ "drivingSession.history.title" | t }}
-    </h2>
-    @if (!selectedEnrollmentId()) {
-      <p class="mt-3 text-sm text-[#6c788b]">
-        {{ "drivingSession.real.noStudents" | t }}
-      </p>
-    } @else if (historyLoading()) {
-      <p class="mt-3 text-sm text-[#6c788b]">
-        {{ "drivingSession.real.historyLoading" | t }}
-      </p>
-    } @else if (historyError()) {
-      <p role="alert" class="mt-3 text-sm text-red-700">
-        {{ "drivingSession.real.historyError" | t }}
-      </p>
-    } @else if (!history().length) {
-      <p class="mt-3 text-sm text-[#6c788b]">
-        {{ "drivingSession.real.noHistory" | t }}
-      </p>
-    } @else {
-      <div class="mt-4 space-y-3">
-        @for (item of history(); track item.id) {
-          <div class="rounded-[13px] border border-[#e3e8ef] p-4">
-            <p class="text-sm font-bold">
-              {{ formatDate(item.evaluatedAtUtc) }} · {{ item.subject }}
-            </p>
-            @if (sessionTitle(item.trainingSessionId); as title) {
-              <p class="mt-1 text-xs text-[#738095]">
-                {{ "drivingSession.real.linkedSession" | t }} : {{ title }}
-              </p>
-            }
-            <p class="mt-1 text-xs text-[#738095]">
-              {{ "drivingSession.information.trainer" | t }} :
-              {{ item.trainerDisplayName }}
-            </p>
-            <div class="mt-3 flex flex-wrap gap-2">
-              @for (criterion of item.criteria; track criterion.id) {
-                <span class="rounded-full bg-[#f1f4f8] px-3 py-1 text-xs">
-                  {{ criterion.label }} :
-                  {{ "drivingSession.real.levels." + criterion.level | t }}
-                </span>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <h2 class="text-[16px] font-bold">{{ 'drivingSession.evaluation.title' | t }}</h2>
+      <p class="mt-0.5 text-[12px] text-[#768295]">{{ 'drivingSession.evaluation.subtitle' | t }}</p>
+      <div class="mt-3 space-y-2">
+        @for (criterion of criteria; track criterion.id) {
+          <div class="rounded-[13px] bg-[#f1f4f8] p-2.5">
+            <p class="mb-2 text-[11px] font-semibold text-[#4b5563]">{{ criterion.labelKey | t }}</p>
+            <div class="grid grid-cols-3 gap-2">
+              @for (level of ['acquired','progress','work']; track level) {
+                <button type="button" (click)="setLevel(criterion.id, $any(level))" [disabled]="!canEdit()" [class]="'h-[34px] rounded-[11px] border text-[11px] font-semibold transition ' + levelClasses(criterion.id,$any(level)) + (!canEdit() ? ' cursor-default' : '')">{{ ('drivingSession.levels.' + level) | t }}</button>
               }
             </div>
-            @if (item.positive) {
-              <p class="mt-2 text-xs">
-                <strong
-                  >{{ "drivingSession.observations.positive" | t }} :</strong
-                >
-                {{ item.positive }}
-              </p>
-            }
-            @if (item.difficulty) {
-              <p class="mt-2 text-xs">
-                <strong
-                  >{{
-                    "drivingSession.observations.difficulties" | t
-                  }}
-                  :</strong
-                >
-                {{ item.difficulty }}
-              </p>
-            }
-            @if (item.nextGoal) {
-              <p class="mt-2 text-xs">
-                <strong
-                  >{{ "drivingSession.observations.nextGoal" | t }} :</strong
-                >
-                {{ item.nextGoal }}
-              </p>
-            }
-            @if (item.freeObservation) {
-              <p class="mt-2 text-xs">
-                <strong>{{ "drivingSession.observations.free" | t }} :</strong>
-                {{ item.freeObservation }}
-              </p>
-            }
           </div>
         }
       </div>
+    </article>
+  </div>
+
+  <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+    <h2 class="text-[16px] font-bold">{{ 'drivingSession.observations.title' | t }}</h2>
+    <div class="mt-4 grid gap-3 md:grid-cols-2">
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.positive' | t }}</label><textarea rows="2" [value]="positive() | t" (input)="updateText(positive,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.difficulties' | t }}</label><textarea rows="2" [value]="difficulties() | t" (input)="updateText(difficulties,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.errors' | t }}</label><textarea rows="2" [value]="errors() | t" (input)="updateText(errors,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.advice' | t }}</label><textarea rows="2" [value]="advice() | t" (input)="updateText(advice,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.nextGoal' | t }}</label><textarea rows="2" [value]="nextGoal() | t" (input)="updateText(nextGoal,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+      <div><label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.observations.free' | t }}</label><textarea rows="2" [value]="freeObservation()" (input)="updateText(freeObservation,$event)" [readonly]="!canEdit()" class="w-full resize-none rounded-[11px] border border-[#dfe5ec] bg-white px-3 py-2.5 text-[12px] outline-none read-only:bg-[#f5f7fa]"></textarea></div>
+    </div>
+    @if (canEdit()) {
+      <button type="button" (click)="save()" class="mt-3 flex h-[42px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#2b66a4] text-[13px] font-semibold text-white"><i class="ph ph-steering-wheel text-[17px]"></i>{{ (saved() ? 'drivingSession.actions.saved' : 'drivingSession.actions.validate') | t }}</button>
     }
+  </article>
+
+  <article id="driving-history" class="mt-4 scroll-mt-24 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+    <h2 class="text-[16px] font-bold">{{ 'drivingSession.history.title' | t }}</h2>
+    <div class="mt-4 space-y-3">
+      @for (item of visibleHistory(); track item.id) {
+        <div class="rounded-[13px] border border-[#e3e8ef] p-3.5">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div><p class="text-[13px] font-bold">{{ item.studentName }} · {{ item.date }}</p><p class="mt-0.5 text-[11px] text-[#738095]">{{ item.subjectKey | t }}</p></div>
+            <div class="flex items-center gap-2"><span class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[10px] font-semibold text-[#2a64a2]">{{ item.competence }}</span><span class="text-[10px] text-[#738095]">{{ item.trainer }}</span></div>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-x-3 gap-y-2">
+            @for (entry of item.evaluations; track entry.criterionId) {
+              <div class="flex items-center gap-1.5 text-[10px]"><span class="text-[#667085]">{{ labelForCriterion(entry.criterionId) | t }}</span><span [class]="'rounded-full px-2 py-0.5 font-semibold ' + historyLevelClasses(entry.level)">{{ ('drivingSession.levels.' + entry.level) | t }}</span></div>
+            }
+          </div>
+        </div>
+      }
+    </div>
   </article>
 </section>

@@ -2,9 +2,9 @@
 // This file contains TypeScript contracts only and is safe in API-only mode.
 
 export type InternshipStatus =
-  "completed" | "incomplete" | "inProgress" | "planned";
+  "completed" | "incomplete" | "inProgress" | "planned" | "cancelled";
 
-export type InternshipActivityStatus = "done" | "pending";
+export type InternshipActivityStatus = "done" | "pending" | "notApplicable";
 
 export interface InternshipActivity {
   labelKey: string;

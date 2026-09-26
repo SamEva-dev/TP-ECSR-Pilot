@@ -1,22 +1,30 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from "@angular/core";
-import { FormsModule } from "@angular/forms";
-import { RouterLink } from "@angular/router";
-import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { TranslateService } from "../../../core/i18n/translate.service";
-import {
-  DEFAULT_SHEET_CATALOG,
-  SHEET_CATEGORIES,
-} from "../../../core/api-data/runtime-data.store";
-import type {
-  SheetCatalogItem,
-  SheetCategory,
-} from "../../../core/models/sheet-catalog.models";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { TranslatePipe } from '../../../core/i18n/translate.pipe';
+import { TranslateService } from '../../../core/i18n/translate.service';
+import { LearningApiService } from '../../../core/learning/learning-api.service';
+import type { PedagogicalTopicDto } from '../../../core/learning/learning.models';
+import { ApplicationNotificationService } from '../../../core/notifications/application-notification.service';
+import { WorkspaceContextService } from '../../../core/workspace/workspace-context.service';
+
+type SheetCategory = 'rules' | 'risk' | 'vehicle' | 'pedagogy' | 'exam' | 'mobility';
+
+interface SheetCatalogItem {
+  id: string;
+  code: string;
+  number: number;
+  customTitle: string;
+  category: SheetCategory;
+  durationMinutes: number;
+  active: boolean;
+  reference: string;
+  customObjective: string;
+  customExample: string;
+  customCorrection: string;
+  custom: boolean;
+}
 
 interface SheetDraft {
   id?: string;
@@ -31,21 +39,26 @@ interface SheetDraft {
   correction: string;
 }
 
+const SHEET_CATEGORIES: readonly SheetCategory[] = ['rules', 'risk', 'vehicle', 'pedagogy', 'exam', 'mobility'];
+
 @Component({
-  selector: "app-sheets-configuration",
+  selector: 'app-sheets-configuration',
   imports: [FormsModule, RouterLink, TranslatePipe],
-  templateUrl: "./sheets-configuration.component.html",
+  templateUrl: './sheets-configuration.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SheetsConfigurationComponent {
   private readonly translate = inject(TranslateService);
-  private readonly storageKey = "tp-ecsr-pilot.sheet-catalog";
+  private readonly api = inject(LearningApiService);
+  private readonly workspace = inject(WorkspaceContextService);
+  private readonly notifications = inject(ApplicationNotificationService);
+  private loadSequence = 0;
 
   readonly categories = SHEET_CATEGORIES;
-  readonly items = signal<SheetCatalogItem[]>(this.loadCatalog());
-  readonly query = signal("");
-  readonly categoryFilter = signal<"all" | SheetCategory>("all");
-  readonly statusFilter = signal<"all" | "active" | "inactive">("all");
+  readonly items = signal<SheetCatalogItem[]>([]);
+  readonly query = signal('');
+  readonly categoryFilter = signal<'all' | SheetCategory>('all');
+  readonly statusFilter = signal<'all' | 'active' | 'inactive'>('all');
   readonly editorOpen = signal(false);
   readonly viewerOpen = signal(false);
   readonly deleteOpen = signal(false);
@@ -53,6 +66,7 @@ export class SheetsConfigurationComponent {
   readonly selected = signal<SheetCatalogItem | null>(null);
   readonly pendingDelete = signal<SheetCatalogItem | null>(null);
   readonly duplicateNumber = signal(false);
+  private readonly referentialVersionId = computed(() => String(this.workspace.cohort()?.referentialVersionId ?? ''));
 
   draft: SheetDraft = this.emptyDraft();
 
@@ -62,67 +76,40 @@ export class SheetsConfigurationComponent {
     const status = this.statusFilter();
 
     return this.items().filter((item) => {
-      const title = this.titleOf(item).toLocaleLowerCase(
-        this.translate.locale(),
-      );
-      const matchesQuery =
-        !q ||
-        title.includes(q) ||
-        String(item.number).includes(q) ||
-        (item.reference ?? "").toLocaleLowerCase().includes(q);
-      const matchesCategory = category === "all" || item.category === category;
-      const matchesStatus =
-        status === "all" || (status === "active" ? item.active : !item.active);
+      const title = this.titleOf(item).toLocaleLowerCase(this.translate.locale());
+      const matchesQuery = !q || title.includes(q) || String(item.number).includes(q) || item.reference.toLocaleLowerCase().includes(q);
+      const matchesCategory = category === 'all' || item.category === category;
+      const matchesStatus = status === 'all' || (status === 'active' ? item.active : !item.active);
       return matchesQuery && matchesCategory && matchesStatus;
     });
   });
 
-  readonly activeCount = computed(
-    () => this.items().filter((item) => item.active).length,
-  );
-  readonly inactiveCount = computed(
-    () => this.items().length - this.activeCount(),
-  );
-  readonly customCount = computed(
-    () => this.items().filter((item) => !!item.customTitle).length,
-  );
+  readonly activeCount = computed(() => this.items().filter((item) => item.active).length);
+  readonly inactiveCount = computed(() => this.items().length - this.activeCount());
+  readonly customCount = computed(() => this.items().filter((item) => item.custom).length);
 
-  updateQuery(event: Event): void {
-    this.query.set((event.target as HTMLInputElement).value);
+  constructor() {
+    effect(() => {
+      const referentialVersionId = this.referentialVersionId();
+      void this.reload(referentialVersionId, true);
+    });
   }
 
-  updateCategory(event: Event): void {
-    this.categoryFilter.set(
-      (event.target as HTMLSelectElement).value as "all" | SheetCategory,
-    );
-  }
+  updateQuery(event: Event): void { this.query.set((event.target as HTMLInputElement).value ?? ''); }
+  updateCategory(event: Event): void { this.categoryFilter.set(((event.target as HTMLSelectElement).value || 'all') as 'all' | SheetCategory); }
+  updateStatus(event: Event): void { this.statusFilter.set(((event.target as HTMLSelectElement).value || 'all') as 'all' | 'active' | 'inactive'); }
 
-  updateStatus(event: Event): void {
-    this.statusFilter.set(
-      (event.target as HTMLSelectElement).value as
-        "all" | "active" | "inactive",
-    );
-  }
-
-  titleOf(item: SheetCatalogItem): string {
-    return (
-      item.customTitle ??
-      (item.titleKey ? this.translate.instant(item.titleKey) : "")
-    );
-  }
-
-  categoryKey(category: SheetCategory): string {
-    return `sheetConfig.categories.${category}`;
-  }
+  titleOf(item: SheetCatalogItem): string { return item.customTitle ?? ''; }
+  categoryKey(category: SheetCategory): string { return `sheetConfig.categories.${category}`; }
 
   categoryClasses(category: SheetCategory): string {
     const classes: Record<SheetCategory, string> = {
-      rules: "bg-[#e6f2ff] text-[#2a64a2]",
-      risk: "bg-[#fff0c9] text-[#8b5e00]",
-      vehicle: "bg-[#e7f7ed] text-[#188447]",
-      pedagogy: "bg-[#f0eaff] text-[#7652b5]",
-      exam: "bg-[#ffe8e4] text-[#c94738]",
-      mobility: "bg-[#e8f7f5] text-[#287e74]",
+      rules: 'bg-[#e6f2ff] text-[#2a64a2]',
+      risk: 'bg-[#fff0c9] text-[#8b5e00]',
+      vehicle: 'bg-[#e7f7ed] text-[#188447]',
+      pedagogy: 'bg-[#f0eaff] text-[#7652b5]',
+      exam: 'bg-[#ffe8e4] text-[#c94738]',
+      mobility: 'bg-[#e8f7f5] text-[#287e74]',
     };
     return classes[category];
   }
@@ -144,159 +131,131 @@ export class SheetsConfigurationComponent {
       category: item.category,
       durationMinutes: item.durationMinutes,
       active: item.active,
-      reference: item.reference ?? "",
-      objective: item.customObjective ?? "",
-      example: item.customExample ?? "",
-      correction: item.customCorrection ?? "",
+      reference: item.reference,
+      objective: item.customObjective,
+      example: item.customExample,
+      correction: item.customCorrection,
     };
     this.editorOpen.set(true);
   }
 
-  closeEditor(): void {
-    this.editorOpen.set(false);
-    this.duplicateNumber.set(false);
-  }
+  closeEditor(): void { this.editorOpen.set(false); this.duplicateNumber.set(false); }
 
-  saveDraft(): void {
-    const title = this.draft.title.trim();
-    if (!title || this.draft.number < 1) return;
+  async saveDraft(): Promise<void> {
+    const referentialVersionId = this.referentialVersionId();
+    const title = (this.draft.title ?? '').trim();
+    if (!referentialVersionId || !title || (this.draft.number ?? 0) < 1 || (this.draft.durationMinutes ?? 0) < 1) return;
 
-    const duplicate = this.items().some(
-      (item) => item.number === this.draft.number && item.id !== this.draft.id,
-    );
+    const duplicate = this.items().some((item) => item.number === this.draft.number && item.id !== this.draft.id);
     this.duplicateNumber.set(duplicate);
     if (duplicate) return;
 
-    const current = this.draft.id
-      ? this.items().find((item) => item.id === this.draft.id)
-      : undefined;
-    const next: SheetCatalogItem = {
-      id: current?.id ?? `custom-${Date.now()}`,
-      number: this.draft.number,
-      customTitle: title,
-      category: this.draft.category,
-      durationMinutes: Math.max(1, this.draft.durationMinutes || 40),
-      active: this.draft.active,
-      reference: this.draft.reference.trim() || undefined,
-      customObjective: this.draft.objective.trim() || undefined,
-      customExample: this.draft.example.trim() || undefined,
-      customCorrection: this.draft.correction.trim() || undefined,
+    const body = {
+      number: this.draft.number ?? 0,
+      title,
+      category: this.draft.category ?? 'rules',
+      durationMinutes: this.draft.durationMinutes ?? 0,
+      active: !!this.draft.active,
+      reference: (this.draft.reference ?? '').trim(),
+      objective: (this.draft.objective ?? '').trim(),
+      example: (this.draft.example ?? '').trim(),
+      correction: (this.draft.correction ?? '').trim(),
     };
 
-    const updated = current
-      ? this.items().map((item) => (item.id === current.id ? next : item))
-      : [...this.items(), next];
-
-    this.setItems(updated);
-    this.editorOpen.set(false);
+    try {
+      if (this.draft.id) await firstValueFrom(this.api.updateTopicCatalog(referentialVersionId, this.draft.id, body));
+      else await firstValueFrom(this.api.createTopic(referentialVersionId, body));
+      await this.reload(referentialVersionId, true);
+      this.editorOpen.set(false);
+      this.duplicateNumber.set(false);
+    } catch {
+      this.notifications.error('sheetConfig.api.saveError', '/administration/fiches');
+    }
   }
 
-  openView(item: SheetCatalogItem): void {
-    this.selected.set(item);
-    this.viewerOpen.set(true);
-  }
+  openView(item: SheetCatalogItem): void { this.selected.set(item); this.viewerOpen.set(true); }
+  closeView(): void { this.viewerOpen.set(false); this.selected.set(null); }
+  editFromView(): void { const item = this.selected(); if (!item) return; this.closeView(); this.openEdit(item); }
+  requestDelete(item: SheetCatalogItem): void { this.pendingDelete.set(item); this.deleteOpen.set(true); }
+  cancelDelete(): void { this.deleteOpen.set(false); this.pendingDelete.set(null); }
 
-  closeView(): void {
-    this.viewerOpen.set(false);
-    this.selected.set(null);
-  }
-
-  editFromView(): void {
-    const item = this.selected();
-    if (!item) return;
-    this.closeView();
-    this.openEdit(item);
-  }
-
-  requestDelete(item: SheetCatalogItem): void {
-    this.pendingDelete.set(item);
-    this.deleteOpen.set(true);
-  }
-
-  cancelDelete(): void {
-    this.deleteOpen.set(false);
-    this.pendingDelete.set(null);
-  }
-
-  confirmDelete(): void {
+  async confirmDelete(): Promise<void> {
     const item = this.pendingDelete();
-    if (!item) return;
-    this.setItems(this.items().filter((entry) => entry.id !== item.id));
-    this.cancelDelete();
+    const referentialVersionId = this.referentialVersionId();
+    if (!item || !referentialVersionId) return;
+    try {
+      await firstValueFrom(this.api.deleteTopic(referentialVersionId, item.id));
+      await this.reload(referentialVersionId, true);
+      this.cancelDelete();
+    } catch {
+      this.notifications.error('sheetConfig.api.deleteError', '/administration/fiches');
+    }
   }
 
-  toggleActive(item: SheetCatalogItem): void {
-    this.setItems(
-      this.items().map((entry) =>
-        entry.id === item.id ? { ...entry, active: !entry.active } : entry,
-      ),
-    );
+  async toggleActive(item: SheetCatalogItem): Promise<void> {
+    const referentialVersionId = this.referentialVersionId();
+    if (!referentialVersionId) return;
+    try {
+      await firstValueFrom(this.api.updateTopicCatalog(referentialVersionId, item.id, {
+        number: item.number, title: item.customTitle, category: item.category, durationMinutes: item.durationMinutes,
+        active: !item.active, reference: item.reference, objective: item.customObjective, example: item.customExample, correction: item.customCorrection,
+      }));
+      await this.reload(referentialVersionId, true);
+    } catch {
+      this.notifications.error('sheetConfig.api.saveError', '/administration/fiches');
+    }
   }
 
-  resetDefaults(): void {
-    this.setItems(DEFAULT_SHEET_CATALOG.map((item) => ({ ...item })));
-  }
-
-  objectiveOf(item: SheetCatalogItem): string {
-    return (
-      item.customObjective ||
-      this.translate.instant("sheetConfig.viewer.defaultObjective", {
-        title: this.titleOf(item),
-      })
-    );
-  }
-
-  exampleOf(item: SheetCatalogItem): string {
-    return (
-      item.customExample ||
-      this.translate.instant("sheetConfig.viewer.defaultExample", {
-        title: this.titleOf(item),
-      })
-    );
-  }
-
-  correctionOf(item: SheetCatalogItem): string {
-    return (
-      item.customCorrection ||
-      this.translate.instant("sheetConfig.viewer.defaultCorrection", {
-        title: this.titleOf(item),
-      })
-    );
-  }
+  resetDefaults(): void { void this.reload(this.referentialVersionId(), true); }
+  objectiveOf(item: SheetCatalogItem): string { return item.customObjective ?? ''; }
+  exampleOf(item: SheetCatalogItem): string { return item.customExample ?? ''; }
+  correctionOf(item: SheetCatalogItem): string { return item.customCorrection ?? ''; }
 
   private emptyDraft(): SheetDraft {
-    const nextNumber = this.items
-      ? Math.max(0, ...this.items().map((item) => item.number)) + 1
-      : 59;
+    const nextNumber = Math.max(0, ...this.items().map((item) => item.number ?? 0)) + 1;
+    return { number: nextNumber, title: '', category: 'rules', durationMinutes: 0, active: true, reference: '', objective: '', example: '', correction: '' };
+  }
+
+  private async reload(referentialVersionId: string, notify: boolean): Promise<void> {
+    const seq = ++this.loadSequence;
+    if (!referentialVersionId) { this.items.set([]); return; }
+    try {
+      const rows = await firstValueFrom(this.api.getTopicCatalog(referentialVersionId));
+      if (seq !== this.loadSequence) return;
+      this.items.set((rows ?? []).map((row) => this.mapTopic(row)).sort((a, b) => a.number - b.number));
+    } catch {
+      if (seq !== this.loadSequence) return;
+      this.items.set([]);
+      if (notify) this.notifications.error('sheetConfig.api.loadError', '/administration/fiches');
+    }
+  }
+
+  private mapTopic(row: PedagogicalTopicDto): SheetCatalogItem {
+    const code = String(row?.code ?? '');
     return {
-      number: nextNumber,
-      title: "",
-      category: "rules",
-      durationMinutes: 40,
-      active: true,
-      reference: "",
-      objective: "",
-      example: "",
-      correction: "",
+      id: String(row?.id ?? ''),
+      code,
+      number: Number(row?.number ?? 0),
+      customTitle: String(row?.title ?? ''),
+      category: this.normalizeCategory(row?.category),
+      durationMinutes: Number(row?.durationMinutes ?? 0),
+      active: !!row?.active,
+      reference: String(row?.reference ?? ''),
+      customObjective: String(row?.objective ?? ''),
+      customExample: String(row?.example ?? ''),
+      customCorrection: String(row?.correction ?? ''),
+      custom: code.toUpperCase().startsWith('SHEET-'),
     };
   }
 
-  private setItems(items: SheetCatalogItem[]): void {
-    const sorted = [...items].sort((a, b) => a.number - b.number);
-    this.items.set(sorted);
-    localStorage.setItem(this.storageKey, JSON.stringify(sorted));
-  }
-
-  private loadCatalog(): SheetCatalogItem[] {
-    try {
-      const raw = localStorage.getItem(this.storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw) as SheetCatalogItem[];
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      }
-    } catch {
-      // Keep demo defaults if local data is invalid.
-    }
-    return DEFAULT_SHEET_CATALOG.map((item) => ({ ...item }));
+  private normalizeCategory(value: string | null | undefined): SheetCategory {
+    const normalized = String(value ?? '').trim().toLowerCase();
+    if (SHEET_CATEGORIES.includes(normalized as SheetCategory)) return normalized as SheetCategory;
+    if (normalized.includes('risk')) return 'risk';
+    if (normalized.includes('vehic')) return 'vehicle';
+    if (normalized.includes('pedag') || normalized.includes('remc')) return 'pedagogy';
+    if (normalized.includes('exam') || normalized.includes('certif')) return 'exam';
+    if (normalized.includes('mobil')) return 'mobility';
+    return 'rules';
   }
 }

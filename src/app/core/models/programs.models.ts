@@ -1,17 +1,14 @@
-// Extracted from the former mock-data contract. No runtime demo data lives here.
-// This file contains TypeScript contracts only and is safe in API-only mode.
-
 import type { ProgramModule } from "./workspace.models";
 
 export type ProgramCatalogStatus = "active" | "draft" | "inactive";
-
 export type ProgramCatalogCategory = string;
 
 export interface ProgramCatalogItem {
   id: string;
-  apiId?: string;
+  apiId: string;
   code: string;
   name: string;
+  familyCode: string;
   category: ProgramCatalogCategory;
   icon: string;
   description: string;
@@ -23,7 +20,7 @@ export interface ProgramCatalogItem {
   students: number;
   trainers: number;
   activeCohorts: number;
-  successRate: number | null;
+  successRate: number;
 }
 
 export interface ProgramFormValue {

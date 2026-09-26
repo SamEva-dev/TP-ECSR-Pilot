@@ -1,0 +1,38 @@
+import type { AlertItem, DrivingObservation, Promotion, Student, TimelineItem, TrainerAgendaItem } from '../models/app.models';
+export const PROMOTIONS:Promotion[]=[
+ {id:'p1',name:'TP ECSR 2026–2027',start:'2026-09-01',end:'2027-06-30',plannedHours:910},
+ {id:'p2',name:'TP ECSR 2025–2026',start:'2025-09-02',end:'2026-06-26',plannedHours:910}
+];
+export const STUDENTS:Student[]=[
+ {id:'s1',firstName:'Sam',lastName:'Fokam',promotionId:'p1',progress:72,plannedHours:910,completedHours:684,catchupHours:4,preparedSheets:37,validatedSheets:32,status:'good',skills:{C1:92,C2:72,C3:52,C4:32}},
+ {id:'s2',firstName:'Julie',lastName:'Moreau',promotionId:'p1',progress:61,plannedHours:910,completedHours:555,catchupHours:14,preparedSheets:32,validatedSheets:19,status:'late',skills:{C1:81,C2:61,C3:41,C4:21}},
+ {id:'s3',firstName:'Marc',lastName:'Girard',promotionId:'p1',progress:78,plannedHours:910,completedHours:710,catchupHours:0,preparedSheets:41,validatedSheets:24,status:'good',skills:{C1:98,C2:78,C3:58,C4:38}},
+ {id:'s4',firstName:'Léa',lastName:'Perrin',promotionId:'p1',progress:55,plannedHours:910,completedHours:501,catchupHours:12,preparedSheets:29,validatedSheets:17,status:'warning',skills:{C1:75,C2:55,C3:35,C4:15}},
+ {id:'s5',firstName:'Karim',lastName:'Benali',promotionId:'p1',progress:84,plannedHours:910,completedHours:764,catchupHours:2,preparedSheets:44,validatedSheets:26,status:'good',skills:{C1:100,C2:84,C3:64,C4:44}},
+ {id:'s6',firstName:'Nadia',lastName:'Chevalier',promotionId:'p1',progress:66,plannedHours:910,completedHours:601,catchupHours:7,preparedSheets:34,validatedSheets:20,status:'good',skills:{C1:86,C2:66,C3:46,C4:26}},
+ {id:'s7',firstName:'Thomas',lastName:'Roussel',promotionId:'p1',progress:47,plannedHours:910,completedHours:428,catchupHours:18,preparedSheets:24,validatedSheets:14,status:'late',skills:{C1:67,C2:47,C3:27,C4:8}},
+ {id:'s8',firstName:'Chloé',lastName:'Marchand',promotionId:'p1',progress:91,plannedHours:910,completedHours:828,catchupHours:0,preparedSheets:47,validatedSheets:27,status:'good',skills:{C1:100,C2:91,C3:71,C4:51}},
+ {id:'s9',firstName:'Mehdi',lastName:'Amrani',promotionId:'p1',progress:69,plannedHours:910,completedHours:628,catchupHours:3,preparedSheets:36,validatedSheets:21,status:'good',skills:{C1:89,C2:69,C3:49,C4:29}}
+];
+export const PROMOTION_METRICS={p1:{trainers:5,attendanceRate:96,completedHours:5699,remainingHours:2491,catchupHours:60,progress:69,totalPlannedHours:8190},p2:{trainers:5,attendanceRate:94,completedHours:4618,remainingHours:842,catchupHours:42,progress:76,totalPlannedHours:5460}} as const;
+export const ALERTS:AlertItem[]=[
+{id:'a1',level:'danger',titleKey:'home.direction.alerts.over10.title',detailKey:'home.direction.alerts.over10.detail'},
+{id:'a2',level:'warning',titleKey:'home.direction.alerts.noEvaluation.title',detailKey:'home.direction.alerts.noEvaluation.detail'},
+{id:'a3',level:'warning',titleKey:'home.direction.alerts.sheetsDelay.title',detailKey:'home.direction.alerts.sheetsDelay.detail'},
+{id:'a4',level:'danger',titleKey:'home.direction.alerts.unjustified.title',detailKey:'home.direction.alerts.unjustified.detail'},
+{id:'a5',level:'info',titleKey:'home.direction.alerts.internship.title',detailKey:'home.direction.alerts.internship.detail'}];
+export const TRAINER_AGENDA:TrainerAgendaItem[]=[
+{time:'08:00',target:'Sam Fokam',type:'driving',subjectKey:'home.trainer.agenda.virages'},
+{time:'10:00',target:'Julie Moreau',type:'driving',subjectKey:'home.trainer.agenda.highway'},
+{time:'13:30',target:'Promotion ECSR 2026',type:'classroom',subjectKey:'home.trainer.agenda.intersections'},
+{time:'15:30',target:'Marc Girard',type:'presentation',subjectKey:'home.trainer.agenda.sheet12'},
+{time:'17:00',target:'Léa Perrin',type:'catchup',subjectKey:'home.trainer.agenda.catchupSigns'}];
+export const DRIVING_OBSERVATIONS:DrivingObservation[]=[
+{id:'o1',studentName:'Sam Fokam',date:'20/09/2026',competence:'C3',subjectKey:'home.observations.virages.subject',positiveKey:'home.observations.virages.positive',workOnKey:'home.observations.virages.workOn',nextGoalKey:'home.observations.virages.nextGoal'},
+{id:'o2',studentName:'Julie Moreau',date:'20/09/2026',competence:'C3',subjectKey:'home.observations.highway.subject',positiveKey:'home.observations.highway.positive',workOnKey:'home.observations.highway.workOn',nextGoalKey:'home.observations.highway.nextGoal'},
+{id:'o3',studentName:'Sam Fokam',date:'13/09/2026',competence:'C1',subjectKey:'home.observations.lesson.subject',positiveKey:'home.observations.lesson.positive',workOnKey:'home.observations.lesson.workOn',nextGoalKey:'home.observations.lesson.nextGoal'}];
+export const SAM_TIMELINE:TimelineItem[]=[
+{dateKey:'home.student.timeline.18sep',titleKey:'home.student.timeline.sheet32',detailKey:'home.student.timeline.virages',status:'valid'},
+{dateKey:'home.student.timeline.19sep',titleKey:'home.student.timeline.absence',detailKey:'home.student.timeline.catchup7',status:'absence'},
+{dateKey:'home.student.timeline.20sep',titleKey:'home.student.timeline.driving',detailKey:'home.student.timeline.drivingDetail',status:'driving'},
+{dateKey:'home.student.timeline.21sep',titleKey:'home.student.timeline.classroom',detailKey:'home.student.timeline.classroomDetail',status:'classroom'}];

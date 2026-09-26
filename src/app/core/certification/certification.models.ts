@@ -55,4 +55,7 @@ export interface CertificationCandidate {
   decisionComment?: string | null;
   decisionAtUtc?: string | null;
   assessments: CertificationAssessment[];
+  firstName?: string | null;
+  lastName?: string | null;
+  candidateNumber?: string | null;
 }

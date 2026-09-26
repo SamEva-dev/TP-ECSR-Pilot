@@ -1,12 +1,7 @@
-// Extracted from the former mock-data contract. No runtime demo data lives here.
-// This file contains TypeScript contracts only and is safe in API-only mode.
-
 import type { ProgramModule } from "./workspace.models";
 
 export type ReferentialStatus = "active" | "draft" | "archived";
-
-export type VolumeCategory =
-  "classroom" | "driving" | "internship" | "assessment" | "other";
+export type VolumeCategory = "classroom" | "driving" | "internship" | "assessment" | "other";
 
 export interface ReferentialSubCompetency {
   id: string;
@@ -38,6 +33,16 @@ export interface ReferentialStageRequirement {
   mandatory: boolean;
 }
 
+export interface ReferentialLinkedCohort {
+  id: string;
+  name: string;
+  siteName: string;
+  start: string;
+  end: string;
+  studentCount: number;
+  status: string;
+}
+
 export interface ReferentialCertificationStep {
   id: string;
   label: string;
@@ -45,13 +50,16 @@ export interface ReferentialCertificationStep {
   evaluator: "jury" | "trainer" | "system";
 }
 
+/** Safe UI projection returned from PedagoraPilot. Arrays are always initialized. */
 export interface TrainingReferential {
   id: string;
-  apiId?: string;
+  apiId: string;
+  referentialId: string;
   programId: string;
   code: string;
   name: string;
   version: string;
+  certificationCode: string | null;
   status: ReferentialStatus;
   effectiveFrom: string;
   effectiveTo: string | null;
@@ -64,7 +72,9 @@ export interface TrainingReferential {
   requiredDocumentCount: number;
   certificationSchemeName: string;
   certificationSteps: ReferentialCertificationStep[];
+  linkedCohorts: ReferentialLinkedCohort[];
   notes: string;
+  notesKey: string | null;
 }
 
 export interface ReferentialVersionFormValue {
@@ -73,5 +83,5 @@ export interface ReferentialVersionFormValue {
   version: string;
   code: string;
   effectiveFrom: string;
-  status: ReferentialStatus;
+  status: "draft" | "active";
 }

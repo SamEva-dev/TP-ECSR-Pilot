@@ -103,6 +103,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "planning/nouveau",
+        canActivate: [roleGuard],
+        data: { permission: "planning.view" },
+        loadComponent: () =>
+          import("./features/planning/planning-create-route.component").then(
+            (m) => m.PlanningCreateRouteComponent,
+          ),
+      },
+      {
         path: "teletravail",
         canActivate: [roleGuard],
         data: { permission: "remoteWork.view" },

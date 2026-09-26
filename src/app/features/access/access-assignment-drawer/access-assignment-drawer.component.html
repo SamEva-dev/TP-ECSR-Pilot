@@ -1,333 +1,109 @@
-<div
-  class="fixed inset-0 z-[70] bg-[#101828]/35 backdrop-blur-[1px]"
-  (click)="closed.emit()"
-></div>
-<aside
-  class="fixed inset-y-0 right-0 z-[80] flex w-full max-w-[620px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(15,23,42,0.18)]"
->
-  <header
-    class="flex items-start justify-between gap-4 border-b border-[#dfe5ec] bg-white px-6 py-5"
-  >
+<div class="fixed inset-0 z-[70] bg-[#101828]/35 backdrop-blur-[1px]" (click)="closed.emit()"></div>
+<aside class="fixed inset-y-0 right-0 z-[80] flex w-full max-w-[620px] flex-col bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(15,23,42,0.18)]">
+  <header class="flex items-start justify-between gap-4 border-b border-[#dfe5ec] bg-white px-6 py-5">
     <div>
       <div class="flex items-center gap-3">
-        <span
-          class="grid size-[42px] place-items-center rounded-full bg-[#2a64a2] text-[13px] font-extrabold text-white"
-          >{{ account().firstName[0] }}{{ account().lastName[0] }}</span
-        >
+        <span class="grid size-[42px] place-items-center rounded-full bg-[#2a64a2] text-[13px] font-extrabold text-white">{{ account().firstName?.[0] ?? "" }}{{ account().lastName?.[0] ?? "" }}</span>
         <div>
-          <h2 class="text-[19px] font-extrabold text-[#172033]">
-            {{ "access.assignments.title" | t }}
-          </h2>
-          <p class="mt-0.5 text-[13px] text-[#6c788b]">
-            {{ account().firstName }} {{ account().lastName }} ·
-            {{ account().email }}
-          </p>
+          <h2 class="text-[19px] font-extrabold text-[#172033]">{{ "access.assignments.title" | t }}</h2>
+          <p class="mt-0.5 text-[13px] text-[#6c788b]">{{ account().firstName }} {{ account().lastName }} · {{ account().email }}</p>
         </div>
       </div>
-      <p class="mt-3 text-[12px] leading-[1.5] text-[#768295]">
-        {{ "access.assignments.subtitle" | t }}
-      </p>
+      <p class="mt-3 text-[12px] leading-[1.5] text-[#768295]">{{ "access.assignments.subtitle" | t }}</p>
     </div>
-    <button
-      type="button"
-      (click)="closed.emit()"
-      class="grid size-9 shrink-0 place-items-center rounded-[10px] border border-[#dbe2ea] bg-white text-[#64748b] hover:bg-[#f1f5f9]"
-      [attr.aria-label]="'common.closeMenu' | t"
-    >
-      <i class="ph ph-x text-[18px]"></i>
-    </button>
+    <button type="button" (click)="closed.emit()" class="grid size-9 shrink-0 place-items-center rounded-[10px] border border-[#dbe2ea] bg-white text-[#64748b] hover:bg-[#f1f5f9]" [attr.aria-label]="'common.closeMenu' | t"><i class="ph ph-x text-[18px]"></i></button>
   </header>
 
   <div class="flex-1 overflow-y-auto px-6 py-5">
     <div class="flex items-center justify-between gap-3">
       <div>
-        <h3 class="text-[15px] font-bold text-[#172033]">
-          {{ "access.assignments.current" | t }}
-        </h3>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{
-            "access.assignments.currentSubtitle"
-              | t: { count: account().assignments.length }
-          }}
-        </p>
+        <h3 class="text-[15px] font-bold text-[#172033]">{{ "access.assignments.current" | t }}</h3>
+        <p class="mt-0.5 text-[12px] text-[#768295]">{{ "access.assignments.currentSubtitle" | t: { count: account().assignments.length } }}</p>
       </div>
-      <button
-        type="button"
-        (click)="showCreate.set(!showCreate())"
-        class="inline-flex h-[39px] items-center gap-2 rounded-[10px] bg-[#2a64a2] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#255b93]"
-      >
-        <i class="ph ph-plus text-[15px]"></i>{{ "access.assignments.add" | t }}
-      </button>
+      <button type="button" (click)="showCreate.set(!showCreate())" class="inline-flex h-[39px] items-center gap-2 rounded-[10px] bg-[#2a64a2] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#255b93]"><i class="ph ph-plus text-[15px]"></i>{{ "access.assignments.add" | t }}</button>
     </div>
 
     @if (showCreate()) {
-      <section
-        class="mt-4 rounded-[17px] border border-[#b9cfe5] bg-white p-4 shadow-sm"
-      >
-        <div class="flex items-center gap-2 text-[#2a64a2]">
-          <i class="ph ph-path text-[18px]"></i>
-          <h4 class="text-[14px] font-bold text-[#172033]">
-            {{ "access.assignments.newTitle" | t }}
-          </h4>
-        </div>
+      <section class="mt-4 rounded-[17px] border border-[#b9cfe5] bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-2 text-[#2a64a2]"><i class="ph ph-path text-[18px]"></i><h4 class="text-[14px] font-bold text-[#172033]">{{ "access.assignments.newTitle" | t }}</h4></div>
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
-          <label
-            class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.role" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="role"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                <option value="platform_admin">
-                  {{ "access.assignments.roles.platform_admin" | t }}
-                </option>
-                <option value="organization_admin">
-                  {{ "access.assignments.roles.organization_admin" | t }}
-                </option>
-                <option value="organization_direction">
-                  {{ "access.assignments.roles.organization_direction" | t }}
-                </option>
-                <option value="site_direction">
-                  {{ "access.assignments.roles.site_direction" | t }}
-                </option>
-                <option value="pedagogical_manager">
-                  {{ "access.assignments.roles.pedagogical_manager" | t }}
-                </option>
-                <option value="secretariat">
-                  {{ "access.assignments.roles.secretariat" | t }}
-                </option>
-                <option value="trainer">
-                  {{ "access.assignments.roles.trainer" | t }}
-                </option>
-                <option value="student">
-                  {{ "access.assignments.roles.student" | t }}
-                </option>
-                <option value="jury">
-                  {{ "access.assignments.roles.jury" | t }}
-                </option>
-                <option value="read_only">
-                  {{ "access.assignments.roles.read_only" | t }}
-                </option></select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.role" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="role" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">
+              <option value="platform_admin">{{ "access.assignments.roles.platform_admin" | t }}</option>
+              <option value="organization_admin">{{ "access.assignments.roles.organization_admin" | t }}</option>
+              <option value="organization_direction">{{ "access.assignments.roles.organization_direction" | t }}</option>
+              <option value="site_direction">{{ "access.assignments.roles.site_direction" | t }}</option>
+              <option value="pedagogical_manager">{{ "access.assignments.roles.pedagogical_manager" | t }}</option>
+              <option value="secretariat">{{ "access.assignments.roles.secretariat" | t }}</option>
+              <option value="trainer">{{ "access.assignments.roles.trainer" | t }}</option>
+              <option value="student">{{ "access.assignments.roles.student" | t }}</option>
+              <option value="jury">{{ "access.assignments.roles.jury" | t }}</option>
+              <option value="read_only">{{ "access.assignments.roles.read_only" | t }}</option>
+            </select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
-          <label
-            class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.scope" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="scope"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                <option value="platform">
-                  {{ "access.assignments.scopes.platform" | t }}
-                </option>
-                <option value="organization">
-                  {{ "access.assignments.scopes.organization" | t }}
-                </option>
-                <option value="site">
-                  {{ "access.assignments.scopes.site" | t }}
-                </option>
-                <option value="program">
-                  {{ "access.assignments.scopes.program" | t }}
-                </option>
-                <option value="cohort">
-                  {{ "access.assignments.scopes.cohort" | t }}
-                </option>
-                <option value="exam">
-                  {{ "access.assignments.scopes.exam" | t }}
-                </option></select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.scope" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="scope" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">
+              <option value="platform">{{ "access.assignments.scopes.platform" | t }}</option>
+              <option value="organization">{{ "access.assignments.scopes.organization" | t }}</option>
+              <option value="site">{{ "access.assignments.scopes.site" | t }}</option>
+              <option value="program">{{ "access.assignments.scopes.program" | t }}</option>
+              <option value="cohort">{{ "access.assignments.scopes.cohort" | t }}</option>
+              <option value="exam">{{ "access.assignments.scopes.exam" | t }}</option>
+            </select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
         </div>
 
         @if (scope !== "platform") {
-          <label
-            class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.organization" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="organizationId"
-                (ngModelChange)="onOrganizationChange()"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                @for (item of organizations; track item.id) {
-                  <option [value]="item.id">{{ item.name }}</option>
-                }</select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.organization" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="organizationId" (ngModelChange)="onOrganizationChange()" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">@for (item of organizations; track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
         }
         @if (["site", "program", "cohort", "exam"].includes(scope)) {
-          <label
-            class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.site" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="siteId"
-                (ngModelChange)="onSiteChange()"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                @for (item of sites(); track item.id) {
-                  <option [value]="item.id">{{ item.name }}</option>
-                }</select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.site" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="siteId" (ngModelChange)="onSiteChange()" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">@for (item of sites(); track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
         }
         @if (["program", "cohort", "exam"].includes(scope)) {
-          <label
-            class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.program" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="programId"
-                (ngModelChange)="onProgramChange()"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                @for (item of availablePrograms(); track item.id) {
-                  <option [value]="item.id">{{ item.name }}</option>
-                }</select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.program" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="programId" (ngModelChange)="onProgramChange()" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">@for (item of availablePrograms(); track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
         }
         @if (["cohort", "exam"].includes(scope)) {
-          <label
-            class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.cohort" | t }}
-            <div class="relative mt-1">
-              <select
-                [(ngModel)]="cohortId"
-                class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-              >
-                @for (item of cohorts(); track item.id) {
-                  <option [value]="item.id">{{ item.name }}</option>
-                }</select
-              ><i
-                class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"
-              ></i>
-            </div>
+          <label class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.cohort" | t }}
+            <div class="relative mt-1"><select [(ngModel)]="cohortId" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-8 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100">@for (item of cohorts(); track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div>
           </label>
         }
         @if (scope === "exam") {
-          <label
-            class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]"
-            >{{ "access.assignments.exam" | t }}
-            <input
-              [(ngModel)]="examSessionId"
-              class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100"
-            />
+          <label class="mt-3 block text-[11px] font-semibold uppercase tracking-[0.04em] text-[#667085]">{{ "access.assignments.exam" | t }}
+            <input [(ngModel)]="examSessionId" class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] bg-white px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" />
           </label>
         }
-        <div class="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            (click)="showCreate.set(false)"
-            class="h-[39px] rounded-[10px] border border-[#dbe2ea] bg-white px-4 text-[12px] font-semibold text-[#475569]"
-          >
-            {{ "common.cancel" | t }}</button
-          ><button
-            type="button"
-            (click)="add()"
-            class="h-[39px] rounded-[10px] bg-[#f59e0b] px-4 text-[12px] font-bold text-white shadow-sm"
-          >
-            {{ "access.assignments.save" | t }}
-          </button>
-        </div>
+        <div class="mt-4 flex justify-end gap-2"><button type="button" (click)="showCreate.set(false)" class="h-[39px] rounded-[10px] border border-[#dbe2ea] bg-white px-4 text-[12px] font-semibold text-[#475569]">{{ "common.cancel" | t }}</button><button type="button" (click)="add()" class="h-[39px] rounded-[10px] bg-[#f59e0b] px-4 text-[12px] font-bold text-white shadow-sm">{{ "access.assignments.save" | t }}</button></div>
       </section>
     }
 
     <div class="mt-4 space-y-3">
       @for (assignment of account().assignments; track assignment.id) {
-        <article
-          class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-        >
+        <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <span
-                  class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[10.5px] font-bold text-[#2a64a2]"
-                  >{{ roleKey(assignment.role) | t }}</span
-                ><span
-                  class="rounded-full bg-[#f1f4f8] px-2.5 py-1 text-[10.5px] font-semibold text-[#64748b]"
-                  >{{ scopeKey(assignment.scope) | t }}</span
-                >
-                @if (assignment.role === "read_only") {
-                  <span
-                    class="rounded-full bg-[#fff0c9] px-2.5 py-1 text-[10.5px] font-semibold text-[#8b5e00]"
-                    >{{ "access.assignments.readOnlyBadge" | t }}</span
-                  >
-                }
-              </div>
-              <div
-                class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[#475569]"
-              >
-                @if (assignment.organizationId) {
-                  <span class="font-semibold text-[#172033]">{{
-                    organizationName(assignment.organizationId)
-                  }}</span>
-                }
-                @if (assignment.siteId) {
-                  <i class="ph ph-caret-right text-[#9aa5b5]"></i
-                  ><span>{{ siteName(assignment.siteId) }}</span>
-                }
-                @if (assignment.programId) {
-                  <i class="ph ph-caret-right text-[#9aa5b5]"></i
-                  ><span>{{ programName(assignment.programId) }}</span>
-                }
-                @if (assignment.cohortId) {
-                  <i class="ph ph-caret-right text-[#9aa5b5]"></i
-                  ><span>{{ cohortName(assignment.cohortId) }}</span>
-                }
-                @if (assignment.examSessionId) {
-                  <i class="ph ph-caret-right text-[#9aa5b5]"></i
-                  ><span>{{ assignment.examSessionId }}</span>
-                }
+              <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-[#e5f2ff] px-2.5 py-1 text-[10.5px] font-bold text-[#2a64a2]">{{ roleKey(assignment.role) | t }}</span><span class="rounded-full bg-[#f1f4f8] px-2.5 py-1 text-[10.5px] font-semibold text-[#64748b]">{{ scopeKey(assignment.scope) | t }}</span>@if (assignment.role === "read_only") {<span class="rounded-full bg-[#fff0c9] px-2.5 py-1 text-[10.5px] font-semibold text-[#8b5e00]">{{ "access.assignments.readOnlyBadge" | t }}</span>}</div>
+              <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[#475569]">
+                @if (assignment.organizationId) {<span class="font-semibold text-[#172033]">{{ organizationName(assignment.organizationId) }}</span>}
+                @if (assignment.siteId) {<i class="ph ph-caret-right text-[#9aa5b5]"></i><span>{{ siteName(assignment.siteId) }}</span>}
+                @if (assignment.programId) {<i class="ph ph-caret-right text-[#9aa5b5]"></i><span>{{ programName(assignment.programId) }}</span>}
+                @if (assignment.cohortId) {<i class="ph ph-caret-right text-[#9aa5b5]"></i><span>{{ cohortName(assignment.cohortId) }}</span>}
+                @if (assignment.examSessionId) {<i class="ph ph-caret-right text-[#9aa5b5]"></i><span>{{ assignment.examSessionId }}</span>}
               </div>
             </div>
-            <button
-              type="button"
-              (click)="assignmentRemoved.emit(assignment.id)"
-              class="grid size-8 shrink-0 place-items-center rounded-[9px] text-[#f04438] hover:bg-[#fff1f0]"
-              [attr.aria-label]="'access.assignments.remove' | t"
-            >
-              <i class="ph ph-trash text-[16px]"></i>
-            </button>
+            <button type="button" (click)="assignmentRemoved.emit(assignment.id)" class="grid size-8 shrink-0 place-items-center rounded-[9px] text-[#f04438] hover:bg-[#fff1f0]" [attr.aria-label]="'access.assignments.remove' | t"><i class="ph ph-trash text-[16px]"></i></button>
           </div>
         </article>
       } @empty {
-        <div
-          class="rounded-[17px] border border-dashed border-[#cad4df] bg-white px-5 py-10 text-center"
-        >
-          <i class="ph ph-user-switch text-[28px] text-[#8da0b4]"></i>
-          <p class="mt-2 text-[13px] font-semibold text-[#475569]">
-            {{ "access.assignments.empty" | t }}
-          </p>
-        </div>
+        <div class="rounded-[17px] border border-dashed border-[#cad4df] bg-white px-5 py-10 text-center"><i class="ph ph-user-switch text-[28px] text-[#8da0b4]"></i><p class="mt-2 text-[13px] font-semibold text-[#475569]">{{ "access.assignments.empty" | t }}</p></div>
       }
     </div>
   </div>
 
-  <footer class="border-t border-[#dfe5ec] bg-white px-6 py-4">
-    <button
-      type="button"
-      (click)="closed.emit()"
-      class="h-[42px] w-full rounded-[10px] bg-[#2a64a2] text-[13px] font-semibold text-white"
-    >
-      {{ "access.assignments.done" | t }}
-    </button>
-  </footer>
+  <footer class="border-t border-[#dfe5ec] bg-white px-6 py-4"><button type="button" (click)="closed.emit()" class="h-[42px] w-full rounded-[10px] bg-[#2a64a2] text-[13px] font-semibold text-white">{{ "access.assignments.done" | t }}</button></footer>
 </aside>

@@ -37,6 +37,12 @@ export interface TrainingSite {
   code: string;
   name: string;
   city: string;
+  address?: string;
+  postalCode?: string;
+  phone?: string;
+  email?: string;
+  manager?: string;
+  status?: "active" | "attention" | "inactive" | string;
   active: boolean;
 }
 
@@ -72,6 +78,7 @@ export interface WorkspaceCohort {
   studentCount: number;
   capacity?: number;
   referentialVersionId?: string;
+  legacyPromotionId?: string;
 }
 
 export interface WorkspaceSelection {

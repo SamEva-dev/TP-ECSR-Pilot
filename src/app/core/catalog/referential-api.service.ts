@@ -21,6 +21,41 @@ export interface ReferentialApiDto {
   enabledModules: string[];
   notesKey?: string | null;
 }
+export interface ReferentialCompetencyDetailApiDto {
+  id: string;
+  parentId?: string | null;
+  code: string;
+  title: string;
+  kind: string;
+  sortOrder: number;
+}
+export interface ReferentialCertificationStepDetailApiDto {
+  id: string;
+  code: string;
+  title: string;
+  kind: string;
+  durationMinutes: number;
+  sortOrder: number;
+}
+export interface ReferentialLinkedCohortApiDto {
+  id: string;
+  key: string;
+  name: string;
+  siteName: string;
+  startDate: string;
+  endDate: string;
+  studentCount: number;
+  status: string;
+}
+export interface ReferentialVersionDetailsApiDto {
+  versionId: string;
+  topicCount: number;
+  competencies: ReferentialCompetencyDetailApiDto[];
+  workplacePeriodTypes: string[];
+  certificationSchemeName: string;
+  certificationSteps: ReferentialCertificationStepDetailApiDto[];
+  linkedCohorts: ReferentialLinkedCohortApiDto[];
+}
 @Injectable({ providedIn: "root" })
 export class ReferentialApiService {
   private readonly http = inject(HttpClient);
@@ -28,6 +63,13 @@ export class ReferentialApiService {
     return firstValueFrom(
       this.http.get<ReferentialApiDto[]>(
         `${environment.apiBaseUrl}/api/v1/referentials`,
+      ),
+    );
+  }
+  details(versionId: string) {
+    return firstValueFrom(
+      this.http.get<ReferentialVersionDetailsApiDto>(
+        `${environment.apiBaseUrl}/api/v1/referential-versions/${encodeURIComponent(versionId)}`,
       ),
     );
   }

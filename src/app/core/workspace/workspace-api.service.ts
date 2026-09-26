@@ -21,6 +21,12 @@ export interface WorkspaceSiteApi {
   code: string;
   name: string;
   city: string;
+  address: string;
+  postalCode: string;
+  phone: string;
+  email: string;
+  manager: string;
+  status: "active" | "attention" | "inactive" | string;
   active: boolean;
 }
 export interface WorkspaceProgramApi {

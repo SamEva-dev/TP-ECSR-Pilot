@@ -15,6 +15,12 @@ export interface LearnerProfileApi {
   enrolledOn: string;
 }
 
+export interface TopicEvaluationCriterionApi {
+  id: string;
+  code: string;
+  level: "acquired" | "in_progress" | "review" | string;
+}
+
 export interface TopicProgressApi {
   id: string;
   topicId: string;
@@ -27,7 +33,11 @@ export interface TopicProgressApi {
   presentationDate: string | null;
   presentationDurationMinutes: number | null;
   evaluatorDisplayName: string | null;
+  positivePoints: string | null;
+  improvements: string | null;
   comment: string | null;
+  nextObjective: string | null;
+  evaluationCriteria: TopicEvaluationCriterionApi[];
 }
 
 export interface UpdateTopicProgressApiRequest {
@@ -36,7 +46,11 @@ export interface UpdateTopicProgressApiRequest {
   presentationDate: string | null;
   presentationDurationMinutes: number | null;
   evaluatorDisplayName: null;
+  positivePoints: string | null;
+  improvements: string | null;
   comment: string | null;
+  nextObjective: string | null;
+  evaluationCriteria: { code: string; level: "acquired" | "in_progress" | "review" }[];
 }
 
 export interface CompetencyProgressApi {
@@ -70,6 +84,7 @@ export interface CohortCompetencyRowApi {
 
 export interface DrivingEvaluationApi {
   id: string;
+  enrollmentId: string;
   competencyDefinitionId: string;
   trainingSessionId: string | null;
   evaluatedAtUtc: string;

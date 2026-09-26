@@ -1,10 +1,8 @@
-// Extracted from the former mock-data contract. No runtime demo data lives here.
-// This file contains TypeScript contracts only and is safe in API-only mode.
-
 export type SiteOperationalStatus = "active" | "attention" | "inactive";
 
 export interface SiteProfile {
   id: string;
+  apiId: string;
   organizationId: string;
   code: string;
   name: string;
@@ -24,24 +22,6 @@ export interface SiteProfile {
   rooms: number;
   vehicles: number;
   alerts: number;
-}
-
-export interface SiteProgramMetric {
-  siteId: string;
-  programId: string;
-  students: number;
-  trainers: number;
-  activeCohorts: number;
-  attendanceRate: number;
-  successRate: number;
-}
-
-export interface SiteAlertItem {
-  id: string;
-  siteId: string;
-  level: "danger" | "warning" | "info";
-  titleKey: string;
-  detailKey: string;
 }
 
 export interface SiteFormValue {

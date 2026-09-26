@@ -3,6 +3,7 @@ import {
   Component,
   HostListener,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -12,6 +13,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from "@angular/router";
+import { firstValueFrom } from "rxjs";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { AttentionService } from "../../core/attention/attention.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
@@ -20,7 +22,9 @@ import {
   navItemVisibleForRole,
 } from "../../core/navigation/app-navigation.config";
 import { GlobalSearchService } from "../../core/search/global-search.service";
+import { AuthGateService } from "../../core/session/auth-gate.service";
 import { SessionService } from "../../core/session/session.service";
+import { ApplicationNotificationService } from "../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgramLogoComponent } from "../../shared/branding/program-logo.component";
 import { ContextSwitcherComponent } from "../../shared/workspace/context-switcher.component";
@@ -49,6 +53,8 @@ const MOBILE_PRIORITY: Record<string, string[]> = {
 export class AppShellComponent {
   private readonly router = inject(Router);
   readonly sessionService = inject(SessionService);
+  private readonly authGate = inject(AuthGateService);
+  private readonly notifications = inject(ApplicationNotificationService);
   readonly workspace = inject(WorkspaceContextService);
   readonly access = inject(AccessPolicyService);
   readonly attention = inject(AttentionService);
@@ -90,6 +96,17 @@ export class AppShellComponent {
   readonly searchResults = computed(() =>
     this.globalSearch.search(this.searchQuery()),
   );
+
+  constructor() {
+    effect(() => {
+      const notificationId = this.attention.lastApplicationNotificationId();
+      if (!notificationId) return;
+      queueMicrotask(() => {
+        this.searchOpen.set(false);
+        this.notificationsOpen.set(true);
+      });
+    });
+  }
 
   roleLabelKey(): string {
     return `common.roles.${this.sessionService.role()}`;
@@ -151,8 +168,15 @@ export class AppShellComponent {
     this.notificationsOpen.set(false);
   }
 
-  logout(): void {
-    this.sessionService.disconnect();
-    void this.router.navigateByUrl("/connexion");
+  async logout(): Promise<void> {
+    try {
+      await firstValueFrom(this.authGate.revokeSession());
+    } catch {
+      this.notifications.error("auth.errors.logoutFailed", "/connexion");
+    } finally {
+      this.authGate.logout();
+      this.sessionService.disconnect();
+      await this.router.navigateByUrl("/connexion");
+    }
   }
 }

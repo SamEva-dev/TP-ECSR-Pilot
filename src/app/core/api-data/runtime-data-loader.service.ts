@@ -3,6 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { firstValueFrom, forkJoin, of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { environment } from "../../environments/environment";
+import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import type { WorkspaceBootstrapApi } from "../workspace/workspace-api.service";
 import {
   ATTENDANCE_STUDENTS,
@@ -63,6 +64,7 @@ import {
 export class RuntimeDataLoaderService {
   private contextGeneration = 0;
   private readonly http = inject(HttpClient);
+  private readonly notifications = inject(ApplicationNotificationService);
   private readonly api = environment.apiBaseUrl;
 
   invalidate(): void {
@@ -187,60 +189,67 @@ export class RuntimeDataLoaderService {
         (x) => x.id === selection.siteId || x.key === selection.siteId,
       )?.id ?? TRAINING_SITES.find((x) => x.id === selection.siteId)?.apiId;
 
+    let partialFailure = false;
+    const safe = (fallback: any) =>
+      catchError(() => {
+        partialFailure = true;
+        return of(fallback);
+      });
+
     const requests: Record<string, any> = {
       referentials: this.http
         .get<any[]>(`${this.api}/api/v1/referentials`)
-        .pipe(catchError(() => of([]))),
+        .pipe(safe([])),
       programs: this.http
         .get<any[]>(`${this.api}/api/v1/programs`)
-        .pipe(catchError(() => of([]))),
+        .pipe(safe([])),
       audit: this.http
         .get<any>(`${this.api}/api/v1/reporting/audit`, {
           params: new HttpParams().set("pageSize", "100"),
         })
-        .pipe(catchError(() => of({ items: [] }))),
+        .pipe(safe({ items: [] })),
     };
     if (cohortApiId) {
       requests["learners"] = this.http
         .get<any[]>(`${this.api}/api/v1/cohorts/${cohortApiId}/learners`)
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["sessions"] = this.http
         .get<any[]>(`${this.api}/api/v1/training-sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["workplace"] = this.http
         .get<any[]>(`${this.api}/api/v1/workplace/periods`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["certSessions"] = this.http
         .get<any[]>(`${this.api}/api/v1/certification/sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["distanceLive"] = this.http
         .get<any[]>(`${this.api}/api/v1/distance-learning/live-sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["distanceAsync"] = this.http
         .get<any[]>(`${this.api}/api/v1/distance-learning/async-modules`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
     }
     if (referentialVersionId) {
       requests["topics"] = this.http
         .get<any[]>(
           `${this.api}/api/v1/learning/referentials/${referentialVersionId}/topics`,
         )
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["competencies"] = this.http
         .get<any[]>(
           `${this.api}/api/v1/learning/referentials/${referentialVersionId}/competencies`,
         )
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
       requests["certSchemes"] = this.http
         .get<any[]>(`${this.api}/api/v1/certification/schemes`, {
           params: new HttpParams().set(
@@ -248,30 +257,30 @@ export class RuntimeDataLoaderService {
             referentialVersionId,
           ),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
     }
     if (organizationApiId)
       requests["orgDashboard"] = this.http
         .get<any>(
           `${this.api}/api/v1/reporting/organizations/${organizationApiId}/dashboard`,
         )
-        .pipe(catchError(() => of(null)));
+        .pipe(safe(null));
     if (siteApiId)
       requests["siteDashboard"] = this.http
         .get<any>(`${this.api}/api/v1/reporting/sites/${siteApiId}/dashboard`)
-        .pipe(catchError(() => of(null)));
+        .pipe(safe(null));
     if (cohortApiId)
       requests["cohortDashboard"] = this.http
         .get<any>(
           `${this.api}/api/v1/reporting/cohorts/${cohortApiId}/dashboard`,
         )
-        .pipe(catchError(() => of(null)));
+        .pipe(safe(null));
     if (siteApiId)
       requests["remoteWork"] = this.http
         .get<any[]>(`${this.api}/api/v1/workforce/remote-work`, {
           params: new HttpParams().set("siteId", siteApiId),
         })
-        .pipe(catchError(() => of([])));
+        .pipe(safe([]));
 
     const data: any = await firstValueFrom(forkJoin(requests));
     if (generation !== this.contextGeneration || !isCurrent()) return;
@@ -285,7 +294,6 @@ export class RuntimeDataLoaderService {
         version: x.version,
         totalHours: x.totalHours ?? 0,
         sheetCount: x.sheetCount ?? 0,
-        stageRequirements: [],
       })),
     );
     replaceRuntimeArray(
@@ -397,7 +405,12 @@ export class RuntimeDataLoaderService {
             `${this.api}/api/v1/certification/sessions/${firstExam.id}/candidates`,
           ),
         );
-      } catch {}
+      } catch {
+        partialFailure = true;
+      }
+    }
+    if (partialFailure) {
+      this.notifications.error("workspace.api.partialLoadFailed", "/accueil");
     }
     replaceRuntimeArray(
       CERTIFICATION_CANDIDATES,

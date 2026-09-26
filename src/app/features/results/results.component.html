@@ -1,189 +1,25 @@
 <section class="mx-auto w-full max-w-[1450px]">
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <div class="flex flex-wrap items-center gap-2">
-        <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
-          {{ "results.title" | t }}
-        </h1>
-        <span
-          class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
-          >{{ program()?.name }}</span
-        ><span
-          class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10.5px] font-semibold text-[#8b5e00]"
-          >{{ scheme().code }}</span
-        >
-      </div>
-      <p class="mt-0.5 text-[13px] text-[#6c788b]">
-        {{ exam().name }} · {{ "results.subtitle" | t }}
-      </p>
+      <div class="flex flex-wrap items-center gap-2"><h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'results.title' | t }}</h1><span class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]">{{ program()?.name }}</span><span class="rounded-full bg-[#fff0c9] px-3 py-1 text-[10.5px] font-semibold text-[#8b5e00]">{{ scheme().code }}</span></div>
+      <p class="mt-0.5 text-[13px] text-[#6c788b]">{{ exam().name }} · {{ 'results.subtitle' | t }}</p>
     </div>
-    <div class="flex flex-wrap gap-2">
-      <a
-        routerLink="/certification"
-        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"
-        ><i class="ph ph-arrow-left"></i>{{ "results.back" | t }}</a
-      ><button
-        type="button"
-        (click)="publish()"
-        [disabled]="published()"
-        class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white disabled:opacity-60"
-      >
-        <i class="ph ph-megaphone"></i
-        >{{ (published() ? "results.published" : "results.publish") | t }}
-      </button>
-    </div>
+    <div class="flex flex-wrap gap-2"><a routerLink="/certification" class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[12px] font-semibold shadow-sm"><i class="ph ph-arrow-left"></i>{{ 'results.back' | t }}</a><button type="button" (click)="publish()" [disabled]="published()" class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white disabled:opacity-60"><i class="ph ph-megaphone"></i>{{ (published() ? 'results.published' : 'results.publish') | t }}</button></div>
   </div>
 
-  @if (published()) {
-    <div
-      class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"
-    >
-      <i class="ph ph-check-circle text-[18px]"></i
-      >{{ "results.publishSuccess" | t }}
-    </div>
-  }
+  @if (published()) {<div class="mt-4 flex items-center gap-3 rounded-[14px] border border-[#bdebc9] bg-[#e9f9ed] px-4 py-3 text-[12px] text-[#16843b]"><i class="ph ph-check-circle text-[18px]"></i>{{ 'results.publishSuccess' | t }}</div>}
 
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[10px] uppercase text-[#718096]">
-        {{ "results.kpi.candidates" | t }}
-      </p>
-      <p class="mt-2 text-[24px] font-extrabold">{{ stats().total }}</p>
-    </article>
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[10px] uppercase text-[#718096]">
-        {{ "results.kpi.obtained" | t }}
-      </p>
-      <p class="mt-2 text-[24px] font-extrabold text-[#18a547]">
-        {{ stats().obtained }}
-      </p>
-    </article>
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[10px] uppercase text-[#718096]">
-        {{ "results.kpi.partial" | t }}
-      </p>
-      <p class="mt-2 text-[24px] font-extrabold text-[#8b5e00]">
-        {{ stats().partial }}
-      </p>
-    </article>
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[10px] uppercase text-[#718096]">
-        {{ "results.kpi.failed" | t }}
-      </p>
-      <p class="mt-2 text-[24px] font-extrabold text-[#f22b2b]">
-        {{ stats().failed }}
-      </p>
-    </article>
-    <article
-      class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[10px] uppercase text-[#718096]">
-        {{ "results.kpi.absent" | t }}
-      </p>
-      <p class="mt-2 text-[24px] font-extrabold text-[#64748b]">
-        {{ stats().absent }}
-      </p>
-    </article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'results.kpi.candidates' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ stats().total }}</p></article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'results.kpi.obtained' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#18a547]">{{ stats().obtained }}</p></article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'results.kpi.partial' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#8b5e00]">{{ stats().partial }}</p></article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'results.kpi.failed' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#f22b2b]">{{ stats().failed }}</p></article>
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10px] uppercase text-[#718096]">{{ 'results.kpi.absent' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#64748b]">{{ stats().absent }}</p></article>
   </div>
 
-  <article
-    class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-  >
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <h2 class="text-[16px] font-bold">{{ "results.tableTitle" | t }}</h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "results.multiTableSubtitle" | t: { scheme: scheme().code } }}
-        </p>
-      </div>
-      <div class="flex gap-2">
-        <button
-          class="inline-flex h-[34px] items-center gap-1.5 rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
-        >
-          <i class="ph ph-file-pdf"></i>PDF</button
-        ><button
-          class="inline-flex h-[34px] items-center gap-1.5 rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
-        >
-          <i class="ph ph-file-xls"></i>Excel
-        </button>
-      </div>
-    </div>
-    <div class="mt-4 overflow-x-auto">
-      <table class="min-w-full text-left text-[12px]">
-        <thead>
-          <tr
-            class="border-b border-[#e1e7ee] text-[10px] uppercase text-[#718096]"
-          >
-            <th class="pb-2 pr-4">{{ "certification.table.candidate" | t }}</th>
-            @for (unit of scheme().units; track unit.id) {
-              <th class="pb-2 pr-4">{{ unit.shortLabel }}</th>
-            }
-            <th class="pb-2 pr-4">{{ "results.result" | t }}</th>
-            <th class="pb-2 pr-4">{{ "results.publication" | t }}</th>
-            <th class="pb-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (candidate of candidates(); track candidate.id) {
-            <tr class="border-b border-[#edf1f5] last:border-0">
-              <td class="py-3 pr-4">
-                <p class="font-bold">
-                  {{ candidate.firstName }} {{ candidate.lastName }}
-                </p>
-                <p class="text-[10.5px] text-[#7b8798]">
-                  {{ candidate.candidateNumber }}
-                </p>
-              </td>
-              @for (unit of scheme().units; track unit.id) {
-                @let status = unitStatus(candidate, unit.id);
-                <td class="py-3 pr-4">
-                  <i [class]="'ph text-[17px] ' + statusIcon(status)"></i>
-                </td>
-              }
-              <td class="py-3 pr-4">
-                <span
-                  [class]="
-                    'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                    resultClasses(candidate.result)
-                  "
-                  >{{ "results.status." + candidate.result | t }}</span
-                >
-              </td>
-              <td class="py-3 pr-4">
-                <span
-                  [class]="
-                    'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                    (published()
-                      ? 'bg-[#d8f8df] text-[#18a547]'
-                      : 'bg-[#eef2f6] text-[#64748b]')
-                  "
-                  >{{
-                    (published()
-                      ? "results.publicationStates.published"
-                      : "results.publicationStates.draft"
-                    ) | t
-                  }}</span
-                >
-              </td>
-              <td class="py-3 text-right">
-                <a
-                  [routerLink]="['/certification/candidats', candidate.id]"
-                  class="inline-flex h-[31px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
-                  >{{ "common.open" | t }}</a
-                >
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+  <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+    <div class="flex items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold">{{ 'results.tableTitle' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'results.multiTableSubtitle' | t: { scheme: scheme().code } }}</p></div><div class="flex gap-2"><button type="button" (click)="exportPdf()" class="inline-flex h-[34px] items-center gap-1.5 rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"><i class="ph ph-file-pdf"></i>PDF</button><button type="button" (click)="exportExcel()" class="inline-flex h-[34px] items-center gap-1.5 rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"><i class="ph ph-file-xls"></i>Excel</button></div></div>
+    <div class="mt-4 overflow-x-auto"><table class="min-w-full text-left text-[12px]"><thead><tr class="border-b border-[#e1e7ee] text-[10px] uppercase text-[#718096]"><th class="pb-2 pr-4">{{ 'certification.table.candidate' | t }}</th>@for (unit of scheme().units; track unit.id) {<th class="pb-2 pr-4">{{ unit.shortLabel }}</th>}<th class="pb-2 pr-4">{{ 'results.result' | t }}</th><th class="pb-2 pr-4">{{ 'results.publication' | t }}</th><th class="pb-2"></th></tr></thead>
+      <tbody>@for (candidate of candidates(); track candidate.id) {<tr class="border-b border-[#edf1f5] last:border-0"><td class="py-3 pr-4"><p class="font-bold">{{ candidate.firstName }} {{ candidate.lastName }}</p><p class="text-[10.5px] text-[#7b8798]">{{ candidate.candidateNumber }}</p></td>@for (unit of scheme().units; track unit.id) {@let status = unitStatus(candidate, unit.id);<td class="py-3 pr-4"><i [class]="'ph text-[17px] ' + statusIcon(status)"></i></td>}<td class="py-3 pr-4"><span [class]="'rounded-full px-2.5 py-1 text-[10px] font-semibold ' + resultClasses(candidate.result)">{{ 'results.status.' + candidate.result | t }}</span></td><td class="py-3 pr-4"><span [class]="'rounded-full px-2.5 py-1 text-[10px] font-semibold ' + (published() ? 'bg-[#d8f8df] text-[#18a547]' : 'bg-[#eef2f6] text-[#64748b]')">{{ (published() ? 'results.publicationStates.published' : 'results.publicationStates.draft') | t }}</span></td><td class="py-3 text-right"><a [routerLink]="['/certification/candidats', candidate.id]" class="inline-flex h-[31px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm">{{ 'common.open' | t }}</a></td></tr>}</tbody></table></div>
   </article>
 </section>

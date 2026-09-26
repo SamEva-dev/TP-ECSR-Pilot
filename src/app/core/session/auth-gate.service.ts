@@ -29,6 +29,22 @@ export interface AuthGateLoginResponse {
   passwordChangeBeforeUtc: string | null;
 }
 
+
+export interface AuthGateTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  passwordChangeRequired: boolean;
+  passwordChangeBeforeUtc: string | null;
+}
+
+export interface AuthGateVerifyMfaRequest {
+  mfaToken: string;
+  code: string;
+  rememberDevice?: boolean;
+  deviceFingerprint?: string;
+}
+
 export interface AuthGateRegistrationRequest {
   email: string;
   password: string;
@@ -92,6 +108,53 @@ export class AuthGateService {
           }
         }),
       );
+  }
+
+
+  verifyMfa(
+    request: AuthGateVerifyMfaRequest,
+    rememberMe: boolean,
+  ): Observable<AuthGateLoginResponse> {
+    return this.http
+      .post<AuthGateLoginResponse>(`${this.baseUrl}/verify-2fa`, request)
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.tokens.setTokens(
+              response.accessToken,
+              response.refreshToken,
+              rememberMe,
+            );
+          }
+        }),
+      );
+  }
+
+  changePassword(
+    currentPassword: string,
+    newPassword: string,
+    rememberMe: boolean,
+  ): Observable<AuthGateTokenResponse> {
+    return this.http
+      .post<AuthGateTokenResponse>(`${this.baseUrl}/change-password`, {
+        currentPassword,
+        newPassword,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.accessToken) {
+            this.tokens.setTokens(
+              response.accessToken,
+              response.refreshToken,
+              rememberMe,
+            );
+          }
+        }),
+      );
+  }
+
+  revokeSession(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/logout`, {});
   }
 
   registerOrganization(

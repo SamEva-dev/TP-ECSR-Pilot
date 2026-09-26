@@ -3,6 +3,9 @@
 
 export type PedagogicalSessionType =
   | "classroom"
+  | "distance"
+  | "driving"
+  | "internship"
   | "presentation"
   | "evaluation"
   | "sensitization"

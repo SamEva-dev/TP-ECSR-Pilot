@@ -5,24 +5,26 @@ import {
   effect,
   inject,
   signal,
+  type WritableSignal,
 } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import { DrivingApiStoreService } from "../../core/api-data/driving-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import type { DrivingHistoryItem, DrivingLevel } from "../../core/models/driving.models";
 import { SessionService } from "../../core/session/session.service";
-import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
-import {
-  TrainingDeliveryApiService,
-  type TrainingSessionApi,
-} from "../../core/training-delivery/training-delivery-api.service";
-import {
-  StudentProfileApiService,
-  type CompetencyDefinitionApi,
-  type DrivingEvaluationApi,
-  type LearnerProfileApi,
-  type RecordDrivingEvaluationApiRequest,
-} from "../../core/students/student-profile-api.service";
 
-type Level = "not_assessed" | "in_progress" | "rework" | "acquired";
+const EMPTY_HISTORY: DrivingHistoryItem = {
+  id: "",
+  studentId: "",
+  studentName: "",
+  date: "",
+  competence: "",
+  trainer: "",
+  subjectKey: "",
+  positiveKey: "",
+  difficultyKey: "",
+  nextGoalKey: "",
+  evaluations: [],
+};
 
 @Component({
   selector: "app-driving",
@@ -31,317 +33,229 @@ type Level = "not_assessed" | "in_progress" | "rework" | "acquired";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DrivingComponent {
-  readonly session = inject(SessionService);
-  readonly workspace = inject(WorkspaceContextService);
-  private readonly api = inject(StudentProfileApiService);
-  private readonly sessionsApi = inject(TrainingDeliveryApiService);
-  readonly isStudent = computed(() => this.session.role() === "stagiaire");
-  readonly canEdit = computed(() =>
-    ["direction", "formateur"].includes(this.session.role()),
-  );
-  readonly students = signal<LearnerProfileApi[]>([]);
-  readonly definitions = signal<CompetencyDefinitionApi[]>([]);
-  readonly selectedEnrollmentId = signal("");
-  readonly selectedDefinitionId = signal("");
-  readonly history = signal<DrivingEvaluationApi[]>([]);
-  readonly sessions = signal<TrainingSessionApi[]>([]);
-  readonly selectedSessionId = signal("");
-  readonly sessionsError = signal(false);
-  readonly levels: Level[] = [
-    "not_assessed",
-    "in_progress",
-    "rework",
-    "acquired",
-  ];
-  readonly evaluation = signal<Record<string, Level>>({});
-  readonly subject = signal("");
+  readonly sessionService = inject(SessionService);
+  readonly store = inject(DrivingApiStoreService);
+
+  get students() {
+    return this.store.students();
+  }
+
+  get trainers() {
+    return this.store.trainers();
+  }
+
+  get competencies() {
+    return this.store.competencies();
+  }
+
+  get criteria() {
+    return this.store.criteria(this.selectedCompetence(), this.selectedSubSkill());
+  }
+
+  get vehicles() {
+    return [] as { id: string; label: string }[];
+  }
+
+  readonly selectedStudentId = signal("");
+  readonly selectedTrainerId = signal("");
+  readonly selectedVehicleId = signal("");
+  readonly selectedCompetence = signal("");
+  readonly selectedSubSkill = signal("");
+  readonly date = signal("");
+  readonly start = signal("");
+  readonly end = signal("");
+  readonly duration = signal("");
+  readonly objective = signal("");
   readonly positive = signal("");
-  readonly difficulty = signal("");
+  readonly difficulties = signal("");
+  readonly errors = signal("");
+  readonly advice = signal("");
   readonly nextGoal = signal("");
   readonly freeObservation = signal("");
-  readonly rosterLoading = signal(false);
-  readonly rosterError = signal(false);
-  readonly definitionsError = signal(false);
-  readonly historyLoading = signal(false);
-  readonly historyError = signal(false);
-  readonly saving = signal(false);
-  readonly saveError = signal(false);
   readonly saved = signal(false);
-  readonly selectedStudent = computed(
-    () =>
-      this.students().find(
-        (x) => x.enrollmentId === this.selectedEnrollmentId(),
-      ) ?? null,
+
+  readonly evaluation = signal<Record<string, DrivingLevel>>({});
+
+  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly isTrainer = computed(() => this.sessionService.role() === "formateur");
+  readonly canEdit = computed(
+    () => this.sessionService.role() === "direction" || this.sessionService.role() === "formateur",
   );
-  readonly eligibleSessions = computed(() =>
-    this.sessions().filter(
-      (x) =>
-        x.type === "driving" &&
-        x.status !== "cancelled" &&
-        new Date(x.startsAtUtc).getTime() <= Date.now() &&
-        (x.audienceMode !== "selected-enrollments" ||
-          x.participantEnrollmentIds.includes(this.selectedEnrollmentId())),
-    ),
-  );
-  readonly competencyGroups = computed(() => {
-    const defs = this.definitions();
-    const ids = new Set(defs.map((x) => x.id));
-    return defs.filter((x) => !x.parentId || !ids.has(x.parentId));
-  });
-  readonly selectedDefinition = computed(
-    () =>
-      this.competencyGroups().find(
-        (x) => x.id === this.selectedDefinitionId(),
-      ) ?? null,
-  );
-  readonly criteria = computed(() => {
-    const parent = this.selectedDefinition();
-    if (!parent) return [];
-    const children = this.definitions().filter((x) => x.parentId === parent.id);
-    return children.length ? children : [parent];
-  });
-  readonly latestHistory = computed(() => this.history()[0] ?? null);
-  readonly valid = computed(
-    () =>
-      !!this.selectedEnrollmentId() &&
-      !!this.selectedDefinition() &&
-      !!this.subject().trim() &&
-      this.criteria().length > 0 &&
-      this.criteria().every((x) => !!this.evaluation()[x.code]),
-  );
-  private rosterGeneration = 0;
-  private historyGeneration = 0;
 
   constructor() {
-    effect((onCleanup) => {
-      const user = this.session.session();
-      const cohort = this.workspace.cohort();
-      const loaded = this.workspace.remoteWorkspaceLoaded();
-      const generation = ++this.rosterGeneration;
-      this.students.set([]);
-      this.definitions.set([]);
-      this.sessions.set([]);
-      this.selectedSessionId.set("");
-      this.sessionsError.set(false);
-      this.selectedEnrollmentId.set("");
-      this.selectedDefinitionId.set("");
-      this.evaluation.set({});
-      this.rosterLoading.set(false);
-      this.rosterError.set(false);
-      this.definitionsError.set(false);
-      this.saved.set(false);
-      this.saveError.set(false);
-      if (user && loaded) {
-        this.rosterLoading.set(true);
-        if (user.role === "stagiaire") void this.loadSelf(generation);
-        else if (cohort?.apiId)
-          void this.loadCohort(
-            cohort.apiId,
-            cohort.referentialVersionId ?? "",
-            generation,
-          );
-        else this.rosterLoading.set(false);
-      }
-      onCleanup(() => {
-        this.rosterGeneration++;
-      });
+    effect(() => {
+      const students = this.store.students();
+      const current = this.selectedStudentId();
+      const selected = students.some((student) => student.id === current)
+        ? current
+        : (students[0]?.id ?? "");
+      if (selected !== current) this.selectedStudentId.set(selected);
+      this.store.selectStudent(selected);
     });
-    effect((onCleanup) => {
-      const id = this.selectedEnrollmentId();
-      const generation = ++this.historyGeneration;
-      this.history.set([]);
-      this.selectedSessionId.set("");
-      this.historyError.set(false);
-      this.historyLoading.set(false);
-      this.saved.set(false);
-      this.saveError.set(false);
-      if (id) {
-        this.historyLoading.set(true);
-        void this.loadHistory(id, generation);
+
+    effect(() => {
+      const trainers = this.store.trainers();
+      const current = this.selectedTrainerId();
+      if (!trainers.some((trainer) => trainer.id === current)) {
+        this.selectedTrainerId.set(trainers[0]?.id ?? "");
       }
-      onCleanup(() => {
-        this.historyGeneration++;
-      });
+    });
+
+    effect(() => {
+      const competencies = this.store.competencies();
+      const current = this.selectedCompetence();
+      const preferred = competencies.find((item) => item.id.toUpperCase() === "C3")?.id;
+      const selected = competencies.some((item) => item.id === current)
+        ? current
+        : (preferred ?? competencies[0]?.id ?? "");
+      if (selected !== current) this.selectedCompetence.set(selected);
+    });
+
+    effect(() => {
+      const skills = this.store.subSkills(this.selectedCompetence());
+      const current = this.selectedSubSkill();
+      if (!skills.some((skill) => skill.id === current)) {
+        this.selectedSubSkill.set(skills[0]?.id ?? "");
+      }
+    });
+
+    effect(() => {
+      const allowed = new Set(this.criteria.map((criterion) => criterion.id));
+      const current = this.evaluation();
+      const normalized = Object.fromEntries(
+        Object.entries(current).filter(([key]) => allowed.has(key)),
+      ) as Record<string, DrivingLevel>;
+      if (Object.keys(normalized).length !== Object.keys(current).length) this.evaluation.set(normalized);
+    });
+
+    effect(() => {
+      const form = this.store.sessionForm(this.selectedStudentId());
+      this.date.set(form.date);
+      this.start.set(form.start);
+      this.end.set(form.end);
+      this.duration.set(form.duration);
+      this.saved.set(false);
     });
   }
 
-  private async loadSelf(generation: number): Promise<void> {
-    try {
-      const profile = await firstValueFrom(this.api.self());
-      if (generation !== this.rosterGeneration) return;
-      this.students.set([profile]);
-      this.selectedEnrollmentId.set(profile.enrollmentId);
-      const version = this.workspace.cohortReferentialVersionByApiId(
-        profile.cohortId,
-      );
-      if (version) await this.loadDefinitions(version, generation);
-      else this.definitionsError.set(true);
-    } catch {
-      if (generation === this.rosterGeneration) this.rosterError.set(true);
-    } finally {
-      if (generation === this.rosterGeneration) this.rosterLoading.set(false);
-    }
+  readonly selectedStudent = computed(() =>
+    this.students.find((student) => student.id === this.selectedStudentId()) ?? { id: "", name: "" },
+  );
+  readonly selectedTrainer = computed(() =>
+    this.trainers.find((trainer) => trainer.id === this.selectedTrainerId()) ?? { id: "", name: "" },
+  );
+  readonly selectedVehicle = computed(() =>
+    this.vehicles.find((vehicle) => vehicle.id === this.selectedVehicleId()) ?? { id: "", label: "" },
+  );
+  readonly selectedCompetenceInfo = computed(() =>
+    this.competencies.find((competence) => competence.id === this.selectedCompetence()) ?? {
+      id: "",
+      definitionId: "",
+      descriptionKey: "",
+    },
+  );
+  readonly subSkills = computed(() => this.store.subSkills(this.selectedCompetence()));
+  readonly latestHistory = computed(() => this.store.history()[0] ?? EMPTY_HISTORY);
+  readonly visibleHistory = computed(() => this.store.history());
+
+  updateStudent(event: Event) {
+    if (this.isStudent()) return;
+    const id = (event.target as HTMLSelectElement).value ?? "";
+    this.selectedStudentId.set(id);
+    this.store.selectStudent(id);
+    this.resetEvaluationFields();
   }
-  private async loadCohort(
-    cohortId: string,
-    version: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const rows = await firstValueFrom(this.api.cohortLearners(cohortId));
-      if (generation !== this.rosterGeneration) return;
-      this.students.set(rows);
-      this.selectedEnrollmentId.set(rows[0]?.enrollmentId ?? "");
-      void this.loadSessions(cohortId, generation);
-      if (version) await this.loadDefinitions(version, generation);
-      else this.definitionsError.set(true);
-    } catch {
-      if (generation === this.rosterGeneration) this.rosterError.set(true);
-    } finally {
-      if (generation === this.rosterGeneration) this.rosterLoading.set(false);
-    }
+
+  updateTrainer(event: Event) {
+    if (this.isTrainer() || this.isStudent()) return;
+    this.selectedTrainerId.set((event.target as HTMLSelectElement).value ?? "");
   }
-  private async loadSessions(
-    cohortId: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const sessions = await this.sessionsApi.list(cohortId);
-      if (generation === this.rosterGeneration) this.sessions.set(sessions);
-    } catch {
-      if (generation === this.rosterGeneration) this.sessionsError.set(true);
-    }
+
+  updateVehicle(event: Event) {
+    this.selectedVehicleId.set((event.target as HTMLSelectElement).value ?? "");
   }
-  private async loadDefinitions(
-    version: string,
-    generation: number,
-  ): Promise<void> {
-    try {
-      const definitions = await firstValueFrom(
-        this.api.competencyDefinitions(version),
-      );
-      if (generation !== this.rosterGeneration) return;
-      this.definitions.set(definitions.filter((x) => x.active));
-      const ids = new Set(definitions.map((x) => x.id));
-      this.selectedDefinitionId.set(
-        definitions.find(
-          (x) => x.active && (!x.parentId || !ids.has(x.parentId)),
-        )?.id ?? "",
-      );
-    } catch {
-      if (generation === this.rosterGeneration) this.definitionsError.set(true);
-    }
-  }
-  private async loadHistory(id: string, generation: number): Promise<void> {
-    try {
-      const rows = await firstValueFrom(this.api.driving(id));
-      if (generation === this.historyGeneration) this.history.set(rows);
-    } catch {
-      if (generation === this.historyGeneration) this.historyError.set(true);
-    } finally {
-      if (generation === this.historyGeneration) this.historyLoading.set(false);
-    }
-  }
-  updateStudent(event: Event): void {
-    if (!this.isStudent())
-      this.selectedEnrollmentId.set((event.target as HTMLSelectElement).value);
-  }
-  updateSession(event: Event): void {
-    this.selectedSessionId.set((event.target as HTMLSelectElement).value);
+
+  updateText(target: WritableSignal<string>, event: Event) {
+    target.set((event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "");
     this.saved.set(false);
   }
-  sessionTitle(id: string | null): string | null {
-    return this.sessions().find((x) => x.id === id)?.title ?? null;
-  }
-  selectDefinition(id: string): void {
+
+  selectCompetence(id: string) {
     if (!this.canEdit()) return;
-    this.selectedDefinitionId.set(id);
+    this.selectedCompetence.set(id ?? "");
+    this.selectedSubSkill.set(this.store.subSkills(id ?? "")[0]?.id ?? "");
     this.evaluation.set({});
     this.saved.set(false);
   }
-  setLevel(code: string, level: Level): void {
+
+  selectSubSkill(id: string) {
     if (!this.canEdit()) return;
-    this.evaluation.update((current) => ({ ...current, [code]: level }));
+    this.selectedSubSkill.set(id ?? "");
+    this.evaluation.set({});
     this.saved.set(false);
   }
-  updateText(
-    field:
-      "subject" | "positive" | "difficulty" | "nextGoal" | "freeObservation",
-    event: Event,
-  ): void {
-    this[field].set(
-      (event.target as HTMLInputElement | HTMLTextAreaElement).value,
-    );
+
+  setLevel(criterionId: string, level: DrivingLevel) {
+    if (!this.canEdit() || !criterionId) return;
+    this.evaluation.update((current) => ({ ...current, [criterionId]: level }));
     this.saved.set(false);
   }
-  levelClasses(code: string, level: Level): string {
-    return this.evaluation()[code] === level
-      ? "border-[#2b66a4] bg-[#2b66a4] text-white"
-      : "border-[#dfe5ec] bg-white text-[#334155]";
+
+  levelClasses(criterionId: string, level: DrivingLevel) {
+    const selected = this.evaluation()[criterionId] === level;
+    if (!selected) return "bg-white text-[#243044] border-[#e5eaf0]";
+    return level === "acquired"
+      ? "bg-[#1fad55] text-white border-[#1fad55]"
+      : level === "progress"
+        ? "bg-[#f6a51e] text-white border-[#f6a51e]"
+        : "bg-[#ed1f2b] text-white border-[#ed1f2b]";
   }
-  formatDate(value: string): string {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? "—"
-      : new Intl.DateTimeFormat(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(date);
+
+  historyLevelClasses(level: DrivingLevel) {
+    return level === "acquired"
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : level === "progress"
+        ? "bg-[#fff0c9] text-[#8b5e00]"
+        : "bg-[#ffe1df] text-[#f22b2b]";
   }
-  async save(): Promise<void> {
-    if (!this.canEdit() || !this.valid() || this.saving()) return;
-    const enrollmentId = this.selectedEnrollmentId();
-    const sessionId = this.selectedSessionId();
-    if (sessionId && !this.eligibleSessions().some((x) => x.id === sessionId))
-      return;
-    const definition = this.selectedDefinition();
-    if (!definition) return;
-    const request: RecordDrivingEvaluationApiRequest = {
-      competencyDefinitionId: definition.id,
-      trainingSessionId: sessionId || null,
-      evaluatedAtUtc: new Date().toISOString(),
-      trainerAuthGateUserId: null,
-      trainerDisplayName: "",
-      subject: this.subject().trim(),
-      positive: this.positive().trim() || null,
-      difficulty: this.difficulty().trim() || null,
-      nextGoal: this.nextGoal().trim() || null,
-      freeObservation: this.freeObservation().trim() || null,
-      criteria: this.criteria().map((x) => ({
-        code: x.code,
-        label: x.title,
-        level: this.evaluation()[x.code],
-      })),
-    };
-    this.saving.set(true);
-    this.saveError.set(false);
+
+  labelForCriterion(id: string) {
+    return this.criteria.find((criterion) => criterion.id === id)?.labelKey ?? id ?? "";
+  }
+
+  async save() {
+    if (!this.canEdit()) return;
+    const ok = await this.store.record({
+      enrollmentId: this.selectedStudentId(),
+      competenceCode: this.selectedCompetence(),
+      subSkillCode: this.selectedSubSkill(),
+      evaluation: this.evaluation(),
+      objective: this.objective(),
+      positive: this.positive(),
+      difficulties: this.difficulties(),
+      errors: this.errors(),
+      advice: this.advice(),
+      nextGoal: this.nextGoal(),
+      freeObservation: this.freeObservation(),
+      date: this.date(),
+    });
+    this.saved.set(ok);
+    if (ok) setTimeout(() => this.saved.set(false), 1800);
+  }
+
+  scrollToHistory() {
+    document.getElementById("driving-history")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  private resetEvaluationFields(): void {
+    this.objective.set("");
+    this.positive.set("");
+    this.difficulties.set("");
+    this.errors.set("");
+    this.advice.set("");
+    this.nextGoal.set("");
+    this.freeObservation.set("");
+    this.evaluation.set({});
     this.saved.set(false);
-    try {
-      const recorded = await firstValueFrom(
-        this.api.recordDriving(enrollmentId, request),
-      );
-      if (enrollmentId !== this.selectedEnrollmentId()) return;
-      this.history.update((rows) => [
-        recorded,
-        ...rows.filter((x) => x.id !== recorded.id),
-      ]);
-      this.saved.set(true);
-      this.subject.set("");
-      this.positive.set("");
-      this.difficulty.set("");
-      this.nextGoal.set("");
-      this.freeObservation.set("");
-      this.evaluation.set({});
-    } catch {
-      if (enrollmentId === this.selectedEnrollmentId())
-        this.saveError.set(true);
-    } finally {
-      this.saving.set(false);
-    }
-  }
-  scrollToHistory(): void {
-    document
-      .getElementById("driving-history")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }

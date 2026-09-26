@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  output,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import type { TrainingReferential } from "../../../core/models/referentials.models";
 

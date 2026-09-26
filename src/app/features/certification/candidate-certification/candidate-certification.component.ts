@@ -2,21 +2,47 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
+import { CertificationApiStoreService } from "../../../core/api-data/certification-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import { SessionService } from "../../../core/session/session.service";
 import type {
   CertificationCandidate,
   CertificationUnitStatus,
 } from "../../../core/models/certification.models";
-import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
+import { SessionService } from "../../../core/session/session.service";
+import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
 
 type JuryLevel = "satisfactory" | "partial" | "insufficient";
+
+const EMPTY_CANDIDATE: CertificationCandidate = {
+  id: "",
+  studentId: "",
+  firstName: "",
+  lastName: "",
+  candidateNumber: "",
+  promotionId: "",
+  ready: false,
+  missingKeys: [],
+  completedHours: 0,
+  plannedHours: 0,
+  documentsReady: 0,
+  documentsTotal: 0,
+  ccp1: "pending",
+  ccp2: "pending",
+  result: "pending",
+  published: false,
+  examTime: "",
+  steps: [],
+  programId: "",
+  schemeId: "",
+  unitStatuses: [],
+};
 
 @Component({
   selector: "app-candidate-certification",
@@ -27,69 +53,77 @@ type JuryLevel = "satisfactory" | "partial" | "insufficient";
 export class CandidateCertificationComponent {
   private readonly route = inject(ActivatedRoute);
   readonly sessionService = inject(SessionService);
-  readonly contextData = inject(ContextualTrainingDataService);
-  readonly scheme = this.contextData.certificationScheme;
-  readonly program = this.contextData.program;
-  readonly exam = this.contextData.examSession;
+  readonly store = inject(CertificationApiStoreService);
+  readonly workspace = inject(WorkspaceContextService);
+  readonly scheme = this.store.scheme;
+  readonly program = this.workspace.program;
+  readonly exam = this.store.examSession;
 
-  private readonly requestedCandidateId =
-    this.route.snapshot.paramMap.get("id") ?? "";
-  private readonly ownStudentId =
-    this.sessionService.session()?.studentId ?? "";
+  private readonly requestedCandidateId = this.route.snapshot.paramMap.get("id") ?? "";
 
   readonly candidate = computed<CertificationCandidate>(() => {
-    const candidates = this.contextData.certificationCandidates();
-    const wanted =
-      this.sessionService.role() === "stagiaire"
-        ? this.ownStudentId
-        : this.requestedCandidateId;
-    return (
-      candidates.find(
-        (item) => item.id === wanted || item.studentId === wanted,
-      ) ?? candidates[0]!
-    );
+    const candidates = this.store.candidates();
+    if (this.sessionService.role() === "stagiaire") {
+      const enrollmentId = this.store.selfEnrollmentId();
+      return candidates.find((item) => this.store.rawCandidate(item.id)?.enrollmentId === enrollmentId) ?? candidates[0] ?? EMPTY_CANDIDATE;
+    }
+    return candidates.find((item) => item.id === this.requestedCandidateId || item.studentId === this.requestedCandidateId) ?? candidates[0] ?? EMPTY_CANDIDATE;
   });
 
   readonly isJury = computed(() => this.sessionService.role() === "jury");
   readonly readiness = computed(() => {
     const candidate = this.candidate();
-    return Math.round(
-      (candidate.completedHours / Math.max(candidate.plannedHours, 1)) * 100,
-    );
+    if (candidate.plannedHours <= 0) return 0;
+    return Math.round((candidate.completedHours / candidate.plannedHours) * 100);
   });
   readonly evaluationSaved = signal(false);
+  readonly juryLevels = signal<Record<string, JuryLevel>>({});
   readonly evaluationLocked = signal(false);
   juryNotes = "";
-  readonly juryLevels = signal<Record<string, JuryLevel>>({});
+
+  constructor() {
+    effect(() => {
+      const candidate = this.candidate();
+      const raw = this.store.rawCandidate(candidate.id);
+      const levels: Record<string, JuryLevel> = {};
+      for (const assessment of raw?.assessments ?? []) {
+        const stepId = assessment.stepDefinitionId ?? "";
+        if (stepId) levels[stepId] = this.store.levelForAssessment(assessment.outcome ?? "");
+      }
+      this.juryLevels.set(levels);
+      this.juryNotes = raw?.assessments?.find((assessment) => Boolean(assessment.comment))?.comment ?? "";
+    }, { allowSignalWrites: true });
+  }
 
   setLevel(id: string, level: JuryLevel): void {
     if (this.evaluationLocked()) return;
-    this.juryLevels.update((value) => ({ ...value, [id]: level }));
+    this.juryLevels.update((value) => ({ ...value, [id ?? ""]: level }));
     this.evaluationSaved.set(false);
   }
 
   selected(id: string, level: JuryLevel): boolean {
-    return this.juryLevels()[id] === level;
+    return this.juryLevels()[id ?? ""] === level;
   }
 
-  saveDraft(): void {
-    this.evaluationSaved.set(true);
+  async saveDraft(): Promise<void> {
+    const candidate = this.candidate();
+    if (!candidate.id) return;
+    const saved = await this.store.saveAssessments(candidate.id, this.juryLevels(), this.juryNotes ?? "");
+    this.evaluationSaved.set(saved);
   }
 
-  validateEvaluation(): void {
-    this.evaluationSaved.set(true);
-    this.evaluationLocked.set(true);
+  async validateEvaluation(): Promise<void> {
+    const candidate = this.candidate();
+    if (!candidate.id) return;
+    const criteria = this.scheme().juryCriteria;
+    if (criteria.length && !criteria.every((criterion) => Boolean(this.juryLevels()[criterion.id]))) return;
+    const saved = await this.store.saveAssessments(candidate.id, this.juryLevels(), this.juryNotes ?? "");
+    this.evaluationSaved.set(saved);
+    if (saved) this.evaluationLocked.set(true);
   }
 
   unitStatus(unitId: string): CertificationUnitStatus {
-    const candidate = this.candidate();
-    const explicit = candidate.unitStatuses?.find(
-      (item) => item.unitId === unitId,
-    )?.status;
-    if (explicit) return explicit;
-    if (unitId === "ccp1") return candidate.ccp1;
-    if (unitId === "ccp2") return candidate.ccp2;
-    return candidate.ready ? "validated" : "pending";
+    return this.candidate().unitStatuses?.find((item) => item.unitId === unitId)?.status ?? "pending";
   }
 
   statusClasses(status: string): string {

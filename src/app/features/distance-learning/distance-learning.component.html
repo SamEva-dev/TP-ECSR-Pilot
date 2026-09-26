@@ -2,301 +2,101 @@
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <div class="flex flex-wrap items-center gap-2">
-        <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
-          {{ "distanceLearning.title" | t }}
-        </h1>
-        <span
-          class="inline-flex rounded-full bg-[#e6f2ff] px-3 py-1 text-[11px] font-semibold text-[#2a64a2]"
-          >{{ "distanceLearning.badge" | t }}</span
-        >
+        <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'distanceLearning.title' | t }}</h1>
+        <span class="inline-flex rounded-full bg-[#e6f2ff] px-3 py-1 text-[11px] font-semibold text-[#2a64a2]">{{ 'distanceLearning.badge' | t }}</span>
       </div>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
-        {{ "distanceLearning.subtitle" | t }}
-      </p>
-      <p class="mt-1 text-[11.5px] font-medium text-[#8792a3]">
-        {{ workspace.breadcrumb() }}
-      </p>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">{{ 'distanceLearning.subtitle' | t }}</p>
+      <p class="mt-1 text-[11.5px] font-medium text-[#8792a3]">{{ workspace.breadcrumb() }}</p>
     </div>
     @if (canCreate()) {
-      <button
-        type="button"
-        (click)="openCreateDrawer()"
-        class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12.5px] font-semibold text-white shadow-sm"
-      >
-        <i class="ph ph-plus text-[16px]"></i
-        >{{ "distanceLearning.actions.create" | t }}
+      <button type="button" (click)="openCreateDrawer()" class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12.5px] font-semibold text-white shadow-sm">
+        <i class="ph ph-plus text-[16px]"></i>{{ 'distanceLearning.actions.create' | t }}
       </button>
     }
   </div>
 
   @if (saved()) {
-    <div
-      class="mt-4 flex items-center gap-2 rounded-[13px] border border-[#bfe7ca] bg-[#eaf8ee] px-4 py-3 text-[12px] font-semibold text-[#168c40]"
-    >
-      <i class="ph ph-check-circle text-[17px]"></i
-      >{{ "distanceLearning.messages.saved" | t }}
+    <div class="mt-4 flex items-center gap-2 rounded-[13px] border border-[#bfe7ca] bg-[#eaf8ee] px-4 py-3 text-[12px] font-semibold text-[#168c40]">
+      <i class="ph ph-check-circle text-[17px]"></i>{{ 'distanceLearning.messages.saved' | t }}
     </div>
   }
   @if (joined()) {
-    <div
-      class="mt-4 flex items-center gap-2 rounded-[13px] border border-[#bed8ef] bg-[#edf6fe] px-4 py-3 text-[12px] font-semibold text-[#2a64a2]"
-    >
-      <i class="ph ph-video-camera text-[17px]"></i
-      >{{ "distanceLearning.messages.joined" | t }}
+    <div class="mt-4 flex items-center gap-2 rounded-[13px] border border-[#bed8ef] bg-[#edf6fe] px-4 py-3 text-[12px] font-semibold text-[#2a64a2]">
+      <i class="ph ph-video-camera text-[17px]"></i>{{ 'distanceLearning.messages.joined' | t }}
     </div>
   }
 
   @if (isDirection() || isSecretariat()) {
     <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-      <article
-        class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
-          {{ "distanceLearning.kpi.liveSessions" | t }}
-        </p>
+      <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'distanceLearning.kpi.liveSessions' | t }}</p>
         <p class="mt-2 text-[25px] font-extrabold">{{ liveSessionCount() }}</p>
-        <span
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"
-          ><i class="ph ph-video-camera text-[19px]"></i
-        ></span>
+        <span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-video-camera text-[19px]"></i></span>
       </article>
-      <article
-        class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
-          {{ "distanceLearning.kpi.liveHours" | t }}
-        </p>
+      <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'distanceLearning.kpi.liveHours' | t }}</p>
         <p class="mt-2 text-[25px] font-extrabold">{{ totalLiveHours() }} h</p>
-        <span
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"
-          ><i class="ph ph-clock text-[19px]"></i
-        ></span>
+        <span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-clock text-[19px]"></i></span>
       </article>
-      <article
-        class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
-          {{ "distanceLearning.kpi.asyncHours" | t }}
-        </p>
+      <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'distanceLearning.kpi.asyncHours' | t }}</p>
         <p class="mt-2 text-[25px] font-extrabold">{{ totalAsyncHours() }} h</p>
-        <span
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#fff0d2] text-[#9a6500]"
-          ><i class="ph ph-books text-[19px]"></i
-        ></span>
+        <span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#fff0d2] text-[#9a6500]"><i class="ph ph-books text-[19px]"></i></span>
       </article>
-      <article
-        class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
-          {{ "distanceLearning.kpi.completion" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">
-          {{ currentSiteMetric().completionRate }} %
-        </p>
-        <span
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#d8f8df] text-[#168c40]"
-          ><i class="ph ph-check-circle text-[19px]"></i
-        ></span>
+      <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'distanceLearning.kpi.completion' | t }}</p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ currentSiteMetric().completionRate }} %</p>
+        <span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#d8f8df] text-[#168c40]"><i class="ph ph-check-circle text-[19px]"></i></span>
       </article>
-      <article
-        class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] font-medium uppercase text-[#637083]">
-          {{ "distanceLearning.kpi.lateModules" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">
-          {{ currentSiteMetric().lateModules }}
-        </p>
-        <span
-          class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#ffe1df] text-[#d93434]"
-          ><i class="ph ph-warning text-[19px]"></i
-        ></span>
+      <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
+        <p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'distanceLearning.kpi.lateModules' | t }}</p>
+        <p class="mt-2 text-[25px] font-extrabold">{{ currentSiteMetric().lateModules }}</p>
+        <span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#ffe1df] text-[#d93434]"><i class="ph ph-warning text-[19px]"></i></span>
       </article>
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
         <div class="flex items-start justify-between gap-3">
-          <div>
-            <h2 class="text-[16px] font-bold">
-              {{ "distanceLearning.management.sessionsTitle" | t }}
-            </h2>
-            <p class="mt-0.5 text-[12px] text-[#768295]">
-              {{ "distanceLearning.management.sessionsSubtitle" | t }}
-            </p>
-          </div>
-          <span
-            class="rounded-full bg-[#edf5fc] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]"
-            >{{ workspace.site()?.city }}</span
-          >
+          <div><h2 class="text-[16px] font-bold">{{ 'distanceLearning.management.sessionsTitle' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.management.sessionsSubtitle' | t }}</p></div>
+          <span class="rounded-full bg-[#edf5fc] px-3 py-1 text-[10.5px] font-semibold text-[#2a64a2]">{{ workspace.site()?.city }}</span>
         </div>
         <div class="mt-4 space-y-2.5">
           @for (item of contextSessions(); track item.id) {
-            <button
-              type="button"
-              (click)="selectLive(item.id)"
-              class="flex w-full items-center gap-3 rounded-[14px] border border-[#e1e7ee] bg-white p-3.5 text-left transition hover:bg-[#f9fbfd]"
-            >
-              <span
-                class="grid size-10 shrink-0 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"
-                ><i class="ph ph-video-camera text-[18px]"></i
-              ></span>
-              <div class="min-w-0 flex-1">
-                <p class="truncate text-[13px] font-bold text-[#172033]">
-                  {{ item.titleKey | t }}
-                </p>
-                <p class="mt-0.5 text-[11px] text-[#788598]">
-                  {{ item.date }} · {{ item.start }}–{{ item.end }} ·
-                  {{ item.trainer }}
-                </p>
-              </div>
-              <span
-                [class]="
-                  'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                  sessionStatusClass(item.status)
-                "
-                >{{ "distanceLearning.sessionStatus." + item.status | t }}</span
-              >
+            <button type="button" (click)="selectLive(item.id)" class="flex w-full items-center gap-3 rounded-[14px] border border-[#e1e7ee] bg-white p-3.5 text-left transition hover:bg-[#f9fbfd]">
+              <span class="grid size-10 shrink-0 place-items-center rounded-full bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-video-camera text-[18px]"></i></span>
+              <div class="min-w-0 flex-1"><p class="truncate text-[13px] font-bold text-[#172033]">{{ item.titleKey | t }}</p><p class="mt-0.5 text-[11px] text-[#788598]">{{ item.date }} · {{ item.start }}–{{ item.end }} · {{ item.trainer }}</p></div>
+              <span [class]="'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ' + sessionStatusClass(item.status)">{{ ('distanceLearning.sessionStatus.' + item.status) | t }}</span>
             </button>
           }
         </div>
       </article>
 
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "distanceLearning.management.modalityTitle" | t }}
-        </h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "distanceLearning.management.modalitySubtitle" | t }}
-        </p>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <h2 class="text-[16px] font-bold">{{ 'distanceLearning.management.modalityTitle' | t }}</h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.management.modalitySubtitle' | t }}</p>
         <div class="mt-5 flex items-center justify-center">
-          <div
-            class="relative grid size-[190px] place-items-center rounded-full"
-            style="background: conic-gradient(#2b66a4 0 72%, #f5a623 72% 100%)"
-          >
-            <div
-              class="grid size-[126px] place-items-center rounded-full bg-white text-center"
-            >
-              <div>
-                <p class="text-[27px] font-extrabold text-[#172033]">28 %</p>
-                <p class="text-[10.5px] text-[#758195]">
-                  {{ "distanceLearning.management.remoteShare" | t }}
-                </p>
-              </div>
-            </div>
+          <div class="relative grid size-[190px] place-items-center rounded-full" [style.background]="modalityGradient()">
+            <div class="grid size-[126px] place-items-center rounded-full bg-white text-center"><div><p class="text-[27px] font-extrabold text-[#172033]">{{ remoteShare() }} %</p><p class="text-[10.5px] text-[#758195]">{{ 'distanceLearning.management.remoteShare' | t }}</p></div></div>
           </div>
         </div>
         <div class="mt-5 grid grid-cols-2 gap-2">
-          <div class="rounded-[13px] bg-[#f1f5f9] p-3">
-            <div class="flex items-center gap-2">
-              <span class="size-2.5 rounded-full bg-[#2b66a4]"></span
-              ><span class="text-[11px] font-semibold">{{
-                "distanceLearning.management.onsite" | t
-              }}</span>
-            </div>
-            <p class="mt-2 text-[19px] font-bold">72 %</p>
-          </div>
-          <div class="rounded-[13px] bg-[#fff6e4] p-3">
-            <div class="flex items-center gap-2">
-              <span class="size-2.5 rounded-full bg-[#f5a623]"></span
-              ><span class="text-[11px] font-semibold">{{
-                "distanceLearning.management.remote" | t
-              }}</span>
-            </div>
-            <p class="mt-2 text-[19px] font-bold">28 %</p>
-          </div>
+          <div class="rounded-[13px] bg-[#f1f5f9] p-3"><div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-[#2b66a4]"></span><span class="text-[11px] font-semibold">{{ 'distanceLearning.management.onsite' | t }}</span></div><p class="mt-2 text-[19px] font-bold">{{ onsiteShare() }} %</p></div>
+          <div class="rounded-[13px] bg-[#fff6e4] p-3"><div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-[#f5a623]"></span><span class="text-[11px] font-semibold">{{ 'distanceLearning.management.remote' | t }}</span></div><p class="mt-2 text-[19px] font-bold">{{ remoteShare() }} %</p></div>
         </div>
       </article>
     </div>
 
     @if (isDirection()) {
-      <article
-        class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "distanceLearning.management.sitesTitle" | t }}
-        </h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "distanceLearning.management.sitesSubtitle" | t }}
-        </p>
+      <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <h2 class="text-[16px] font-bold">{{ 'distanceLearning.management.sitesTitle' | t }}</h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.management.sitesSubtitle' | t }}</p>
         <div class="mt-4 overflow-x-auto">
           <table class="min-w-full text-left text-[12px]">
-            <thead>
-              <tr
-                class="border-b border-[#e3e8ee] text-[10px] uppercase text-[#7b8798]"
-              >
-                <th class="pb-2">{{ "distanceLearning.table.site" | t }}</th>
-                <th class="pb-2">
-                  {{ "distanceLearning.table.liveHours" | t }}
-                </th>
-                <th class="pb-2">
-                  {{ "distanceLearning.table.asyncHours" | t }}
-                </th>
-                <th class="pb-2">
-                  {{ "distanceLearning.table.students" | t }}
-                </th>
-                <th class="pb-2">
-                  {{ "distanceLearning.table.completion" | t }}
-                </th>
-                <th class="pb-2">{{ "distanceLearning.table.late" | t }}</th>
-              </tr>
-            </thead>
+            <thead><tr class="border-b border-[#e3e8ee] text-[10px] uppercase text-[#7b8798]"><th class="pb-2">{{ 'distanceLearning.table.site' | t }}</th><th class="pb-2">{{ 'distanceLearning.table.liveHours' | t }}</th><th class="pb-2">{{ 'distanceLearning.table.asyncHours' | t }}</th><th class="pb-2">{{ 'distanceLearning.table.students' | t }}</th><th class="pb-2">{{ 'distanceLearning.table.completion' | t }}</th><th class="pb-2">{{ 'distanceLearning.table.late' | t }}</th></tr></thead>
             <tbody>
-              @for (
-                metric of [
-                  {
-                    name: "Nice",
-                    live: 84,
-                    async: 41,
-                    students: 126,
-                    completion: 82,
-                    late: 7,
-                  },
-                  {
-                    name: "Marseille",
-                    live: 72,
-                    async: 34,
-                    students: 118,
-                    completion: 78,
-                    late: 9,
-                  },
-                  {
-                    name: "Toulouse",
-                    live: 66,
-                    async: 29,
-                    students: 94,
-                    completion: 85,
-                    late: 4,
-                  },
-                ];
-                track metric.name
-              ) {
-                <tr class="border-b border-[#edf1f5] last:border-0">
-                  <td class="py-3 font-semibold">{{ metric.name }}</td>
-                  <td class="py-3">{{ metric.live }} h</td>
-                  <td class="py-3">{{ metric.async }} h</td>
-                  <td class="py-3">{{ metric.students }}</td>
-                  <td class="py-3">
-                    <span
-                      class="rounded-full bg-[#d8f8df] px-2.5 py-1 font-semibold text-[#168c40]"
-                      >{{ metric.completion }} %</span
-                    >
-                  </td>
-                  <td class="py-3">
-                    <span
-                      [class]="
-                        metric.late > 7
-                          ? 'font-semibold text-[#d93434]'
-                          : 'text-[#5f6d80]'
-                      "
-                      >{{ metric.late }}</span
-                    >
-                  </td>
-                </tr>
+              @for (metric of siteMetrics(); track metric.name) {
+                <tr class="border-b border-[#edf1f5] last:border-0"><td class="py-3 font-semibold">{{ metric.name }}</td><td class="py-3">{{ metric.live }} h</td><td class="py-3">{{ metric.async }} h</td><td class="py-3">{{ metric.students }}</td><td class="py-3"><span class="rounded-full bg-[#d8f8df] px-2.5 py-1 font-semibold text-[#168c40]">{{ metric.completion }} %</span></td><td class="py-3"><span [class]="metric.late > 7 ? 'font-semibold text-[#d93434]' : 'text-[#5f6d80]'">{{ metric.late }}</span></td></tr>
               }
             </tbody>
           </table>
@@ -307,324 +107,50 @@
 
   @if (isTrainer()) {
     <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.trainer.today" | t }}
-        </p>
-        <p class="mt-2 text-[24px] font-extrabold">
-          {{ contextSessions().length }}
-        </p>
-        <p class="mt-1 text-[11px] text-[#768295]">
-          {{ "distanceLearning.trainer.liveClasses" | t }}
-        </p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.trainer.toCorrect" | t }}
-        </p>
-        <p class="mt-2 text-[24px] font-extrabold">7</p>
-        <p class="mt-1 text-[11px] text-[#768295]">
-          {{ "distanceLearning.trainer.works" | t }}
-        </p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.trainer.quizzes" | t }}
-        </p>
-        <p class="mt-2 text-[24px] font-extrabold">2</p>
-        <p class="mt-1 text-[11px] text-[#768295]">
-          {{ "distanceLearning.trainer.toAnalyze" | t }}
-        </p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.trainer.lateStudents" | t }}
-        </p>
-        <p class="mt-2 text-[24px] font-extrabold text-[#d93434]">4</p>
-        <p class="mt-1 text-[11px] text-[#768295]">
-          {{ "distanceLearning.trainer.modulesLate" | t }}
-        </p>
-      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.trainer.today' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ contextSessions().length }}</p><p class="mt-1 text-[11px] text-[#768295]">{{ 'distanceLearning.trainer.liveClasses' | t }}</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.trainer.toCorrect' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ trainerToCorrect() }}</p><p class="mt-1 text-[11px] text-[#768295]">{{ 'distanceLearning.trainer.works' | t }}</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.trainer.quizzes' | t }}</p><p class="mt-2 text-[24px] font-extrabold">{{ trainerQuizzes() }}</p><p class="mt-1 text-[11px] text-[#768295]">{{ 'distanceLearning.trainer.toAnalyze' | t }}</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.trainer.lateStudents' | t }}</p><p class="mt-2 text-[24px] font-extrabold text-[#d93434]">{{ lateStudentCount() }}</p><p class="mt-1 text-[11px] text-[#768295]">{{ 'distanceLearning.trainer.modulesLate' | t }}</p></article>
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[0.82fr_1.18fr]">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "distanceLearning.trainer.sessionsTitle" | t }}
-        </h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "distanceLearning.trainer.sessionsSubtitle" | t }}
-        </p>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <h2 class="text-[16px] font-bold">{{ 'distanceLearning.trainer.sessionsTitle' | t }}</h2>
+        <p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.trainer.sessionsSubtitle' | t }}</p>
         <div class="mt-4 space-y-2.5">
           @for (item of contextSessions(); track item.id) {
-            <button
-              type="button"
-              (click)="selectLive(item.id)"
-              [class]="
-                'w-full rounded-[14px] border p-3.5 text-left transition ' +
-                (selectedLive()?.id === item.id
-                  ? 'border-[#8eb6db] bg-[#eef6fd]'
-                  : 'border-[#e1e7ee] bg-white hover:bg-[#f9fbfd]')
-              "
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-[13px] font-bold">{{ item.titleKey | t }}</p>
-                  <p class="mt-1 text-[11px] text-[#788598]">
-                    {{ item.date }} · {{ item.start }}–{{ item.end }}
-                  </p>
-                </div>
-                <span
-                  [class]="
-                    'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                    sessionStatusClass(item.status)
-                  "
-                  >{{
-                    "distanceLearning.sessionStatus." + item.status | t
-                  }}</span
-                >
-              </div>
-              <div
-                class="mt-3 flex items-center gap-2 text-[10.5px] text-[#617083]"
-              >
-                <i class="ph ph-video-camera"></i
-                >{{ "distanceLearning.platforms." + item.platform | t
-                }}<span>·</span
-                ><span
-                  >{{ item.expected }}
-                  {{ "distanceLearning.students" | t }}</span
-                >
-              </div>
+            <button type="button" (click)="selectLive(item.id)" [class]="'w-full rounded-[14px] border p-3.5 text-left transition ' + (selectedLive()?.id === item.id ? 'border-[#8eb6db] bg-[#eef6fd]' : 'border-[#e1e7ee] bg-white hover:bg-[#f9fbfd]')">
+              <div class="flex items-start justify-between gap-3"><div><p class="text-[13px] font-bold">{{ item.titleKey | t }}</p><p class="mt-1 text-[11px] text-[#788598]">{{ item.date }} · {{ item.start }}–{{ item.end }}</p></div><span [class]="'rounded-full px-2.5 py-1 text-[10px] font-semibold ' + sessionStatusClass(item.status)">{{ ('distanceLearning.sessionStatus.' + item.status) | t }}</span></div>
+              <div class="mt-3 flex items-center gap-2 text-[10.5px] text-[#617083]"><i class="ph ph-video-camera"></i>{{ ('distanceLearning.platforms.' + item.platform) | t }}<span>·</span><span>{{ item.expected }} {{ 'distanceLearning.students' | t }}</span></div>
             </button>
           }
         </div>
       </article>
 
       @if (selectedLive(); as live) {
-        <article
-          class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-        >
-          <div
-            class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-          >
-            <div>
-              <div class="flex items-center gap-2">
-                <span
-                  [class]="
-                    'rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                    sessionStatusClass(live.status)
-                  "
-                  >{{
-                    "distanceLearning.sessionStatus." + live.status | t
-                  }}</span
-                ><span class="text-[10.5px] text-[#788598]">{{
-                  "distanceLearning.platforms." + live.platform | t
-                }}</span>
-              </div>
-              <h2 class="mt-2 text-[17px] font-bold">
-                {{ live.titleKey | t }}
-              </h2>
-              <p class="mt-1 text-[11.5px] text-[#768295]">
-                {{ live.date }} · {{ live.start }}–{{ live.end }} ·
-                {{ live.trainer }}
-              </p>
-            </div>
-            <button
-              type="button"
-              (click)="simulateJoin()"
-              class="inline-flex h-9 items-center gap-2 rounded-[10px] bg-[#f59e0b] px-3.5 text-[11px] font-semibold text-white"
-            >
-              <i class="ph ph-video-camera"></i
-              >{{ "distanceLearning.actions.openClass" | t }}
-            </button>
+        <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div><div class="flex items-center gap-2"><span [class]="'rounded-full px-2.5 py-1 text-[10px] font-semibold ' + sessionStatusClass(live.status)">{{ ('distanceLearning.sessionStatus.' + live.status) | t }}</span><span class="text-[10.5px] text-[#788598]">{{ ('distanceLearning.platforms.' + live.platform) | t }}</span></div><h2 class="mt-2 text-[17px] font-bold">{{ live.titleKey | t }}</h2><p class="mt-1 text-[11.5px] text-[#768295]">{{ live.date }} · {{ live.start }}–{{ live.end }} · {{ live.trainer }}</p></div>
+            <button type="button" (click)="simulateJoin()" class="inline-flex h-9 items-center gap-2 rounded-[10px] bg-[#f59e0b] px-3.5 text-[11px] font-semibold text-white"><i class="ph ph-video-camera"></i>{{ 'distanceLearning.actions.openClass' | t }}</button>
           </div>
 
-          <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-            <div class="rounded-[12px] bg-[#eaf8ee] p-2.5">
-              <p class="text-[18px] font-bold text-[#168c40]">
-                {{ presentCount() }}
-              </p>
-              <p class="text-[10px] text-[#617083]">
-                {{ "distanceLearning.attendance.present" | t }}
-              </p>
-            </div>
-            <div class="rounded-[12px] bg-[#fff5da] p-2.5">
-              <p class="text-[18px] font-bold text-[#8a6100]">
-                {{ lateCount() }}
-              </p>
-              <p class="text-[10px] text-[#617083]">
-                {{ "distanceLearning.attendance.late" | t }}
-              </p>
-            </div>
-            <div class="rounded-[12px] bg-[#ffe9e6] p-2.5">
-              <p class="text-[18px] font-bold text-[#d93434]">
-                {{ absentCount() }}
-              </p>
-              <p class="text-[10px] text-[#617083]">
-                {{ "distanceLearning.attendance.absent" | t }}
-              </p>
-            </div>
-          </div>
+          <div class="mt-4 grid grid-cols-3 gap-2 text-center"><div class="rounded-[12px] bg-[#eaf8ee] p-2.5"><p class="text-[18px] font-bold text-[#168c40]">{{ presentCount() }}</p><p class="text-[10px] text-[#617083]">{{ 'distanceLearning.attendance.present' | t }}</p></div><div class="rounded-[12px] bg-[#fff5da] p-2.5"><p class="text-[18px] font-bold text-[#8a6100]">{{ lateCount() }}</p><p class="text-[10px] text-[#617083]">{{ 'distanceLearning.attendance.late' | t }}</p></div><div class="rounded-[12px] bg-[#ffe9e6] p-2.5"><p class="text-[18px] font-bold text-[#d93434]">{{ absentCount() }}</p><p class="text-[10px] text-[#617083]">{{ 'distanceLearning.attendance.absent' | t }}</p></div></div>
 
           <div class="mt-5 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <div class="flex items-center justify-between">
-                <h3 class="text-[13px] font-bold">
-                  {{ "distanceLearning.classroom.participants" | t }}
-                </h3>
-                <span class="text-[10.5px] text-[#7a8798]">{{
-                  "distanceLearning.classroom.clickStatus" | t
-                }}</span>
-              </div>
+              <div class="flex items-center justify-between"><h3 class="text-[13px] font-bold">{{ 'distanceLearning.classroom.participants' | t }}</h3><span class="text-[10.5px] text-[#7a8798]">{{ 'distanceLearning.classroom.clickStatus' | t }}</span></div>
               <div class="mt-2 max-h-[320px] space-y-1.5 overflow-y-auto pr-1">
-                @for (
-                  participant of selectedParticipants();
-                  track participant.id
-                ) {
-                  <div
-                    class="flex items-center gap-2 rounded-[11px] border border-[#e5eaf0] px-3 py-2.5"
-                  >
-                    <span
-                      class="grid size-7 shrink-0 place-items-center rounded-full bg-[#edf3f8] text-[10px] font-bold text-[#2a64a2]"
-                      >{{ participant.name.charAt(0) }}</span
-                    >
-                    <div class="min-w-0 flex-1">
-                      <p class="truncate text-[11.5px] font-semibold">
-                        {{ participant.name }}
-                      </p>
-                      <p class="text-[9.5px] text-[#8190a2]">
-                        @if (participant.connectedAt) {
-                          {{ participant.connectedAt }} ·
-                          {{ formatMinutes(participant.connectedMinutes) }}
-                        } @else {
-                          {{ "distanceLearning.classroom.notConnected" | t }}
-                        }
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      (click)="cycleAttendance(participant.id)"
-                      [class]="
-                        'rounded-full px-2.5 py-1 text-[9.5px] font-semibold ' +
-                        attendanceClass(participant.attendance)
-                      "
-                    >
-                      {{
-                        "distanceLearning.attendance." + participant.attendance
-                          | t
-                      }}
-                    </button>
-                  </div>
+                @for (participant of selectedParticipants(); track participant.id) {
+                  <div class="flex items-center gap-2 rounded-[11px] border border-[#e5eaf0] px-3 py-2.5"><span class="grid size-7 shrink-0 place-items-center rounded-full bg-[#edf3f8] text-[10px] font-bold text-[#2a64a2]">{{ participant.name.charAt(0) }}</span><div class="min-w-0 flex-1"><p class="truncate text-[11.5px] font-semibold">{{ participant.name }}</p><p class="text-[9.5px] text-[#8190a2]">@if (participant.connectedAt) { {{ participant.connectedAt }} · {{ formatMinutes(participant.connectedMinutes) }} } @else { {{ 'distanceLearning.classroom.notConnected' | t }} }</p></div><button type="button" (click)="cycleAttendance(participant.id)" [class]="'rounded-full px-2.5 py-1 text-[9.5px] font-semibold ' + attendanceClass(participant.attendance)">{{ ('distanceLearning.attendance.' + participant.attendance) | t }}</button></div>
                 } @empty {
-                  <div
-                    class="rounded-[12px] bg-[#f7f9fc] p-4 text-center text-[11px] text-[#7a8798]"
-                  >
-                    {{ "distanceLearning.classroom.noParticipantsYet" | t }}
-                  </div>
+                  <div class="rounded-[12px] bg-[#f7f9fc] p-4 text-center text-[11px] text-[#7a8798]">{{ 'distanceLearning.classroom.noParticipantsYet' | t }}</div>
                 }
               </div>
             </div>
 
             <div class="space-y-4">
-              <div>
-                <h3 class="text-[13px] font-bold">
-                  {{ "distanceLearning.classroom.interactions" | t }}
-                </h3>
-                <div class="mt-2 space-y-2">
-                  @for (
-                    interaction of selectedInteractions();
-                    track interaction.id
-                  ) {
-                    <div class="rounded-[11px] bg-[#f4f7fa] p-3">
-                      <div class="flex items-start gap-2">
-                        <i
-                          [class]="
-                            'ph mt-0.5 text-[15px] text-[#2a64a2] ' +
-                            interactionIcon(interaction.type)
-                          "
-                        ></i>
-                        <div class="min-w-0 flex-1">
-                          <p class="text-[11px] font-semibold">
-                            {{ interaction.titleKey | t }}
-                          </p>
-                          <p class="mt-1 text-[9.5px] text-[#7d899a]">
-                            {{ interaction.completed }}/{{
-                              interaction.expected
-                            }}
-                            ·
-                            @if (interaction.successRate) {
-                              {{ interaction.successRate }} %
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  } @empty {
-                    <p
-                      class="rounded-[11px] bg-[#f7f9fc] p-3 text-[10.5px] text-[#7b8798]"
-                    >
-                      {{ "distanceLearning.classroom.noInteractions" | t }}
-                    </p>
-                  }
-                </div>
-                <div class="mt-2 grid grid-cols-2 gap-2">
-                  <button
-                    class="rounded-[9px] border border-[#dce3eb] px-2 py-2 text-[10px] font-semibold"
-                  >
-                    <i class="ph ph-question mr-1"></i
-                    >{{ "distanceLearning.actions.question" | t }}</button
-                  ><button
-                    class="rounded-[9px] border border-[#dce3eb] px-2 py-2 text-[10px] font-semibold"
-                  >
-                    <i class="ph ph-chart-bar mr-1"></i
-                    >{{ "distanceLearning.actions.poll" | t }}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <h3 class="text-[13px] font-bold">
-                  {{ "distanceLearning.classroom.resources" | t }}
-                </h3>
-                <div class="mt-2 space-y-2">
-                  @for (resource of selectedResources(); track resource.id) {
-                    <div
-                      class="flex items-center gap-2 rounded-[11px] border border-[#e5eaf0] p-2.5"
-                    >
-                      <i
-                        [class]="
-                          'ph text-[16px] text-[#f59e0b] ' +
-                          resourceIcon(resource.type)
-                        "
-                      ></i>
-                      <div class="min-w-0 flex-1">
-                        <p class="truncate text-[10.5px] font-semibold">
-                          {{ resource.titleKey | t }}
-                        </p>
-                        <p class="text-[9.5px] text-[#8490a2]">
-                          {{ resource.viewedBy }}/{{ resource.totalStudents }}
-                          {{ "distanceLearning.classroom.viewed" | t }}
-                        </p>
-                      </div>
-                    </div>
-                  } @empty {
-                    <p
-                      class="rounded-[11px] bg-[#f7f9fc] p-3 text-[10.5px] text-[#7b8798]"
-                    >
-                      {{ "distanceLearning.classroom.noResources" | t }}
-                    </p>
-                  }
-                </div>
-              </div>
+              <div><h3 class="text-[13px] font-bold">{{ 'distanceLearning.classroom.interactions' | t }}</h3><div class="mt-2 space-y-2">@for (interaction of selectedInteractions(); track interaction.id) {<div class="rounded-[11px] bg-[#f4f7fa] p-3"><div class="flex items-start gap-2"><i [class]="'ph mt-0.5 text-[15px] text-[#2a64a2] ' + interactionIcon(interaction.type)"></i><div class="min-w-0 flex-1"><p class="text-[11px] font-semibold">{{ interaction.titleKey | t }}</p><p class="mt-1 text-[9.5px] text-[#7d899a]">{{ interaction.completed }}/{{ interaction.expected }} · @if (interaction.successRate) { {{ interaction.successRate }} % }</p></div></div></div>} @empty {<p class="rounded-[11px] bg-[#f7f9fc] p-3 text-[10.5px] text-[#7b8798]">{{ 'distanceLearning.classroom.noInteractions' | t }}</p>}</div><div class="mt-2 grid grid-cols-2 gap-2"><button class="rounded-[9px] border border-[#dce3eb] px-2 py-2 text-[10px] font-semibold"><i class="ph ph-question mr-1"></i>{{ 'distanceLearning.actions.question' | t }}</button><button class="rounded-[9px] border border-[#dce3eb] px-2 py-2 text-[10px] font-semibold"><i class="ph ph-chart-bar mr-1"></i>{{ 'distanceLearning.actions.poll' | t }}</button></div></div>
+              <div><h3 class="text-[13px] font-bold">{{ 'distanceLearning.classroom.resources' | t }}</h3><div class="mt-2 space-y-2">@for (resource of selectedResources(); track resource.id) {<div class="flex items-center gap-2 rounded-[11px] border border-[#e5eaf0] p-2.5"><i [class]="'ph text-[16px] text-[#f59e0b] ' + resourceIcon(resource.type)"></i><div class="min-w-0 flex-1"><p class="truncate text-[10.5px] font-semibold">{{ resource.titleKey | t }}</p><p class="text-[9.5px] text-[#8490a2]">{{ resource.viewedBy }}/{{ resource.totalStudents }} {{ 'distanceLearning.classroom.viewed' | t }}</p></div></div>} @empty {<p class="rounded-[11px] bg-[#f7f9fc] p-3 text-[10.5px] text-[#7b8798]">{{ 'distanceLearning.classroom.noResources' | t }}</p>}</div></div>
             </div>
           </div>
         </article>
@@ -634,166 +160,20 @@
 
   @if (isStudent()) {
     <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.student.modulesToDo" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">
-          {{ contextModules().length }}
-        </p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.student.dueThisWeek" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">2</p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.student.remoteHours" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">14 h</p>
-      </article>
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-      >
-        <p class="text-[10.5px] uppercase text-[#758195]">
-          {{ "distanceLearning.student.progress" | t }}
-        </p>
-        <p class="mt-2 text-[25px] font-extrabold">{{ completionRate() }} %</p>
-      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.student.modulesToDo' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ contextModules().length }}</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.student.dueThisWeek' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ studentDueThisWeek() }}</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.student.remoteHours' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ studentRemoteHours() }} h</p></article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] uppercase text-[#758195]">{{ 'distanceLearning.student.progress' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ completionRate() }} %</p></article>
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[0.75fr_1.25fr]">
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <h2 class="text-[16px] font-bold">
-          {{ "distanceLearning.student.nextLive" | t }}
-        </h2>
-        <p class="mt-0.5 text-[12px] text-[#768295]">
-          {{ "distanceLearning.student.nextLiveSubtitle" | t }}
-        </p>
-        @if (contextSessions()[0]; as next) {
-          <div class="mt-4 rounded-[15px] bg-[#edf6fe] p-4">
-            <div class="flex items-start justify-between gap-3">
-              <span
-                class="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-[#2a64a2]"
-                >{{ "distanceLearning.platforms." + next.platform | t }}</span
-              ><span class="text-[10px] font-medium text-[#607188]">{{
-                next.date
-              }}</span>
-            </div>
-            <p class="mt-3 text-[14px] font-bold">{{ next.titleKey | t }}</p>
-            <p class="mt-1 text-[11px] text-[#6e7b8d]">
-              {{ next.start }}–{{ next.end }} · {{ next.trainer }}
-            </p>
-            <button
-              type="button"
-              (click)="simulateJoin()"
-              class="mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-[10px] bg-[#2b66a4] text-[11px] font-semibold text-white"
-            >
-              <i class="ph ph-video-camera"></i
-              >{{ "distanceLearning.actions.join" | t }}
-            </button>
-          </div>
-        }
-      </article>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"><h2 class="text-[16px] font-bold">{{ 'distanceLearning.student.nextLive' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.student.nextLiveSubtitle' | t }}</p>@if (contextSessions()[0]; as next) {<div class="mt-4 rounded-[15px] bg-[#edf6fe] p-4"><div class="flex items-start justify-between gap-3"><span class="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-[#2a64a2]">{{ ('distanceLearning.platforms.' + next.platform) | t }}</span><span class="text-[10px] font-medium text-[#607188]">{{ next.date }}</span></div><p class="mt-3 text-[14px] font-bold">{{ next.titleKey | t }}</p><p class="mt-1 text-[11px] text-[#6e7b8d]">{{ next.start }}–{{ next.end }} · {{ next.trainer }}</p><button type="button" (click)="simulateJoin()" class="mt-4 inline-flex h-9 w-full items-center justify-center gap-2 rounded-[10px] bg-[#2b66a4] text-[11px] font-semibold text-white"><i class="ph ph-video-camera"></i>{{ 'distanceLearning.actions.join' | t }}</button></div>}</article>
 
-      <article
-        class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-      >
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-        >
-          <div>
-            <h2 class="text-[16px] font-bold">
-              {{ "distanceLearning.student.myModules" | t }}
-            </h2>
-            <p class="mt-0.5 text-[12px] text-[#768295]">
-              {{ "distanceLearning.student.myModulesSubtitle" | t }}
-            </p>
-          </div>
-          <select
-            (change)="updateModuleFilter($event)"
-            class="h-9 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px] text-[#536174]"
-          >
-            <option value="all">
-              {{ "distanceLearning.filters.all" | t }}
-            </option>
-            <option value="not-started">
-              {{ "distanceLearning.moduleStatus.not-started" | t }}
-            </option>
-            <option value="in-progress">
-              {{ "distanceLearning.moduleStatus.in-progress" | t }}
-            </option>
-            <option value="completed">
-              {{ "distanceLearning.moduleStatus.completed" | t }}
-            </option>
-            <option value="late">
-              {{ "distanceLearning.moduleStatus.late" | t }}
-            </option>
-          </select>
-        </div>
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 class="text-[16px] font-bold">{{ 'distanceLearning.student.myModules' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.student.myModulesSubtitle' | t }}</p></div><select (change)="updateModuleFilter($event)" class="h-9 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px] text-[#536174]"><option value="all">{{ 'distanceLearning.filters.all' | t }}</option><option value="not-started">{{ 'distanceLearning.moduleStatus.not-started' | t }}</option><option value="in-progress">{{ 'distanceLearning.moduleStatus.in-progress' | t }}</option><option value="completed">{{ 'distanceLearning.moduleStatus.completed' | t }}</option><option value="late">{{ 'distanceLearning.moduleStatus.late' | t }}</option></select></div>
         <div class="mt-4 space-y-3">
           @for (module of filteredModules(); track module.id) {
-            <article class="rounded-[15px] border border-[#e1e7ee] p-4">
-              <div
-                class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"
-              >
-                <div>
-                  <p class="text-[13px] font-bold">{{ module.titleKey | t }}</p>
-                  <p class="mt-1 text-[10.5px] text-[#788598]">
-                    {{ module.estimatedMinutes }} min ·
-                    {{ "distanceLearning.student.due" | t }}
-                    {{ module.dueDate }}
-                  </p>
-                </div>
-                <span
-                  [class]="
-                    'w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold ' +
-                    moduleStatusClass(module.status)
-                  "
-                  >{{
-                    "distanceLearning.moduleStatus." + module.status | t
-                  }}</span
-                >
-              </div>
-              <div class="mt-3 h-2 overflow-hidden rounded-full bg-[#edf1f6]">
-                <div
-                  class="h-full rounded-full bg-[linear-gradient(90deg,#2b66a4,#f59e0b)]"
-                  [style.width.%]="module.progress"
-                ></div>
-              </div>
-              <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                @for (step of module.steps; track step.id) {
-                  <button
-                    type="button"
-                    (click)="toggleModuleStep(module.id, step.id)"
-                    [class]="
-                      'flex items-center gap-2 rounded-[10px] border px-3 py-2 text-left text-[10.5px] ' +
-                      (step.completed
-                        ? 'border-[#bfe7ca] bg-[#effaf2] text-[#168c40]'
-                        : 'border-[#e2e7ed] bg-white text-[#5f6d80]')
-                    "
-                  >
-                    <i
-                      [class]="
-                        'ph text-[14px] ' +
-                        (step.completed ? 'ph-check-circle' : 'ph-circle')
-                      "
-                    ></i
-                    >{{ step.labelKey | t }}
-                  </button>
-                }
-              </div>
-            </article>
+            <article class="rounded-[15px] border border-[#e1e7ee] p-4"><div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><p class="text-[13px] font-bold">{{ module.titleKey | t }}</p><p class="mt-1 text-[10.5px] text-[#788598]">{{ module.estimatedMinutes }} min · {{ 'distanceLearning.student.due' | t }} {{ module.dueDate }}</p></div><span [class]="'w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold ' + moduleStatusClass(module.status)">{{ ('distanceLearning.moduleStatus.' + module.status) | t }}</span></div><div class="mt-3 h-2 overflow-hidden rounded-full bg-[#edf1f6]"><div class="h-full rounded-full bg-[linear-gradient(90deg,#2b66a4,#f59e0b)]" [style.width.%]="module.progress"></div></div><div class="mt-3 grid gap-2 sm:grid-cols-2">@for (step of module.steps; track step.id) {<button type="button" (click)="toggleModuleStep(module.id, step.id)" [class]="'flex items-center gap-2 rounded-[10px] border px-3 py-2 text-left text-[10.5px] ' + (step.completed ? 'border-[#bfe7ca] bg-[#effaf2] text-[#168c40]' : 'border-[#e2e7ed] bg-white text-[#5f6d80]')"><i [class]="'ph text-[14px] ' + (step.completed ? 'ph-check-circle' : 'ph-circle')"></i>{{ step.labelKey | t }}</button>}</div></article>
           }
         </div>
       </article>
@@ -801,77 +181,11 @@
   }
 
   @if (!isStudent()) {
-    <article
-      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
-    >
-      <div
-        class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-      >
-        <div>
-          <h2 class="text-[16px] font-bold">
-            {{ "distanceLearning.async.title" | t }}
-          </h2>
-          <p class="mt-0.5 text-[12px] text-[#768295]">
-            {{ "distanceLearning.async.subtitle" | t }}
-          </p>
-        </div>
-        <select
-          (change)="updateModuleFilter($event)"
-          class="h-9 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px] text-[#536174]"
-        >
-          <option value="all">{{ "distanceLearning.filters.all" | t }}</option>
-          <option value="not-started">
-            {{ "distanceLearning.moduleStatus.not-started" | t }}
-          </option>
-          <option value="in-progress">
-            {{ "distanceLearning.moduleStatus.in-progress" | t }}
-          </option>
-          <option value="completed">
-            {{ "distanceLearning.moduleStatus.completed" | t }}
-          </option>
-          <option value="late">
-            {{ "distanceLearning.moduleStatus.late" | t }}
-          </option>
-        </select>
-      </div>
+    <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><h2 class="text-[16px] font-bold">{{ 'distanceLearning.async.title' | t }}</h2><p class="mt-0.5 text-[12px] text-[#768295]">{{ 'distanceLearning.async.subtitle' | t }}</p></div><select (change)="updateModuleFilter($event)" class="h-9 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px] text-[#536174]"><option value="all">{{ 'distanceLearning.filters.all' | t }}</option><option value="not-started">{{ 'distanceLearning.moduleStatus.not-started' | t }}</option><option value="in-progress">{{ 'distanceLearning.moduleStatus.in-progress' | t }}</option><option value="completed">{{ 'distanceLearning.moduleStatus.completed' | t }}</option><option value="late">{{ 'distanceLearning.moduleStatus.late' | t }}</option></select></div>
       <div class="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
         @for (module of filteredModules(); track module.id) {
-          <article class="rounded-[14px] border border-[#e2e7ed] p-4">
-            <div class="flex items-start justify-between gap-3">
-              <span
-                [class]="
-                  'rounded-full px-2.5 py-1 text-[9.5px] font-semibold ' +
-                  moduleStatusClass(module.status)
-                "
-                >{{
-                  "distanceLearning.moduleStatus." + module.status | t
-                }}</span
-              ><span class="text-[10px] text-[#7a8798]">{{
-                module.dueDate
-              }}</span>
-            </div>
-            <h3 class="mt-3 text-[13px] font-bold">
-              {{ module.titleKey | t }}
-            </h3>
-            <p class="mt-1 text-[10.5px] text-[#788598]">
-              {{ module.descriptionKey | t }}
-            </p>
-            <div class="mt-3 flex items-center justify-between text-[10px]">
-              <span
-                >{{ module.completedStudents }}/{{ module.expectedStudents }}
-                {{ "distanceLearning.async.completedStudents" | t }}</span
-              ><span class="font-semibold">{{ module.progress }} %</span>
-            </div>
-            <div class="mt-2 h-2 overflow-hidden rounded-full bg-[#edf1f6]">
-              <div
-                class="h-full rounded-full bg-[linear-gradient(90deg,#2b66a4,#f59e0b)]"
-                [style.width.%]="module.progress"
-              ></div>
-            </div>
-            <p class="mt-3 text-[10px] text-[#7a8798]">
-              {{ module.estimatedMinutes }} min · {{ module.trainer }}
-            </p>
-          </article>
+          <article class="rounded-[14px] border border-[#e2e7ed] p-4"><div class="flex items-start justify-between gap-3"><span [class]="'rounded-full px-2.5 py-1 text-[9.5px] font-semibold ' + moduleStatusClass(module.status)">{{ ('distanceLearning.moduleStatus.' + module.status) | t }}</span><span class="text-[10px] text-[#7a8798]">{{ module.dueDate }}</span></div><h3 class="mt-3 text-[13px] font-bold">{{ module.titleKey | t }}</h3><p class="mt-1 text-[10.5px] text-[#788598]">{{ module.descriptionKey | t }}</p><div class="mt-3 flex items-center justify-between text-[10px]"><span>{{ module.completedStudents }}/{{ module.expectedStudents }} {{ 'distanceLearning.async.completedStudents' | t }}</span><span class="font-semibold">{{ module.progress }} %</span></div><div class="mt-2 h-2 overflow-hidden rounded-full bg-[#edf1f6]"><div class="h-full rounded-full bg-[linear-gradient(90deg,#2b66a4,#f59e0b)]" [style.width.%]="module.progress"></div></div><p class="mt-3 text-[10px] text-[#7a8798]">{{ module.estimatedMinutes }} min · {{ module.trainer }}</p></article>
         }
       </div>
     </article>
@@ -879,175 +193,21 @@
 </section>
 
 @if (drawerOpen()) {
-  <button
-    type="button"
-    class="fixed inset-0 z-50 bg-[#122033]/35"
-    (click)="closeDrawer()"
-    [attr.aria-label]="'distanceLearning.drawer.close' | t"
-  ></button>
-  <aside
-    class="fixed inset-y-0 right-0 z-[60] w-full max-w-[520px] overflow-y-auto bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(15,31,54,0.18)]"
-  >
-    <div
-      class="sticky top-0 z-10 flex items-start justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"
-    >
-      <div>
-        <h2 class="text-[19px] font-extrabold text-[#172033]">
-          {{ "distanceLearning.drawer.title" | t }}
-        </h2>
-        <p class="mt-1 text-[11.5px] text-[#768295]">
-          {{ workspace.breadcrumb() }}
-        </p>
-      </div>
-      <button
-        type="button"
-        (click)="closeDrawer()"
-        class="grid size-9 place-items-center rounded-[10px] border border-[#dce3eb] text-[#637083]"
-      >
-        <i class="ph ph-x text-[17px]"></i>
-      </button>
-    </div>
-    <form
-      [formGroup]="createForm"
-      (ngSubmit)="createDistanceItem()"
-      class="p-6"
-    >
-      <div class="grid grid-cols-2 gap-2 rounded-[13px] bg-[#e9eef4] p-1.5">
-        <label
-          [class]="
-            'cursor-pointer rounded-[10px] px-3 py-2.5 text-center text-[11px] font-semibold ' +
-            (createForm.controls.kind.value === 'live'
-              ? 'bg-white text-[#2a64a2] shadow-sm'
-              : 'text-[#687589]')
-          "
-          ><input
-            class="sr-only"
-            type="radio"
-            value="live"
-            formControlName="kind"
-          />{{ "distanceLearning.drawer.live" | t }}</label
-        ><label
-          [class]="
-            'cursor-pointer rounded-[10px] px-3 py-2.5 text-center text-[11px] font-semibold ' +
-            (createForm.controls.kind.value === 'async'
-              ? 'bg-white text-[#2a64a2] shadow-sm'
-              : 'text-[#687589]')
-          "
-          ><input
-            class="sr-only"
-            type="radio"
-            value="async"
-            formControlName="kind"
-          />{{ "distanceLearning.drawer.async" | t }}</label
-        >
-      </div>
-      <label class="mt-5 block"
-        ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-          "distanceLearning.drawer.name" | t
-        }}</span
-        ><input
-          formControlName="title"
-          class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px] outline-none focus:border-[#8eb6db] focus:ring-2 focus:ring-blue-100"
-          [placeholder]="'distanceLearning.drawer.namePlaceholder' | t"
-      /></label>
-      @if (createForm.controls.kind.value === "live") {
-        <div class="mt-4 grid gap-3 sm:grid-cols-3">
-          <label class="block"
-            ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-              "distanceLearning.drawer.date" | t
-            }}</span
-            ><input
-              type="date"
-              formControlName="date"
-              class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]" /></label
-          ><label class="block"
-            ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-              "distanceLearning.drawer.start" | t
-            }}</span
-            ><input
-              type="time"
-              formControlName="start"
-              class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]" /></label
-          ><label class="block"
-            ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-              "distanceLearning.drawer.end" | t
-            }}</span
-            ><input
-              type="time"
-              formControlName="end"
-              class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]"
-          /></label>
-        </div>
-        <label class="mt-4 block"
-          ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-            "distanceLearning.drawer.platform" | t
-          }}</span
-          ><select
-            formControlName="platform"
-            class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"
-          >
-            <option value="teams">Microsoft Teams</option>
-            <option value="zoom">Zoom</option>
-            <option value="meet">Google Meet</option>
-            <option value="jitsi">Jitsi</option>
-            <option value="other">
-              {{ "distanceLearning.platforms.other" | t }}
-            </option>
-          </select></label
-        >
-        <label class="mt-4 block"
-          ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-            "distanceLearning.drawer.link" | t
-          }}</span
-          ><input
-            formControlName="joinUrl"
-            class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"
-            placeholder="https://..."
-        /></label>
+  <button type="button" class="fixed inset-0 z-50 bg-[#122033]/35" (click)="closeDrawer()" [attr.aria-label]="'distanceLearning.drawer.close' | t"></button>
+  <aside class="fixed inset-y-0 right-0 z-[60] w-full max-w-[520px] overflow-y-auto bg-[#f7f9fc] shadow-[-18px_0_45px_rgba(15,31,54,0.18)]">
+    <div class="sticky top-0 z-10 flex items-start justify-between border-b border-[#dfe5ec] bg-white px-6 py-5"><div><h2 class="text-[19px] font-extrabold text-[#172033]">{{ 'distanceLearning.drawer.title' | t }}</h2><p class="mt-1 text-[11.5px] text-[#768295]">{{ workspace.breadcrumb() }}</p></div><button type="button" (click)="closeDrawer()" class="grid size-9 place-items-center rounded-[10px] border border-[#dce3eb] text-[#637083]"><i class="ph ph-x text-[17px]"></i></button></div>
+    <form [formGroup]="createForm" (ngSubmit)="createDistanceItem()" class="p-6">
+      <div class="grid grid-cols-2 gap-2 rounded-[13px] bg-[#e9eef4] p-1.5"><label [class]="'cursor-pointer rounded-[10px] px-3 py-2.5 text-center text-[11px] font-semibold ' + (createForm.controls.kind.value === 'live' ? 'bg-white text-[#2a64a2] shadow-sm' : 'text-[#687589]')"><input class="sr-only" type="radio" value="live" formControlName="kind">{{ 'distanceLearning.drawer.live' | t }}</label><label [class]="'cursor-pointer rounded-[10px] px-3 py-2.5 text-center text-[11px] font-semibold ' + (createForm.controls.kind.value === 'async' ? 'bg-white text-[#2a64a2] shadow-sm' : 'text-[#687589]')"><input class="sr-only" type="radio" value="async" formControlName="kind">{{ 'distanceLearning.drawer.async' | t }}</label></div>
+      <label class="mt-5 block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.name' | t }}</span><input formControlName="title" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px] outline-none focus:border-[#8eb6db] focus:ring-2 focus:ring-blue-100" [placeholder]="'distanceLearning.drawer.namePlaceholder' | t"></label>
+      @if (createForm.controls.kind.value === 'live') {
+        <div class="mt-4 grid gap-3 sm:grid-cols-3"><label class="block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.date' | t }}</span><input type="date" formControlName="date" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]"></label><label class="block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.start' | t }}</span><input type="time" formControlName="start" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]"></label><label class="block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.end' | t }}</span><input type="time" formControlName="end" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[11px]"></label></div>
+        <label class="mt-4 block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.platform' | t }}</span><select formControlName="platform" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"><option value="teams">Microsoft Teams</option><option value="zoom">Zoom</option><option value="meet">Google Meet</option><option value="jitsi">Jitsi</option><option value="other">{{ 'distanceLearning.platforms.other' | t }}</option></select></label>
+        <label class="mt-4 block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.link' | t }}</span><input formControlName="joinUrl" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]" placeholder="https://..."></label>
       } @else {
-        <div class="mt-4 grid gap-3 sm:grid-cols-2">
-          <label class="block"
-            ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-              "distanceLearning.drawer.duration" | t
-            }}</span
-            ><input
-              type="number"
-              min="15"
-              formControlName="estimatedMinutes"
-              class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]" /></label
-          ><label class="block"
-            ><span class="mb-1.5 block text-[11.5px] font-semibold">{{
-              "distanceLearning.drawer.dueDate" | t
-            }}</span
-            ><input
-              type="date"
-              formControlName="dueDate"
-              class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"
-          /></label>
-        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2"><label class="block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.duration' | t }}</span><input type="number" min="15" formControlName="estimatedMinutes" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"></label><label class="block"><span class="mb-1.5 block text-[11.5px] font-semibold">{{ 'distanceLearning.drawer.dueDate' | t }}</span><input type="date" formControlName="dueDate" class="h-10 w-full rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[12px]"></label></div>
       }
-      <div class="mt-5 rounded-[13px] border border-[#cfe0ef] bg-[#edf6fe] p-4">
-        <div class="flex items-start gap-3">
-          <i class="ph ph-info mt-0.5 text-[17px] text-[#2a64a2]"></i>
-          <p class="text-[10.5px] leading-relaxed text-[#55708d]">
-            {{ "distanceLearning.drawer.help" | t }}
-          </p>
-        </div>
-      </div>
-      <div class="mt-6 flex justify-end gap-2">
-        <button
-          type="button"
-          (click)="closeDrawer()"
-          class="h-10 rounded-[10px] border border-[#dce3eb] bg-white px-4 text-[11px] font-semibold text-[#536174]"
-        >
-          {{ "distanceLearning.drawer.cancel" | t }}</button
-        ><button
-          type="submit"
-          class="h-10 rounded-[10px] bg-[#2b66a4] px-4 text-[11px] font-semibold text-white"
-        >
-          {{ "distanceLearning.drawer.save" | t }}
-        </button>
-      </div>
+      <div class="mt-5 rounded-[13px] border border-[#cfe0ef] bg-[#edf6fe] p-4"><div class="flex items-start gap-3"><i class="ph ph-info mt-0.5 text-[17px] text-[#2a64a2]"></i><p class="text-[10.5px] leading-relaxed text-[#55708d]">{{ 'distanceLearning.drawer.help' | t }}</p></div></div>
+      <div class="mt-6 flex justify-end gap-2"><button type="button" (click)="closeDrawer()" class="h-10 rounded-[10px] border border-[#dce3eb] bg-white px-4 text-[11px] font-semibold text-[#536174]">{{ 'distanceLearning.drawer.cancel' | t }}</button><button type="submit" class="h-10 rounded-[10px] bg-[#2b66a4] px-4 text-[11px] font-semibold text-white">{{ 'distanceLearning.drawer.save' | t }}</button></div>
     </form>
   </aside>
 }

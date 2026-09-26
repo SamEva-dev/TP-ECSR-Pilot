@@ -32,6 +32,18 @@ export class DistanceLearningApiService {
     );
   }
 
+  addParticipant(
+    sessionId: string,
+    payload: { enrollmentId: string; displayName: string },
+  ): Promise<DistanceLearningSessionApi> {
+    return firstValueFrom(
+      this.http.post<DistanceLearningSessionApi>(
+        `${this.base}/live-sessions/${sessionId}/participants`,
+        payload,
+      ),
+    );
+  }
+
   updateSessionStatus(
     id: string,
     status: string,

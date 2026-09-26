@@ -43,6 +43,26 @@ export class LearningApiService {
       `${this.base}/referentials/${referentialVersionId}/topics`,
     );
   }
+  getTopicCatalog(referentialVersionId: string): Observable<PedagogicalTopicDto[]> {
+    return this.http.get<PedagogicalTopicDto[]>(
+      `${this.base}/referentials/${referentialVersionId}/topics/catalog`,
+    );
+  }
+  createTopic(referentialVersionId: string, body: unknown): Observable<PedagogicalTopicDto> {
+    return this.http.post<PedagogicalTopicDto>(
+      `${this.base}/referentials/${referentialVersionId}/topics`, body,
+    );
+  }
+  updateTopicCatalog(referentialVersionId: string, topicId: string, body: unknown): Observable<PedagogicalTopicDto> {
+    return this.http.put<PedagogicalTopicDto>(
+      `${this.base}/referentials/${referentialVersionId}/topics/${topicId}`, body,
+    );
+  }
+  deleteTopic(referentialVersionId: string, topicId: string): Observable<boolean> {
+    return this.http.delete<boolean>(
+      `${this.base}/referentials/${referentialVersionId}/topics/${topicId}`,
+    );
+  }
   getLearnerTopics(
     enrollmentId: string,
   ): Observable<LearnerTopicProgressDto[]> {

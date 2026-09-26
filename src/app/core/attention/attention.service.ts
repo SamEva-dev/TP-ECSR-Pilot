@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from "@angular/core";
 import { AccessPolicyService } from "../access/access-policy.service";
 import { ATTENTION_MOCK_ITEMS } from "../api-data/runtime-data.store";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
+import { ApplicationNotificationService } from "../notifications/application-notification.service";
 
 const STORAGE_KEY = "tp-ecsr-pilot.attention-read";
 
@@ -9,6 +10,7 @@ const STORAGE_KEY = "tp-ecsr-pilot.attention-read";
 export class AttentionService {
   private readonly access = inject(AccessPolicyService);
   private readonly workspace = inject(WorkspaceContextService);
+  private readonly applicationNotifications = inject(ApplicationNotificationService);
   private readonly readIds = signal<Set<string>>(this.restore());
 
   readonly items = computed(() => {
@@ -16,7 +18,12 @@ export class AttentionService {
     const programId = this.workspace.selection().programId;
     const cohortId = this.workspace.selection().cohortId;
 
-    return ATTENTION_MOCK_ITEMS.filter((item) => {
+    const runtime = this.applicationNotifications.items().map((item) => ({
+      ...item,
+      read: this.readIds().has(this.contextualId(item.id)),
+    }));
+
+    const business = ATTENTION_MOCK_ITEMS.filter((item) => {
       if (!item.audiences.some((role) => roles.includes(role))) return false;
       if (item.programIds && !item.programIds.includes(programId)) return false;
       if (item.cohortIds && !item.cohortIds.includes(cohortId)) return false;
@@ -25,7 +32,11 @@ export class AttentionService {
       ...item,
       read: this.readIds().has(this.contextualId(item.id)),
     }));
+
+    return [...runtime, ...business];
   });
+
+  readonly lastApplicationNotificationId = this.applicationNotifications.lastId;
 
   readonly unreadCount = computed(
     () => this.items().filter((item) => !item.read).length,

@@ -1,145 +1,69 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  <div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[29px] font-extrabold text-[#172033]">
-        {{ "access.title" | t }}
-      </h1>
-      <p class="text-[13px] text-[#6c788b]">{{ "access.real.subtitle" | t }}</p>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ "access.title" | t }}</h1>
+      <p class="mt-0.5 text-[14px] text-[#6c788b]">{{ "access.multiScopeSubtitle" | t }}</p>
     </div>
-    <button
-      type="button"
-      (click)="load()"
-      [disabled]="loading() || !!savingId()"
-      class="rounded-[10px] bg-[#2a64a2] px-4 py-2 text-white disabled:opacity-50"
-    >
-      {{ "access.real.refresh" | t }}
-    </button>
+    @if (selectedAccount(); as selected) {
+      <button type="button" (click)="openAssignments(selected)" class="inline-flex h-[40px] items-center gap-2 rounded-[11px] bg-[#2a64a2] px-4 text-[12px] font-semibold text-white shadow-sm hover:bg-[#255b93]"><i class="ph ph-user-switch text-[17px]"></i>{{ "access.assignments.manage" | t }}</button>
+    }
   </div>
-  @if (error()) {
-    <p role="alert" class="mt-4 rounded-[10px] bg-red-50 p-3 text-red-700">
-      {{ error() | t }}
-    </p>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <article class="relative min-h-[93px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ "access.kpi.accounts" | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ stats().total }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"><i class="ph ph-users-three text-[20px]"></i></span></article>
+    <article class="relative min-h-[93px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ "access.kpi.active" | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ stats().active }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#d8f8df] text-[#22a84b]"><i class="ph ph-check-circle text-[20px]"></i></span></article>
+    <article class="relative min-h-[93px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ "access.kpi.assignments" | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ stats().assignments }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"><i class="ph ph-path text-[20px]"></i></span></article>
+    <article class="relative min-h-[93px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ "access.kpi.multiScope" | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ stats().multiScope }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff0c9] text-[#8a641b]"><i class="ph ph-buildings text-[20px]"></i></span></article>
+  </div>
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-[0.72fr_1.68fr]">
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <h2 class="text-[16px] font-bold">{{ "access.invite.title" | t }}</h2>
+      <p class="mt-0.5 text-[13px] text-[#768295]">{{ "access.invite.multiScopeHint" | t }}</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <label class="block text-[12px] font-semibold text-[#334155]">{{ "access.invite.firstName" | t }}<input [(ngModel)]="inviteFirstName" class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></label>
+        <label class="block text-[12px] font-semibold text-[#334155]">{{ "access.invite.lastName" | t }}<input [(ngModel)]="inviteLastName" class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></label>
+      </div>
+      <label class="mt-3 block text-[12px] font-semibold text-[#334155]">{{ "access.invite.email" | t }}<input [(ngModel)]="inviteEmail" type="email" [placeholder]="'access.invite.emailPlaceholder' | t" class="mt-1 h-[42px] w-full rounded-[10px] border border-[#dbe2ea] px-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></label>
+      <label class="mt-3 block text-[12px] font-semibold text-[#334155]">{{ "access.invite.role" | t }}<div class="relative mt-1"><select [(ngModel)]="inviteRole" class="h-[42px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-9 text-[13px] outline-none"><option value="direction">{{ "access.roles.direction" | t }}</option><option value="secretariat">{{ "access.roles.secretariat" | t }}</option><option value="formateur">{{ "access.roles.formateur" | t }}</option><option value="stagiaire">{{ "access.roles.stagiaire" | t }}</option><option value="jury">{{ "access.roles.jury" | t }}</option></select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div></label>
+      <button type="button" (click)="invite()" class="mt-4 flex h-[42px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#2a64a2] px-4 text-[13px] font-semibold text-white shadow-sm hover:bg-[#255b93]"><i class="ph ph-plus text-[16px]"></i>{{ "access.invite.sendAndAssign" | t }}</button>
+      <p class="mt-2 text-[11px] leading-[1.45] text-[#7b8798]">{{ "access.invite.assignmentAfterInvite" | t }}</p>
+    </article>
+
+    <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><h2 class="text-[16px] font-bold">{{ "access.accounts.multiScopeTitle" | t }}</h2><p class="mt-0.5 text-[13px] text-[#768295]">{{ "access.accounts.subtitle" | t: { count: filteredAccounts().length } }}</p></div><div class="rounded-full bg-[#e5f2ff] px-3 py-1 text-[11px] font-semibold text-[#2a64a2]">{{ "access.accounts.scopeRule" | t }}</div></div>
+      <div class="mt-4 grid gap-2 sm:grid-cols-[1fr_180px]"><div class="relative"><i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#7b8798]"></i><input type="search" [value]="search()" (input)="setSearch($any($event.target).value)" [placeholder]="'access.accounts.searchExtended' | t" class="h-[40px] w-full rounded-[10px] border border-[#dbe2ea] pl-9 pr-3 text-[13px] outline-none focus:border-[#91acd0] focus:ring-2 focus:ring-blue-100" /></div><div class="relative"><select [value]="roleFilter()" (change)="setRoleFilter($any($event.target).value)" class="h-[40px] w-full appearance-none rounded-[10px] border border-[#dbe2ea] bg-white px-3 pr-9 text-[13px]"><option value="all">{{ "access.accounts.allRoles" | t }}</option><option value="direction">{{ "access.roles.direction" | t }}</option><option value="secretariat">{{ "access.roles.secretariat" | t }}</option><option value="formateur">{{ "access.roles.formateur" | t }}</option><option value="stagiaire">{{ "access.roles.stagiaire" | t }}</option><option value="jury">{{ "access.roles.jury" | t }}</option></select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#7c8798]"></i></div></div>
+
+      <div class="mt-3 max-h-[500px] space-y-2 overflow-y-auto pr-1">
+        @for (account of filteredAccounts(); track account.id) {
+          <div role="button" tabindex="0" (click)="select(account)" (keydown.enter)="select(account)" [class]="'grid cursor-pointer gap-3 rounded-[14px] border px-3 py-3 transition sm:grid-cols-[minmax(210px,1.3fr)_minmax(190px,1fr)_110px_90px_auto] sm:items-center ' + (selectedId() === account.id ? 'border-[#80abd7] bg-[#e8f3ff]' : 'border-[#dfe5ec] bg-white hover:bg-[#f8fafc]')">
+            <div class="flex min-w-0 items-center gap-3"><span class="grid size-[38px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[12px] font-bold text-white">{{ initials(account) }}</span><span class="min-w-0"><span class="block truncate text-[13px] font-bold text-[#172033]">{{ account.firstName }} {{ account.lastName }}</span><span class="block truncate text-[11px] text-[#768295]">{{ account.email }}</span></span></div>
+            <div class="min-w-0"><p class="truncate text-[11px] font-semibold text-[#475569]">{{ assignmentSummary(account) }}</p><p class="mt-0.5 text-[10.5px] text-[#8a96a8]">{{ "access.accounts.assignmentCount" | t: { count: account.assignments.length } }}</p></div>
+            <span class="w-fit rounded-full bg-[#e6f2ff] px-2.5 py-1 text-[10.5px] font-semibold text-[#2a64a2]">{{ roleKey(account.role) | t }}</span>
+            <span [class]="'w-fit rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' + (account.access === 'active' ? 'bg-[#d8f8df] text-[#18a547]' : account.access === 'invited' ? 'bg-[#fff0c9] text-[#8b5e00]' : 'bg-[#ffe1df] text-[#f22b2b]')">{{ stateKey(account) | t }}</span>
+            <div (click)="$event.stopPropagation()" class="flex justify-end gap-1"><button type="button" (click)="openAssignments(account)" class="grid size-[32px] place-items-center rounded-[9px] border border-[#d9e0e9] bg-white text-[#2a64a2] shadow-sm" [attr.aria-label]="'access.assignments.manage' | t"><i class="ph ph-user-switch text-[16px]"></i></button><button type="button" (click)="toggleAccess(account)" class="grid size-[32px] place-items-center rounded-[9px] border border-[#d9e0e9] bg-white text-[#64748b] shadow-sm"><i [class]="'ph text-[16px] ' + (account.access === 'active' ? 'ph-shield-warning' : 'ph-check')"></i></button><button type="button" (click)="deleteAccount(account)" class="grid size-[32px] place-items-center rounded-[9px] text-[#f04438] hover:bg-[#fff1f0]"><i class="ph ph-trash text-[16px]"></i></button></div>
+          </div>
+        } @empty {<div class="rounded-[14px] bg-[#f4f6f8] px-4 py-8 text-center text-[12px] text-[#7b8798]">{{ "access.accounts.empty" | t }}</div>}
+      </div>
+    </article>
+  </div>
+
+  @if (selectedAccount(); as selected) {
+    <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_1.5fr]">
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <div class="flex items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold">{{ "access.assignments.summaryTitle" | t }}</h2><p class="mt-0.5 text-[13px] text-[#768295]">{{ selected.firstName }} {{ selected.lastName }}</p></div><button type="button" (click)="openAssignments(selected)" class="inline-flex h-[35px] items-center gap-2 rounded-[10px] border border-[#cddae7] bg-white px-3 text-[11px] font-semibold text-[#2a64a2]"><i class="ph ph-pencil-simple text-[14px]"></i>{{ "access.assignments.manage" | t }}</button></div>
+        <div class="mt-4 space-y-2">@for (assignment of selected.assignments; track assignment.id) {<div class="rounded-[13px] bg-[#f3f6f9] px-3.5 py-3"><div class="flex items-center justify-between gap-2"><span class="text-[12px] font-bold text-[#172033]">{{ "access.assignments.roles." + assignment.role | t }}</span><span class="rounded-full bg-white px-2 py-1 text-[10px] font-semibold text-[#64748b]">{{ "access.assignments.scopes." + assignment.scope | t }}</span></div><p class="mt-1.5 text-[11px] leading-[1.45] text-[#667085]">{{ organizationName(assignment.organizationId) }}@if (assignment.siteId) { · {{ siteName(assignment.siteId) }} }@if (assignment.programId) { · {{ programName(assignment.programId) }} }</p></div>} @empty {<p class="rounded-[13px] bg-[#fff7e8] p-3 text-[12px] text-[#8b5e00]">{{ "access.assignments.empty" | t }}</p>}</div>
+      </article>
+
+      <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <div class="flex items-start justify-between gap-3"><div><h2 class="text-[16px] font-bold">{{ "access.permissions.title" | t: { name: selected.firstName + " " + selected.lastName } }}</h2><p class="mt-0.5 text-[13px] text-[#768295]">{{ "access.permissions.scopeHint" | t }}</p></div><i class="ph ph-key text-[19px] text-[#7c8798]"></i></div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">@for (permission of selected.permissions; track permission.key) {<button type="button" (click)="togglePermission(permission.key)" class="flex min-h-[59px] items-center gap-3 rounded-[13px] border border-[#dfe5ec] bg-white px-3.5 py-2.5 text-left"><span [class]="'relative h-[20px] w-[34px] shrink-0 rounded-full transition ' + (permission.enabled ? 'bg-[#2a64a2]' : 'bg-[#dbe3ec]')"><span [class]="'absolute top-[3px] size-[14px] rounded-full bg-white shadow transition ' + (permission.enabled ? 'left-[17px]' : 'left-[3px]')"></span></span><span class="min-w-0"><span class="block text-[13px] font-bold text-[#172033]">{{ "access.permissions.items." + permission.key + ".title" | t }}</span><span class="block text-[11px] leading-[1.35] text-[#768295]">{{ "access.permissions.items." + permission.key + ".description" | t }}</span></span></button>}</div>
+        <p class="mt-3 rounded-[11px] bg-[#eaf3fc] px-3 py-2 text-[11px] leading-[1.45] text-[#47627e]">{{ "access.permissions.effectiveRule" | t }}</p>
+      </article>
+    </div>
   }
-  <div class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-5">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h2 class="text-[16px] font-bold">
-        {{ "access.accounts.multiScopeTitle" | t }} ({{ total() }})
-      </h2>
-      <input
-        type="search"
-        [value]="search()"
-        (input)="setSearch($any($event.target).value)"
-        [placeholder]="'access.accounts.searchExtended' | t"
-        class="rounded-[10px] border border-[#dbe2ea] px-3 py-2"
-      />
-    </div>
-    <div class="mt-4 overflow-x-auto">
-      <table class="w-full min-w-[700px] text-left text-[13px]">
-        <thead class="border-b text-[#637083]">
-          <tr>
-            <th class="p-3">{{ "access.real.person" | t }}</th>
-            <th class="p-3">{{ "access.invite.email" | t }}</th>
-            <th class="p-3">{{ "access.invite.role" | t }}</th>
-            <th class="p-3">{{ "access.real.status" | t }}</th>
-            <th class="p-3">{{ "access.real.actions" | t }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (account of accounts(); track account.id) {
-            <tr class="border-b border-[#e8edf2]">
-              <td class="p-3 font-semibold">
-                {{ account.firstName }} {{ account.lastName }}
-              </td>
-              <td class="p-3">{{ account.email }}</td>
-              <td class="p-3">
-                <select
-                  [value]="account.roles[0] ?? ''"
-                  [disabled]="
-                    !!savingId() ||
-                    account.id === session.session()?.userId ||
-                    account.status !== 'Active'
-                  "
-                  (change)="
-                    changeRole(account, $any($event.target).value);
-                    $any($event.target).value = account.roles[0] ?? ''
-                  "
-                  class="w-full rounded border border-[#dbe2ea] bg-white p-2"
-                >
-                  <option value="" disabled>
-                    {{ "access.real.chooseRole" | t }}
-                  </option>
-                  @for (option of roleOptions(); track option.value) {
-                    <option [value]="option.value">
-                      {{
-                        option.key
-                          ? ("access.assignments.roles." + option.key | t)
-                          : option.value
-                      }}
-                    </option>
-                  }
-                </select>
-              </td>
-              <td class="p-3">
-                {{
-                  (account.status === "Active"
-                    ? "access.states.active"
-                    : "access.states.suspended"
-                  ) | t
-                }}
-              </td>
-              <td class="p-3">
-                <button
-                  type="button"
-                  [disabled]="
-                    !!savingId() || account.id === session.session()?.userId
-                  "
-                  (click)="changeStatus(account)"
-                  class="rounded border border-[#cddae7] px-3 py-2 text-[#2a64a2] disabled:opacity-50"
-                >
-                  {{
-                    (account.status === "Active"
-                      ? "access.real.suspend"
-                      : "access.real.reactivate"
-                    ) | t
-                  }}
-                </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="5" class="p-8 text-center text-[#768295]">
-                {{
-                  (loading()
-                    ? "access.accounts.loading"
-                    : error()
-                      ? "access.real.unavailable"
-                      : "access.accounts.empty"
-                  ) | t
-                }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-4 flex items-center justify-between">
-      <button
-        type="button"
-        (click)="load(page() - 1)"
-        [disabled]="loading() || page() <= 1"
-        class="rounded border px-3 py-2 disabled:opacity-50"
-      >
-        {{ "access.real.previous" | t }}
-      </button>
-      <span>{{ page() }} / {{ pageCount() }}</span>
-      <button
-        type="button"
-        (click)="load(page() + 1)"
-        [disabled]="loading() || !hasNext()"
-        class="rounded border px-3 py-2 disabled:opacity-50"
-      >
-        {{ "access.real.next" | t }}
-      </button>
-    </div>
-  </div>
 </section>
+
+@if (assignmentDrawerOpen() && selectedAccount(); as account) {
+  <app-access-assignment-drawer [account]="account" (closed)="assignmentDrawerOpen.set(false)" (assignmentAdded)="addAssignment($event)" (assignmentRemoved)="removeAssignment($event)" />
+}

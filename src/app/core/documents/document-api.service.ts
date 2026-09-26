@@ -17,19 +17,44 @@ export class DocumentApiService {
 
   async download(document: DocumentDto): Promise<void> {
     const response = await firstValueFrom(
-      this.http.get(`${this.base}/${document.id}/content`, {
+      this.http.get(`${this.base}/${encodeURIComponent(document.id)}/content`, {
         observe: "response",
         responseType: "blob",
       }),
     );
 
+    const body = response.body;
+    if (!body) throw new Error("DOCUMENT_CONTENT_EMPTY");
     const version = document.versions[0];
-    const url = URL.createObjectURL(response.body!);
-    const a = window.document.createElement("a");
-    a.href = url;
-    a.download = version?.fileName ?? "document";
-    a.click();
-    URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(body);
+    try {
+      const anchor = window.document.createElement("a");
+      anchor.href = url;
+      anchor.download = version?.fileName ?? "";
+      anchor.click();
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async downloadById(id: string, fileName = ""): Promise<void> {
+    const response = await firstValueFrom(
+      this.http.get(`${this.base}/${encodeURIComponent(id)}/content`, {
+        observe: "response",
+        responseType: "blob",
+      }),
+    );
+    const body = response.body;
+    if (!body) throw new Error("DOCUMENT_CONTENT_EMPTY");
+    const url = URL.createObjectURL(body);
+    try {
+      const anchor = window.document.createElement("a");
+      anchor.href = url;
+      anchor.download = fileName ?? "";
+      anchor.click();
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   upload(form: FormData): Promise<DocumentDto> {
@@ -38,11 +63,11 @@ export class DocumentApiService {
 
   replace(id: string, form: FormData): Promise<DocumentDto> {
     return firstValueFrom(
-      this.http.post<DocumentDto>(`${this.base}/${id}/versions`, form),
+      this.http.post<DocumentDto>(`${this.base}/${encodeURIComponent(id)}/versions`, form),
     );
   }
 
   delete(id: string): Promise<void> {
-    return firstValueFrom(this.http.delete<void>(`${this.base}/${id}`));
+    return firstValueFrom(this.http.delete<void>(`${this.base}/${encodeURIComponent(id)}`));
   }
 }

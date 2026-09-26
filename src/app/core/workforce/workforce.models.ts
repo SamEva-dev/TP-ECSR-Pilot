@@ -1,3 +1,10 @@
+export interface RemoteWorkPolicyApi {
+  enabled: boolean;
+  approvalRequired: boolean;
+  maxDaysPerWeek: number;
+  halfDayAllowed: boolean;
+  endOfDayReport: boolean;
+}
 export interface RemoteWorkActivityApi {
   id: string;
   code: string;
@@ -21,4 +28,14 @@ export interface RemoteWorkRequestApi {
   approverDisplayName?: string | null;
   decidedAtUtc?: string | null;
   activities: RemoteWorkActivityApi[];
+}
+
+export interface CreateRemoteWorkRequestApi {
+  siteId: string;
+  date: string;
+  period: string;
+  startTime: string | null;
+  endTime: string | null;
+  comment: string | null;
+  activities: Array<{ code: string; label: string }>;
 }

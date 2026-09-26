@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   effect,
   inject,
@@ -8,13 +9,29 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { firstValueFrom } from "rxjs";
+import { SheetsApiStoreService } from "../../../core/api-data/sheets-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import {
-  StudentProfileApiService,
-  type TopicProgressApi,
-  type UpdateTopicProgressApiRequest,
-} from "../../../core/students/student-profile-api.service";
+  SHEET_EVALUATION_CRITERIA,
+  type EvaluationLevel,
+  type PedagogicalSheet,
+} from "../../../core/models/sheets.models";
+
+export type FinalEvaluationDecision = "validated" | "rework";
+
+export interface SheetEvaluationSavedEvent {
+  studentId: string;
+  sheetNumber: number;
+  presentationDate: string;
+  durationMinutes: number;
+  evaluator: string;
+  levels: Record<string, EvaluationLevel>;
+  positivePoints: string;
+  improvements: string;
+  generalComment: string;
+  nextObjective: string;
+  decision: FinalEvaluationDecision;
+}
 
 @Component({
   selector: "app-evaluate-sheet-drawer",
@@ -22,109 +39,236 @@ import {
   templateUrl: "./evaluate-sheet-drawer.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EvaluateSheetDrawerComponent {
-  readonly enrollmentId = input.required<string>();
-  readonly studentName = input.required<string>();
-  readonly topics = input.required<TopicProgressApi[]>();
+export class EvaluateSheetDrawerComponent implements OnInit {
+  readonly initialStudentId = input("");
   readonly closed = output<void>();
-  readonly savedTopic = output<TopicProgressApi>();
-  private readonly api = inject(StudentProfileApiService);
-  readonly topicId = signal("");
-  readonly selectedTopic = computed(
-    () =>
-      this.topics().find((x) => x.topicId === this.topicId()) ??
-      this.topics()[0] ??
-      null,
-  );
-  readonly status = signal("");
-  readonly preparationDate = signal("");
+  readonly evaluationSaved = output<SheetEvaluationSavedEvent>();
+
+  readonly store = inject(SheetsApiStoreService);
+  get students() { return this.store.students(); }
+  get evaluators() {
+    const name = this.store.currentEvaluator();
+    return [name];
+  }
+  readonly criteria = SHEET_EVALUATION_CRITERIA;
+  readonly levels: EvaluationLevel[] = ["acquired", "in_progress", "review"];
+  readonly sheets = this.store.sheets;
+
+  readonly studentId = signal("");
+  readonly sheetNumber = signal(0);
   readonly presentationDate = signal("");
-  readonly duration = signal("");
-  readonly comment = signal("");
-  readonly saving = signal(false);
-  readonly error = signal(false);
-  readonly invalid = signal(false);
-  readonly statuses = [
-    "not_started",
-    "in_progress",
-    "ready",
-    "presented",
-    "validated",
-    "rework",
-  ];
+  readonly durationMinutes = signal(0);
+  readonly evaluator = signal("");
+  readonly positivePoints = signal("");
+  readonly improvements = signal("");
+  readonly generalComment = signal("");
+  readonly nextObjective = signal("");
+  readonly decision = signal<FinalEvaluationDecision>("validated");
+  readonly saved = signal(false);
+
+  readonly evaluation = signal<Record<string, EvaluationLevel>>(
+    this.defaultEvaluation(),
+  );
+  private hydratedSelection = "";
+
+  readonly selectedStudent = computed(
+    () => this.students.find((student) => student.id === this.studentId()) ?? {
+      id: "",
+      firstName: "",
+      lastName: "",
+    },
+  );
+
+  readonly acquiredCount = computed(
+    () => Object.values(this.evaluation()).filter((level) => level === "acquired").length,
+  );
+  readonly inProgressCount = computed(
+    () => Object.values(this.evaluation()).filter((level) => level === "in_progress").length,
+  );
+  readonly reviewCount = computed(
+    () => Object.values(this.evaluation()).filter((level) => level === "review").length,
+  );
 
   constructor() {
     effect(() => {
-      const topic = this.selectedTopic();
-      this.status.set(topic?.status ?? "");
-      this.preparationDate.set(topic?.preparationDate ?? "");
-      this.presentationDate.set(topic?.presentationDate ?? "");
-      this.duration.set(
-        topic?.presentationDurationMinutes == null
-          ? ""
-          : String(topic.presentationDurationMinutes),
-      );
-      this.comment.set(topic?.comment ?? "");
-      this.error.set(false);
-      this.invalid.set(false);
+      const students = this.store.students();
+      const current = this.studentId();
+      const selected = students.some((student) => student.id === current)
+        ? current
+        : (students[0]?.id ?? "");
+      if (selected !== current) {
+        this.studentId.set(selected);
+        this.store.selectStudent(selected);
+      }
+    });
+
+    effect(() => {
+      const available = this.sheets();
+      const currentNumber = this.sheetNumber();
+      const selectedNumber = available.some((sheet) => sheet.number === currentNumber)
+        ? currentNumber
+        : (available.find((sheet) => sheet.number === 32)?.number ?? available[0]?.number ?? 0);
+      if (selectedNumber !== currentNumber) this.sheetNumber.set(selectedNumber);
+      const selectedSheet = available.find((sheet) => sheet.number === selectedNumber) ?? null;
+      const selectionKey = `${this.studentId()}|${selectedSheet?.topicId ?? ""}`;
+      if (selectionKey !== this.hydratedSelection) {
+        this.hydratedSelection = selectionKey;
+        this.hydrate(selectedSheet);
+      }
     });
   }
 
-  selectTopic(event: Event): void {
-    this.topicId.set((event.target as HTMLSelectElement).value);
+  ngOnInit(): void {
+    const requested = this.initialStudentId() ?? "";
+    const selected = this.students.some((student) => student.id === requested)
+      ? requested
+      : (this.students[0]?.id ?? "");
+    this.studentId.set(selected);
+    this.store.selectStudent(selected);
   }
-  setStatus(event: Event): void {
-    this.status.set((event.target as HTMLSelectElement).value);
-    this.invalid.set(false);
+
+  updateStudent(event: Event): void {
+    const selected = (event.target as HTMLSelectElement).value ?? "";
+    this.studentId.set(selected);
+    this.sheetNumber.set(0);
+    this.hydratedSelection = "";
+    this.saved.set(false);
+    this.store.selectStudent(selected);
   }
-  setField(
-    field: "preparationDate" | "presentationDate" | "duration" | "comment",
+
+  updateSheet(event: Event): void {
+    this.sheetNumber.set(Number((event.target as HTMLSelectElement).value || 0));
+    this.saved.set(false);
+  }
+
+  updateDate(event: Event): void {
+    this.presentationDate.set((event.target as HTMLInputElement).value ?? "");
+    this.saved.set(false);
+  }
+
+  updateDuration(event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value || 0);
+    this.durationMinutes.set(Number.isFinite(value) ? value : 0);
+    this.saved.set(false);
+  }
+
+  updateEvaluator(event: Event): void {
+    this.evaluator.set((event.target as HTMLSelectElement).value ?? "");
+    this.saved.set(false);
+  }
+
+  updateText(
+    target: "positivePoints" | "improvements" | "generalComment" | "nextObjective",
     event: Event,
   ): void {
-    this[field].set(
-      (event.target as HTMLInputElement | HTMLTextAreaElement).value,
-    );
-    this.invalid.set(false);
+    const value = (event.target as HTMLTextAreaElement).value ?? "";
+    this[target].set(value);
+    this.saved.set(false);
   }
+
+  setLevel(criterion: string, level: EvaluationLevel): void {
+    this.evaluation.update((current) => ({ ...current, [criterion]: level }));
+    this.saved.set(false);
+  }
+
+  setDecision(decision: FinalEvaluationDecision): void {
+    this.decision.set(decision);
+    this.saved.set(false);
+  }
+
+  levelClasses(criterion: string, level: EvaluationLevel): string {
+    if (this.evaluation()[criterion] !== level) {
+      return "border-[#dce3eb] bg-white text-[#475569] hover:border-[#b7c4d2] hover:bg-[#f8fafc]";
+    }
+
+    if (level === "acquired")
+      return "border-[#22a84b] bg-[#dcf8e3] text-[#15803d] shadow-sm";
+    if (level === "in_progress")
+      return "border-[#f2aa2b] bg-[#fff1cb] text-[#825a00] shadow-sm";
+    return "border-[#ef5a52] bg-[#ffe3e0] text-[#cf342d] shadow-sm";
+  }
+
+  decisionClasses(decision: FinalEvaluationDecision): string {
+    if (this.decision() !== decision) {
+      return "border-[#dce3eb] bg-white text-[#475569] hover:bg-[#f8fafc]";
+    }
+
+    return decision === "validated"
+      ? "border-[#22a84b] bg-[#dcf8e3] text-[#15803d] shadow-sm"
+      : "border-[#ef5a52] bg-[#ffe3e0] text-[#cf342d] shadow-sm";
+  }
+
   async save(): Promise<void> {
-    const topic = this.selectedTopic();
-    const duration = this.duration() ? Number(this.duration()) : null;
-    const presented = ["presented", "validated", "rework"].includes(
-      this.status(),
-    );
-    if (
-      !topic ||
-      !this.statuses.includes(this.status()) ||
-      this.saving() ||
-      (duration !== null &&
-        (!Number.isInteger(duration) || duration < 1 || duration > 1440)) ||
-      (presented && (!this.presentationDate() || duration === null))
-    ) {
-      this.invalid.set(true);
+    const updated = await this.store.saveEvaluation({
+      studentId: this.studentId(),
+      sheetNumber: this.sheetNumber(),
+      presentationDate: this.presentationDate(),
+      durationMinutes: this.durationMinutes(),
+      levels: this.evaluation(),
+      positivePoints: this.positivePoints(),
+      improvements: this.improvements(),
+      generalComment: this.generalComment(),
+      nextObjective: this.nextObjective(),
+      decision: this.decision(),
+    });
+
+    if (!updated) {
+      this.saved.set(false);
       return;
     }
-    const request: UpdateTopicProgressApiRequest = {
-      status: this.status(),
-      preparationDate: this.preparationDate() || null,
-      presentationDate: this.presentationDate() || null,
-      presentationDurationMinutes: duration,
-      evaluatorDisplayName: null,
-      comment: this.comment().trim() || null,
-    };
-    this.saving.set(true);
-    this.error.set(false);
-    try {
-      const row = await firstValueFrom(
-        this.api.updateTopic(this.enrollmentId(), topic.topicId, request),
-      );
-      this.savedTopic.emit(row);
-    } catch {
-      this.error.set(true);
-    } finally {
-      this.saving.set(false);
-    }
+
+    this.applyUpdated(updated);
+    this.saved.set(true);
+    this.evaluationSaved.emit({
+      studentId: this.studentId(),
+      sheetNumber: updated.number,
+      presentationDate: updated.presentationDate,
+      durationMinutes: updated.durationMinutes,
+      evaluator: updated.evaluator,
+      levels: { ...updated.evaluationLevels },
+      positivePoints: updated.positivePoints,
+      improvements: updated.improvements,
+      generalComment: updated.generalComment,
+      nextObjective: updated.nextObjective,
+      decision: updated.status === "rework" ? "rework" : "validated",
+    });
   }
+
   close(): void {
-    if (!this.saving()) this.closed.emit();
+    this.closed.emit();
+  }
+
+  private hydrate(sheet: PedagogicalSheet | null): void {
+    this.presentationDate.set(sheet?.presentationDate ?? "");
+    this.durationMinutes.set(sheet?.durationMinutes ?? 0);
+    this.evaluator.set(sheet?.evaluator || this.store.currentEvaluator());
+    this.positivePoints.set(sheet?.positivePoints ?? "");
+    this.improvements.set(sheet?.improvements ?? "");
+    this.generalComment.set(sheet?.generalComment ?? "");
+    this.nextObjective.set(sheet?.nextObjective ?? "");
+    this.decision.set(sheet?.status === "rework" ? "rework" : "validated");
+    const existing = sheet?.evaluationLevels ?? {};
+    this.evaluation.set(Object.fromEntries(
+      this.criteria.map((criterion) => [criterion, existing[criterion] ?? "in_progress"]),
+    ) as Record<string, EvaluationLevel>);
+    this.saved.set(false);
+  }
+
+  private applyUpdated(sheet: PedagogicalSheet): void {
+    this.presentationDate.set(sheet.presentationDate);
+    this.durationMinutes.set(sheet.durationMinutes);
+    this.evaluator.set(sheet.evaluator);
+    this.positivePoints.set(sheet.positivePoints);
+    this.improvements.set(sheet.improvements);
+    this.generalComment.set(sheet.generalComment);
+    this.nextObjective.set(sheet.nextObjective);
+    this.decision.set(sheet.status === "rework" ? "rework" : "validated");
+    this.evaluation.set({ ...sheet.evaluationLevels });
+  }
+
+  private defaultEvaluation(): Record<string, EvaluationLevel> {
+    return Object.fromEntries(
+      SHEET_EVALUATION_CRITERIA.map((criterion) => [criterion, "in_progress"]),
+    ) as Record<string, EvaluationLevel>;
   }
 }

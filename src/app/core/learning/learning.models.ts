@@ -39,6 +39,9 @@ export interface PedagogicalTopicDto {
   durationMinutes: number;
   reference?: string | null;
   active: boolean;
+  objective?: string | null;
+  example?: string | null;
+  correction?: string | null;
 }
 export interface LearnerTopicProgressDto {
   id: string;

@@ -1,252 +1,57 @@
 <section class="mx-auto w-full max-w-[1450px]">
   <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
     <div>
-      <div
-        class="mb-2 inline-flex items-center gap-2 rounded-full bg-[#e6f1fc] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#245c97]"
-      >
-        <i class="ph ph-map-pin-area text-[15px]"></i>{{ "sites.badge" | t }}
-      </div>
-      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">
-        {{ "sites.title" | t }}
-      </h1>
-      <p class="mt-1 text-[14px] text-[#6c788b]">
-        {{
-          "sites.subtitle"
-            | t: { organization: workspace.organization()?.name ?? "" }
-        }}
-      </p>
+      <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-[#e6f1fc] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#245c97]"><i class="ph ph-map-pin-area text-[15px]"></i>{{ 'sites.badge' | t }}</div>
+      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'sites.title' | t }}</h1>
+      <p class="mt-1 text-[14px] text-[#6c788b]">{{ 'sites.subtitle' | t: { organization: workspace.organization()?.name ?? '' } }}</p>
     </div>
-    <button
-      type="button"
-      (click)="addSite()"
-      class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white shadow-sm"
-    >
-      <i class="ph ph-plus text-[16px]"></i>{{ "sites.add" | t }}
-    </button>
+    <button type="button" (click)="addSite()" class="inline-flex h-[40px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white shadow-sm"><i class="ph ph-plus text-[16px]"></i>{{ 'sites.add' | t }}</button>
   </div>
 
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-    <article
-      class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "sites.kpis.sites" | t }}
-      </p>
-      <p class="mt-2 text-[26px] font-extrabold">
-        {{ organizationSites().length }}
-      </p>
-      <span
-        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
-        ><i class="ph ph-buildings text-[20px]"></i
-      ></span>
-    </article>
-    <article
-      class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "sites.kpis.students" | t }}
-      </p>
-      <p class="mt-2 text-[26px] font-extrabold">{{ totals().students }}</p>
-      <span
-        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"
-        ><i class="ph ph-student text-[20px]"></i
-      ></span>
-    </article>
-    <article
-      class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "sites.kpis.trainers" | t }}
-      </p>
-      <p class="mt-2 text-[26px] font-extrabold">{{ totals().trainers }}</p>
-      <span
-        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#f1ecff] text-[#7653c6]"
-        ><i class="ph ph-chalkboard-teacher text-[20px]"></i
-      ></span>
-    </article>
-    <article
-      class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
-      <p class="text-[11px] font-medium uppercase text-[#637083]">
-        {{ "sites.kpis.alerts" | t }}
-      </p>
-      <p class="mt-2 text-[26px] font-extrabold">{{ totals().alerts }}</p>
-      <span
-        class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff1d4] text-[#9a6500]"
-        ><i class="ph ph-warning text-[20px]"></i
-      ></span>
-    </article>
+    <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ 'sites.kpis.sites' | t }}</p><p class="mt-2 text-[26px] font-extrabold">{{ organizationSites().length }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"><i class="ph ph-buildings text-[20px]"></i></span></article>
+    <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ 'sites.kpis.students' | t }}</p><p class="mt-2 text-[26px] font-extrabold">{{ totals().students }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"><i class="ph ph-student text-[20px]"></i></span></article>
+    <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ 'sites.kpis.trainers' | t }}</p><p class="mt-2 text-[26px] font-extrabold">{{ totals().trainers }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#f1ecff] text-[#7653c6]"><i class="ph ph-chalkboard-teacher text-[20px]"></i></span></article>
+    <article class="relative min-h-[104px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[11px] font-medium uppercase text-[#637083]">{{ 'sites.kpis.alerts' | t }}</p><p class="mt-2 text-[26px] font-extrabold">{{ totals().alerts }}</p><span class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#fff1d4] text-[#9a6500]"><i class="ph ph-warning text-[20px]"></i></span></article>
   </div>
 
-  <div
-    class="mt-4 flex flex-col gap-3 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm md:flex-row md:items-center"
-  >
-    <div class="relative min-w-0 flex-1">
-      <i
-        class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#7c8798]"
-      ></i
-      ><input
-        [value]="query()"
-        (input)="query.set($any($event.target).value)"
-        type="search"
-        [placeholder]="'sites.search' | t"
-        class="h-10 w-full rounded-[11px] border border-[#d9e1ea] bg-white pl-9 pr-3 text-[13px] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
-    <div class="relative md:w-[190px]">
-      <select
-        [value]="status()"
-        (change)="setStatus($any($event.target).value)"
-        class="h-10 w-full appearance-none rounded-[11px] border border-[#d9e1ea] bg-white px-3 pr-9 text-[12.5px] outline-none"
-      >
-        <option value="all">{{ "sites.filters.all" | t }}</option>
-        <option value="active">{{ "sites.status.active" | t }}</option>
-        <option value="attention">{{ "sites.status.attention" | t }}</option>
-        <option value="inactive">
-          {{ "sites.status.inactive" | t }}
-        </option></select
-      ><i
-        class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b]"
-      ></i>
-    </div>
+  <div class="mt-4 flex flex-col gap-3 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm md:flex-row md:items-center">
+    <div class="relative min-w-0 flex-1"><i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-[#7c8798]"></i><input [value]="query()" (input)="query.set($any($event.target).value)" type="search" [placeholder]="'sites.search' | t" class="h-10 w-full rounded-[11px] border border-[#d9e1ea] bg-white pl-9 pr-3 text-[13px] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100" /></div>
+    <div class="relative md:w-[190px]"><select [value]="status()" (change)="setStatus($any($event.target).value)" class="h-10 w-full appearance-none rounded-[11px] border border-[#d9e1ea] bg-white px-3 pr-9 text-[12.5px] outline-none"><option value="all">{{ 'sites.filters.all' | t }}</option><option value="active">{{ 'sites.status.active' | t }}</option><option value="attention">{{ 'sites.status.attention' | t }}</option><option value="inactive">{{ 'sites.status.inactive' | t }}</option></select><i class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b]"></i></div>
   </div>
 
   <div class="mt-4 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
     @for (site of filteredSites(); track site.id) {
-      <article
-        class="rounded-[18px] border border-[#dfe5ec] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_15px_35px_rgba(32,77,127,0.10)]"
-      >
+      <article class="rounded-[18px] border border-[#dfe5ec] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_15px_35px_rgba(32,77,127,0.10)]">
         <div class="flex items-start justify-between gap-4">
           <div class="flex min-w-0 items-start gap-3">
-            <span
-              class="grid size-11 shrink-0 place-items-center rounded-[14px] bg-[#e7f1fb] text-[#2a64a2]"
-              ><i class="ph ph-buildings text-[21px]"></i
-            ></span>
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <h2 class="truncate text-[16px] font-bold text-[#172033]">
-                  {{ site.name }}
-                </h2>
-                <span
-                  [class]="
-                    'inline-flex rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +
-                    statusClass(site.status)
-                  "
-                  >{{ "sites.status." + site.status | t }}</span
-                >
-              </div>
-              <p class="mt-1 text-[12px] text-[#748095]">
-                <i class="ph ph-map-pin mr-1 text-[14px]"></i>{{ site.city }} ·
-                {{ site.code }}
-              </p>
-            </div>
+            <span class="grid size-11 shrink-0 place-items-center rounded-[14px] bg-[#e7f1fb] text-[#2a64a2]"><i class="ph ph-buildings text-[21px]"></i></span>
+            <div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><h2 class="truncate text-[16px] font-bold text-[#172033]">{{ site.name }}</h2><span [class]="'inline-flex rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' + statusClass(site.status)">{{ ('sites.status.' + site.status) | t }}</span></div><p class="mt-1 text-[12px] text-[#748095]"><i class="ph ph-map-pin mr-1 text-[14px]"></i>{{ site.city }} · {{ site.code }}</p></div>
           </div>
-          <button
-            type="button"
-            (click)="editSite(site)"
-            class="grid size-9 shrink-0 place-items-center rounded-[10px] border border-[#dce3eb] text-[#637083] transition hover:bg-[#f1f5f9]"
-            [attr.aria-label]="'sites.edit' | t"
-          >
-            <i class="ph ph-pencil-simple text-[16px]"></i>
-          </button>
+          <button type="button" (click)="editSite(site)" class="grid size-9 shrink-0 place-items-center rounded-[10px] border border-[#dce3eb] text-[#637083] transition hover:bg-[#f1f5f9]" [attr.aria-label]="'sites.edit' | t"><i class="ph ph-pencil-simple text-[16px]"></i></button>
         </div>
 
         <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <div class="rounded-[13px] bg-[#f5f7fa] p-3">
-            <span class="block text-[10.5px] text-[#7a8597]">{{
-              "sites.card.students" | t
-            }}</span
-            ><strong class="mt-1 block text-[16px]">{{ site.students }}</strong>
-          </div>
-          <div class="rounded-[13px] bg-[#f5f7fa] p-3">
-            <span class="block text-[10.5px] text-[#7a8597]">{{
-              "sites.card.trainers" | t
-            }}</span
-            ><strong class="mt-1 block text-[16px]">{{ site.trainers }}</strong>
-          </div>
-          <div class="rounded-[13px] bg-[#f5f7fa] p-3">
-            <span class="block text-[10.5px] text-[#7a8597]">{{
-              "sites.card.programs" | t
-            }}</span
-            ><strong class="mt-1 block text-[16px]">{{ site.programs }}</strong>
-          </div>
-          <div class="rounded-[13px] bg-[#f5f7fa] p-3">
-            <span class="block text-[10.5px] text-[#7a8597]">{{
-              "sites.card.cohorts" | t
-            }}</span
-            ><strong class="mt-1 block text-[16px]">{{
-              site.activeCohorts
-            }}</strong>
-          </div>
+          <div class="rounded-[13px] bg-[#f5f7fa] p-3"><span class="block text-[10.5px] text-[#7a8597]">{{ 'sites.card.students' | t }}</span><strong class="mt-1 block text-[16px]">{{ site.students }}</strong></div>
+          <div class="rounded-[13px] bg-[#f5f7fa] p-3"><span class="block text-[10.5px] text-[#7a8597]">{{ 'sites.card.trainers' | t }}</span><strong class="mt-1 block text-[16px]">{{ site.trainers }}</strong></div>
+          <div class="rounded-[13px] bg-[#f5f7fa] p-3"><span class="block text-[10.5px] text-[#7a8597]">{{ 'sites.card.programs' | t }}</span><strong class="mt-1 block text-[16px]">{{ site.programs }}</strong></div>
+          <div class="rounded-[13px] bg-[#f5f7fa] p-3"><span class="block text-[10.5px] text-[#7a8597]">{{ 'sites.card.cohorts' | t }}</span><strong class="mt-1 block text-[16px]">{{ site.activeCohorts }}</strong></div>
         </div>
 
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
-          <div>
-            <div class="mb-1.5 flex justify-between text-[11px]">
-              <span class="text-[#758196]">{{
-                "sites.card.attendance" | t
-              }}</span
-              ><strong>{{ site.attendanceRate }} %</strong>
-            </div>
-            <div class="h-2 overflow-hidden rounded-full bg-[#edf1f6]">
-              <div
-                class="h-full rounded-full bg-[#2a64a2]"
-                [style.width.%]="site.attendanceRate"
-              ></div>
-            </div>
-          </div>
-          <div>
-            <div class="mb-1.5 flex justify-between text-[11px]">
-              <span class="text-[#758196]">{{ "sites.card.success" | t }}</span
-              ><strong>{{ site.successRate }} %</strong>
-            </div>
-            <div class="h-2 overflow-hidden rounded-full bg-[#edf1f6]">
-              <div
-                class="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#ffb547)]"
-                [style.width.%]="site.successRate"
-              ></div>
-            </div>
-          </div>
+          <div><div class="mb-1.5 flex justify-between text-[11px]"><span class="text-[#758196]">{{ 'sites.card.attendance' | t }}</span><strong>{{ site.attendanceRate }} %</strong></div><div class="h-2 overflow-hidden rounded-full bg-[#edf1f6]"><div class="h-full rounded-full bg-[#2a64a2]" [style.width.%]="site.attendanceRate"></div></div></div>
+          <div><div class="mb-1.5 flex justify-between text-[11px]"><span class="text-[#758196]">{{ 'sites.card.success' | t }}</span><strong>{{ site.successRate }} %</strong></div><div class="h-2 overflow-hidden rounded-full bg-[#edf1f6]"><div class="h-full rounded-full bg-[linear-gradient(90deg,#f59e0b,#ffb547)]" [style.width.%]="site.successRate"></div></div></div>
         </div>
 
-        <div
-          class="mt-4 flex items-center justify-between gap-3 border-t border-[#edf1f5] pt-4"
-        >
-          <p class="truncate text-[11.5px] text-[#748095]">
-            <i class="ph ph-user-circle mr-1 text-[14px]"></i>{{ site.manager }}
-          </p>
-          <button
-            type="button"
-            (click)="openSite(site)"
-            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-[10px] bg-[#2b66a4] px-3 text-[11.5px] font-semibold text-white"
-          >
-            <span>{{ "sites.open" | t }}</span
-            ><i class="ph ph-arrow-right text-[14px]"></i>
-          </button>
+        <div class="mt-4 flex items-center justify-between gap-3 border-t border-[#edf1f5] pt-4">
+          <p class="truncate text-[11.5px] text-[#748095]"><i class="ph ph-user-circle mr-1 text-[14px]"></i>{{ site.manager }}</p>
+          <button type="button" (click)="openSite(site)" class="inline-flex h-9 shrink-0 items-center gap-2 rounded-[10px] bg-[#2b66a4] px-3 text-[11.5px] font-semibold text-white"><span>{{ 'sites.open' | t }}</span><i class="ph ph-arrow-right text-[14px]"></i></button>
         </div>
       </article>
     } @empty {
-      <div
-        class="md:col-span-2 2xl:col-span-3 rounded-[18px] border border-dashed border-[#cfd8e3] bg-white p-10 text-center"
-      >
-        <span
-          class="mx-auto grid size-12 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"
-          ><i class="ph ph-magnifying-glass text-[21px]"></i
-        ></span>
-        <h2 class="mt-3 text-[15px] font-bold">
-          {{ "sites.empty.title" | t }}
-        </h2>
-        <p class="mt-1 text-[12.5px] text-[#748095]">
-          {{ "sites.empty.subtitle" | t }}
-        </p>
-      </div>
+      <div class="md:col-span-2 2xl:col-span-3 rounded-[18px] border border-dashed border-[#cfd8e3] bg-white p-10 text-center"><span class="mx-auto grid size-12 place-items-center rounded-full bg-[#eef4fa] text-[#2a64a2]"><i class="ph ph-magnifying-glass text-[21px]"></i></span><h2 class="mt-3 text-[15px] font-bold">{{ 'sites.empty.title' | t }}</h2><p class="mt-1 text-[12.5px] text-[#748095]">{{ 'sites.empty.subtitle' | t }}</p></div>
     }
   </div>
 
-  <app-site-drawer
-    [open]="drawerOpen()"
-    [site]="editingSite()"
-    (closed)="drawerOpen.set(false)"
-    (saved)="saveSite($event)"
-  />
+  <app-site-drawer [open]="drawerOpen()" [site]="editingSite()" (closed)="drawerOpen.set(false)" (saved)="saveSite($event)" />
 </section>

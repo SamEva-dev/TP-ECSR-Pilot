@@ -1,8 +1,18 @@
-import { Injectable, computed, effect, inject, signal } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
+import { RealtimeService } from "../realtime/realtime.service";
 import { WorkspaceApiService } from "./workspace-api.service";
 import { SessionService } from "../session/session.service";
 import { RuntimeDataLoaderService } from "../api-data/runtime-data-loader.service";
 import { clearRuntimeData } from "../api-data/runtime-data.store";
+import { ApplicationNotificationService } from "../notifications/application-notification.service";
+import type { CohortResponse } from "../training/training-catalog-api.service";
 import type {
   ProgramOffering,
   WorkspaceAccessRule,
@@ -15,7 +25,9 @@ const STORAGE_PREFIX = "tp-ecsr-pilot.workspace-context";
 export class WorkspaceContextService {
   private readonly sessionService = inject(SessionService);
   private readonly workspaceApi = inject(WorkspaceApiService);
+  private readonly realtime = inject(RealtimeService);
   private readonly runtimeData = inject(RuntimeDataLoaderService);
+  private readonly notifications = inject(ApplicationNotificationService);
   private readonly organizationsSignal = signal<any[]>([]);
   private readonly sitesSignal = signal<any[]>([]);
   private readonly programsSignal = signal<any[]>([]);
@@ -103,6 +115,103 @@ export class WorkspaceContextService {
       ) ?? null,
   );
 
+  sitePrograms(siteId: string): any[] {
+    if (!this.sites().some((site) => site.id === siteId)) return [];
+    const programIds = new Set(
+      this.offeringsSignal()
+        .filter(
+          (offering) =>
+            offering.siteId === siteId &&
+            offering.active &&
+            this.canAccessOffering(offering),
+        )
+        .map((offering) => offering.programId),
+    );
+    return this.programsSignal().filter((program) =>
+      programIds.has(program.id),
+    );
+  }
+
+  siteCohorts(siteId: string): any[] {
+    if (!this.sites().some((site) => site.id === siteId)) return [];
+    const offerings = this.offeringsSignal().filter(
+      (offering) =>
+        offering.siteId === siteId && this.canAccessOffering(offering),
+    );
+    return this.cohortsSignal()
+      .filter(
+        (cohort) =>
+          offerings.some((offering) => offering.id === cohort.offeringId) &&
+          this.canAccessCohort(cohort.id),
+      )
+      .map((cohort) => {
+        const programId = offerings.find(
+          (offering) => offering.id === cohort.offeringId,
+        )?.programId;
+        return {
+          ...cohort,
+          programId,
+          programName:
+            this.programsSignal().find((program) => program.id === programId)
+              ?.name ?? "",
+        };
+      });
+  }
+  activeOfferingForContext(): ProgramOffering | null {
+    const site = this.site();
+    const program = this.program();
+    if (!site || !program) return null;
+    return (
+      this.offeringsSignal().find(
+        (item) =>
+          item.siteId === site.id &&
+          item.programId === program.id &&
+          item.active &&
+          this.canAccessOffering(item),
+      ) ?? null
+    );
+  }
+
+  /** Apply the server's committed response without waiting for the next workspace GET. */
+  applySavedCohort(dto: CohortResponse): string | null {
+    const organization = this.organization();
+    const offering = this.offeringsSignal().find(
+      (item) => item.apiId === dto.programOfferingId,
+    );
+    const site = this.sitesSignal().find((item) => item.apiId === dto.siteId);
+    if (
+      !organization ||
+      organization.apiId !== dto.organizationId ||
+      !site ||
+      site.organizationId !== organization.id ||
+      !offering ||
+      offering.siteId !== site.id ||
+      !this.canAccessOffering(offering) ||
+      (this.access().cohortIds && !this.access().cohortIds?.includes(dto.key))
+    )
+      return null;
+    const cohort = {
+      id: dto.key,
+      apiId: dto.id,
+      offeringId: offering.id,
+      name: dto.name,
+      shortName: dto.code,
+      start: dto.startDate,
+      end: dto.endDate,
+      status: dto.status,
+      studentCount: dto.learnerCount,
+      capacity: dto.capacity,
+      referentialVersionId: dto.referentialVersionId,
+    };
+    this.cohortsSignal.update((items) => {
+      const index = items.findIndex((item) => item.apiId === dto.id);
+      return index < 0
+        ? [...items, cohort]
+        : items.map((item, i) => (i === index ? cohort : item));
+    });
+    return cohort.id;
+  }
+
   cohortNameByApiId(id: string): string | null {
     return this.cohortsSignal().find((item) => item.apiId === id)?.name ?? null;
   }
@@ -150,6 +259,20 @@ export class WorkspaceContextService {
 
   constructor() {
     effect(() => {
+      const event = this.realtime.lastEvent();
+      if (
+        !event ||
+        !/^(pedagora\.organization\.training-site\.|pedagora\.catalog\.(program\.|offering\.|referential-version\.)|pedagora\.training\.(cohort\.|enrollment\.))/.test(
+          event.typeKey,
+        )
+      )
+        return;
+      untracked(() => {
+        if (this.sessionService.session() && this.remoteWorkspaceLoaded())
+          void this.reload();
+      });
+    });
+    effect(() => {
       const session = this.sessionService.session();
       const key = session
         ? `${session.role}:${session.email.toLowerCase()}`
@@ -172,10 +295,10 @@ export class WorkspaceContextService {
 
   private async loadRemoteWorkspace(key: string): Promise<void> {
     const sequence = ++this.loadSequence;
+    const hadSnapshot = this.remoteWorkspaceLoaded();
     this.remoteWorkspaceError.set(false);
     try {
       const dto = await this.workspaceApi.load();
-      console.log("Workspace bootstrap data loaded", dto);
       if (sequence !== this.loadSequence || key !== this.sessionKey) return;
       const organizations = dto.organizations.map((item) => ({
         id: item.key,
@@ -198,10 +321,16 @@ export class WorkspaceContextService {
           item.organizationKey ||
           orgApiToKey.get(item.organizationId) ||
           item.organizationId,
-        code: item.code,
-        name: item.name,
-        city: item.city,
-        active: item.active,
+        code: item.code ?? "",
+        name: item.name ?? "",
+        city: item.city ?? "",
+        address: item.address ?? "",
+        postalCode: item.postalCode ?? "",
+        phone: item.phone ?? "",
+        email: item.email ?? "",
+        manager: item.manager ?? "",
+        status: item.status ?? (item.active ? "active" : "inactive"),
+        active: item.active ?? false,
       }));
       this.organizationsSignal.set(organizations);
       this.sitesSignal.set(sites);
@@ -282,6 +411,11 @@ export class WorkspaceContextService {
       this.remoteWorkspaceError.set(false);
     } catch {
       if (sequence !== this.loadSequence || key !== this.sessionKey) return;
+      this.notifications.error("workspace.api.loadFailed", "/accueil");
+      if (hadSnapshot) {
+        this.remoteWorkspaceError.set(true);
+        return;
+      }
       this.runtimeData.invalidate();
       clearRuntimeData();
       this.organizationsSignal.set([]);

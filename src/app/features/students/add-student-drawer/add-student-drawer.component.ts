@@ -26,6 +26,7 @@ export interface CreateStudentPayload {
   birthDate: string;
   promotionId: string;
   startDate: string;
+  sendInvitation: boolean;
 }
 
 @Component({
@@ -46,28 +47,14 @@ export class AddStudentDrawerComponent {
   });
 
   readonly form = new FormGroup({
-    firstName: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    lastName: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    email: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
+    firstName: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    lastName: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email] }),
     phone: new FormControl("", { nonNullable: true }),
     birthDate: new FormControl("", { nonNullable: true }),
-    promotionId: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    startDate: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+    promotionId: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    startDate: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    sendInvitation: new FormControl(true, { nonNullable: true }),
   });
 
   constructor() {
@@ -76,20 +63,6 @@ export class AddStudentDrawerComponent {
       if (!cohort) return;
       this.form.controls.promotionId.setValue(cohort.id, { emitEvent: false });
       this.form.controls.startDate.setValue(cohort.start, { emitEvent: false });
-    });
-    effect(() => {
-      if (this.open()) return;
-      const cohort = this.contextData.cohort();
-      this.form.reset({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        birthDate: "",
-        promotionId: cohort?.id ?? "",
-        startDate: cohort?.start ?? "",
-      });
-      this.submitted.set(false);
     });
   }
 
@@ -110,16 +83,23 @@ export class AddStudentDrawerComponent {
       return;
     }
     this.studentCreated.emit(this.form.getRawValue());
+    const cohort = this.contextData.cohort();
+    this.form.reset({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      birthDate: "",
+      promotionId: cohort?.id ?? "",
+      startDate: cohort?.start ?? "",
+      sendInvitation: true,
+    });
+    this.submitted.set(false);
   }
 
-  showRequired(
-    controlName:
-      "firstName" | "lastName" | "email" | "promotionId" | "startDate",
-  ): boolean {
+  showRequired(controlName: "firstName" | "lastName" | "email" | "promotionId" | "startDate"): boolean {
     const control = this.form.controls[controlName];
-    return (
-      (this.submitted() || control.touched) && control.hasError("required")
-    );
+    return (this.submitted() || control.touched) && control.hasError("required");
   }
 
   showEmailError(): boolean {
