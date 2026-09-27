@@ -51,17 +51,48 @@ export class CreateInternshipDrawerComponent {
   }
 
   readonly form = new FormGroup({
-    studentId: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    company: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
-    city: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(80)] }),
-    tutor: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
-    tutorEmail: new FormControl("", { nonNullable: true, validators: [Validators.email] }),
+    studentId: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    company: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(120)],
+    }),
+    city: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(80)],
+    }),
+    tutor: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(100)],
+    }),
+    tutorEmail: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.email],
+    }),
     tutorPhone: new FormControl("", { nonNullable: true }),
-    startDate: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    endDate: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    plannedHours: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(1000)] }),
+    startDate: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    endDate: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    plannedHours: new FormControl(0, {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.min(1),
+        Validators.max(1000),
+      ],
+    }),
     agreementReceived: new FormControl(false, { nonNullable: true }),
-    notes: new FormControl("", { nonNullable: true, validators: [Validators.maxLength(500)] }),
+    notes: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.maxLength(500)],
+    }),
   });
 
   constructor() {
@@ -72,8 +103,15 @@ export class CreateInternshipDrawerComponent {
 
       if (open && !this.wasOpen) {
         this.resetForm(defaultHours, students[0]?.id ?? "");
-      } else if (open && !students.some((student) => student.id === this.form.controls.studentId.value)) {
-        this.form.controls.studentId.setValue(students[0]?.id ?? "", { emitEvent: false });
+      } else if (
+        open &&
+        !students.some(
+          (student) => student.id === this.form.controls.studentId.value,
+        )
+      ) {
+        this.form.controls.studentId.setValue(students[0]?.id ?? "", {
+          emitEvent: false,
+        });
       }
       this.wasOpen = open;
     });
@@ -103,7 +141,8 @@ export class CreateInternshipDrawerComponent {
 
     this.periodCreated.emit({
       ...values,
-      studentName: `${student.firstName ?? ""} ${student.lastName ?? ""}`.trim(),
+      studentName:
+        `${student.firstName ?? ""} ${student.lastName ?? ""}`.trim(),
       company: values.company ?? "",
       city: values.city ?? "",
       tutor: values.tutor ?? "",
@@ -111,16 +150,27 @@ export class CreateInternshipDrawerComponent {
       tutorPhone: values.tutorPhone ?? "",
       startDate: values.startDate ?? "",
       endDate: values.endDate ?? "",
-      plannedHours: Number.isFinite(values.plannedHours) ? values.plannedHours : 0,
+      plannedHours: Number.isFinite(values.plannedHours)
+        ? values.plannedHours
+        : 0,
       notes: values.notes ?? "",
     });
   }
 
   showRequired(
-    name: "studentId" | "company" | "city" | "tutor" | "startDate" | "endDate" | "plannedHours",
+    name:
+      | "studentId"
+      | "company"
+      | "city"
+      | "tutor"
+      | "startDate"
+      | "endDate"
+      | "plannedHours",
   ): boolean {
     const control = this.form.controls[name];
-    return (this.submitted() || control.touched) && control.hasError("required");
+    return (
+      (this.submitted() || control.touched) && control.hasError("required")
+    );
   }
 
   showEmailError(): boolean {
@@ -130,7 +180,10 @@ export class CreateInternshipDrawerComponent {
 
   showHoursError(): boolean {
     const control = this.form.controls.plannedHours;
-    return (this.submitted() || control.touched) && (control.hasError("min") || control.hasError("max"));
+    return (
+      (this.submitted() || control.touched) &&
+      (control.hasError("min") || control.hasError("max"))
+    );
   }
 
   dateRangeInvalid(): boolean {

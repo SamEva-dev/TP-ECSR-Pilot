@@ -1,6 +1,7 @@
 // UI contracts for the competency screen. Runtime business data comes from PedagoraPilot.Api.
 
-export type SkillCriterionLevel = "not_assessed" | "acquired" | "in_progress" | "rework";
+export type SkillCriterionLevel =
+  "not_assessed" | "acquired" | "in_progress" | "rework";
 
 export interface SkillCriterion {
   definitionId: string;

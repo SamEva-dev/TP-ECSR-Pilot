@@ -41,7 +41,12 @@ export interface OrganizationModuleSetting {
 }
 
 export interface OrganizationPreference {
-  id: "absenceAlerts" | "certificationAlerts" | "weeklyDigest" | "autoArchive" | "strictAudit";
+  id:
+    | "absenceAlerts"
+    | "certificationAlerts"
+    | "weeklyDigest"
+    | "autoArchive"
+    | "strictAudit";
   icon: string;
   labelKey: string;
   descriptionKey: string;
@@ -140,42 +145,178 @@ const BRANDING: Record<string, OrganizationBrandingSettings> = {
 };
 
 export const ORGANIZATION_MODULE_SETTINGS: OrganizationModuleSetting[] = [
-  { id: "planning", icon: "ph-calendar-dots", labelKey: "organizationAdmin.modules.items.planning.title", descriptionKey: "organizationAdmin.modules.items.planning.description", enabled: true },
-  { id: "attendance", icon: "ph-clipboard-text", labelKey: "organizationAdmin.modules.items.attendance.title", descriptionKey: "organizationAdmin.modules.items.attendance.description", enabled: true },
-  { id: "sessions", icon: "ph-list-bullets", labelKey: "organizationAdmin.modules.items.sessions.title", descriptionKey: "organizationAdmin.modules.items.sessions.description", enabled: true },
-  { id: "driving", icon: "ph-car", labelKey: "organizationAdmin.modules.items.driving.title", descriptionKey: "organizationAdmin.modules.items.driving.description", enabled: true },
-  { id: "plateau", icon: "ph-traffic-cone", labelKey: "organizationAdmin.modules.items.plateau.title", descriptionKey: "organizationAdmin.modules.items.plateau.description", enabled: true },
-  { id: "sheets", icon: "ph-presentation-chart", labelKey: "organizationAdmin.modules.items.sheets.title", descriptionKey: "organizationAdmin.modules.items.sheets.description", enabled: true },
-  { id: "skills", icon: "ph-target", labelKey: "organizationAdmin.modules.items.skills.title", descriptionKey: "organizationAdmin.modules.items.skills.description", enabled: true },
-  { id: "internships", icon: "ph-briefcase", labelKey: "organizationAdmin.modules.items.internships.title", descriptionKey: "organizationAdmin.modules.items.internships.description", enabled: true },
-  { id: "documents", icon: "ph-folder-open", labelKey: "organizationAdmin.modules.items.documents.title", descriptionKey: "organizationAdmin.modules.items.documents.description", enabled: true },
-  { id: "certification", icon: "ph-certificate", labelKey: "organizationAdmin.modules.items.certification.title", descriptionKey: "organizationAdmin.modules.items.certification.description", enabled: true },
-  { id: "statistics", icon: "ph-chart-line-up", labelKey: "organizationAdmin.modules.items.statistics.title", descriptionKey: "organizationAdmin.modules.items.statistics.description", enabled: true },
+  {
+    id: "planning",
+    icon: "ph-calendar-dots",
+    labelKey: "organizationAdmin.modules.items.planning.title",
+    descriptionKey: "organizationAdmin.modules.items.planning.description",
+    enabled: true,
+  },
+  {
+    id: "attendance",
+    icon: "ph-clipboard-text",
+    labelKey: "organizationAdmin.modules.items.attendance.title",
+    descriptionKey: "organizationAdmin.modules.items.attendance.description",
+    enabled: true,
+  },
+  {
+    id: "sessions",
+    icon: "ph-list-bullets",
+    labelKey: "organizationAdmin.modules.items.sessions.title",
+    descriptionKey: "organizationAdmin.modules.items.sessions.description",
+    enabled: true,
+  },
+  {
+    id: "driving",
+    icon: "ph-car",
+    labelKey: "organizationAdmin.modules.items.driving.title",
+    descriptionKey: "organizationAdmin.modules.items.driving.description",
+    enabled: true,
+  },
+  {
+    id: "plateau",
+    icon: "ph-traffic-cone",
+    labelKey: "organizationAdmin.modules.items.plateau.title",
+    descriptionKey: "organizationAdmin.modules.items.plateau.description",
+    enabled: true,
+  },
+  {
+    id: "sheets",
+    icon: "ph-presentation-chart",
+    labelKey: "organizationAdmin.modules.items.sheets.title",
+    descriptionKey: "organizationAdmin.modules.items.sheets.description",
+    enabled: true,
+  },
+  {
+    id: "skills",
+    icon: "ph-target",
+    labelKey: "organizationAdmin.modules.items.skills.title",
+    descriptionKey: "organizationAdmin.modules.items.skills.description",
+    enabled: true,
+  },
+  {
+    id: "internships",
+    icon: "ph-briefcase",
+    labelKey: "organizationAdmin.modules.items.internships.title",
+    descriptionKey: "organizationAdmin.modules.items.internships.description",
+    enabled: true,
+  },
+  {
+    id: "documents",
+    icon: "ph-folder-open",
+    labelKey: "organizationAdmin.modules.items.documents.title",
+    descriptionKey: "organizationAdmin.modules.items.documents.description",
+    enabled: true,
+  },
+  {
+    id: "certification",
+    icon: "ph-certificate",
+    labelKey: "organizationAdmin.modules.items.certification.title",
+    descriptionKey: "organizationAdmin.modules.items.certification.description",
+    enabled: true,
+  },
+  {
+    id: "statistics",
+    icon: "ph-chart-line-up",
+    labelKey: "organizationAdmin.modules.items.statistics.title",
+    descriptionKey: "organizationAdmin.modules.items.statistics.description",
+    enabled: true,
+  },
 ];
 
 export const ORGANIZATION_PREFERENCES: OrganizationPreference[] = [
-  { id: "absenceAlerts", icon: "ph-warning", labelKey: "organizationAdmin.settings.items.absenceAlerts.title", descriptionKey: "organizationAdmin.settings.items.absenceAlerts.description", enabled: true },
-  { id: "certificationAlerts", icon: "ph-certificate", labelKey: "organizationAdmin.settings.items.certificationAlerts.title", descriptionKey: "organizationAdmin.settings.items.certificationAlerts.description", enabled: true },
-  { id: "weeklyDigest", icon: "ph-envelope-simple", labelKey: "organizationAdmin.settings.items.weeklyDigest.title", descriptionKey: "organizationAdmin.settings.items.weeklyDigest.description", enabled: true },
-  { id: "autoArchive", icon: "ph-archive", labelKey: "organizationAdmin.settings.items.autoArchive.title", descriptionKey: "organizationAdmin.settings.items.autoArchive.description", enabled: false },
-  { id: "strictAudit", icon: "ph-shield-check", labelKey: "organizationAdmin.settings.items.strictAudit.title", descriptionKey: "organizationAdmin.settings.items.strictAudit.description", enabled: true },
+  {
+    id: "absenceAlerts",
+    icon: "ph-warning",
+    labelKey: "organizationAdmin.settings.items.absenceAlerts.title",
+    descriptionKey:
+      "organizationAdmin.settings.items.absenceAlerts.description",
+    enabled: true,
+  },
+  {
+    id: "certificationAlerts",
+    icon: "ph-certificate",
+    labelKey: "organizationAdmin.settings.items.certificationAlerts.title",
+    descriptionKey:
+      "organizationAdmin.settings.items.certificationAlerts.description",
+    enabled: true,
+  },
+  {
+    id: "weeklyDigest",
+    icon: "ph-envelope-simple",
+    labelKey: "organizationAdmin.settings.items.weeklyDigest.title",
+    descriptionKey: "organizationAdmin.settings.items.weeklyDigest.description",
+    enabled: true,
+  },
+  {
+    id: "autoArchive",
+    icon: "ph-archive",
+    labelKey: "organizationAdmin.settings.items.autoArchive.title",
+    descriptionKey: "organizationAdmin.settings.items.autoArchive.description",
+    enabled: false,
+  },
+  {
+    id: "strictAudit",
+    icon: "ph-shield-check",
+    labelKey: "organizationAdmin.settings.items.strictAudit.title",
+    descriptionKey: "organizationAdmin.settings.items.strictAudit.description",
+    enabled: true,
+  },
 ];
 
 export const ORGANIZATION_AUDIT: OrganizationAuditEntry[] = [
-  { id: "oa1", actor: "Claire Berthier", initials: "CB", actionKey: "organizationAdmin.audit.items.site.title", detailKey: "organizationAdmin.audit.items.site.detail", date: "21/09/2026 · 14:12", tone: "blue" },
-  { id: "oa2", actor: "Nadia Lambert", initials: "NL", actionKey: "organizationAdmin.audit.items.assignment.title", detailKey: "organizationAdmin.audit.items.assignment.detail", date: "21/09/2026 · 11:38", tone: "green" },
-  { id: "oa3", actor: "Claire Berthier", initials: "CB", actionKey: "organizationAdmin.audit.items.program.title", detailKey: "organizationAdmin.audit.items.program.detail", date: "20/09/2026 · 17:04", tone: "amber" },
-  { id: "oa4", actor: "Système", initials: "SY", actionKey: "organizationAdmin.audit.items.archive.title", detailKey: "organizationAdmin.audit.items.archive.detail", date: "20/09/2026 · 02:00", tone: "blue" },
+  {
+    id: "oa1",
+    actor: "Claire Berthier",
+    initials: "CB",
+    actionKey: "organizationAdmin.audit.items.site.title",
+    detailKey: "organizationAdmin.audit.items.site.detail",
+    date: "21/09/2026 · 14:12",
+    tone: "blue",
+  },
+  {
+    id: "oa2",
+    actor: "Nadia Lambert",
+    initials: "NL",
+    actionKey: "organizationAdmin.audit.items.assignment.title",
+    detailKey: "organizationAdmin.audit.items.assignment.detail",
+    date: "21/09/2026 · 11:38",
+    tone: "green",
+  },
+  {
+    id: "oa3",
+    actor: "Claire Berthier",
+    initials: "CB",
+    actionKey: "organizationAdmin.audit.items.program.title",
+    detailKey: "organizationAdmin.audit.items.program.detail",
+    date: "20/09/2026 · 17:04",
+    tone: "amber",
+  },
+  {
+    id: "oa4",
+    actor: "Système",
+    initials: "SY",
+    actionKey: "organizationAdmin.audit.items.archive.title",
+    detailKey: "organizationAdmin.audit.items.archive.detail",
+    date: "20/09/2026 · 02:00",
+    tone: "blue",
+  },
 ];
 
-export function organizationProfileFor(id: string | undefined): OrganizationAdminProfile {
+export function organizationProfileFor(
+  id: string | undefined,
+): OrganizationAdminProfile {
   return { ...(PROFILES[id ?? "org-aftral"] ?? PROFILES["org-aftral"]) };
 }
 
-export function organizationMetricsFor(id: string | undefined): OrganizationAdminMetrics {
+export function organizationMetricsFor(
+  id: string | undefined,
+): OrganizationAdminMetrics {
   return { ...(METRICS[id ?? "org-aftral"] ?? METRICS["org-aftral"]) };
 }
 
-export function organizationBrandingFor(id: string | undefined): OrganizationBrandingSettings {
+export function organizationBrandingFor(
+  id: string | undefined,
+): OrganizationBrandingSettings {
   return { ...(BRANDING[id ?? "org-aftral"] ?? BRANDING["org-aftral"]) };
 }

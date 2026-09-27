@@ -1714,7 +1714,14 @@
       "secretariat": "Administration",
       "formateur": "Trainer",
       "stagiaire": "Student",
-      "jury": "Jury member"
+      "jury": "Jury member",
+      "organization_admin": "Organization administrator",
+      "organization_direction": "Organization management",
+      "site_direction": "Site management",
+      "pedagogical_manager": "Educational manager",
+      "trainer": "Trainer",
+      "student": "Student",
+      "read_only": "Read only"
     },
     "states": {
       "active": "Active access",
@@ -1849,7 +1856,8 @@
       "permissionError": "Unable to save this permission.",
       "assignmentError": "Unable to save this assignment.",
       "inviteError": "Unable to send this invitation.",
-      "pendingActionError": "This action will be available after the invitation is accepted."
+      "pendingActionError": "This action will be available after the invitation is accepted.",
+      "roleError": "Unable to update this account role."
     }
   },
   "administration": {
@@ -3833,6 +3841,11 @@
     "COHORT_CODE_INVALID": "The cohort code is invalid.",
     "COHORT_DATE_RANGE_INVALID": "The cohort end date must be on or after the start date.",
     "COHORT_CAPACITY_INVALID": "The cohort capacity must be between 1 and 500 learners.",
+    "ORGANIZATION_SIRET_REQUIRED": "The organization SIRET is required.",
+    "ORGANIZATION_SIRET_INVALID": "The provided SIRET is invalid.",
+    "ORGANIZATION_VERIFICATION_PROFILE_INCOMPLETE": "Complete the organization legal profile before requesting verification.",
+    "ORGANIZATION_VERIFICATION_STATUS_INVALID": "The organization verification status is invalid.",
+    "ORGANIZATION_SUBSCRIPTION_STATUS_INVALID": "The organization subscription status is invalid.",
     "LEARNER_NOT_FOUND": "The learner could not be found.",
     "LEARNER_ALREADY_ENROLLED": "This learner is already enrolled in this cohort.",
     "LEARNER_PERSON_REQUIRED": "The learner person record is required.",
@@ -4070,6 +4083,11 @@
     "COHORT_CODE_INVALID": "The cohort code is invalid.",
     "COHORT_DATE_RANGE_INVALID": "The cohort end date must be on or after the start date.",
     "COHORT_CAPACITY_INVALID": "The cohort capacity must be between 1 and 500 learners.",
+    "ORGANIZATION_SIRET_REQUIRED": "The organization SIRET is required.",
+    "ORGANIZATION_SIRET_INVALID": "The provided SIRET is invalid.",
+    "ORGANIZATION_VERIFICATION_PROFILE_INCOMPLETE": "Complete the organization legal profile before requesting verification.",
+    "ORGANIZATION_VERIFICATION_STATUS_INVALID": "The organization verification status is invalid.",
+    "ORGANIZATION_SUBSCRIPTION_STATUS_INVALID": "The organization subscription status is invalid.",
     "LEARNER_NOT_FOUND": "The learner could not be found.",
     "LEARNER_ALREADY_ENROLLED": "This learner is already enrolled in this cohort.",
     "LEARNER_PERSON_REQUIRED": "The learner person record is required.",

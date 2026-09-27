@@ -50,7 +50,10 @@ export interface UpdateTopicProgressApiRequest {
   improvements: string | null;
   comment: string | null;
   nextObjective: string | null;
-  evaluationCriteria: { code: string; level: "acquired" | "in_progress" | "review" }[];
+  evaluationCriteria: {
+    code: string;
+    level: "acquired" | "in_progress" | "review";
+  }[];
 }
 
 export interface CompetencyProgressApi {

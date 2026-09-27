@@ -50,9 +50,13 @@ export class StudentsComponent {
     const status = this.status();
 
     return this.students().filter((student) => {
-      const fullName = `${student.firstName ?? ""} ${student.lastName ?? ""}`.toLocaleLowerCase("fr");
+      const fullName =
+        `${student.firstName ?? ""} ${student.lastName ?? ""}`.toLocaleLowerCase(
+          "fr",
+        );
       const matchesSearch = !query || fullName.includes(query);
-      const matchesPromotion = promotionId === "all" || (student.promotionId ?? "") === promotionId;
+      const matchesPromotion =
+        promotionId === "all" || (student.promotionId ?? "") === promotionId;
       const matchesStatus = status === "all" || student.status === status;
       return matchesSearch && matchesPromotion && matchesStatus;
     });
@@ -72,7 +76,9 @@ export class StudentsComponent {
     const student = await this.store.create(payload);
     if (!student) return;
 
-    this.createdStudentName.set(`${student.firstName} ${student.lastName}`.trim());
+    this.createdStudentName.set(
+      `${student.firstName} ${student.lastName}`.trim(),
+    );
     this.drawerOpen.set(false);
     setTimeout(() => this.createdStudentName.set(""), 3500);
   }
@@ -86,7 +92,10 @@ export class StudentsComponent {
   }
 
   updateStatus(event: Event): void {
-    this.status.set(((event.target as HTMLSelectElement).value || "all") as "all" | StudentStatus);
+    this.status.set(
+      ((event.target as HTMLSelectElement).value || "all") as
+        "all" | StudentStatus,
+    );
   }
 
   initials(student: StudentDirectoryItem): string {

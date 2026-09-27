@@ -30,20 +30,26 @@ export class CertificationComponent {
   readonly scheme = this.store.scheme;
   readonly juryMembers = this.store.juryMembers;
   readonly program = this.workspace.program;
-  readonly readyCount = computed(() =>
-    this.store.candidates().filter((item) => item.ready).length,
+  readonly readyCount = computed(
+    () => this.store.candidates().filter((item) => item.ready).length,
   );
   readonly completionRate = computed(() => {
     const candidates = this.store.candidates();
-    return Math.round((this.readyCount() / Math.max(candidates.length, 1)) * 100);
+    return Math.round(
+      (this.readyCount() / Math.max(candidates.length, 1)) * 100,
+    );
   });
   readonly currentCandidate = computed(() => {
     const candidates = this.store.candidates();
     const selfEnrollmentId = this.store.selfEnrollmentId();
-    return candidates.find((item) => {
-      const raw = this.store.rawCandidate(item.id);
-      return raw?.enrollmentId === selfEnrollmentId;
-    }) ?? candidates[0] ?? null;
+    return (
+      candidates.find((item) => {
+        const raw = this.store.rawCandidate(item.id);
+        return raw?.enrollmentId === selfEnrollmentId;
+      }) ??
+      candidates[0] ??
+      null
+    );
   });
 
   get examSession() {
@@ -71,11 +77,19 @@ export class CertificationComponent {
   }
 
   readinessClasses(ready: boolean): string {
-    return ready ? "bg-[#d8f8df] text-[#18a547]" : "bg-[#fff0c9] text-[#8b5e00]";
+    return ready
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : "bg-[#fff0c9] text-[#8b5e00]";
   }
 
-  unitStatus(candidate: CertificationCandidate, unitId: string): CertificationUnitStatus {
-    return candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status ?? "pending";
+  unitStatus(
+    candidate: CertificationCandidate,
+    unitId: string,
+  ): CertificationUnitStatus {
+    return (
+      candidate.unitStatuses?.find((item) => item.unitId === unitId)?.status ??
+      "pending"
+    );
   }
 
   unitClasses(status: CertificationUnitStatus): string {

@@ -14,7 +14,10 @@ import {
   Validators,
 } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { PlanningEvent, PlanningType } from "../../../core/models/planning.models";
+import type {
+  PlanningEvent,
+  PlanningType,
+} from "../../../core/models/planning.models";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 
 export interface AddPlanningPayload {
@@ -130,25 +133,38 @@ export class AddPlanningDrawerComponent {
     return Boolean(startTime && endTime && endTime <= startTime);
   }
 
-  dayFromDate(date = this.form.controls.date.value): PlanningEvent["day"] | null {
+  dayFromDate(
+    date = this.form.controls.date.value,
+  ): PlanningEvent["day"] | null {
     if (!date) return null;
     const day = new Date(`${date}T12:00:00`).getDay();
     return (
-      {
-        1: "monday",
-        2: "tuesday",
-        3: "wednesday",
-        4: "thursday",
-        5: "friday",
-      } as Record<number, PlanningEvent["day"]>
-    )[day] ?? null;
+      (
+        {
+          1: "monday",
+          2: "tuesday",
+          3: "wednesday",
+          4: "thursday",
+          5: "friday",
+        } as Record<number, PlanningEvent["day"]>
+      )[day] ?? null
+    );
   }
 
   showRequired(
-    name: "date" | "startTime" | "endTime" | "promotionId" | "type" | "title" | "responsible",
+    name:
+      | "date"
+      | "startTime"
+      | "endTime"
+      | "promotionId"
+      | "type"
+      | "title"
+      | "responsible",
   ): boolean {
     const control = this.form.controls[name];
-    return (this.submitted() || control.touched) && control.hasError("required");
+    return (
+      (this.submitted() || control.touched) && control.hasError("required")
+    );
   }
 
   typeKey(type: PlanningType): string {
@@ -177,7 +193,9 @@ export class AddPlanningDrawerComponent {
       month: "2-digit",
       day: "2-digit",
     }).formatToParts(new Date());
-    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    const values = Object.fromEntries(
+      parts.map((part) => [part.type, part.value]),
+    );
     return `${values["year"] ?? ""}-${values["month"] ?? ""}-${values["day"] ?? ""}`;
   }
 }

@@ -70,9 +70,12 @@ export class ReferentialApiStoreService {
     this.loading.set(true);
     try {
       const rows = await this.api.list();
-      if (generation !== this.generation || request !== this.request) return false;
+      if (generation !== this.generation || request !== this.request)
+        return false;
 
-      const base = (Array.isArray(rows) ? rows : []).map((row) => this.map(row));
+      const base = (Array.isArray(rows) ? rows : []).map((row) =>
+        this.map(row),
+      );
       this.itemsSignal.set(base);
       this.remoteLoaded.set(true);
       this.loadError.set(false);
@@ -80,14 +83,19 @@ export class ReferentialApiStoreService {
       if (!base.length) return true;
 
       const settled = await Promise.allSettled(
-        base.map(async (item) => ({ item, details: await this.api.details(item.apiId) })),
+        base.map(async (item) => ({
+          item,
+          details: await this.api.details(item.apiId),
+        })),
       );
-      if (generation !== this.generation || request !== this.request) return false;
+      if (generation !== this.generation || request !== this.request)
+        return false;
 
       const details = new Map<string, ReferentialVersionDetailsApiDto>();
       let detailFailure = false;
       for (const result of settled) {
-        if (result.status === "fulfilled") details.set(result.value.item.apiId, result.value.details);
+        if (result.status === "fulfilled")
+          details.set(result.value.item.apiId, result.value.details);
         else detailFailure = true;
       }
 
@@ -97,7 +105,8 @@ export class ReferentialApiStoreService {
           return detail ? this.enrich(item, detail) : item;
         }),
       );
-      if (detailFailure) this.notifications.error("referentials.api.loadError", "/referentiels");
+      if (detailFailure)
+        this.notifications.error("referentials.api.loadError", "/referentiels");
       return true;
     } catch {
       if (generation === this.generation && request === this.request) {
@@ -107,7 +116,8 @@ export class ReferentialApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
@@ -115,9 +125,13 @@ export class ReferentialApiStoreService {
     void this.reload();
   }
 
-  async createVersion(value: ReferentialVersionFormValue): Promise<TrainingReferential | null> {
+  async createVersion(
+    value: ReferentialVersionFormValue,
+  ): Promise<TrainingReferential | null> {
     const source = this.itemsSignal().find(
-      (item) => item.id === value.sourceReferentialId || item.apiId === value.sourceReferentialId,
+      (item) =>
+        item.id === value.sourceReferentialId ||
+        item.apiId === value.sourceReferentialId,
     );
     if (!source || source.programId !== value.programId) {
       this.notifications.error("referentials.api.saveError", "/referentiels");
@@ -132,7 +146,9 @@ export class ReferentialApiStoreService {
         totalHours: this.number(source.totalHours),
         sheetCount: this.number(source.sheetCount),
         requiredDocumentCount: this.number(source.requiredDocumentCount),
-        enabledModules: Array.isArray(source.enabledModules) ? source.enabledModules : [],
+        enabledModules: Array.isArray(source.enabledModules)
+          ? source.enabledModules
+          : [],
         notesKey: source.notesKey,
         externalKey: null,
         publish: value.status === "active",
@@ -141,7 +157,9 @@ export class ReferentialApiStoreService {
       const mapped = this.map(created);
       this.itemsSignal.update((items) => [mapped, ...items]);
       await this.reload();
-      return this.itemsSignal().find((item) => item.apiId === mapped.apiId) ?? mapped;
+      return (
+        this.itemsSignal().find((item) => item.apiId === mapped.apiId) ?? mapped
+      );
     } catch {
       this.notifications.error("referentials.api.saveError", "/referentiels");
       return null;
@@ -151,7 +169,10 @@ export class ReferentialApiStoreService {
   async publish(versionId: string): Promise<boolean> {
     const current = this.itemsSignal().find((item) => item.apiId === versionId);
     if (!current || current.status !== "draft") {
-      this.notifications.error("referentials.api.publishError", "/referentiels");
+      this.notifications.error(
+        "referentials.api.publishError",
+        "/referentiels",
+      );
       return false;
     }
 
@@ -160,21 +181,34 @@ export class ReferentialApiStoreService {
       await this.reload();
       return true;
     } catch {
-      this.notifications.error("referentials.api.publishError", `/referentiels/${current.id}`);
+      this.notifications.error(
+        "referentials.api.publishError",
+        `/referentiels/${current.id}`,
+      );
       return false;
     }
   }
 
-  private enrich(item: TrainingReferential, details: ReferentialVersionDetailsApiDto): TrainingReferential {
-    const definitions = Array.isArray(details?.competencies) ? details.competencies : [];
-    const parents = definitions.filter((definition) => !this.text(definition.parentId));
+  private enrich(
+    item: TrainingReferential,
+    details: ReferentialVersionDetailsApiDto,
+  ): TrainingReferential {
+    const definitions = Array.isArray(details?.competencies)
+      ? details.competencies
+      : [];
+    const parents = definitions.filter(
+      (definition) => !this.text(definition.parentId),
+    );
     const competencies: ReferentialCompetency[] = parents.map((definition) => ({
       id: this.text(definition.id),
       code: this.text(definition.code),
       label: this.text(definition.title),
       description: "",
       subCompetencies: definitions
-        .filter((candidate) => this.text(candidate.parentId) === this.text(definition.id))
+        .filter(
+          (candidate) =>
+            this.text(candidate.parentId) === this.text(definition.id),
+        )
         .sort((a, b) => this.number(a.sortOrder) - this.number(b.sortOrder))
         .map((candidate) => ({
           id: this.text(candidate.id),
@@ -184,7 +218,9 @@ export class ReferentialApiStoreService {
     }));
 
     const certificationSteps: ReferentialCertificationStep[] = (
-      Array.isArray(details?.certificationSteps) ? details.certificationSteps : []
+      Array.isArray(details?.certificationSteps)
+        ? details.certificationSteps
+        : []
     )
       .slice()
       .sort((a, b) => this.number(a.sortOrder) - this.number(b.sortOrder))
@@ -199,12 +235,27 @@ export class ReferentialApiStoreService {
       ...item,
       competencies,
       sheetCount: this.number(details?.topicCount),
-      stageRequirements: (Array.isArray(details?.workplacePeriodTypes) ? details.workplacePeriodTypes : [])
-        .filter((code): code is string => typeof code === "string" && code.trim().length > 0)
-        .map((code) => ({ id: code, label: code, hours: 0, description: "", mandatory: true })),
+      stageRequirements: (Array.isArray(details?.workplacePeriodTypes)
+        ? details.workplacePeriodTypes
+        : []
+      )
+        .filter(
+          (code): code is string =>
+            typeof code === "string" && code.trim().length > 0,
+        )
+        .map((code) => ({
+          id: code,
+          label: code,
+          hours: 0,
+          description: "",
+          mandatory: true,
+        })),
       certificationSchemeName: this.text(details?.certificationSchemeName),
       certificationSteps,
-      linkedCohorts: (Array.isArray(details?.linkedCohorts) ? details.linkedCohorts : []).map((cohort) => ({
+      linkedCohorts: (Array.isArray(details?.linkedCohorts)
+        ? details.linkedCohorts
+        : []
+      ).map((cohort) => ({
         id: this.text(cohort?.key) || this.text(cohort?.id),
         name: this.text(cohort?.name),
         siteName: this.text(cohort?.siteName),
@@ -246,14 +297,17 @@ export class ReferentialApiStoreService {
 
   private evaluator(kind: unknown): ReferentialCertificationStep["evaluator"] {
     const value = this.text(kind).toLowerCase();
-    if (value.includes("system") || value.includes("automatic")) return "system";
+    if (value.includes("system") || value.includes("automatic"))
+      return "system";
     if (value.includes("trainer")) return "trainer";
     return "jury";
   }
 
   private modules(value: unknown): ProgramModule[] {
     return Array.isArray(value)
-      ? (value.filter((item): item is ProgramModule => typeof item === "string") as ProgramModule[])
+      ? (value.filter(
+          (item): item is ProgramModule => typeof item === "string",
+        ) as ProgramModule[])
       : [];
   }
 

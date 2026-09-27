@@ -1,10 +1,24 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import type { StudentStatus } from "../models/app.models";
-import type { AuditLogItem, ReportPromotionOption, ReportStudentRow } from "../models/reports.models";
+import type {
+  AuditLogItem,
+  ReportPromotionOption,
+  ReportStudentRow,
+} from "../models/reports.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
-import type { AuditEntry, CohortLearnerDashboard } from "../reporting/reporting.models";
+import type {
+  AuditEntry,
+  CohortLearnerDashboard,
+} from "../reporting/reporting.models";
 import { ReportingApiService } from "../reporting/reporting-api.service";
 import { SessionService } from "../session/session.service";
 import { TranslateService } from "../i18n/translate.service";
@@ -32,21 +46,46 @@ export class ReportsApiStoreService {
   readonly auditLog = this.auditSignal.asReadonly();
 
   readonly promotions = computed<ReportPromotionOption[]>(() =>
-    this.workspace.cohorts().map((cohort) => ({
-      id: this.text(cohort.id),
-      apiId: this.text(cohort.apiId),
-      name: this.text(cohort.name),
-    })).filter((cohort) => cohort.id && cohort.apiId),
+    this.workspace
+      .cohorts()
+      .map((cohort) => ({
+        id: this.text(cohort.id),
+        apiId: this.text(cohort.apiId),
+        name: this.text(cohort.name),
+      }))
+      .filter((cohort) => cohort.id && cohort.apiId),
   );
 
-  readonly promotionName = computed(() =>
-    this.promotions().find((promotion) => promotion.id === this.promotionIdSignal())?.name ?? "",
+  readonly promotionName = computed(
+    () =>
+      this.promotions().find(
+        (promotion) => promotion.id === this.promotionIdSignal(),
+      )?.name ?? "",
   );
-  readonly totalCompletedHours = computed(() => this.round1(this.studentsSignal().reduce((sum, row) => sum + this.number(row.completedHours), 0)));
-  readonly totalCatchupHours = computed(() => this.round1(this.studentsSignal().reduce((sum, row) => sum + this.number(row.catchupHours), 0)));
+  readonly totalCompletedHours = computed(() =>
+    this.round1(
+      this.studentsSignal().reduce(
+        (sum, row) => sum + this.number(row.completedHours),
+        0,
+      ),
+    ),
+  );
+  readonly totalCatchupHours = computed(() =>
+    this.round1(
+      this.studentsSignal().reduce(
+        (sum, row) => sum + this.number(row.catchupHours),
+        0,
+      ),
+    ),
+  );
   readonly averageProgress = computed(() => {
     const rows = this.studentsSignal();
-    return rows.length ? Math.round(rows.reduce((sum, row) => sum + this.number(row.progress), 0) / rows.length) : 0;
+    return rows.length
+      ? Math.round(
+          rows.reduce((sum, row) => sum + this.number(row.progress), 0) /
+            rows.length,
+        )
+      : 0;
   });
 
   readonly canSeeAudit = computed(() => {
@@ -66,7 +105,7 @@ export class ReportsApiStoreService {
         ? current
         : options.some((row) => row.id === globalPromotionId)
           ? globalPromotionId
-          : options[0]?.id ?? "";
+          : (options[0]?.id ?? "");
       if (resolved !== current) this.promotionIdSignal.set(resolved);
       const generation = ++this.generation;
       this.studentsSignal.set([]);
@@ -77,7 +116,13 @@ export class ReportsApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.(training|learning|workplace|certification|audit)\./.test(event.typeKey)) return;
+      if (
+        !event ||
+        !/^pedagora\.(training|learning|workplace|certification|audit)\./.test(
+          event.typeKey,
+        )
+      )
+        return;
       untracked(() => void this.reload());
     });
   }
@@ -92,13 +137,17 @@ export class ReportsApiStoreService {
   }
 
   async exportExcel(): Promise<boolean> {
-    const option = this.promotions().find((row) => row.id === this.promotionIdSignal());
+    const option = this.promotions().find(
+      (row) => row.id === this.promotionIdSignal(),
+    );
     if (!option?.apiId) {
       this.notifications.error("reports.api.exportFailed", "/rapports");
       return false;
     }
     try {
-      const blob = await firstValueFrom(this.reporting.exportCohort(option.apiId));
+      const blob = await firstValueFrom(
+        this.reporting.exportCohort(option.apiId),
+      );
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
@@ -114,7 +163,10 @@ export class ReportsApiStoreService {
     }
   }
 
-  private async load(generation: number, promotionId: string): Promise<boolean> {
+  private async load(
+    generation: number,
+    promotionId: string,
+  ): Promise<boolean> {
     const option = this.promotions().find((row) => row.id === promotionId);
     const request = ++this.request;
     this.loading.set(true);
@@ -123,25 +175,44 @@ export class ReportsApiStoreService {
       const learnerPromise = option?.apiId
         ? firstValueFrom(this.reporting.cohortLearners(option.apiId))
         : Promise.resolve([] as CohortLearnerDashboard[]);
-      const auditPromise = this.canSeeAudit() && organizationApiId
-        ? firstValueFrom(this.reporting.audit({ organizationId: organizationApiId, page: 1, pageSize: 50 }))
-        : Promise.resolve({ items: [], page: 1, pageSize: 50, total: 0 });
-      const [learnersResult, auditResult] = await Promise.allSettled([learnerPromise, auditPromise]);
-      if (generation !== this.generation || request !== this.request) return false;
+      const auditPromise =
+        this.canSeeAudit() && organizationApiId
+          ? firstValueFrom(
+              this.reporting.audit({
+                organizationId: organizationApiId,
+                page: 1,
+                pageSize: 50,
+              }),
+            )
+          : Promise.resolve({ items: [], page: 1, pageSize: 50, total: 0 });
+      const [learnersResult, auditResult] = await Promise.allSettled([
+        learnerPromise,
+        auditPromise,
+      ]);
+      if (generation !== this.generation || request !== this.request)
+        return false;
 
-      const learners = learnersResult.status === "fulfilled" && Array.isArray(learnersResult.value)
-        ? learnersResult.value
-        : [];
-      const audit = auditResult.status === "fulfilled" && Array.isArray(auditResult.value?.items)
-        ? auditResult.value.items
-        : [];
+      const learners =
+        learnersResult.status === "fulfilled" &&
+        Array.isArray(learnersResult.value)
+          ? learnersResult.value
+          : [];
+      const audit =
+        auditResult.status === "fulfilled" &&
+        Array.isArray(auditResult.value?.items)
+          ? auditResult.value.items
+          : [];
       this.studentsSignal.set(learners.map((row) => this.student(row)));
       this.auditSignal.set(audit.map((row) => this.audit(row)));
-      const failed = learnersResult.status === "rejected" || auditResult.status === "rejected";
+      const failed =
+        learnersResult.status === "rejected" ||
+        auditResult.status === "rejected";
       this.loadError.set(failed);
       if (failed) {
         this.notifications.error(
-          learnersResult.status === "rejected" ? "reports.api.loadFailed" : "reports.api.auditFailed",
+          learnersResult.status === "rejected"
+            ? "reports.api.loadFailed"
+            : "reports.api.auditFailed",
           "/rapports",
         );
       }
@@ -155,7 +226,8 @@ export class ReportsApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
@@ -188,7 +260,14 @@ export class ReportsApiStoreService {
 
   private status(row: CohortLearnerDashboard): StudentStatus {
     const enrollment = this.text(row?.enrollmentStatus).toLowerCase();
-    if (this.number(row?.catchupMinutes) > 0 || this.number(row?.absentCount) > 0 || enrollment === "suspended" || enrollment === "withdrawn" || enrollment === "cancelled") return "late";
+    if (
+      this.number(row?.catchupMinutes) > 0 ||
+      this.number(row?.absentCount) > 0 ||
+      enrollment === "suspended" ||
+      enrollment === "withdrawn" ||
+      enrollment === "cancelled"
+    )
+      return "late";
     if (enrollment === "pending") return "warning";
     return "good";
   }
@@ -196,25 +275,38 @@ export class ReportsApiStoreService {
   private formatDateTime(value: unknown): string {
     const date = new Date(this.text(value));
     if (Number.isNaN(date.getTime())) return "";
-    return new Intl.DateTimeFormat(this.translate.locale() === "en" ? "en-GB" : "fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-      timeZone: "Europe/Paris",
-    }).format(date);
+    return new Intl.DateTimeFormat(
+      this.translate.locale() === "en" ? "en-GB" : "fr-FR",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+        timeZone: "Europe/Paris",
+      },
+    ).format(date);
   }
 
   private safeFileName(value: string): string {
-    return this.text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+    return this.text(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
-  private hours(value: unknown): number { return this.round1(this.number(value) / 60); }
-  private round1(value: number): number { return Math.round(this.number(value) * 10) / 10; }
+  private hours(value: unknown): number {
+    return this.round1(this.number(value) / 60);
+  }
+  private round1(value: number): number {
+    return Math.round(this.number(value) * 10) / 10;
+  }
   private number(value: unknown): number {
     const parsed = typeof value === "number" ? value : Number(value);
     return Number.isFinite(parsed) ? parsed : 0;
   }
-  private text(value: unknown): string { return typeof value === "string" ? value : ""; }
+  private text(value: unknown): string {
+    return typeof value === "string" ? value : "";
+  }
 }

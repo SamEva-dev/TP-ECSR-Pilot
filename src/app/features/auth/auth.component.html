@@ -231,12 +231,25 @@
             @if (loginStep() !== "email") {
               <div>
                 <label class="mb-2 block text-sm font-semibold text-[#263b55]">
-                  {{ (loginStep() === "mfa" ? "auth.mfaCode" : loginStep() === "password-change" ? "auth.newPassword" : "auth.password") | t }}
+                  {{
+                    (loginStep() === "mfa"
+                      ? "auth.mfaCode"
+                      : loginStep() === "password-change"
+                        ? "auth.newPassword"
+                        : "auth.password"
+                    ) | t
+                  }}
                 </label>
                 <div class="relative">
                   <input
                     formControlName="password"
-                    [type]="loginStep() === 'mfa' ? 'text' : (showPassword() ? 'text' : 'password')"
+                    [type]="
+                      loginStep() === 'mfa'
+                        ? 'text'
+                        : showPassword()
+                          ? 'text'
+                          : 'password'
+                    "
                     [attr.inputmode]="loginStep() === 'mfa' ? 'numeric' : null"
                     class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4 pr-12 outline-none focus:border-[#2d67a6] focus:ring-2 focus:ring-blue-100"
                   />

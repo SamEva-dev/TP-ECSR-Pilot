@@ -96,6 +96,7 @@ export class ProgramApiStoreService {
         code: this.text(value.code).trim(),
         name: this.text(value.name).trim(),
         descriptionKey: this.text(value.description).trim(),
+        referenceVersion: this.text(value.referenceVersion).trim(),
         icon: this.iconFor(value.category),
         durationHours: this.number(value.durationHours),
         status: this.status(value.status),
@@ -103,8 +104,16 @@ export class ProgramApiStoreService {
         externalKey: null,
       });
       this.programsSignal.update((items) => [...items, this.map(created)]);
+      const currentSite = this.workspace.site();
+      if (currentSite?.apiId && created?.id) {
+        await this.api.setOffering(this.text(created.id), currentSite.apiId, true);
+      }
       await this.reload();
       await this.workspace.reload();
+      if (currentSite?.id && created?.key) {
+        this.workspace.selectSite(currentSite.id);
+        this.workspace.selectProgram(this.text(created.key));
+      }
       if (this.workspace.remoteWorkspaceError())
         this.notifications.error("programs.real.workspaceError", "/formations");
       return true;
@@ -126,6 +135,7 @@ export class ProgramApiStoreService {
             : this.familyFor(value.category),
         name: this.text(value.name).trim(),
         descriptionKey: this.text(value.description).trim(),
+        referenceVersion: this.text(value.referenceVersion).trim(),
         icon:
           current.category === value.category
             ? current.icon

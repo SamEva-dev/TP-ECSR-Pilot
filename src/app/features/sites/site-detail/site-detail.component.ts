@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { SiteApiStoreService } from "../../../core/api-data/site-api-store.service";
@@ -34,16 +41,24 @@ export class SiteDetailComponent {
 
   readonly programs = computed(() => {
     const cohorts = this.workspace.siteCohorts(this.siteId);
-    return this.programStore.programs()
+    return this.programStore
+      .programs()
       .filter((program) => program.siteIds.includes(this.siteId))
       .map((program) => {
-        const programCohorts = cohorts.filter((cohort) => cohort.programId === program.id);
+        const programCohorts = cohorts.filter(
+          (cohort) => cohort.programId === program.id,
+        );
         return {
           ...program,
           metric: {
-            students: programCohorts.reduce((sum, cohort) => sum + (cohort.studentCount ?? 0), 0),
+            students: programCohorts.reduce(
+              (sum, cohort) => sum + (cohort.studentCount ?? 0),
+              0,
+            ),
             trainers: 0,
-            activeCohorts: programCohorts.filter((cohort) => cohort.status === "active").length,
+            activeCohorts: programCohorts.filter(
+              (cohort) => cohort.status === "active",
+            ).length,
             attendanceRate: 0,
             successRate: 0,
           },
@@ -67,7 +82,10 @@ export class SiteDetailComponent {
     queueMicrotask(() => this.workspace.selectSite(this.siteId));
     effect(() => {
       if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", `/etablissements/${this.siteId}`);
+        this.notifications.error(
+          "sites.real.workspaceError",
+          `/etablissements/${this.siteId}`,
+        );
     });
   }
 

@@ -72,29 +72,45 @@ export class TrainingCatalogApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/v1/cohorts`;
 
-  list(filters: {
-    organizationId?: string;
-    siteId?: string;
-    programId?: string;
-  } = {}): Promise<CohortResponse[]> {
+  list(
+    filters: {
+      organizationId?: string;
+      siteId?: string;
+      programId?: string;
+    } = {},
+  ): Promise<CohortResponse[]> {
     let params = new HttpParams();
-    if (filters.organizationId) params = params.set("organizationId", filters.organizationId);
+    if (filters.organizationId)
+      params = params.set("organizationId", filters.organizationId);
     if (filters.siteId) params = params.set("siteId", filters.siteId);
     if (filters.programId) params = params.set("programId", filters.programId);
-    return firstValueFrom(this.http.get<CohortResponse[]>(this.baseUrl, { params }));
-  }
-
-  createCohort(request: CreateCohortRequest): Promise<CohortResponse> {
-    return firstValueFrom(this.http.post<CohortResponse>(this.baseUrl, request));
-  }
-
-  updateCohort(id: string, request: UpdateCohortRequest): Promise<CohortResponse> {
     return firstValueFrom(
-      this.http.put<CohortResponse>(`${this.baseUrl}/${encodeURIComponent(id)}`, request),
+      this.http.get<CohortResponse[]>(this.baseUrl, { params }),
     );
   }
 
-  enroll(cohortId: string, request: EnrollLearnerRequest): Promise<LearnerResponse> {
+  createCohort(request: CreateCohortRequest): Promise<CohortResponse> {
+    return firstValueFrom(
+      this.http.post<CohortResponse>(this.baseUrl, request),
+    );
+  }
+
+  updateCohort(
+    id: string,
+    request: UpdateCohortRequest,
+  ): Promise<CohortResponse> {
+    return firstValueFrom(
+      this.http.put<CohortResponse>(
+        `${this.baseUrl}/${encodeURIComponent(id)}`,
+        request,
+      ),
+    );
+  }
+
+  enroll(
+    cohortId: string,
+    request: EnrollLearnerRequest,
+  ): Promise<LearnerResponse> {
     return firstValueFrom(
       this.http.post<LearnerResponse>(
         `${this.baseUrl}/${encodeURIComponent(cohortId)}/learners`,

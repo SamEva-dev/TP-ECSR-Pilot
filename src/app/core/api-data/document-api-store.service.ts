@@ -1,5 +1,16 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
-import type { ApiDocumentCategory, ApiDocumentVisibility, DocumentDto } from "../documents/document.models";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
+import type {
+  ApiDocumentCategory,
+  ApiDocumentVisibility,
+  DocumentDto,
+} from "../documents/document.models";
 import { DocumentApiService } from "../documents/document-api.service";
 import { TranslateService } from "../i18n/translate.service";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
@@ -53,7 +64,9 @@ export class DocumentApiStoreService {
     const cohortId = this.text(this.workspace.cohort()?.apiId);
     return this.rowsSignal()
       .filter((row) => !row.siteId || !siteId || row.siteId === siteId)
-      .filter((row) => !row.programId || !programId || row.programId === programId)
+      .filter(
+        (row) => !row.programId || !programId || row.programId === programId,
+      )
       .filter((row) => !row.cohortId || !cohortId || row.cohortId === cohortId)
       .map((row) => this.toLibraryItem(row));
   });
@@ -82,19 +95,24 @@ export class DocumentApiStoreService {
     this.loading.set(true);
     try {
       const rows = await this.api.list();
-      if (generation !== this.generation || request !== this.request) return false;
-      this.rowsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)));
+      if (generation !== this.generation || request !== this.request)
+        return false;
+      this.rowsSignal.set(
+        (Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)),
+      );
       this.loadError.set(false);
       return true;
     } catch {
       if (generation === this.generation && request === this.request) {
         this.rowsSignal.set([]);
         this.loadError.set(true);
-        if (notify) this.notifications.error("documents.real.loadError", "/documents");
+        if (notify)
+          this.notifications.error("documents.real.loadError", "/documents");
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
@@ -107,7 +125,10 @@ export class DocumentApiStoreService {
     this.mutating.set(true);
     try {
       const created = this.normalize(await this.api.upload(form));
-      this.rowsSignal.update((items) => [created, ...items.filter((item) => item.id !== created.id)]);
+      this.rowsSignal.update((items) => [
+        created,
+        ...items.filter((item) => item.id !== created.id),
+      ]);
       await this.reload(this.generation, false);
       return true;
     } catch {
@@ -128,7 +149,9 @@ export class DocumentApiStoreService {
     }
   }
 
-  async replace(item: DocumentLibraryItem): Promise<DocumentLibraryItem | null> {
+  async replace(
+    item: DocumentLibraryItem,
+  ): Promise<DocumentLibraryItem | null> {
     const file = await this.pickFile();
     if (!file || this.mutating()) return null;
 
@@ -152,12 +175,18 @@ export class DocumentApiStoreService {
 
   async delete(item: DocumentLibraryItem): Promise<boolean> {
     if (this.mutating()) return false;
-    if (typeof window !== "undefined" && !window.confirm(this.translate.instant("documents.real.confirmDelete"))) return false;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(this.translate.instant("documents.real.confirmDelete"))
+    )
+      return false;
 
     this.mutating.set(true);
     try {
       await this.api.delete(item.id);
-      this.rowsSignal.update((items) => items.filter((row) => row.id !== item.id));
+      this.rowsSignal.update((items) =>
+        items.filter((row) => row.id !== item.id),
+      );
       return true;
     } catch {
       this.notifications.error("documents.real.deleteError", "/documents");
@@ -168,7 +197,10 @@ export class DocumentApiStoreService {
   }
 
   private upsert(row: DocumentDto): void {
-    this.rowsSignal.update((items) => [row, ...items.filter((item) => item.id !== row.id)]);
+    this.rowsSignal.update((items) => [
+      row,
+      ...items.filter((item) => item.id !== row.id),
+    ]);
   }
 
   private buildUploadForm(file: File): FormData {
@@ -212,13 +244,20 @@ export class DocumentApiStoreService {
         resolve(file);
       };
       input.type = "file";
-      input.accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png";
-      input.addEventListener("change", () => finish(input.files?.[0] ?? null), { once: true });
+      input.accept =
+        ".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png";
+      input.addEventListener("change", () => finish(input.files?.[0] ?? null), {
+        once: true,
+      });
       input.addEventListener("cancel", () => finish(null), { once: true });
       if (typeof window !== "undefined") {
-        window.addEventListener("focus", () => {
-          window.setTimeout(() => finish(input.files?.[0] ?? null), 0);
-        }, { once: true });
+        window.addEventListener(
+          "focus",
+          () => {
+            window.setTimeout(() => finish(input.files?.[0] ?? null), 0);
+          },
+          { once: true },
+        );
       }
       input.click();
     });
@@ -226,19 +265,29 @@ export class DocumentApiStoreService {
 
   private toLibraryItem(row: DocumentDto): DocumentLibraryItem {
     const version = row.versions[0];
-    const ownerName = row.ownerType === "enrollment" && row.ownerId
-      ? this.contextData.students().find((student) => student.enrollmentId === row.ownerId)
-      : undefined;
+    const ownerName =
+      row.ownerType === "enrollment" && row.ownerId
+        ? this.contextData
+            .students()
+            .find((student) => student.enrollmentId === row.ownerId)
+        : undefined;
     return {
       id: row.id,
       title: row.title,
-      date: this.displayDate(version?.uploadedAtUtc || row.updatedAtUtc || row.createdAtUtc),
-      author: this.text(version?.uploadedByDisplayName) || row.createdByDisplayName,
+      date: this.displayDate(
+        version?.uploadedAtUtc || row.updatedAtUtc || row.createdAtUtc,
+      ),
+      author:
+        this.text(version?.uploadedByDisplayName) || row.createdByDisplayName,
       size: this.formatBytes(version?.sizeBytes),
       category: row.category,
-      ownerStudentId: row.ownerType === "enrollment" ? this.text(row.ownerId) : undefined,
-      ownerName: ownerName ? `${this.text(ownerName.firstName)} ${this.text(ownerName.lastName)}`.trim() : undefined,
-      visibleToStudent: row.visibility === "all" || row.visibility === "student",
+      ownerStudentId:
+        row.ownerType === "enrollment" ? this.text(row.ownerId) : undefined,
+      ownerName: ownerName
+        ? `${this.text(ownerName.firstName)} ${this.text(ownerName.lastName)}`.trim()
+        : undefined,
+      visibleToStudent:
+        row.visibility === "all" || row.visibility === "student",
       fileName: this.text(version?.fileName),
       format: this.fileFormat(version?.fileName, version?.contentType),
       version: version ? String(version.versionNumber) : "",
@@ -250,10 +299,20 @@ export class DocumentApiStoreService {
   }
 
   private normalize(row: DocumentDto): DocumentDto {
-    const category: ApiDocumentCategory = row?.category === "administrative" || row?.category === "pedagogical" || row?.category === "evaluation" || row?.category === "course" || row?.category === "internship" || row?.category === "student" || row?.category === "certification"
-      ? row.category
-      : "other";
-    const visibility: ApiDocumentVisibility = row?.visibility === "all" || row?.visibility === "student" ? row.visibility : "staff";
+    const category: ApiDocumentCategory =
+      row?.category === "administrative" ||
+      row?.category === "pedagogical" ||
+      row?.category === "evaluation" ||
+      row?.category === "course" ||
+      row?.category === "internship" ||
+      row?.category === "student" ||
+      row?.category === "certification"
+        ? row.category
+        : "other";
+    const visibility: ApiDocumentVisibility =
+      row?.visibility === "all" || row?.visibility === "student"
+        ? row.visibility
+        : "staff";
     return {
       id: this.text(row?.id),
       organizationId: this.text(row?.organizationId),
@@ -290,13 +349,18 @@ export class DocumentApiStoreService {
   }
 
   private fileTitle(fileName: string): string {
-    const title = fileName.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
+    const title = fileName
+      .replace(/\.[^.]+$/, "")
+      .replace(/[_-]+/g, " ")
+      .trim();
     return title || fileName.trim();
   }
 
   private fileFormat(fileName: unknown, contentType: unknown): string {
     const name = this.text(fileName);
-    const extension = name.includes(".") ? name.split(".").pop()?.toUpperCase() ?? "" : "";
+    const extension = name.includes(".")
+      ? (name.split(".").pop()?.toUpperCase() ?? "")
+      : "";
     if (extension) return extension;
     const type = this.text(contentType);
     if (type === "application/pdf") return "PDF";
@@ -326,7 +390,9 @@ export class DocumentApiStoreService {
   }
 
   private compact(value: number): string {
-    return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 }).format(value);
+    return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 }).format(
+      value,
+    );
   }
 
   private currentUserName(): string {

@@ -29,7 +29,9 @@ export class DocumentsComponent {
   readonly selectedDocument = signal<DocumentLibraryItem | null>(null);
 
   readonly role = this.sessionService.role;
-  readonly contextualDocuments = computed<DocumentLibraryItem[]>(() => this.store.documents());
+  readonly contextualDocuments = computed<DocumentLibraryItem[]>(() =>
+    this.store.documents(),
+  );
 
   readonly canImport = computed(() => this.role() !== "stagiaire");
   readonly canManageDocument = computed(
@@ -41,7 +43,8 @@ export class DocumentsComponent {
     if (role === "stagiaire") return this.contextualDocuments();
     if (role === "formateur") {
       return this.contextualDocuments().filter(
-        (document) => document.category !== "administrative" || document.visibleToStudent,
+        (document) =>
+          document.category !== "administrative" || document.visibleToStudent,
       );
     }
     return this.contextualDocuments();

@@ -1,7 +1,9 @@
-export type RemoteWorkStatus = "requested" | "approved" | "rejected" | "completed" | "cancelled";
+export type RemoteWorkStatus =
+  "requested" | "approved" | "rejected" | "completed" | "cancelled";
 export type RemoteWorkPeriod = "full-day" | "morning" | "afternoon" | "custom";
 export type RemoteActivityStatus = "todo" | "in-progress" | "done";
-export type WorkMode = "onsite" | "remote" | "field" | "travel" | "leave" | "absence";
+export type WorkMode =
+  "onsite" | "remote" | "field" | "travel" | "leave" | "absence";
 
 export interface RemoteWorkPolicy {
   enabled: boolean;

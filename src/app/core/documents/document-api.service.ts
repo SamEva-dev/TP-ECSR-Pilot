@@ -63,11 +63,16 @@ export class DocumentApiService {
 
   replace(id: string, form: FormData): Promise<DocumentDto> {
     return firstValueFrom(
-      this.http.post<DocumentDto>(`${this.base}/${encodeURIComponent(id)}/versions`, form),
+      this.http.post<DocumentDto>(
+        `${this.base}/${encodeURIComponent(id)}/versions`,
+        form,
+      ),
     );
   }
 
   delete(id: string): Promise<void> {
-    return firstValueFrom(this.http.delete<void>(`${this.base}/${encodeURIComponent(id)}`));
+    return firstValueFrom(
+      this.http.delete<void>(`${this.base}/${encodeURIComponent(id)}`),
+    );
   }
 }

@@ -47,13 +47,19 @@ export class AttendanceComponent {
 
   constructor() {
     effect(() => {
-      this.students.set(this.attendance.students().map((student) => ({ ...student })));
+      this.students.set(
+        this.attendance.students().map((student) => ({ ...student })),
+      );
       this.saved.set(false);
     });
   }
 
-  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
-  readonly isSecretariat = computed(() => this.sessionService.role() === "secretariat");
+  readonly isStudent = computed(
+    () => this.sessionService.role() === "stagiaire",
+  );
+  readonly isSecretariat = computed(
+    () => this.sessionService.role() === "secretariat",
+  );
   readonly canEdit = computed(() => !this.isStudent());
   readonly visibleStudents = computed(() => {
     const students = this.students();
@@ -64,12 +70,17 @@ export class AttendanceComponent {
   readonly metrics = computed(() => {
     const students = this.students();
     return {
-      present: students.filter((student) => student.status === "present").length,
+      present: students.filter((student) => student.status === "present")
+        .length,
       late: students.filter((student) => student.status === "late").length,
       absent: students.filter((student) => student.status === "absent").length,
-      excused: students.filter((student) => student.status === "excused").length,
+      excused: students.filter((student) => student.status === "excused")
+        .length,
       missedHours: this.roundHours(
-        students.reduce((sum, student) => sum + this.number(student.missedHours), 0),
+        students.reduce(
+          (sum, student) => sum + this.number(student.missedHours),
+          0,
+        ),
       ),
     };
   });
@@ -98,35 +109,59 @@ export class AttendanceComponent {
     this.students.update((students) =>
       students.map((student) => {
         if (student.id !== studentId) return student;
-        const duration = status === "absent" || status === "excused"
-          ? 0
-          : status === "late"
-            ? Math.min(this.number(student.duration) || expectedHours, expectedHours)
-            : expectedHours;
+        const duration =
+          status === "absent" || status === "excused"
+            ? 0
+            : status === "late"
+              ? Math.min(
+                  this.number(student.duration) || expectedHours,
+                  expectedHours,
+                )
+              : expectedHours;
         const missedHours = Math.max(0, expectedHours - duration);
         return {
           ...student,
           status,
           duration: this.roundHours(duration),
           missedHours: this.roundHours(missedHours),
-          addToCatchup: status !== "excused" && (status === "absent" || status === "late") && missedHours > 0,
+          addToCatchup:
+            status !== "excused" &&
+            (status === "absent" || status === "late") &&
+            missedHours > 0,
         };
       }),
     );
     this.saved.set(false);
   }
 
-  updateField(studentId: string, field: "arrival" | "departure" | "comment", event: Event) {
+  updateField(
+    studentId: string,
+    field: "arrival" | "departure" | "comment",
+    event: Event,
+  ) {
     if (!this.canEdit() || !studentId) return;
-    const value = (event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "";
+    const value =
+      (event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "";
     this.students.update((students) =>
       students.map((student) => {
         if (student.id !== studentId) return student;
         const updated = { ...student, [field]: value };
-        if (field === "comment" || updated.status === "absent" || updated.status === "excused") return updated;
-        const duration = this.durationBetween(updated.arrival, updated.departure, this.attendance.expectedHours());
+        if (
+          field === "comment" ||
+          updated.status === "absent" ||
+          updated.status === "excused"
+        )
+          return updated;
+        const duration = this.durationBetween(
+          updated.arrival,
+          updated.departure,
+          this.attendance.expectedHours(),
+        );
         if (duration === null) return updated;
-        const missedHours = Math.max(0, this.attendance.expectedHours() - duration);
+        const missedHours = Math.max(
+          0,
+          this.attendance.expectedHours() - duration,
+        );
         return {
           ...updated,
           duration: this.roundHours(duration),
@@ -144,7 +179,8 @@ export class AttendanceComponent {
   }
 
   statusClasses(status: AttendanceStatus, active: boolean) {
-    if (!active) return "border-[#dfe5ec] bg-white text-[#334155] hover:bg-[#f6f8fb]";
+    if (!active)
+      return "border-[#dfe5ec] bg-white text-[#334155] hover:bg-[#f6f8fb]";
     if (status === "present") return "border-[#20a956] bg-[#20a956] text-white";
     if (status === "late") return "border-[#f5a11a] bg-[#f5a11a] text-white";
     if (status === "absent") return "border-[#ed2632] bg-[#ed2632] text-white";
@@ -156,7 +192,11 @@ export class AttendanceComponent {
     return `attendance.status.${status || "pending"}`;
   }
 
-  private durationBetween(arrival: string, departure: string, maximumHours: number): number | null {
+  private durationBetween(
+    arrival: string,
+    departure: string,
+    maximumHours: number,
+  ): number | null {
     const start = this.clockMinutes(arrival);
     const end = this.clockMinutes(departure);
     if (start === null || end === null || end <= start) return null;
@@ -166,7 +206,15 @@ export class AttendanceComponent {
   private clockMinutes(value: string): number | null {
     if (!/^\d{2}:\d{2}$/.test(value)) return null;
     const [hour, minute] = value.split(":").map(Number);
-    if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    if (
+      !Number.isFinite(hour) ||
+      !Number.isFinite(minute) ||
+      hour < 0 ||
+      hour > 23 ||
+      minute < 0 ||
+      minute > 59
+    )
+      return null;
     return hour * 60 + minute;
   }
 

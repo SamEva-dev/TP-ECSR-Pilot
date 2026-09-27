@@ -9,7 +9,10 @@ import {
 } from "@angular/core";
 import { DrivingApiStoreService } from "../../core/api-data/driving-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import type { DrivingHistoryItem, DrivingLevel } from "../../core/models/driving.models";
+import type {
+  DrivingHistoryItem,
+  DrivingLevel,
+} from "../../core/models/driving.models";
 import { SessionService } from "../../core/session/session.service";
 
 const EMPTY_HISTORY: DrivingHistoryItem = {
@@ -49,7 +52,10 @@ export class DrivingComponent {
   }
 
   get criteria() {
-    return this.store.criteria(this.selectedCompetence(), this.selectedSubSkill());
+    return this.store.criteria(
+      this.selectedCompetence(),
+      this.selectedSubSkill(),
+    );
   }
 
   get vehicles() {
@@ -76,10 +82,16 @@ export class DrivingComponent {
 
   readonly evaluation = signal<Record<string, DrivingLevel>>({});
 
-  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
-  readonly isTrainer = computed(() => this.sessionService.role() === "formateur");
+  readonly isStudent = computed(
+    () => this.sessionService.role() === "stagiaire",
+  );
+  readonly isTrainer = computed(
+    () => this.sessionService.role() === "formateur",
+  );
   readonly canEdit = computed(
-    () => this.sessionService.role() === "direction" || this.sessionService.role() === "formateur",
+    () =>
+      this.sessionService.role() === "direction" ||
+      this.sessionService.role() === "formateur",
   );
 
   constructor() {
@@ -104,7 +116,9 @@ export class DrivingComponent {
     effect(() => {
       const competencies = this.store.competencies();
       const current = this.selectedCompetence();
-      const preferred = competencies.find((item) => item.id.toUpperCase() === "C3")?.id;
+      const preferred = competencies.find(
+        (item) => item.id.toUpperCase() === "C3",
+      )?.id;
       const selected = competencies.some((item) => item.id === current)
         ? current
         : (preferred ?? competencies[0]?.id ?? "");
@@ -125,7 +139,8 @@ export class DrivingComponent {
       const normalized = Object.fromEntries(
         Object.entries(current).filter(([key]) => allowed.has(key)),
       ) as Record<string, DrivingLevel>;
-      if (Object.keys(normalized).length !== Object.keys(current).length) this.evaluation.set(normalized);
+      if (Object.keys(normalized).length !== Object.keys(current).length)
+        this.evaluation.set(normalized);
     });
 
     effect(() => {
@@ -138,24 +153,40 @@ export class DrivingComponent {
     });
   }
 
-  readonly selectedStudent = computed(() =>
-    this.students.find((student) => student.id === this.selectedStudentId()) ?? { id: "", name: "" },
+  readonly selectedStudent = computed(
+    () =>
+      this.students.find(
+        (student) => student.id === this.selectedStudentId(),
+      ) ?? { id: "", name: "" },
   );
-  readonly selectedTrainer = computed(() =>
-    this.trainers.find((trainer) => trainer.id === this.selectedTrainerId()) ?? { id: "", name: "" },
+  readonly selectedTrainer = computed(
+    () =>
+      this.trainers.find(
+        (trainer) => trainer.id === this.selectedTrainerId(),
+      ) ?? { id: "", name: "" },
   );
-  readonly selectedVehicle = computed(() =>
-    this.vehicles.find((vehicle) => vehicle.id === this.selectedVehicleId()) ?? { id: "", label: "" },
+  readonly selectedVehicle = computed(
+    () =>
+      this.vehicles.find(
+        (vehicle) => vehicle.id === this.selectedVehicleId(),
+      ) ?? { id: "", label: "" },
   );
-  readonly selectedCompetenceInfo = computed(() =>
-    this.competencies.find((competence) => competence.id === this.selectedCompetence()) ?? {
-      id: "",
-      definitionId: "",
-      descriptionKey: "",
-    },
+  readonly selectedCompetenceInfo = computed(
+    () =>
+      this.competencies.find(
+        (competence) => competence.id === this.selectedCompetence(),
+      ) ?? {
+        id: "",
+        definitionId: "",
+        descriptionKey: "",
+      },
   );
-  readonly subSkills = computed(() => this.store.subSkills(this.selectedCompetence()));
-  readonly latestHistory = computed(() => this.store.history()[0] ?? EMPTY_HISTORY);
+  readonly subSkills = computed(() =>
+    this.store.subSkills(this.selectedCompetence()),
+  );
+  readonly latestHistory = computed(
+    () => this.store.history()[0] ?? EMPTY_HISTORY,
+  );
   readonly visibleHistory = computed(() => this.store.history());
 
   updateStudent(event: Event) {
@@ -176,7 +207,9 @@ export class DrivingComponent {
   }
 
   updateText(target: WritableSignal<string>, event: Event) {
-    target.set((event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "");
+    target.set(
+      (event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "",
+    );
     this.saved.set(false);
   }
 
@@ -220,7 +253,11 @@ export class DrivingComponent {
   }
 
   labelForCriterion(id: string) {
-    return this.criteria.find((criterion) => criterion.id === id)?.labelKey ?? id ?? "";
+    return (
+      this.criteria.find((criterion) => criterion.id === id)?.labelKey ??
+      id ??
+      ""
+    );
   }
 
   async save() {
@@ -244,7 +281,9 @@ export class DrivingComponent {
   }
 
   scrollToHistory() {
-    document.getElementById("driving-history")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById("driving-history")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   private resetEvaluationFields(): void {

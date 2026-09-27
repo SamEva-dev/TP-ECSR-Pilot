@@ -53,7 +53,9 @@ export class AuthComponent {
   );
   readonly isRegister = computed(() => this.mode() === "register");
 
-  readonly loginStep = signal<"email" | "password" | "mfa" | "password-change">("email");
+  readonly loginStep = signal<"email" | "password" | "mfa" | "password-change">(
+    "email",
+  );
   readonly loading = signal(false);
   readonly message = signal("");
   readonly error = signal("");
@@ -296,14 +298,19 @@ export class AuthComponent {
             this.loginForm.controls.rememberMe.value,
           ),
         );
-        await this.handleAuthenticatedLogin(result, this.pendingCurrentPassword);
+        await this.handleAuthenticatedLogin(
+          result,
+          this.pendingCurrentPassword,
+        );
         return;
       }
 
       if (step === "password-change") {
         const newPassword = passwordControl.value;
         if (newPassword.length < 8 || !this.pendingCurrentPassword) {
-          this.error.set(this.translate.instant("auth.errors.passwordTooShort"));
+          this.error.set(
+            this.translate.instant("auth.errors.passwordTooShort"),
+          );
           return;
         }
 

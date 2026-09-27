@@ -4,10 +4,7 @@ import type { AppPermission } from "../access/access.models";
 import { TranslateService } from "../i18n/translate.service";
 import { DEFAULT_SHEET_CATALOG } from "../api-data/runtime-data.store";
 import { STUDENT_DIRECTORY } from "../api-data/runtime-data.store";
-import {
-  APP_NAV_ITEMS,
-  navItemVisibleForRole,
-} from "../navigation/app-navigation.config";
+import { APP_NAV_ITEMS } from "../navigation/app-navigation.config";
 import { SessionService } from "../session/session.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
@@ -35,9 +32,9 @@ export class GlobalSearchService {
 
     const navigation: GlobalSearchResult[] = APP_NAV_ITEMS.filter(
       (item) =>
-        navItemVisibleForRole(item, this.sessionService.role()) &&
         this.access.can(item.permission) &&
-        (!item.module || modules.includes(item.module)),
+        (!item.requiredRoles?.length ||
+          this.access.hasAnyRole(...item.requiredRoles)),
     ).map((item) => ({
       id: `nav:${item.path}`,
       label: this.i18n.instant(item.labelKey),

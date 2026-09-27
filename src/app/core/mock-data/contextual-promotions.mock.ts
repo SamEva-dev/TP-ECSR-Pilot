@@ -135,15 +135,27 @@ const DEFAULT_MANAGERS: Record<string, string> = {
 };
 
 function plannedHoursFor(cohort: WorkspaceCohort): number {
-  return TRAINING_REFERENTIALS.find((item) => item.id === cohort.referentialVersionId)?.totalHours ?? 0;
+  return (
+    TRAINING_REFERENTIALS.find(
+      (item) => item.id === cohort.referentialVersionId,
+    )?.totalHours ?? 0
+  );
 }
 
 function buildPromotion(cohort: WorkspaceCohort): ContextualPromotionSummary {
-  const offering = PROGRAM_OFFERINGS.find((item) => item.id === cohort.offeringId)!;
+  const offering = PROGRAM_OFFERINGS.find(
+    (item) => item.id === cohort.offeringId,
+  )!;
   const site = TRAINING_SITES.find((item) => item.id === offering.siteId)!;
-  const organization = ORGANIZATIONS.find((item) => item.id === site.organizationId)!;
-  const program = TRAINING_PROGRAMS.find((item) => item.id === offering.programId)!;
-  const referential = TRAINING_REFERENTIALS.find((item) => item.id === cohort.referentialVersionId);
+  const organization = ORGANIZATIONS.find(
+    (item) => item.id === site.organizationId,
+  )!;
+  const program = TRAINING_PROGRAMS.find(
+    (item) => item.id === offering.programId,
+  )!;
+  const referential = TRAINING_REFERENTIALS.find(
+    (item) => item.id === cohort.referentialVersionId,
+  );
   const metrics = OPERATIONAL_METRICS[cohort.id];
   const plannedHoursPerStudent = plannedHoursFor(cohort);
   const totalPlannedHours = plannedHoursPerStudent * cohort.studentCount;
@@ -181,8 +193,14 @@ function buildPromotion(cohort: WorkspaceCohort): ContextualPromotionSummary {
   };
 }
 
-export const CONTEXTUAL_PROMOTIONS: ContextualPromotionSummary[] = WORKSPACE_COHORTS.map(buildPromotion);
+export const CONTEXTUAL_PROMOTIONS: ContextualPromotionSummary[] =
+  WORKSPACE_COHORTS.map(buildPromotion);
 
-export function promotionsForSiteProgram(siteId: string, programId: string): ContextualPromotionSummary[] {
-  return CONTEXTUAL_PROMOTIONS.filter((item) => item.siteId === siteId && item.programId === programId);
+export function promotionsForSiteProgram(
+  siteId: string,
+  programId: string,
+): ContextualPromotionSummary[] {
+  return CONTEXTUAL_PROMOTIONS.filter(
+    (item) => item.siteId === siteId && item.programId === programId,
+  );
 }

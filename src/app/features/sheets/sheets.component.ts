@@ -9,7 +9,10 @@ import {
 import { SheetsApiStoreService } from "../../core/api-data/sheets-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { TranslateService } from "../../core/i18n/translate.service";
-import { ALL_SHEET_STATUSES, type SheetStatus } from "../../core/models/sheets.models";
+import {
+  ALL_SHEET_STATUSES,
+  type SheetStatus,
+} from "../../core/models/sheets.models";
 import { SessionService } from "../../core/session/session.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import { EvaluateSheetDrawerComponent } from "./evaluate-sheet-drawer/evaluate-sheet-drawer.component";
@@ -55,8 +58,11 @@ export class SheetsComponent {
     const q = this.query().trim().toLocaleLowerCase("fr");
     const status = this.statusFilter();
     return this.allSheets().filter((sheet) => {
-      const translatedTitle = this.translate.instant(sheet.titleKey).toLocaleLowerCase("fr");
-      const matchesQuery = !q || translatedTitle.includes(q) || String(sheet.number) === q;
+      const translatedTitle = this.translate
+        .instant(sheet.titleKey)
+        .toLocaleLowerCase("fr");
+      const matchesQuery =
+        !q || translatedTitle.includes(q) || String(sheet.number) === q;
       const matchesStatus = status === "all" || sheet.status === status;
       return matchesQuery && matchesStatus;
     });
@@ -65,14 +71,18 @@ export class SheetsComponent {
   readonly reworkCount = computed(() => this.store.reworkCount());
   readonly preparedProgress = computed(() => {
     const total = this.sheetTotal();
-    return total > 0 ? (this.selectedStudent().preparedSheets / total) * 100 : 0;
+    return total > 0
+      ? (this.selectedStudent().preparedSheets / total) * 100
+      : 0;
   });
 
   readonly counts = computed<Record<SheetStatus, number>>(() => {
     const rows = this.allSheets();
     return {
-      not_started: rows.filter((sheet) => sheet.status === "not_started").length,
-      in_progress: rows.filter((sheet) => sheet.status === "in_progress").length,
+      not_started: rows.filter((sheet) => sheet.status === "not_started")
+        .length,
+      in_progress: rows.filter((sheet) => sheet.status === "in_progress")
+        .length,
       ready: rows.filter((sheet) => sheet.status === "ready").length,
       presented: rows.filter((sheet) => sheet.status === "presented").length,
       validated: rows.filter((sheet) => sheet.status === "validated").length,
@@ -80,7 +90,9 @@ export class SheetsComponent {
     };
   });
 
-  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly isStudent = computed(
+    () => this.sessionService.role() === "stagiaire",
+  );
   readonly canEvaluate = computed(() => {
     const role = this.sessionService.role();
     return role === "direction" || role === "formateur";
@@ -91,7 +103,10 @@ export class SheetsComponent {
   }
 
   updateStatus(event: Event): void {
-    this.statusFilter.set(((event.target as HTMLSelectElement).value || "all") as "all" | SheetStatus);
+    this.statusFilter.set(
+      ((event.target as HTMLSelectElement).value || "all") as
+        "all" | SheetStatus,
+    );
   }
 
   updateStudent(event: Event): void {
@@ -113,12 +128,18 @@ export class SheetsComponent {
 
   statusClasses(status: SheetStatus): string {
     switch (status) {
-      case "validated": return "bg-[#d8f8df] text-[#18a547]";
-      case "rework": return "bg-[#ffe1df] text-[#f04438]";
-      case "in_progress": return "bg-[#fff0c9] text-[#8b5e00]";
-      case "ready": return "bg-[#2b66a4] text-white";
-      case "presented": return "bg-[#e5f2ff] text-[#2a64a2]";
-      default: return "bg-[#f0f3f7] text-[#687589]";
+      case "validated":
+        return "bg-[#d8f8df] text-[#18a547]";
+      case "rework":
+        return "bg-[#ffe1df] text-[#f04438]";
+      case "in_progress":
+        return "bg-[#fff0c9] text-[#8b5e00]";
+      case "ready":
+        return "bg-[#2b66a4] text-white";
+      case "presented":
+        return "bg-[#e5f2ff] text-[#2a64a2]";
+      default:
+        return "bg-[#f0f3f7] text-[#687589]";
     }
   }
 

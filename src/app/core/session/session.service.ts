@@ -55,7 +55,10 @@ export class SessionService {
     this.applyAuthenticatedToken(accessToken, this.promotionSignal());
   }
 
-  private applyAuthenticatedToken(accessToken: string, promotionId: string): void {
+  private applyAuthenticatedToken(
+    accessToken: string,
+    promotionId: string,
+  ): void {
     const payload = this.decodeJwt(accessToken);
     if (
       !payload.exp ||

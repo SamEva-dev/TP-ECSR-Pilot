@@ -1,5 +1,9 @@
 import { Injectable, signal } from "@angular/core";
-import { SITE_PROFILES, type SiteFormValue, type SiteProfile } from "./sites.mock";
+import {
+  SITE_PROFILES,
+  type SiteFormValue,
+  type SiteProfile,
+} from "./sites.mock";
 
 const STORAGE_KEY = "tp-ecsr-pilot.mock-sites.v1";
 

@@ -54,11 +54,19 @@ export class SiteApiStoreService {
         phone: this.text(site.phone),
         email: this.text(site.email),
         manager: this.text(site.manager),
-        status: site.status === "attention" ? "attention" : site.active ? "active" : "inactive",
+        status:
+          site.status === "attention"
+            ? "attention"
+            : site.active
+              ? "active"
+              : "inactive",
         students: this.number(report?.learners, fallbackStudents),
         trainers: this.number(site.trainers),
         programs: this.workspace.sitePrograms(site.id).length,
-        activeCohorts: this.number(report?.activeCohorts, fallbackActiveCohorts),
+        activeCohorts: this.number(
+          report?.activeCohorts,
+          fallbackActiveCohorts,
+        ),
         attendanceRate: this.number(report?.attendanceRate),
         successRate: this.number(report?.certificationSuccessRate),
         rooms: this.number(site.rooms),
@@ -74,7 +82,10 @@ export class SiteApiStoreService {
     effect(() => {
       const sites = this.workspace
         .sites()
-        .map((site) => ({ id: this.text(site.id), apiId: this.text(site.apiId) }))
+        .map((site) => ({
+          id: this.text(site.id),
+          apiId: this.text(site.apiId),
+        }))
         .filter((site) => site.apiId.length > 0);
       const ready = this.workspace.remoteWorkspaceLoaded();
       const generation = ++this.generation;
@@ -110,7 +121,9 @@ export class SiteApiStoreService {
 
     try {
       const results = await Promise.allSettled(
-        sites.map((site) => firstValueFrom(this.reporting.siteDashboard(site.apiId))),
+        sites.map((site) =>
+          firstValueFrom(this.reporting.siteDashboard(site.apiId)),
+        ),
       );
       if (generation !== this.generation || request !== this.request) return;
 
@@ -162,7 +175,10 @@ export class SiteApiStoreService {
 
       await this.workspace.reload();
       if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", "/etablissements");
+        this.notifications.error(
+          "sites.real.workspaceError",
+          "/etablissements",
+        );
       return true;
     } catch {
       this.notifications.error("sites.real.saveError", "/etablissements");
@@ -197,7 +213,10 @@ export class SiteApiStoreService {
 
       await this.workspace.reload();
       if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", `/etablissements/${id}`);
+        this.notifications.error(
+          "sites.real.workspaceError",
+          `/etablissements/${id}`,
+        );
       return true;
     } catch {
       this.notifications.error("sites.real.saveError", `/etablissements/${id}`);
@@ -214,6 +233,8 @@ export class SiteApiStoreService {
   }
 
   private number(value: unknown, fallback = 0): number {
-    return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+    return typeof value === "number" && Number.isFinite(value)
+      ? value
+      : fallback;
   }
 }

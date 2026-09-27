@@ -46,16 +46,16 @@ export interface PedagogicalTeamMember {
 }
 
 const promotionStudents = (promotionId: string): PromotionStudentSummary[] =>
-  STUDENT_DIRECTORY.filter((student) => student.promotionId === promotionId).map(
-    ({ id, firstName, lastName, progress, completedHours, status }) => ({
-      id,
-      firstName,
-      lastName,
-      progress,
-      completedHours,
-      status,
-    }),
-  );
+  STUDENT_DIRECTORY.filter(
+    (student) => student.promotionId === promotionId,
+  ).map(({ id, firstName, lastName, progress, completedHours, status }) => ({
+    id,
+    firstName,
+    lastName,
+    progress,
+    completedHours,
+    status,
+  }));
 
 export const PROMOTION_SUMMARIES: PromotionSummary[] = [
   {

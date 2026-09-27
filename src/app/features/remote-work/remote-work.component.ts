@@ -1,5 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
-import { ReactiveFormsModule, FormControl, FormGroup, Validators } from "@angular/forms";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
+import {
+  ReactiveFormsModule,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { RemoteWorkApiStoreService } from "../../core/api-data/remote-work-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type {
@@ -41,21 +52,30 @@ export class RemoteWorkComponent {
   readonly visibleRequests = computed(() => {
     if (!this.isManager()) {
       const userId = this.currentUserId();
-      return userId ? this.requests().filter((item) => item.userId === userId) : [];
+      return userId
+        ? this.requests().filter((item) => item.userId === userId)
+        : [];
     }
     return this.requests().filter((item) => {
-      const siteOk = this.siteFilter() === "all" || item.siteId === this.siteFilter();
-      const statusOk = this.statusFilter() === "all" || item.status === this.statusFilter();
+      const siteOk =
+        this.siteFilter() === "all" || item.siteId === this.siteFilter();
+      const statusOk =
+        this.statusFilter() === "all" || item.status === this.statusFilter();
       return siteOk && statusOk;
     });
   });
 
-  readonly todayRemote = computed(() =>
-    this.requests().filter(
-      (item) => item.date === this.today() && (item.status === "approved" || item.status === "completed"),
-    ).length,
+  readonly todayRemote = computed(
+    () =>
+      this.requests().filter(
+        (item) =>
+          item.date === this.today() &&
+          (item.status === "approved" || item.status === "completed"),
+      ).length,
   );
-  readonly pending = computed(() => this.requests().filter((item) => item.status === "requested").length);
+  readonly pending = computed(
+    () => this.requests().filter((item) => item.status === "requested").length,
+  );
   readonly onsiteCount = computed(() => 0);
   readonly absentCount = computed(() => 0);
   readonly completedMonth = computed(() => {
@@ -72,7 +92,9 @@ export class RemoteWorkComponent {
   readonly myCurrentRequest = computed(() => {
     const userId = this.currentUserId();
     return userId
-      ? this.requests().find((item) => item.userId === userId && item.date === this.today()) ?? null
+      ? (this.requests().find(
+          (item) => item.userId === userId && item.date === this.today(),
+        ) ?? null)
       : null;
   });
   readonly employeeStatusKey = computed(() => {
@@ -83,31 +105,46 @@ export class RemoteWorkComponent {
     const userId = this.currentUserId();
     const today = this.today();
     if (!userId || !today) return "";
-    return this.requests()
-      .filter(
-        (item) =>
-          item.userId === userId &&
-          item.date >= today &&
-          (item.status === "requested" || item.status === "approved"),
-      )
-      .map((item) => item.date)
-      .sort((a, b) => a.localeCompare(b))[0] ?? "";
+    return (
+      this.requests()
+        .filter(
+          (item) =>
+            item.userId === userId &&
+            item.date >= today &&
+            (item.status === "requested" || item.status === "approved"),
+        )
+        .map((item) => item.date)
+        .sort((a, b) => a.localeCompare(b))[0] ?? ""
+    );
   });
   readonly myActivities = computed(() => {
     const request = this.myCurrentRequest();
-    return request ? this.activities().filter((item) => item.requestId === request.id) : [];
+    return request
+      ? this.activities().filter((item) => item.requestId === request.id)
+      : [];
   });
   readonly activityProgress = computed(() => {
     const activities = this.myActivities();
     if (!activities.length) return 0;
-    return Math.round((activities.filter((item) => item.status === "done").length / activities.length) * 100);
+    return Math.round(
+      (activities.filter((item) => item.status === "done").length /
+        activities.length) *
+        100,
+    );
   });
-  readonly myCompletedActivities = computed(() => this.myActivities().filter((item) => item.status === "done").length);
+  readonly myCompletedActivities = computed(
+    () => this.myActivities().filter((item) => item.status === "done").length,
+  );
   readonly weekModes = computed<TeamWorkModeDay[]>(() => []);
 
   readonly requestForm = new FormGroup({
-    date: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    period: new FormControl<RemoteWorkPeriod>("full-day", { nonNullable: true }),
+    date: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    period: new FormControl<RemoteWorkPeriod>("full-day", {
+      nonNullable: true,
+    }),
     startTime: new FormControl("08:30", { nonNullable: true }),
     endTime: new FormControl("17:00", { nonNullable: true }),
     preparation: new FormControl(true, { nonNullable: true }),
@@ -139,12 +176,27 @@ export class RemoteWorkComponent {
     if (this.requestForm.invalid) return;
     const value = this.requestForm.getRawValue();
     const activities = [
-      value.preparation ? { code: "PREPARATION", label: "remoteWork.activityTypes.preparation" } : null,
-      value.correction ? { code: "CORRECTION", label: "remoteWork.activityTypes.correction" } : null,
-      value.followUp ? { code: "FOLLOW_UP", label: "remoteWork.activityTypes.followUp" } : null,
-      value.meeting ? { code: "MEETING", label: "remoteWork.activityTypes.meeting" } : null,
-      value.admin ? { code: "ADMIN", label: "remoteWork.activityTypes.admin" } : null,
-      value.remoteTraining ? { code: "REMOTE_TRAINING", label: "remoteWork.activityTypes.remoteTraining" } : null,
+      value.preparation
+        ? { code: "PREPARATION", label: "remoteWork.activityTypes.preparation" }
+        : null,
+      value.correction
+        ? { code: "CORRECTION", label: "remoteWork.activityTypes.correction" }
+        : null,
+      value.followUp
+        ? { code: "FOLLOW_UP", label: "remoteWork.activityTypes.followUp" }
+        : null,
+      value.meeting
+        ? { code: "MEETING", label: "remoteWork.activityTypes.meeting" }
+        : null,
+      value.admin
+        ? { code: "ADMIN", label: "remoteWork.activityTypes.admin" }
+        : null,
+      value.remoteTraining
+        ? {
+            code: "REMOTE_TRAINING",
+            label: "remoteWork.activityTypes.remoteTraining",
+          }
+        : null,
     ].filter((item): item is { code: string; label: string } => item !== null);
 
     const ok = await this.store.create({
@@ -172,7 +224,8 @@ export class RemoteWorkComponent {
   async toggleActivity(id: string): Promise<void> {
     const activity = this.activities().find((item) => item.id === id);
     if (!activity) return;
-    const status: RemoteActivityStatus = activity.status === "done" ? "todo" : "done";
+    const status: RemoteActivityStatus =
+      activity.status === "done" ? "todo" : "done";
     await this.store.updateActivity(id, status);
   }
 
@@ -181,11 +234,15 @@ export class RemoteWorkComponent {
   }
 
   setStatusFilter(event: Event): void {
-    this.statusFilter.set(((event.target as HTMLSelectElement).value || "all") as "all" | RemoteWorkStatus);
+    this.statusFilter.set(
+      ((event.target as HTMLSelectElement).value || "all") as
+        "all" | RemoteWorkStatus,
+    );
   }
 
   statusClass(status: RemoteWorkStatus): string {
-    if (status === "approved" || status === "completed") return "bg-[#d8f8df] text-[#168c40]";
+    if (status === "approved" || status === "completed")
+      return "bg-[#d8f8df] text-[#168c40]";
     if (status === "requested") return "bg-[#fff0c9] text-[#8a6100]";
     return "bg-[#ffe1df] text-[#d93434]";
   }

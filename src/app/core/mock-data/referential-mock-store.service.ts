@@ -7,12 +7,19 @@ import {
 
 @Injectable({ providedIn: "root" })
 export class ReferentialMockStoreService {
-  private readonly itemsSignal = signal<TrainingReferential[]>(structuredClone(TRAINING_REFERENTIALS));
+  private readonly itemsSignal = signal<TrainingReferential[]>(
+    structuredClone(TRAINING_REFERENTIALS),
+  );
   readonly items = this.itemsSignal.asReadonly();
 
-  createVersion(value: ReferentialVersionFormValue): TrainingReferential | null {
-    const source = this.itemsSignal().find((item) => item.id === value.sourceReferentialId)
-      ?? this.itemsSignal().find((item) => item.programId === value.programId);
+  createVersion(
+    value: ReferentialVersionFormValue,
+  ): TrainingReferential | null {
+    const source =
+      this.itemsSignal().find(
+        (item) => item.id === value.sourceReferentialId,
+      ) ??
+      this.itemsSignal().find((item) => item.programId === value.programId);
     if (!source) return null;
 
     const item: TrainingReferential = {

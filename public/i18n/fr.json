@@ -1714,7 +1714,14 @@
       "secretariat": "Secrétariat",
       "formateur": "Formateur",
       "stagiaire": "Stagiaire",
-      "jury": "Jury"
+      "jury": "Jury",
+      "organization_admin": "Administrateur organisation",
+      "organization_direction": "Direction organisation",
+      "site_direction": "Direction établissement",
+      "pedagogical_manager": "Responsable pédagogique",
+      "trainer": "Formateur",
+      "student": "Stagiaire",
+      "read_only": "Lecture seule"
     },
     "states": {
       "active": "Accès actif",
@@ -1849,7 +1856,8 @@
       "permissionError": "Impossible d’enregistrer cette permission.",
       "assignmentError": "Impossible d’enregistrer cette affectation.",
       "inviteError": "Impossible d’envoyer cette invitation.",
-      "pendingActionError": "Cette action sera disponible après acceptation de l’invitation."
+      "pendingActionError": "Cette action sera disponible après acceptation de l’invitation.",
+      "roleError": "Impossible de modifier le rôle de ce compte."
     }
   },
   "administration": {
@@ -3833,6 +3841,11 @@
     "COHORT_CODE_INVALID": "Le code de la promotion est invalide.",
     "COHORT_DATE_RANGE_INVALID": "La date de fin de la promotion doit être postérieure ou égale à la date de début.",
     "COHORT_CAPACITY_INVALID": "La capacité de la promotion doit être comprise entre 1 et 500 apprenants.",
+    "ORGANIZATION_SIRET_REQUIRED": "Le SIRET de l’organisation est obligatoire.",
+    "ORGANIZATION_SIRET_INVALID": "Le SIRET renseigné est invalide.",
+    "ORGANIZATION_VERIFICATION_PROFILE_INCOMPLETE": "Complétez les informations légales de l’organisation avant de demander sa vérification.",
+    "ORGANIZATION_VERIFICATION_STATUS_INVALID": "Le statut de vérification de l’organisation est invalide.",
+    "ORGANIZATION_SUBSCRIPTION_STATUS_INVALID": "Le statut d’abonnement de l’organisation est invalide.",
     "LEARNER_NOT_FOUND": "L’apprenant est introuvable.",
     "LEARNER_ALREADY_ENROLLED": "Cet apprenant est déjà inscrit à cette promotion.",
     "LEARNER_PERSON_REQUIRED": "La fiche personne de l’apprenant est obligatoire.",
@@ -4070,6 +4083,11 @@
     "COHORT_CODE_INVALID": "Le code de la promotion est invalide.",
     "COHORT_DATE_RANGE_INVALID": "La date de fin de la promotion doit être postérieure ou égale à la date de début.",
     "COHORT_CAPACITY_INVALID": "La capacité de la promotion doit être comprise entre 1 et 500 apprenants.",
+    "ORGANIZATION_SIRET_REQUIRED": "Le SIRET de l’organisation est obligatoire.",
+    "ORGANIZATION_SIRET_INVALID": "Le SIRET renseigné est invalide.",
+    "ORGANIZATION_VERIFICATION_PROFILE_INCOMPLETE": "Complétez les informations légales de l’organisation avant de demander sa vérification.",
+    "ORGANIZATION_VERIFICATION_STATUS_INVALID": "Le statut de vérification de l’organisation est invalide.",
+    "ORGANIZATION_SUBSCRIPTION_STATUS_INVALID": "Le statut d’abonnement de l’organisation est invalide.",
     "LEARNER_NOT_FOUND": "L’apprenant est introuvable.",
     "LEARNER_ALREADY_ENROLLED": "Cet apprenant est déjà inscrit à cette promotion.",
     "LEARNER_PERSON_REQUIRED": "La fiche personne de l’apprenant est obligatoire.",

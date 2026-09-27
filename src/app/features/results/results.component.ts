@@ -254,8 +254,8 @@ export class ResultsComponent {
     candidate: ResultCandidateRow,
     unitId: string,
   ): CertificationUnitStatus {
-    const stepIds = this.scheme().steps
-      .filter((step) => step.unitId === unitId)
+    const stepIds = this.scheme()
+      .steps.filter((step) => step.unitId === unitId)
       .map((step) => step.id)
       .filter(Boolean);
     if (!stepIds.length) return "pending";
@@ -268,7 +268,9 @@ export class ResultsComponent {
       ).toLowerCase(),
     );
 
-    if (outcomes.some((outcome) => outcome === "failed" || outcome === "absent"))
+    if (
+      outcomes.some((outcome) => outcome === "failed" || outcome === "absent")
+    )
       return "not_validated";
     if (
       outcomes.every(
@@ -336,7 +338,11 @@ export class ResultsComponent {
   }
 
   private text(value: unknown): string {
-    return typeof value === "string" ? value : value == null ? "" : String(value);
+    return typeof value === "string"
+      ? value
+      : value == null
+        ? ""
+        : String(value);
   }
 
   private csv(value: unknown): string {

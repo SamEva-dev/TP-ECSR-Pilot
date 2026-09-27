@@ -46,7 +46,10 @@ export class ReportingApiService {
     );
   }
 
-  cohortDrivingObservations(cohortId: string, take = 20): Observable<CohortDrivingObservation[]> {
+  cohortDrivingObservations(
+    cohortId: string,
+    take = 20,
+  ): Observable<CohortDrivingObservation[]> {
     const params = new HttpParams().set("take", String(Math.max(1, take)));
     return this.http.get<CohortDrivingObservation[]>(
       `${this.base}/cohorts/${cohortId}/driving-observations`,
@@ -55,15 +58,22 @@ export class ReportingApiService {
   }
 
   myLearnerDashboard(cohortId?: string): Observable<CohortLearnerDashboard> {
-    const params = cohortId ? new HttpParams().set("cohortId", cohortId) : undefined;
+    const params = cohortId
+      ? new HttpParams().set("cohortId", cohortId)
+      : undefined;
     return this.http.get<CohortLearnerDashboard>(
       `${this.base}/learners/me/dashboard`,
       { params },
     );
   }
 
-  learnerDetail(learnerProfileId: string, cohortId?: string): Observable<LearnerDetailReport> {
-    const params = cohortId ? new HttpParams().set("cohortId", cohortId) : undefined;
+  learnerDetail(
+    learnerProfileId: string,
+    cohortId?: string,
+  ): Observable<LearnerDetailReport> {
+    const params = cohortId
+      ? new HttpParams().set("cohortId", cohortId)
+      : undefined;
     return this.http.get<LearnerDetailReport>(
       `${this.base}/learners/${learnerProfileId}/detail`,
       { params },
@@ -71,14 +81,18 @@ export class ReportingApiService {
   }
 
   myLearnerDetail(cohortId?: string): Observable<LearnerDetailReport> {
-    const params = cohortId ? new HttpParams().set("cohortId", cohortId) : undefined;
+    const params = cohortId
+      ? new HttpParams().set("cohortId", cohortId)
+      : undefined;
     return this.http.get<LearnerDetailReport>(
       `${this.base}/learners/me/detail`,
       { params },
     );
   }
 
-  certificationSuccess(organizationId: string): Observable<CertificationSuccessRecord[]> {
+  certificationSuccess(
+    organizationId: string,
+  ): Observable<CertificationSuccessRecord[]> {
     return this.http.get<CertificationSuccessRecord[]>(
       `${this.base}/organizations/${organizationId}/certification-success`,
     );

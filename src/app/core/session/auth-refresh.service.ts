@@ -1,6 +1,13 @@
 import { HttpBackend, HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable, catchError, finalize, map, shareReplay, throwError } from "rxjs";
+import {
+  Observable,
+  catchError,
+  finalize,
+  map,
+  shareReplay,
+  throwError,
+} from "rxjs";
 import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "./auth-token.store";
 import { SessionService } from "./session.service";

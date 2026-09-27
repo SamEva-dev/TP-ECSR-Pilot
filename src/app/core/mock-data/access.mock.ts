@@ -30,7 +30,20 @@ export interface AccessAccount {
 }
 
 const permissions = (enabled: AccessPermissionKey[]): AccessPermission[] =>
-  ([
+  (
+    [
+      "students",
+      "sessions",
+      "evaluations",
+      "documents",
+      "certification",
+      "reports",
+      "administration",
+    ] as AccessPermissionKey[]
+  ).map((key) => ({ key, enabled: enabled.includes(key) }));
+
+const directionPermissions = () =>
+  permissions([
     "students",
     "sessions",
     "evaluations",
@@ -38,20 +51,33 @@ const permissions = (enabled: AccessPermissionKey[]): AccessPermission[] =>
     "certification",
     "reports",
     "administration",
-  ] as AccessPermissionKey[]).map((key) => ({ key, enabled: enabled.includes(key) }));
-
-const directionPermissions = () =>
-  permissions(["students", "sessions", "evaluations", "documents", "certification", "reports", "administration"]);
-const trainerPermissions = () => permissions(["students", "sessions", "evaluations", "certification"]);
-const secretariatPermissions = () => permissions(["students", "sessions", "documents", "certification", "reports"]);
+  ]);
+const trainerPermissions = () =>
+  permissions(["students", "sessions", "evaluations", "certification"]);
+const secretariatPermissions = () =>
+  permissions([
+    "students",
+    "sessions",
+    "documents",
+    "certification",
+    "reports",
+  ]);
 const studentPermissions = () => permissions(["certification"]);
-const juryPermissions = () => permissions(["evaluations", "documents", "certification"]);
+const juryPermissions = () =>
+  permissions(["evaluations", "documents", "certification"]);
 
 const membership = (
   userId: string,
   suffix: string,
-  value: Omit<WorkspaceMembership, "id" | "userId" | "active"> & { active?: boolean },
-): WorkspaceMembership => ({ id: `${userId}-${suffix}`, userId, active: value.active ?? true, ...value });
+  value: Omit<WorkspaceMembership, "id" | "userId" | "active"> & {
+    active?: boolean;
+  },
+): WorkspaceMembership => ({
+  id: `${userId}-${suffix}`,
+  userId,
+  active: value.active ?? true,
+  ...value,
+});
 
 export const ACCESS_ACCOUNTS: AccessAccount[] = [
   {
@@ -62,7 +88,13 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "direction",
     access: "active",
     permissions: directionPermissions(),
-    assignments: [membership("u1", "org", { role: "organization_direction", scope: "organization", organizationId: "org-aftral" })],
+    assignments: [
+      membership("u1", "org", {
+        role: "organization_direction",
+        scope: "organization",
+        organizationId: "org-aftral",
+      }),
+    ],
   },
   {
     id: "u2",
@@ -72,7 +104,14 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "secretariat",
     access: "active",
     permissions: secretariatPermissions(),
-    assignments: [membership("u2", "nice", { role: "secretariat", scope: "site", organizationId: "org-aftral", siteId: "site-aftral-nice" })],
+    assignments: [
+      membership("u2", "nice", {
+        role: "secretariat",
+        scope: "site",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+      }),
+    ],
   },
   {
     id: "u3",
@@ -84,9 +123,27 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     detailKey: "access.userDetails.marc",
     permissions: trainerPermissions(),
     assignments: [
-      membership("u3", "nice-ecsr", { role: "trainer", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr" }),
-      membership("u3", "nice-moto", { role: "trainer", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-moto" }),
-      membership("u3", "mrs-ecsr", { role: "read_only", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-marseille", programId: "program-ecsr" }),
+      membership("u3", "nice-ecsr", {
+        role: "trainer",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+      }),
+      membership("u3", "nice-moto", {
+        role: "trainer",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-moto",
+      }),
+      membership("u3", "mrs-ecsr", {
+        role: "read_only",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-marseille",
+        programId: "program-ecsr",
+      }),
     ],
   },
   {
@@ -97,7 +154,15 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "formateur",
     access: "active",
     permissions: trainerPermissions(),
-    assignments: [membership("u4", "nice-ecsr", { role: "pedagogical_manager", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr" })],
+    assignments: [
+      membership("u4", "nice-ecsr", {
+        role: "pedagogical_manager",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+      }),
+    ],
   },
   {
     id: "u5",
@@ -107,7 +172,15 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "formateur",
     access: "active",
     permissions: trainerPermissions(),
-    assignments: [membership("u5", "nice-ecsr", { role: "trainer", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr" })],
+    assignments: [
+      membership("u5", "nice-ecsr", {
+        role: "trainer",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+      }),
+    ],
   },
   {
     id: "u6",
@@ -117,7 +190,15 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "formateur",
     access: "active",
     permissions: trainerPermissions(),
-    assignments: [membership("u6", "nice-pl", { role: "trainer", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-pl" })],
+    assignments: [
+      membership("u6", "nice-pl", {
+        role: "trainer",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-pl",
+      }),
+    ],
   },
   {
     id: "u7",
@@ -127,7 +208,15 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "formateur",
     access: "active",
     permissions: trainerPermissions(),
-    assignments: [membership("u7", "nice-bus", { role: "trainer", scope: "program", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-bus" })],
+    assignments: [
+      membership("u7", "nice-bus", {
+        role: "trainer",
+        scope: "program",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-bus",
+      }),
+    ],
   },
   {
     id: "u8",
@@ -137,7 +226,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "active",
     permissions: studentPermissions(),
-    assignments: [membership("u8", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u8", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u9",
@@ -147,7 +245,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "active",
     permissions: studentPermissions(),
-    assignments: [membership("u9", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u9", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u10",
@@ -157,7 +264,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "active",
     permissions: studentPermissions(),
-    assignments: [membership("u10", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u10", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u11",
@@ -167,7 +283,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "active",
     permissions: studentPermissions(),
-    assignments: [membership("u11", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u11", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u12",
@@ -177,7 +302,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "active",
     permissions: studentPermissions(),
-    assignments: [membership("u12", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u12", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u13",
@@ -187,7 +321,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "invited",
     permissions: studentPermissions(),
-    assignments: [membership("u13", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u13", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u14",
@@ -197,7 +340,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "invited",
     permissions: studentPermissions(),
-    assignments: [membership("u14", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u14", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u15",
@@ -207,7 +359,16 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "stagiaire",
     access: "invited",
     permissions: studentPermissions(),
-    assignments: [membership("u15", "p1", { role: "student", scope: "cohort", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1" })],
+    assignments: [
+      membership("u15", "p1", {
+        role: "student",
+        scope: "cohort",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+      }),
+    ],
   },
   {
     id: "u16",
@@ -218,7 +379,17 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     access: "active",
     detailKey: "access.userDetails.jury",
     permissions: juryPermissions(),
-    assignments: [membership("u16", "exam", { role: "jury", scope: "exam", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-ecsr", cohortId: "p1", examSessionId: "exam-2027-02" })],
+    assignments: [
+      membership("u16", "exam", {
+        role: "jury",
+        scope: "exam",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-ecsr",
+        cohortId: "p1",
+        examSessionId: "exam-2027-02",
+      }),
+    ],
   },
   {
     id: "u17",
@@ -228,7 +399,17 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "jury",
     access: "active",
     permissions: juryPermissions(),
-    assignments: [membership("u17", "exam-moto", { role: "jury", scope: "exam", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-moto", cohortId: "cohort-nice-moto-2027-03", examSessionId: "exam-cohort-nice-moto-2027-03" })],
+    assignments: [
+      membership("u17", "exam-moto", {
+        role: "jury",
+        scope: "exam",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-moto",
+        cohortId: "cohort-nice-moto-2027-03",
+        examSessionId: "exam-cohort-nice-moto-2027-03",
+      }),
+    ],
   },
   {
     id: "u18",
@@ -238,7 +419,17 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "jury",
     access: "active",
     permissions: juryPermissions(),
-    assignments: [membership("u18", "exam-pl", { role: "jury", scope: "exam", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-pl", cohortId: "cohort-nice-pl-2027-01", examSessionId: "exam-cohort-nice-pl-2027-01" })],
+    assignments: [
+      membership("u18", "exam-pl", {
+        role: "jury",
+        scope: "exam",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-pl",
+        cohortId: "cohort-nice-pl-2027-01",
+        examSessionId: "exam-cohort-nice-pl-2027-01",
+      }),
+    ],
   },
   {
     id: "u19",
@@ -248,11 +439,23 @@ export const ACCESS_ACCOUNTS: AccessAccount[] = [
     role: "jury",
     access: "active",
     permissions: juryPermissions(),
-    assignments: [membership("u19", "exam-bus", { role: "jury", scope: "exam", organizationId: "org-aftral", siteId: "site-aftral-nice", programId: "program-bus", cohortId: "cohort-nice-bus-2027-02", examSessionId: "exam-cohort-nice-bus-2027-02" })],
+    assignments: [
+      membership("u19", "exam-bus", {
+        role: "jury",
+        scope: "exam",
+        organizationId: "org-aftral",
+        siteId: "site-aftral-nice",
+        programId: "program-bus",
+        cohortId: "cohort-nice-bus-2027-02",
+        examSessionId: "exam-cohort-nice-bus-2027-02",
+      }),
+    ],
   },
 ];
 
-export function accessAccountForSession(session: DemoSession | null): AccessAccount | null {
+export function accessAccountForSession(
+  session: DemoSession | null,
+): AccessAccount | null {
   if (!session) return null;
 
   const exact = ACCESS_ACCOUNTS.find(
@@ -268,5 +471,7 @@ export function accessAccountForSession(session: DemoSession | null): AccessAcco
     jury: "u16",
   };
 
-  return ACCESS_ACCOUNTS.find((item) => item.id === fallbackId[session.role]) ?? null;
+  return (
+    ACCESS_ACCOUNTS.find((item) => item.id === fallbackId[session.role]) ?? null
+  );
 }

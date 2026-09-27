@@ -1,6 +1,17 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import type { EvaluationLevel, PedagogicalSheet, SheetStatus } from "../models/sheets.models";
+import type {
+  EvaluationLevel,
+  PedagogicalSheet,
+  SheetStatus,
+} from "../models/sheets.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
@@ -68,7 +79,10 @@ export class SheetsApiStoreService {
 
   readonly currentEvaluator = computed(() => {
     const current = this.session.session();
-    return `${this.text(current?.firstName)} ${this.text(current?.lastName)}`.trim() || this.text(current?.email);
+    return (
+      `${this.text(current?.firstName)} ${this.text(current?.lastName)}`.trim() ||
+      this.text(current?.email)
+    );
   });
 
   constructor() {
@@ -92,10 +106,12 @@ export class SheetsApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (event?.typeKey !== "pedagora.learning.topic-progress.updated.v1") return;
+      if (event?.typeKey !== "pedagora.learning.topic-progress.updated.v1")
+        return;
       untracked(() => {
         const enrollmentId = this.selectedEnrollmentSignal();
-        if (enrollmentId) void this.loadTopics(enrollmentId, ++this.topicsGeneration, false);
+        if (enrollmentId)
+          void this.loadTopics(enrollmentId, ++this.topicsGeneration, false);
       });
     });
   }
@@ -110,45 +126,73 @@ export class SheetsApiStoreService {
   }
 
   studentSummary(enrollmentId: string): SheetStudentSummary {
-    const student = this.students().find((item) => item.id === enrollmentId) ?? {
+    const student = this.students().find(
+      (item) => item.id === enrollmentId,
+    ) ?? {
       id: "",
       firstName: "",
       lastName: "",
     };
-    const sheets = enrollmentId === this.selectedEnrollmentSignal() ? this.topicsSignal() : [];
+    const sheets =
+      enrollmentId === this.selectedEnrollmentSignal()
+        ? this.topicsSignal()
+        : [];
     return {
       ...student,
-      preparedSheets: sheets.filter((item) => item.status !== "not_started").length,
-      presentedSheets: sheets.filter((item) => item.status === "presented" || item.status === "validated" || item.status === "rework").length,
-      validatedSheets: sheets.filter((item) => item.status === "validated").length,
+      preparedSheets: sheets.filter((item) => item.status !== "not_started")
+        .length,
+      presentedSheets: sheets.filter(
+        (item) =>
+          item.status === "presented" ||
+          item.status === "validated" ||
+          item.status === "rework",
+      ).length,
+      validatedSheets: sheets.filter((item) => item.status === "validated")
+        .length,
     };
   }
 
   reworkCount(): number {
-    return this.topicsSignal().filter((item) => item.status === "rework").length;
+    return this.topicsSignal().filter((item) => item.status === "rework")
+      .length;
   }
 
   topicByNumber(number: number): PedagogicalSheet | null {
-    return this.topicsSignal().find((item) => item.number === this.number(number)) ?? null;
+    return (
+      this.topicsSignal().find((item) => item.number === this.number(number)) ??
+      null
+    );
   }
 
-  async saveEvaluation(value: SaveSheetEvaluationValue): Promise<PedagogicalSheet | null> {
+  async saveEvaluation(
+    value: SaveSheetEvaluationValue,
+  ): Promise<PedagogicalSheet | null> {
     const enrollmentId = this.text(value.studentId);
     const current = this.topicByNumber(value.sheetNumber);
-    if (!enrollmentId || enrollmentId !== this.selectedEnrollmentSignal() || !current?.topicId) {
+    if (
+      !enrollmentId ||
+      enrollmentId !== this.selectedEnrollmentSignal() ||
+      !current?.topicId
+    ) {
       this.notifications.error("sheets.real.saveFailed", "/fiches");
       return null;
     }
 
     const evaluationCriteria = Object.entries(value.levels ?? {})
       .filter(([code]) => Boolean(this.text(code)))
-      .map(([code, level]) => ({ code: this.text(code), level: this.evaluationLevel(level) }));
+      .map(([code, level]) => ({
+        code: this.text(code),
+        level: this.evaluationLevel(level),
+      }));
 
     const request: UpdateTopicProgressApiRequest = {
       status: value.decision === "rework" ? "rework" : "validated",
       preparationDate: current.preparationDate || null,
       presentationDate: this.nullableText(value.presentationDate),
-      presentationDurationMinutes: this.number(value.durationMinutes) > 0 ? this.number(value.durationMinutes) : null,
+      presentationDurationMinutes:
+        this.number(value.durationMinutes) > 0
+          ? this.number(value.durationMinutes)
+          : null,
       evaluatorDisplayName: null,
       positivePoints: this.nullableText(value.positivePoints),
       improvements: this.nullableText(value.improvements),
@@ -158,10 +202,12 @@ export class SheetsApiStoreService {
     };
 
     try {
-      const updated = await firstValueFrom(this.api.updateTopic(enrollmentId, current.topicId, request));
+      const updated = await firstValueFrom(
+        this.api.updateTopic(enrollmentId, current.topicId, request),
+      );
       const mapped = this.mapTopic(updated);
       this.topicsSignal.update((items) =>
-        items.map((item) => item.topicId === mapped.topicId ? mapped : item),
+        items.map((item) => (item.topicId === mapped.topicId ? mapped : item)),
       );
       this.topicsError.set(false);
       return mapped;
@@ -171,7 +217,11 @@ export class SheetsApiStoreService {
     }
   }
 
-  private async loadLearners(cohortApiId: string, selfOnly: boolean, generation: number): Promise<void> {
+  private async loadLearners(
+    cohortApiId: string,
+    selfOnly: boolean,
+    generation: number,
+  ): Promise<void> {
     this.loading.set(true);
     try {
       const rows = selfOnly
@@ -179,11 +229,17 @@ export class SheetsApiStoreService {
         : await firstValueFrom(this.api.cohortLearners(cohortApiId));
       if (generation !== this.contextGeneration) return;
 
-      this.learnersSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalizeLearner(row)));
+      this.learnersSignal.set(
+        (Array.isArray(rows) ? rows : []).map((row) =>
+          this.normalizeLearner(row),
+        ),
+      );
       this.loadError.set(false);
 
       const current = this.selectedEnrollmentSignal();
-      const selected = this.learnersSignal().some((row) => row.enrollmentId === current)
+      const selected = this.learnersSignal().some(
+        (row) => row.enrollmentId === current,
+      )
         ? current
         : (this.learnersSignal()[0]?.enrollmentId ?? "");
       this.selectedEnrollmentSignal.set(selected);
@@ -200,18 +256,32 @@ export class SheetsApiStoreService {
     }
   }
 
-  private async loadTopics(enrollmentId: string, generation: number, notify = true): Promise<void> {
+  private async loadTopics(
+    enrollmentId: string,
+    generation: number,
+    notify = true,
+  ): Promise<void> {
     this.topicsLoading.set(true);
     try {
       const rows = await firstValueFrom(this.api.topics(enrollmentId));
-      if (generation !== this.topicsGeneration || enrollmentId !== this.selectedEnrollmentSignal()) return;
-      this.topicsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.mapTopic(row)));
+      if (
+        generation !== this.topicsGeneration ||
+        enrollmentId !== this.selectedEnrollmentSignal()
+      )
+        return;
+      this.topicsSignal.set(
+        (Array.isArray(rows) ? rows : []).map((row) => this.mapTopic(row)),
+      );
       this.topicsError.set(false);
     } catch {
-      if (generation === this.topicsGeneration && enrollmentId === this.selectedEnrollmentSignal()) {
+      if (
+        generation === this.topicsGeneration &&
+        enrollmentId === this.selectedEnrollmentSignal()
+      ) {
         this.topicsSignal.set([]);
         this.topicsError.set(true);
-        if (notify) this.notifications.error("sheets.real.topicsFailed", "/fiches");
+        if (notify)
+          this.notifications.error("sheets.real.topicsFailed", "/fiches");
       }
     } finally {
       if (generation === this.topicsGeneration) this.topicsLoading.set(false);
@@ -235,7 +305,9 @@ export class SheetsApiStoreService {
 
   private mapTopic(row: TopicProgressApi): PedagogicalSheet {
     const levels: Record<string, EvaluationLevel> = {};
-    for (const criterion of Array.isArray(row?.evaluationCriteria) ? row.evaluationCriteria : []) {
+    for (const criterion of Array.isArray(row?.evaluationCriteria)
+      ? row.evaluationCriteria
+      : []) {
       const code = this.text(criterion?.code);
       if (code) levels[code] = this.evaluationLevel(criterion?.level);
     }
@@ -260,7 +332,11 @@ export class SheetsApiStoreService {
 
   private status(value: unknown): SheetStatus {
     const status = this.text(value).toLowerCase();
-    return status === "in_progress" || status === "ready" || status === "presented" || status === "validated" || status === "rework"
+    return status === "in_progress" ||
+      status === "ready" ||
+      status === "presented" ||
+      status === "validated" ||
+      status === "rework"
       ? status
       : "not_started";
   }

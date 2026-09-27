@@ -6,13 +6,23 @@ import {
   inject,
   signal,
 } from "@angular/core";
-import { SkillsApiStoreService, type SkillStudentOption } from "../../core/api-data/skills-api-store.service";
+import {
+  SkillsApiStoreService,
+  type SkillStudentOption,
+} from "../../core/api-data/skills-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import type { SkillCriterionLevel, SkillDefinition } from "../../core/models/skills.models";
+import type {
+  SkillCriterionLevel,
+  SkillDefinition,
+} from "../../core/models/skills.models";
 import { SessionService } from "../../core/session/session.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
-const EMPTY_STUDENT: SkillStudentOption = { id: "", firstName: "", lastName: "" };
+const EMPTY_STUDENT: SkillStudentOption = {
+  id: "",
+  firstName: "",
+  lastName: "",
+};
 const EMPTY_DEFINITION: SkillDefinition = {
   definitionId: "",
   code: "",
@@ -30,7 +40,9 @@ export class SkillsComponent {
   readonly sessionService = inject(SessionService);
   readonly store = inject(SkillsApiStoreService);
   readonly students = this.store.students;
-  readonly isStudent = computed(() => this.sessionService.role() === "stagiaire");
+  readonly isStudent = computed(
+    () => this.sessionService.role() === "stagiaire",
+  );
   readonly selectedStudentId = signal("");
   readonly selectedSkill = signal("");
 
@@ -51,18 +63,27 @@ export class SkillsComponent {
 
     effect(() => {
       const definitions = this.definitions();
-      if (!definitions.some((definition) => definition.code === this.selectedSkill())) {
+      if (
+        !definitions.some(
+          (definition) => definition.code === this.selectedSkill(),
+        )
+      ) {
         this.selectedSkill.set(definitions[0]?.code ?? "");
       }
     });
   }
 
   readonly selectedStudent = computed(
-    () => this.students().find((student) => student.id === this.selectedStudentId()) ?? EMPTY_STUDENT,
+    () =>
+      this.students().find(
+        (student) => student.id === this.selectedStudentId(),
+      ) ?? EMPTY_STUDENT,
   );
 
   readonly selectedDefinition = computed(
-    () => this.definitions().find((item) => item.code === this.selectedSkill()) ?? EMPTY_DEFINITION,
+    () =>
+      this.definitions().find((item) => item.code === this.selectedSkill()) ??
+      EMPTY_DEFINITION,
   );
 
   readonly linkedSessions = computed(() =>

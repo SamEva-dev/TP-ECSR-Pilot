@@ -6,7 +6,8 @@ export type PedagogicalSessionType =
   | "catchup"
   | "event";
 
-export type SessionModality = "onsite" | "remote-live" | "remote-async" | "practical";
+export type SessionModality =
+  "onsite" | "remote-live" | "remote-async" | "practical";
 
 export interface ProgrammedSession {
   id: string;

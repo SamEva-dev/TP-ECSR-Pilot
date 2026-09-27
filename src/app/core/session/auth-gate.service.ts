@@ -29,7 +29,6 @@ export interface AuthGateLoginResponse {
   passwordChangeBeforeUtc: string | null;
 }
 
-
 export interface AuthGateTokenResponse {
   accessToken: string;
   refreshToken: string;
@@ -109,7 +108,6 @@ export class AuthGateService {
         }),
       );
   }
-
 
   verifyMfa(
     request: AuthGateVerifyMfaRequest,

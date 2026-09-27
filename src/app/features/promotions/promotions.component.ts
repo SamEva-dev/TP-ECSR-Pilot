@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { CohortApiStoreService } from "../../core/api-data/cohort-api-store.service";
 import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
@@ -16,7 +22,12 @@ type PromotionStatusFilter = "all" | WorkspaceCohort["status"];
 
 @Component({
   selector: "app-promotions",
-  imports: [RouterLink, TranslatePipe, ProgressBarComponent, CreatePromotionDrawerComponent],
+  imports: [
+    RouterLink,
+    TranslatePipe,
+    ProgressBarComponent,
+    CreatePromotionDrawerComponent,
+  ],
   templateUrl: "./promotions.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,14 +45,22 @@ export class PromotionsComponent {
 
   readonly filteredPromotions = computed(() => {
     const filter = this.statusFilter();
-    return this.siteProgramPromotions().filter((item) => filter === "all" || item.status === filter);
+    return this.siteProgramPromotions().filter(
+      (item) => filter === "all" || item.status === filter,
+    );
   });
 
   readonly counts = computed(() => ({
     all: this.siteProgramPromotions().length,
-    active: this.siteProgramPromotions().filter((item) => item.status === "active").length,
-    planned: this.siteProgramPromotions().filter((item) => item.status === "planned").length,
-    completed: this.siteProgramPromotions().filter((item) => item.status === "completed").length,
+    active: this.siteProgramPromotions().filter(
+      (item) => item.status === "active",
+    ).length,
+    planned: this.siteProgramPromotions().filter(
+      (item) => item.status === "planned",
+    ).length,
+    completed: this.siteProgramPromotions().filter(
+      (item) => item.status === "completed",
+    ).length,
   }));
 
   readonly activeStudents = computed(() =>
@@ -53,9 +72,15 @@ export class PromotionsComponent {
   readonly referentialLabel = computed(() => {
     const cohort = this.workspace.cohort();
     if (!cohort) return "";
-    return this.referentials.items().find(
-      (item) => item.apiId === cohort.referentialVersionId || item.id === cohort.referentialVersionId,
-    )?.version ?? "";
+    return (
+      this.referentials
+        .items()
+        .find(
+          (item) =>
+            item.apiId === cohort.referentialVersionId ||
+            item.id === cohort.referentialVersionId,
+        )?.version ?? ""
+    );
   });
 
   openCreateDrawer(): void {
@@ -71,7 +96,9 @@ export class PromotionsComponent {
   }
 
   selectPromotion(item: ContextualPromotionSummary): void {
-    const cohort = this.workspace.cohorts().find((candidate) => candidate.id === item.id);
+    const cohort = this.workspace
+      .cohorts()
+      .find((candidate) => candidate.id === item.id);
     if (cohort) this.workspace.selectCohort(cohort.id);
   }
 

@@ -1,8 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { SiteApiStoreService } from "../../core/api-data/site-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../core/models/sites.models";
+import type {
+  SiteFormValue,
+  SiteOperationalStatus,
+  SiteProfile,
+} from "../../core/models/sites.models";
 import { ApplicationNotificationService } from "../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
@@ -24,35 +35,47 @@ export class SitesComponent {
   readonly editingSite = signal<SiteProfile | null>(null);
 
   readonly organizationSites = computed(() =>
-    this.store.sites().filter((site) => site.organizationId === (this.workspace.organization()?.id ?? "")),
+    this.store
+      .sites()
+      .filter(
+        (site) =>
+          site.organizationId === (this.workspace.organization()?.id ?? ""),
+      ),
   );
 
   readonly filteredSites = computed(() => {
     const query = this.query().trim().toLocaleLowerCase("fr-FR");
     const status = this.status();
     return this.organizationSites().filter((site) => {
-      const matchesQuery = !query || [site.name, site.city, site.code, site.manager]
-        .map((value) => value ?? "")
-        .some((value) => value.toLocaleLowerCase("fr-FR").includes(query));
+      const matchesQuery =
+        !query ||
+        [site.name, site.city, site.code, site.manager]
+          .map((value) => value ?? "")
+          .some((value) => value.toLocaleLowerCase("fr-FR").includes(query));
       const matchesStatus = status === "all" || site.status === status;
       return matchesQuery && matchesStatus;
     });
   });
 
-  readonly totals = computed(() => this.organizationSites().reduce(
-    (acc, site) => ({
-      students: acc.students + (site.students ?? 0),
-      trainers: acc.trainers + (site.trainers ?? 0),
-      programs: acc.programs + (site.programs ?? 0),
-      alerts: acc.alerts + (site.alerts ?? 0),
-    }),
-    { students: 0, trainers: 0, programs: 0, alerts: 0 },
-  ));
+  readonly totals = computed(() =>
+    this.organizationSites().reduce(
+      (acc, site) => ({
+        students: acc.students + (site.students ?? 0),
+        trainers: acc.trainers + (site.trainers ?? 0),
+        programs: acc.programs + (site.programs ?? 0),
+        alerts: acc.alerts + (site.alerts ?? 0),
+      }),
+      { students: 0, trainers: 0, programs: 0, alerts: 0 },
+    ),
+  );
 
   constructor() {
     effect(() => {
       if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", "/etablissements");
+        this.notifications.error(
+          "sites.real.workspaceError",
+          "/etablissements",
+        );
     });
   }
 

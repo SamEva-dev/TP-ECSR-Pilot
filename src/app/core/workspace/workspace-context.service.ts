@@ -447,12 +447,11 @@ export class WorkspaceContextService {
       (item) =>
         item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
-    if (!cohort) return;
     this.commit({
       organizationId: organization.id,
       siteId: site.id,
       programId: offering.programId,
-      cohortId: cohort.id,
+      cohortId: cohort?.id ?? "",
     });
   }
 
@@ -468,12 +467,11 @@ export class WorkspaceContextService {
       (item) =>
         item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
-    if (!cohort) return;
     this.commit({
       organizationId: site.organizationId,
       siteId: site.id,
       programId: offering.programId,
-      cohortId: cohort.id,
+      cohortId: cohort?.id ?? "",
     });
   }
 
@@ -485,8 +483,11 @@ export class WorkspaceContextService {
       (item) =>
         item.offeringId === offering.id && this.canAccessCohort(item.id),
     );
-    if (!cohort) return;
-    this.commit({ ...this.selectionSignal(), programId, cohortId: cohort.id });
+    this.commit({
+      ...this.selectionSignal(),
+      programId,
+      cohortId: cohort?.id ?? "",
+    });
   }
 
   selectCohort(cohortId: string): void {
@@ -568,7 +569,7 @@ export class WorkspaceContextService {
         item.organizationId === selection.organizationId,
     );
     const offering = this.findOffering(selection.siteId, selection.programId);
-    const cohort = this.cohortsSignal().some(
+    const cohort = !selection.cohortId || this.cohortsSignal().some(
       (item) =>
         item.id === selection.cohortId && item.offeringId === offering?.id,
     );
@@ -580,7 +581,7 @@ export class WorkspaceContextService {
       this.canAccessOrganization(selection.organizationId) &&
       this.canAccessSite(selection.siteId) &&
       this.canAccessOffering(offering) &&
-      this.canAccessCohort(selection.cohortId),
+      (!selection.cohortId || this.canAccessCohort(selection.cohortId)),
     );
   }
 

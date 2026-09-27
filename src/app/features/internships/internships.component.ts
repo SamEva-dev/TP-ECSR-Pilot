@@ -91,7 +91,8 @@ export class InternshipsComponent {
   progress(period: InternshipPeriod): number {
     if (!this.number(period.plannedHours)) return 0;
     return Math.round(
-      (this.number(period.completedHours) / this.number(period.plannedHours)) * 100,
+      (this.number(period.completedHours) / this.number(period.plannedHours)) *
+        100,
     );
   }
 

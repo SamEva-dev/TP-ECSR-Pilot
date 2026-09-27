@@ -6,8 +6,14 @@ import { ApplicationNotificationService } from "../notifications/application-not
 import { ReportingApiService } from "../reporting/reporting-api.service";
 import type { CohortLearnerDashboard } from "../reporting/reporting.models";
 import { RealtimeService } from "../realtime/realtime.service";
-import { StudentProfileApiService, type LearnerProfileApi } from "../students/student-profile-api.service";
-import { TrainingCatalogApiService, type LearnerResponse } from "../training/training-catalog-api.service";
+import {
+  StudentProfileApiService,
+  type LearnerProfileApi,
+} from "../students/student-profile-api.service";
+import {
+  TrainingCatalogApiService,
+  type LearnerResponse,
+} from "../training/training-catalog-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
 @Injectable({ providedIn: "root" })
@@ -38,7 +44,8 @@ export class StudentApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.training\.enrollment\./.test(event.typeKey)) return;
+      if (!event || !/^pedagora\.training\.enrollment\./.test(event.typeKey))
+        return;
       untracked(() => {
         if (this.workspace.cohort()?.apiId) void this.reload();
       });
@@ -57,19 +64,28 @@ export class StudentApiStoreService {
     const request = ++this.request;
     this.loading.set(true);
     try {
-      const rows = await firstValueFrom(this.profiles.cohortLearners(cohortApiId));
+      const rows = await firstValueFrom(
+        this.profiles.cohortLearners(cohortApiId),
+      );
       let summaries: CohortLearnerDashboard[] = [];
       try {
-        const result = await firstValueFrom(this.reporting.cohortLearners(cohortApiId));
+        const result = await firstValueFrom(
+          this.reporting.cohortLearners(cohortApiId),
+        );
         summaries = Array.isArray(result) ? result : [];
       } catch {
         this.notifications.error("students.api.metricsFailed", "/stagiaires");
       }
-      if (generation !== this.generation || request !== this.request) return false;
-      const summaryByEnrollment = new Map(summaries.map((item) => [item.enrollmentId, item]));
-      this.itemsSignal.set((Array.isArray(rows) ? rows : []).map((row) =>
-        this.map(row, summaryByEnrollment.get(this.text(row?.enrollmentId))),
-      ));
+      if (generation !== this.generation || request !== this.request)
+        return false;
+      const summaryByEnrollment = new Map(
+        summaries.map((item) => [item.enrollmentId, item]),
+      );
+      this.itemsSignal.set(
+        (Array.isArray(rows) ? rows : []).map((row) =>
+          this.map(row, summaryByEnrollment.get(this.text(row?.enrollmentId))),
+        ),
+      );
       this.loadError.set(false);
       return true;
     } catch {
@@ -80,7 +96,8 @@ export class StudentApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
@@ -93,7 +110,9 @@ export class StudentApiStoreService {
     promotionId: string;
     startDate: string;
   }): Promise<StudentDirectoryItem | null> {
-    const cohort = this.workspace.cohorts().find((item) => item.id === payload.promotionId);
+    const cohort = this.workspace
+      .cohorts()
+      .find((item) => item.id === payload.promotionId);
     if (!cohort?.apiId) {
       this.notifications.error("students.api.invalidContext", "/stagiaires");
       return null;
@@ -114,7 +133,10 @@ export class StudentApiStoreService {
       });
 
       const mapped = this.map(created);
-      this.itemsSignal.update((items) => [mapped, ...items.filter((item) => item.enrollmentId !== mapped.enrollmentId)]);
+      this.itemsSignal.update((items) => [
+        mapped,
+        ...items.filter((item) => item.enrollmentId !== mapped.enrollmentId),
+      ]);
 
       await this.workspace.reload();
       if (this.workspace.remoteWorkspaceError())
@@ -127,10 +149,15 @@ export class StudentApiStoreService {
     }
   }
 
-  private map(row: LearnerProfileApi | LearnerResponse, summary?: CohortLearnerDashboard): StudentDirectoryItem {
+  private map(
+    row: LearnerProfileApi | LearnerResponse,
+    summary?: CohortLearnerDashboard,
+  ): StudentDirectoryItem {
     const enrollmentStatus = this.enrollmentStatus(row?.enrollmentStatus);
-    const completedHours = Math.round(this.number(summary?.completedMinutes) / 60 * 10) / 10;
-    const catchupHours = Math.round(this.number(summary?.catchupMinutes) / 60 * 10) / 10;
+    const completedHours =
+      Math.round((this.number(summary?.completedMinutes) / 60) * 10) / 10;
+    const catchupHours =
+      Math.round((this.number(summary?.catchupMinutes) / 60) * 10) / 10;
     return {
       id: this.text(row?.learnerProfileId),
       enrollmentId: this.text(row?.enrollmentId),
@@ -149,9 +176,15 @@ export class StudentApiStoreService {
     };
   }
 
-  private enrollmentStatus(value: unknown): NonNullable<StudentDirectoryItem["enrollmentStatus"]> {
+  private enrollmentStatus(
+    value: unknown,
+  ): NonNullable<StudentDirectoryItem["enrollmentStatus"]> {
     const normalized = this.text(value).toLowerCase();
-    return normalized === "pending" || normalized === "suspended" || normalized === "completed" || normalized === "withdrawn" || normalized === "cancelled"
+    return normalized === "pending" ||
+      normalized === "suspended" ||
+      normalized === "completed" ||
+      normalized === "withdrawn" ||
+      normalized === "cancelled"
       ? normalized
       : "active";
   }
@@ -160,7 +193,8 @@ export class StudentApiStoreService {
     enrollmentStatus: NonNullable<StudentDirectoryItem["enrollmentStatus"]>,
     catchupHours = 0,
   ): StudentStatus {
-    if (enrollmentStatus !== "active" && enrollmentStatus !== "completed") return "warning";
+    if (enrollmentStatus !== "active" && enrollmentStatus !== "completed")
+      return "warning";
     if (catchupHours > 10) return "late";
     if (catchupHours > 0) return "warning";
     return "good";

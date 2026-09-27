@@ -1,4 +1,11 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import type { AttendanceStudent } from "../models/attendance.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
@@ -84,7 +91,8 @@ export class AttendanceApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.training\.attendance\./.test(event.typeKey)) return;
+      if (!event || !/^pedagora\.training\.attendance\./.test(event.typeKey))
+        return;
       untracked(() => {
         const sessionId = this.selectedSession()?.id ?? "";
         if (sessionId) void this.load(sessionId, this.generation, false);
@@ -124,7 +132,10 @@ export class AttendanceApiStoreService {
           const departureAtUtc = student.departure
             ? parisInstant(localDate, student.departure)
             : null;
-          if ((student.arrival && !arrivalAtUtc) || (student.departure && !departureAtUtc)) {
+          if (
+            (student.arrival && !arrivalAtUtc) ||
+            (student.departure && !departureAtUtc)
+          ) {
             throw new Error("ATTENDANCE_TIME_INVALID");
           }
           return {
@@ -132,7 +143,10 @@ export class AttendanceApiStoreService {
             status: student.status as "present" | "late" | "absent" | "excused",
             arrivalAtUtc,
             departureAtUtc,
-            presentMinutes: Math.max(0, Math.round(this.number(student.duration) * 60)),
+            presentMinutes: Math.max(
+              0,
+              Math.round(this.number(student.duration) * 60),
+            ),
             addToCatchup: Boolean(student.addToCatchup),
             comment: this.nullableText(student.comment),
           };
@@ -148,19 +162,31 @@ export class AttendanceApiStoreService {
     }
   }
 
-  private async load(sessionId: string, generation: number, notify = true): Promise<boolean> {
+  private async load(
+    sessionId: string,
+    generation: number,
+    notify = true,
+  ): Promise<boolean> {
     this.loading.set(true);
     try {
       const sheet = await this.api.getAttendance(sessionId);
-      if (generation !== this.generation || sessionId !== (this.selectedSession()?.id ?? "")) return false;
+      if (
+        generation !== this.generation ||
+        sessionId !== (this.selectedSession()?.id ?? "")
+      )
+        return false;
       this.sheetSignal.set(this.normalizeSheet(sheet));
       this.loadError.set(false);
       return true;
     } catch {
-      if (generation === this.generation && sessionId === (this.selectedSession()?.id ?? "")) {
+      if (
+        generation === this.generation &&
+        sessionId === (this.selectedSession()?.id ?? "")
+      ) {
         this.sheetSignal.set(null);
         this.loadError.set(true);
-        if (notify) this.notifications.error("attendance.real.failed", "/presences");
+        if (notify)
+          this.notifications.error("attendance.real.failed", "/presences");
       }
       return false;
     } finally {
@@ -170,7 +196,9 @@ export class AttendanceApiStoreService {
 
   private pickSession(rows: TrainingSessionApi[]): TrainingSessionApi | null {
     const candidates = (Array.isArray(rows) ? rows : [])
-      .filter((row) => row?.status !== "cancelled" && Boolean(this.text(row?.id)))
+      .filter(
+        (row) => row?.status !== "cancelled" && Boolean(this.text(row?.id)),
+      )
       .slice();
     if (!candidates.length) return null;
 
@@ -180,10 +208,16 @@ export class AttendanceApiStoreService {
       .sort((a, b) => this.time(b.startsAtUtc) - this.time(a.startsAtUtc));
     if (started.length) return started[0] ?? null;
 
-    return candidates.sort((a, b) => this.time(a.startsAtUtc) - this.time(b.startsAtUtc))[0] ?? null;
+    return (
+      candidates.sort(
+        (a, b) => this.time(a.startsAtUtc) - this.time(b.startsAtUtc),
+      )[0] ?? null
+    );
   }
 
-  private normalizeSheet(sheet: AttendanceSheetApi | null | undefined): AttendanceSheetApi {
+  private normalizeSheet(
+    sheet: AttendanceSheetApi | null | undefined,
+  ): AttendanceSheetApi {
     return {
       id: this.text(sheet?.id),
       sessionId: this.text(sheet?.sessionId),
@@ -234,7 +268,10 @@ export class AttendanceApiStoreService {
   }
 
   private attendanceStatus(value: unknown): AttendanceStudent["status"] {
-    return value === "present" || value === "late" || value === "absent" || value === "excused"
+    return value === "present" ||
+      value === "late" ||
+      value === "absent" ||
+      value === "excused"
       ? value
       : "pending";
   }
@@ -260,7 +297,9 @@ export class AttendanceApiStoreService {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-      }).formatToParts(date).map((part) => [part.type, part.value]),
+      })
+        .formatToParts(date)
+        .map((part) => [part.type, part.value]),
     );
     return `${parts["year"] ?? ""}-${parts["month"] ?? ""}-${parts["day"] ?? ""}`;
   }

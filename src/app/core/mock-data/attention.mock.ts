@@ -19,7 +19,12 @@ export interface AttentionMockItem {
 export const ATTENTION_MOCK_ITEMS: AttentionMockItem[] = [
   {
     id: "direction-remote-work",
-    audiences: ["platform_admin", "organization_admin", "organization_direction", "site_direction"],
+    audiences: [
+      "platform_admin",
+      "organization_admin",
+      "organization_direction",
+      "site_direction",
+    ],
     titleKey: "attention.items.remoteWork.title",
     detailKey: "attention.items.remoteWork.detail",
     level: "warning",
@@ -29,7 +34,13 @@ export const ATTENTION_MOCK_ITEMS: AttentionMockItem[] = [
   },
   {
     id: "direction-certification",
-    audiences: ["platform_admin", "organization_admin", "organization_direction", "site_direction", "pedagogical_manager"],
+    audiences: [
+      "platform_admin",
+      "organization_admin",
+      "organization_direction",
+      "site_direction",
+      "pedagogical_manager",
+    ],
     titleKey: "attention.items.certification.title",
     detailKey: "attention.items.certification.detail",
     level: "danger",

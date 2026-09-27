@@ -29,9 +29,13 @@ export class OrganizationDashboardComponent {
 
   openProgram(programId: string): void {
     if (!programId) return;
-    const accessibleSite = this.workspace.sites().find((site) =>
-      this.workspace.sitePrograms(site.id).some((program) => program.id === programId),
-    );
+    const accessibleSite = this.workspace
+      .sites()
+      .find((site) =>
+        this.workspace
+          .sitePrograms(site.id)
+          .some((program) => program.id === programId),
+      );
     if (!accessibleSite) return;
     this.workspace.selectSite(accessibleSite.id);
     this.workspace.selectProgram(programId);
@@ -51,6 +55,8 @@ export class OrganizationDashboardComponent {
   }
 
   number(value: number): string {
-    return new Intl.NumberFormat("fr-FR").format(Number.isFinite(value) ? value : 0);
+    return new Intl.NumberFormat("fr-FR").format(
+      Number.isFinite(value) ? value : 0,
+    );
   }
 }

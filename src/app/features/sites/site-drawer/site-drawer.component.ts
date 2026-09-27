@@ -1,7 +1,22 @@
-import { ChangeDetectionStrategy, Component, effect, input, output } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+} from "@angular/core";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../../core/models/sites.models";
+import type {
+  SiteFormValue,
+  SiteOperationalStatus,
+  SiteProfile,
+} from "../../../core/models/sites.models";
 
 @Component({
   selector: "app-site-drawer",
@@ -16,15 +31,35 @@ export class SiteDrawerComponent {
   readonly saved = output<SiteFormValue>();
 
   readonly form = new FormGroup({
-    code: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    city: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    address: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    postalCode: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    code: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    name: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    city: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    address: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    postalCode: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     phone: new FormControl("", { nonNullable: true }),
-    email: new FormControl("", { nonNullable: true, validators: [Validators.email] }),
+    email: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.email],
+    }),
     manager: new FormControl("", { nonNullable: true }),
-    status: new FormControl<SiteOperationalStatus>("active", { nonNullable: true }),
+    status: new FormControl<SiteOperationalStatus>("active", {
+      nonNullable: true,
+    }),
   });
 
   constructor() {

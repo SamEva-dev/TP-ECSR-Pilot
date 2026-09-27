@@ -45,7 +45,9 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   readonly evaluationSaved = output<SheetEvaluationSavedEvent>();
 
   readonly store = inject(SheetsApiStoreService);
-  get students() { return this.store.students(); }
+  get students() {
+    return this.store.students();
+  }
   get evaluators() {
     const name = this.store.currentEvaluator();
     return [name];
@@ -72,21 +74,29 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   private hydratedSelection = "";
 
   readonly selectedStudent = computed(
-    () => this.students.find((student) => student.id === this.studentId()) ?? {
-      id: "",
-      firstName: "",
-      lastName: "",
-    },
+    () =>
+      this.students.find((student) => student.id === this.studentId()) ?? {
+        id: "",
+        firstName: "",
+        lastName: "",
+      },
   );
 
   readonly acquiredCount = computed(
-    () => Object.values(this.evaluation()).filter((level) => level === "acquired").length,
+    () =>
+      Object.values(this.evaluation()).filter((level) => level === "acquired")
+        .length,
   );
   readonly inProgressCount = computed(
-    () => Object.values(this.evaluation()).filter((level) => level === "in_progress").length,
+    () =>
+      Object.values(this.evaluation()).filter(
+        (level) => level === "in_progress",
+      ).length,
   );
   readonly reviewCount = computed(
-    () => Object.values(this.evaluation()).filter((level) => level === "review").length,
+    () =>
+      Object.values(this.evaluation()).filter((level) => level === "review")
+        .length,
   );
 
   constructor() {
@@ -105,11 +115,17 @@ export class EvaluateSheetDrawerComponent implements OnInit {
     effect(() => {
       const available = this.sheets();
       const currentNumber = this.sheetNumber();
-      const selectedNumber = available.some((sheet) => sheet.number === currentNumber)
+      const selectedNumber = available.some(
+        (sheet) => sheet.number === currentNumber,
+      )
         ? currentNumber
-        : (available.find((sheet) => sheet.number === 32)?.number ?? available[0]?.number ?? 0);
-      if (selectedNumber !== currentNumber) this.sheetNumber.set(selectedNumber);
-      const selectedSheet = available.find((sheet) => sheet.number === selectedNumber) ?? null;
+        : (available.find((sheet) => sheet.number === 32)?.number ??
+          available[0]?.number ??
+          0);
+      if (selectedNumber !== currentNumber)
+        this.sheetNumber.set(selectedNumber);
+      const selectedSheet =
+        available.find((sheet) => sheet.number === selectedNumber) ?? null;
       const selectionKey = `${this.studentId()}|${selectedSheet?.topicId ?? ""}`;
       if (selectionKey !== this.hydratedSelection) {
         this.hydratedSelection = selectionKey;
@@ -137,7 +153,9 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   }
 
   updateSheet(event: Event): void {
-    this.sheetNumber.set(Number((event.target as HTMLSelectElement).value || 0));
+    this.sheetNumber.set(
+      Number((event.target as HTMLSelectElement).value || 0),
+    );
     this.saved.set(false);
   }
 
@@ -158,7 +176,8 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   }
 
   updateText(
-    target: "positivePoints" | "improvements" | "generalComment" | "nextObjective",
+    target:
+      "positivePoints" | "improvements" | "generalComment" | "nextObjective",
     event: Event,
   ): void {
     const value = (event.target as HTMLTextAreaElement).value ?? "";
@@ -248,9 +267,14 @@ export class EvaluateSheetDrawerComponent implements OnInit {
     this.nextObjective.set(sheet?.nextObjective ?? "");
     this.decision.set(sheet?.status === "rework" ? "rework" : "validated");
     const existing = sheet?.evaluationLevels ?? {};
-    this.evaluation.set(Object.fromEntries(
-      this.criteria.map((criterion) => [criterion, existing[criterion] ?? "in_progress"]),
-    ) as Record<string, EvaluationLevel>);
+    this.evaluation.set(
+      Object.fromEntries(
+        this.criteria.map((criterion) => [
+          criterion,
+          existing[criterion] ?? "in_progress",
+        ]),
+      ) as Record<string, EvaluationLevel>,
+    );
     this.saved.set(false);
   }
 

@@ -1,4 +1,11 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import type {
   StatisticsCompetencyRow,
@@ -77,37 +84,95 @@ export class StatisticsApiStoreService {
     this.bundlesSignal().map((bundle) => ({
       id: this.text(bundle.cohort.id),
       name: this.text(bundle.cohort.name),
-      progress: this.average(bundle.learners.map((learner) => this.number(learner.averageCompetencyProgress))),
-      completedHours: this.hours(bundle.learners.reduce((sum, learner) => sum + this.number(learner.completedMinutes), 0)),
-      plannedHours: this.hours(bundle.learners.reduce((sum, learner) => sum + this.number(learner.plannedMinutes), 0)),
+      progress: this.average(
+        bundle.learners.map((learner) =>
+          this.number(learner.averageCompetencyProgress),
+        ),
+      ),
+      completedHours: this.hours(
+        bundle.learners.reduce(
+          (sum, learner) => sum + this.number(learner.completedMinutes),
+          0,
+        ),
+      ),
+      plannedHours: this.hours(
+        bundle.learners.reduce(
+          (sum, learner) => sum + this.number(learner.plannedMinutes),
+          0,
+        ),
+      ),
       attendance: this.number(bundle.dashboard?.attendanceRate),
-      catchupHours: this.hours(bundle.learners.reduce((sum, learner) => sum + this.number(learner.catchupMinutes), 0)),
+      catchupHours: this.hours(
+        bundle.learners.reduce(
+          (sum, learner) => sum + this.number(learner.catchupMinutes),
+          0,
+        ),
+      ),
     })),
   );
 
-  private readonly allLearners = computed(() => this.bundlesSignal().flatMap((bundle) => bundle.learners));
+  private readonly allLearners = computed(() =>
+    this.bundlesSignal().flatMap((bundle) => bundle.learners),
+  );
 
-  readonly centerCompetencies = computed(() => this.competencies(this.allLearners()));
+  readonly centerCompetencies = computed(() =>
+    this.competencies(this.allLearners()),
+  );
   readonly centerRanking = computed(() => this.ranking(this.allLearners()));
   readonly centerStatuses = computed(() => this.statusRows(this.allLearners()));
   readonly centerSheets = computed(() => this.sheetSummary(this.allLearners()));
-  readonly directionAverageProgress = computed(() => this.average(this.allLearners().map((row) => this.number(row.averageCompetencyProgress))));
-  readonly directionAttendance = computed(() => this.attendance(this.allLearners()));
-  readonly directionCompletedHours = computed(() => this.hours(this.allLearners().reduce((sum, row) => sum + this.number(row.completedMinutes), 0)));
-  readonly directionCatchupHours = computed(() => this.hours(this.allLearners().reduce((sum, row) => sum + this.number(row.catchupMinutes), 0)));
+  readonly directionAverageProgress = computed(() =>
+    this.average(
+      this.allLearners().map((row) =>
+        this.number(row.averageCompetencyProgress),
+      ),
+    ),
+  );
+  readonly directionAttendance = computed(() =>
+    this.attendance(this.allLearners()),
+  );
+  readonly directionCompletedHours = computed(() =>
+    this.hours(
+      this.allLearners().reduce(
+        (sum, row) => sum + this.number(row.completedMinutes),
+        0,
+      ),
+    ),
+  );
+  readonly directionCatchupHours = computed(() =>
+    this.hours(
+      this.allLearners().reduce(
+        (sum, row) => sum + this.number(row.catchupMinutes),
+        0,
+      ),
+    ),
+  );
 
   private readonly selectedLearners = computed(() => {
     const selectedApiId = this.text(this.workspace.cohort()?.apiId);
-    return this.bundlesSignal().find((bundle) => bundle.cohort.apiId === selectedApiId)?.learners ?? [];
+    return (
+      this.bundlesSignal().find(
+        (bundle) => bundle.cohort.apiId === selectedApiId,
+      )?.learners ?? []
+    );
   });
 
   private readonly trainerSessions = computed(() => {
     const current = this.session.session();
     const userId = this.text(current?.userId).toLowerCase();
-    const displayName = [this.text(current?.firstName), this.text(current?.lastName)].filter(Boolean).join(" ").trim().toLowerCase();
+    const displayName = [
+      this.text(current?.firstName),
+      this.text(current?.lastName),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim()
+      .toLowerCase();
     return this.sessions.apiSessions().filter((row) => {
       const trainerId = this.text(row.trainerAuthGateUserId).toLowerCase();
-      const trainerName = this.text(row.trainerDisplayName).trim().toLowerCase();
+      const trainerName = this.text(row.trainerDisplayName)
+        .trim()
+        .toLowerCase();
       if (trainerId) return !!userId && trainerId === userId;
       return !!displayName && trainerName === displayName;
     });
@@ -117,20 +182,47 @@ export class StatisticsApiStoreService {
     const learners = this.selectedLearners();
     const sessions = this.trainerSessions();
     if (!sessions.length) return [];
-    if (sessions.some((row) => row.audienceMode === "whole-cohort")) return learners;
-    const allowed = new Set(sessions.flatMap((row) => Array.isArray(row.participantEnrollmentIds) ? row.participantEnrollmentIds : []));
+    if (sessions.some((row) => row.audienceMode === "whole-cohort"))
+      return learners;
+    const allowed = new Set(
+      sessions.flatMap((row) =>
+        Array.isArray(row.participantEnrollmentIds)
+          ? row.participantEnrollmentIds
+          : [],
+      ),
+    );
     return learners.filter((row) => allowed.has(this.text(row.enrollmentId)));
   });
 
-  readonly trainerStudents = computed(() => this.ranking(this.trainerLearners()));
-  readonly trainerCompetencies = computed(() => this.competencies(this.trainerLearners()));
-  readonly trainerSheets = computed(() => this.sheetSummary(this.trainerLearners()));
-  readonly trainerStatuses = computed(() => this.statusRows(this.trainerLearners()));
-  readonly trainerAverageProgress = computed(() => this.average(this.trainerLearners().map((row) => this.number(row.averageCompetencyProgress))));
+  readonly trainerStudents = computed(() =>
+    this.ranking(this.trainerLearners()),
+  );
+  readonly trainerCompetencies = computed(() =>
+    this.competencies(this.trainerLearners()),
+  );
+  readonly trainerSheets = computed(() =>
+    this.sheetSummary(this.trainerLearners()),
+  );
+  readonly trainerStatuses = computed(() =>
+    this.statusRows(this.trainerLearners()),
+  );
+  readonly trainerAverageProgress = computed(() =>
+    this.average(
+      this.trainerLearners().map((row) =>
+        this.number(row.averageCompetencyProgress),
+      ),
+    ),
+  );
   readonly trainerAttendance = computed(() => {
     const rows = this.trainerSessions();
-    const expected = rows.reduce((sum, row) => sum + this.number(row.expectedLearners), 0);
-    const present = rows.reduce((sum, row) => sum + this.number(row.presentLearners), 0);
+    const expected = rows.reduce(
+      (sum, row) => sum + this.number(row.expectedLearners),
+      0,
+    );
+    const present = rows.reduce(
+      (sum, row) => sum + this.number(row.presentLearners),
+      0,
+    );
     return expected > 0 ? this.percent(present, expected) : 0;
   });
   readonly trainerSessionCount = computed(() => this.trainerSessions().length);
@@ -138,26 +230,51 @@ export class StatisticsApiStoreService {
 
   readonly secretariatPriorities = computed<StatisticsPriorityRow[]>(() =>
     this.allLearners()
-      .filter((row) => this.number(row.catchupMinutes) > 0 || this.number(row.absentCount) > 0)
+      .filter(
+        (row) =>
+          this.number(row.catchupMinutes) > 0 ||
+          this.number(row.absentCount) > 0,
+      )
       .sort((a, b) => {
-        const catchup = this.number(b.catchupMinutes) - this.number(a.catchupMinutes);
-        return catchup !== 0 ? catchup : this.number(b.absentCount) - this.number(a.absentCount);
+        const catchup =
+          this.number(b.catchupMinutes) - this.number(a.catchupMinutes);
+        return catchup !== 0
+          ? catchup
+          : this.number(b.absentCount) - this.number(a.absentCount);
       })
       .slice(0, 4)
       .map((row) => {
         const catchup = this.number(row.catchupMinutes);
         return {
-          name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
-          detailKey: catchup > 0 ? "statistics.secretariat.priorities.catchup" : "statistics.secretariat.priorities.absence",
-          value: catchup > 0 ? this.hours(catchup) : this.number(row.absentCount),
+          name: [this.text(row.firstName), this.text(row.lastName)]
+            .filter(Boolean)
+            .join(" ")
+            .trim(),
+          detailKey:
+            catchup > 0
+              ? "statistics.secretariat.priorities.catchup"
+              : "statistics.secretariat.priorities.absence",
+          value:
+            catchup > 0 ? this.hours(catchup) : this.number(row.absentCount),
         };
       }),
   );
-  readonly secretariatToRegularize = computed(() => this.allLearners().filter((row) => this.number(row.catchupMinutes) > 0 || this.number(row.absentCount) > 0).length);
+  readonly secretariatToRegularize = computed(
+    () =>
+      this.allLearners().filter(
+        (row) =>
+          this.number(row.catchupMinutes) > 0 ||
+          this.number(row.absentCount) > 0,
+      ).length,
+  );
 
   readonly student = this.studentSignal.asReadonly();
-  readonly studentCompetencies = computed(() => this.competencies(this.studentSignal() ? [this.studentSignal()!] : []));
-  readonly studentSheets = computed(() => this.sheetSummary(this.studentSignal() ? [this.studentSignal()!] : []));
+  readonly studentCompetencies = computed(() =>
+    this.competencies(this.studentSignal() ? [this.studentSignal()!] : []),
+  );
+  readonly studentSheets = computed(() =>
+    this.sheetSummary(this.studentSignal() ? [this.studentSignal()!] : []),
+  );
   readonly studentHours = computed<StatisticsStudentHourRow[]>(() => {
     const row = this.studentSignal();
     const values = [
@@ -166,18 +283,39 @@ export class StatisticsApiStoreService {
       { k: "internship" as const, v: this.hours(row?.internshipMinutes) },
     ];
     const total = values.reduce((sum, item) => sum + item.v, 0);
-    return values.map((item) => ({ ...item, p: total > 0 ? this.percent(item.v, total) : 0 }));
+    return values.map((item) => ({
+      ...item,
+      p: total > 0 ? this.percent(item.v, total) : 0,
+    }));
   });
 
-  readonly studentProgress = computed(() => this.number(this.studentSignal()?.averageCompetencyProgress));
-  readonly studentAttendance = computed(() => this.number(this.studentSignal()?.attendanceRate));
-  readonly studentCompletedHours = computed(() => this.hours(this.studentSignal()?.completedMinutes));
-  readonly studentPlannedHours = computed(() => this.hours(this.studentSignal()?.plannedMinutes));
-  readonly studentCatchupHours = computed(() => this.hours(this.studentSignal()?.catchupMinutes));
-  readonly studentPresentCount = computed(() => this.number(this.studentSignal()?.presentCount));
-  readonly studentLateCount = computed(() => this.number(this.studentSignal()?.lateCount));
-  readonly studentAbsentCount = computed(() => this.number(this.studentSignal()?.absentCount));
-  readonly studentExcusedCount = computed(() => this.number(this.studentSignal()?.excusedCount));
+  readonly studentProgress = computed(() =>
+    this.number(this.studentSignal()?.averageCompetencyProgress),
+  );
+  readonly studentAttendance = computed(() =>
+    this.number(this.studentSignal()?.attendanceRate),
+  );
+  readonly studentCompletedHours = computed(() =>
+    this.hours(this.studentSignal()?.completedMinutes),
+  );
+  readonly studentPlannedHours = computed(() =>
+    this.hours(this.studentSignal()?.plannedMinutes),
+  );
+  readonly studentCatchupHours = computed(() =>
+    this.hours(this.studentSignal()?.catchupMinutes),
+  );
+  readonly studentPresentCount = computed(() =>
+    this.number(this.studentSignal()?.presentCount),
+  );
+  readonly studentLateCount = computed(() =>
+    this.number(this.studentSignal()?.lateCount),
+  );
+  readonly studentAbsentCount = computed(() =>
+    this.number(this.studentSignal()?.absentCount),
+  );
+  readonly studentExcusedCount = computed(() =>
+    this.number(this.studentSignal()?.excusedCount),
+  );
 
   constructor() {
     void this.realtime.start().catch(() => undefined);
@@ -185,11 +323,14 @@ export class StatisticsApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const role = this.session.role();
-      const cohortRows = this.workspace.cohorts().map((cohort) => ({
-        id: this.text(cohort.id),
-        apiId: this.text(cohort.apiId),
-        name: this.text(cohort.name),
-      })).filter((cohort) => cohort.apiId);
+      const cohortRows = this.workspace
+        .cohorts()
+        .map((cohort) => ({
+          id: this.text(cohort.id),
+          apiId: this.text(cohort.apiId),
+          name: this.text(cohort.name),
+        }))
+        .filter((cohort) => cohort.apiId);
       const selectedApiId = this.text(this.workspace.cohort()?.apiId);
       const generation = ++this.generation;
       this.resetDataOnly();
@@ -204,7 +345,13 @@ export class StatisticsApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.(training|learning|workplace|certification)\./.test(event.typeKey)) return;
+      if (
+        !event ||
+        !/^pedagora\.(training|learning|workplace|certification)\./.test(
+          event.typeKey,
+        )
+      )
+        return;
       untracked(() => void this.reload());
     });
   }
@@ -218,15 +365,21 @@ export class StatisticsApiStoreService {
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
       return cohortApiId ? this.loadStudent(generation, cohortApiId) : true;
     }
-    const cohorts = this.workspace.cohorts().map((cohort) => ({
-      id: this.text(cohort.id),
-      apiId: this.text(cohort.apiId),
-      name: this.text(cohort.name),
-    })).filter((cohort) => cohort.apiId);
+    const cohorts = this.workspace
+      .cohorts()
+      .map((cohort) => ({
+        id: this.text(cohort.id),
+        apiId: this.text(cohort.apiId),
+        name: this.text(cohort.name),
+      }))
+      .filter((cohort) => cohort.apiId);
     return this.loadStaff(generation, cohorts);
   }
 
-  private async loadStaff(generation: number, cohorts: CohortContextRow[]): Promise<boolean> {
+  private async loadStaff(
+    generation: number,
+    cohorts: CohortContextRow[],
+  ): Promise<boolean> {
     if (!cohorts.length) {
       this.bundlesSignal.set([]);
       return true;
@@ -234,44 +387,72 @@ export class StatisticsApiStoreService {
     const request = ++this.request;
     this.loading.set(true);
     try {
-      const bundles = await Promise.all(cohorts.map(async (cohort) => {
-        const [dashboard, learners] = await Promise.allSettled([
-          firstValueFrom(this.reporting.cohortDashboard(cohort.apiId)),
-          firstValueFrom(this.reporting.cohortLearners(cohort.apiId)),
-        ]);
-        return {
-          cohort,
-          dashboard: dashboard.status === "fulfilled" ? this.dashboard(dashboard.value) : null,
-          learners: learners.status === "fulfilled" && Array.isArray(learners.value)
-            ? learners.value.map((row) => this.learner(row))
-            : [],
-          failed: dashboard.status === "rejected" || learners.status === "rejected",
-        };
-      }));
-      if (generation !== this.generation || request !== this.request) return false;
+      const bundles = await Promise.all(
+        cohorts.map(async (cohort) => {
+          const [dashboard, learners] = await Promise.allSettled([
+            firstValueFrom(this.reporting.cohortDashboard(cohort.apiId)),
+            firstValueFrom(this.reporting.cohortLearners(cohort.apiId)),
+          ]);
+          return {
+            cohort,
+            dashboard:
+              dashboard.status === "fulfilled"
+                ? this.dashboard(dashboard.value)
+                : null,
+            learners:
+              learners.status === "fulfilled" && Array.isArray(learners.value)
+                ? learners.value.map((row) => this.learner(row))
+                : [],
+            failed:
+              dashboard.status === "rejected" || learners.status === "rejected",
+          };
+        }),
+      );
+      if (generation !== this.generation || request !== this.request)
+        return false;
       const failed = bundles.some((bundle) => bundle.failed);
-      this.bundlesSignal.set(bundles.map(({ cohort, dashboard, learners }) => ({ cohort, dashboard, learners })));
+      this.bundlesSignal.set(
+        bundles.map(({ cohort, dashboard, learners }) => ({
+          cohort,
+          dashboard,
+          learners,
+        })),
+      );
       this.loadError.set(failed);
-      if (failed) this.notifications.error("statistics.real.partialError", "/statistiques");
+      if (failed)
+        this.notifications.error(
+          "statistics.real.partialError",
+          "/statistiques",
+        );
       return !failed;
     } catch {
       if (generation === this.generation && request === this.request) {
         this.resetDataOnly();
         this.loadError.set(true);
-        this.notifications.error("statistics.real.partialError", "/statistiques");
+        this.notifications.error(
+          "statistics.real.partialError",
+          "/statistiques",
+        );
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
-  private async loadStudent(generation: number, cohortApiId: string): Promise<boolean> {
+  private async loadStudent(
+    generation: number,
+    cohortApiId: string,
+  ): Promise<boolean> {
     const request = ++this.request;
     this.loading.set(true);
     try {
-      const row = await firstValueFrom(this.reporting.myLearnerDashboard(cohortApiId));
-      if (generation !== this.generation || request !== this.request) return false;
+      const row = await firstValueFrom(
+        this.reporting.myLearnerDashboard(cohortApiId),
+      );
+      if (generation !== this.generation || request !== this.request)
+        return false;
       this.studentSignal.set(this.learner(row));
       this.loadError.set(false);
       return true;
@@ -279,11 +460,15 @@ export class StatisticsApiStoreService {
       if (generation === this.generation && request === this.request) {
         this.studentSignal.set(null);
         this.loadError.set(true);
-        this.notifications.error("statistics.real.partialError", "/statistiques");
+        this.notifications.error(
+          "statistics.real.partialError",
+          "/statistiques",
+        );
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request) this.loading.set(false);
+      if (generation === this.generation && request === this.request)
+        this.loading.set(false);
     }
   }
 
@@ -292,66 +477,122 @@ export class StatisticsApiStoreService {
     this.studentSignal.set(null);
   }
 
-  private competencies(rows: CohortLearnerDashboard[]): StatisticsCompetencyRow[] {
+  private competencies(
+    rows: CohortLearnerDashboard[],
+  ): StatisticsCompetencyRow[] {
     return (["C1", "C2", "C3", "C4"] as const).map((code) => ({
       code,
       labelKey: `statistics.competencies.${code.toLowerCase()}`,
-      value: this.average(rows.map((row) => this.number(row.competencies?.[code]))),
+      value: this.average(
+        rows.map((row) => this.number(row.competencies?.[code])),
+      ),
     }));
   }
 
   private ranking(rows: CohortLearnerDashboard[]): StatisticsRankingRow[] {
     return [...rows]
-      .sort((a, b) => this.number(b.averageCompetencyProgress) - this.number(a.averageCompetencyProgress))
+      .sort(
+        (a, b) =>
+          this.number(b.averageCompetencyProgress) -
+          this.number(a.averageCompetencyProgress),
+      )
       .slice(0, 6)
       .map((row, index) => ({
         rank: index + 1,
-        name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
+        name: [this.text(row.firstName), this.text(row.lastName)]
+          .filter(Boolean)
+          .join(" ")
+          .trim(),
         progress: this.number(row.averageCompetencyProgress),
       }));
   }
 
   private statusRows(rows: CohortLearnerDashboard[]): StatisticsStatusRow[] {
-    const keys: StatisticsStatusRow["key"][] = ["good", "warning", "late", "finished"];
-    const counts = new Map<StatisticsStatusRow["key"], number>(keys.map((key) => [key, 0]));
+    const keys: StatisticsStatusRow["key"][] = [
+      "good",
+      "warning",
+      "late",
+      "finished",
+    ];
+    const counts = new Map<StatisticsStatusRow["key"], number>(
+      keys.map((key) => [key, 0]),
+    );
     rows.forEach((row) => {
       const key = this.status(row);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     });
     return keys.map((key) => {
       const count = counts.get(key) ?? 0;
-      return { key, count, value: rows.length ? this.percent(count, rows.length) : 0 };
+      return {
+        key,
+        count,
+        value: rows.length ? this.percent(count, rows.length) : 0,
+      };
     });
   }
 
   private status(row: CohortLearnerDashboard): StatisticsStatusRow["key"] {
     const enrollment = this.text(row.enrollmentStatus).toLowerCase();
     if (enrollment === "completed") return "finished";
-    if (this.number(row.catchupMinutes) > 0 || this.number(row.absentCount) > 0) return "late";
+    if (this.number(row.catchupMinutes) > 0 || this.number(row.absentCount) > 0)
+      return "late";
     if (enrollment && enrollment !== "active") return "warning";
     return "good";
   }
 
   private sheetSummary(rows: CohortLearnerDashboard[]): StatisticsSheetSummary {
     if (!rows.length) return { ...EMPTY_SHEETS };
-    const prepared = rows.reduce((sum, row) => sum + this.number(row.preparedTopics), 0);
-    const presented = rows.reduce((sum, row) => sum + this.number(row.presentedTopics), 0);
-    const validated = rows.reduce((sum, row) => sum + this.number(row.validatedTopics), 0);
-    const rework = rows.reduce((sum, row) => sum + this.number(row.reworkTopics), 0);
-    const total = rows.reduce((sum, row) => sum + this.number(row.totalTopics), 0);
-    return { prepared, presented, validated, rework, progress: total > 0 ? this.percent(prepared, total) : 0 };
+    const prepared = rows.reduce(
+      (sum, row) => sum + this.number(row.preparedTopics),
+      0,
+    );
+    const presented = rows.reduce(
+      (sum, row) => sum + this.number(row.presentedTopics),
+      0,
+    );
+    const validated = rows.reduce(
+      (sum, row) => sum + this.number(row.validatedTopics),
+      0,
+    );
+    const rework = rows.reduce(
+      (sum, row) => sum + this.number(row.reworkTopics),
+      0,
+    );
+    const total = rows.reduce(
+      (sum, row) => sum + this.number(row.totalTopics),
+      0,
+    );
+    return {
+      prepared,
+      presented,
+      validated,
+      rework,
+      progress: total > 0 ? this.percent(prepared, total) : 0,
+    };
   }
 
   private attendance(rows: CohortLearnerDashboard[]): number {
-    const expected = rows.reduce((sum, row) => sum + this.number(row.attendanceExpectedMinutes), 0);
-    const present = rows.reduce((sum, row) => sum + this.number(row.attendancePresentMinutes), 0);
+    const expected = rows.reduce(
+      (sum, row) => sum + this.number(row.attendanceExpectedMinutes),
+      0,
+    );
+    const present = rows.reduce(
+      (sum, row) => sum + this.number(row.attendancePresentMinutes),
+      0,
+    );
     return expected > 0 ? this.percent(present, expected) : 0;
   }
 
   private learner(row: CohortLearnerDashboard): CohortLearnerDashboard {
-    const competencies = row?.competencies && typeof row.competencies === "object"
-      ? Object.fromEntries(Object.entries(row.competencies).map(([key, value]) => [this.text(key).toUpperCase(), this.number(value)]))
-      : {};
+    const competencies =
+      row?.competencies && typeof row.competencies === "object"
+        ? Object.fromEntries(
+            Object.entries(row.competencies).map(([key, value]) => [
+              this.text(key).toUpperCase(),
+              this.number(value),
+            ]),
+          )
+        : {};
     return {
       enrollmentId: this.text(row?.enrollmentId),
       learnerProfileId: this.text(row?.learnerProfileId),
@@ -400,10 +641,17 @@ export class StatisticsApiStoreService {
   }
 
   private average(values: number[]): number {
-    return values.length ? Math.round(values.reduce((sum, value) => sum + this.number(value), 0) / values.length) : 0;
+    return values.length
+      ? Math.round(
+          values.reduce((sum, value) => sum + this.number(value), 0) /
+            values.length,
+        )
+      : 0;
   }
   private percent(part: number, total: number): number {
-    return total > 0 ? Math.max(0, Math.min(100, Math.round((part / total) * 100))) : 0;
+    return total > 0
+      ? Math.max(0, Math.min(100, Math.round((part / total) * 100)))
+      : 0;
   }
   private hours(value: unknown): number {
     return Math.round((this.number(value) / 60) * 10) / 10;

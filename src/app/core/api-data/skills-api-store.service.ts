@@ -1,6 +1,17 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import { firstValueFrom } from "rxjs";
-import type { SkillCriterionLevel, SkillDefinition, SkillLinkedSession } from "../models/skills.models";
+import type {
+  SkillCriterionLevel,
+  SkillDefinition,
+  SkillLinkedSession,
+} from "../models/skills.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
@@ -53,7 +64,9 @@ export class SkillsApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
-      const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
+      const referentialVersionId = this.text(
+        this.workspace.cohort()?.referentialVersionId,
+      );
       const selfOnly = this.session.role() === "stagiaire";
       const generation = ++this.contextGeneration;
 
@@ -64,8 +77,14 @@ export class SkillsApiStoreService {
       this.loadError.set(false);
       this.historyError.set(false);
 
-      if (!ready || !referentialVersionId || (!selfOnly && !cohortApiId)) return;
-      void this.loadContext(cohortApiId, referentialVersionId, selfOnly, generation);
+      if (!ready || !referentialVersionId || (!selfOnly && !cohortApiId))
+        return;
+      void this.loadContext(
+        cohortApiId,
+        referentialVersionId,
+        selfOnly,
+        generation,
+      );
     });
 
     effect(() => {
@@ -75,18 +94,33 @@ export class SkillsApiStoreService {
       if (event.typeKey === "pedagora.learning.competency.evaluated.v1") {
         untracked(() => {
           const cohortApiId = this.text(this.workspace.cohort()?.apiId);
-          const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
+          const referentialVersionId = this.text(
+            this.workspace.cohort()?.referentialVersionId,
+          );
           const selfOnly = this.session.role() === "stagiaire";
           if (referentialVersionId && (selfOnly || cohortApiId)) {
-            void this.loadContext(cohortApiId, referentialVersionId, selfOnly, ++this.contextGeneration, false);
+            void this.loadContext(
+              cohortApiId,
+              referentialVersionId,
+              selfOnly,
+              ++this.contextGeneration,
+              false,
+            );
           }
         });
       }
 
-      if (event.typeKey === "pedagora.learning.driving-evaluation.recorded.v1") {
+      if (
+        event.typeKey === "pedagora.learning.driving-evaluation.recorded.v1"
+      ) {
         untracked(() => {
           const enrollmentId = this.selectedEnrollmentSignal();
-          if (enrollmentId) void this.loadHistory(enrollmentId, ++this.historyGeneration, false);
+          if (enrollmentId)
+            void this.loadHistory(
+              enrollmentId,
+              ++this.historyGeneration,
+              false,
+            );
         });
       }
     });
@@ -102,15 +136,21 @@ export class SkillsApiStoreService {
   }
 
   definitionsFor(enrollmentId: string): SkillDefinition[] {
-    const definitions = this.definitionsSignal().filter((item) => item.active !== false);
+    const definitions = this.definitionsSignal().filter(
+      (item) => item.active !== false,
+    );
     const roots = definitions
       .filter((item) => !this.text(item.parentId))
       .slice()
       .sort((a, b) => this.number(a.sortOrder) - this.number(b.sortOrder));
-    const ecsrRoots = roots.filter((item) => /^C[1-4]$/i.test(this.text(item.code)));
+    const ecsrRoots = roots.filter((item) =>
+      /^C[1-4]$/i.test(this.text(item.code)),
+    );
     const row = this.row(enrollmentId);
     const progress = new Map(
-      (Array.isArray(row?.competencies) ? row!.competencies : []).map((item) => [this.text(item.competencyDefinitionId), item]),
+      (Array.isArray(row?.competencies) ? row!.competencies : []).map(
+        (item) => [this.text(item.competencyDefinitionId), item],
+      ),
     );
 
     return (ecsrRoots.length ? ecsrRoots : roots).map((root) => {
@@ -133,33 +173,59 @@ export class SkillsApiStoreService {
   }
 
   skillValue(code: string, enrollmentId: string): number {
-    const definition = this.definitionsFor(enrollmentId).find((item) => item.code === this.text(code));
+    const definition = this.definitionsFor(enrollmentId).find(
+      (item) => item.code === this.text(code),
+    );
     if (!definition) return 0;
 
     const row = this.row(enrollmentId);
     const progress = Array.isArray(row?.competencies) ? row!.competencies : [];
-    const rootRecord = progress.find((item) => this.text(item.competencyDefinitionId) === definition.definitionId);
-    if (rootRecord?.score !== null && rootRecord?.score !== undefined && Number.isFinite(Number(rootRecord.score))) {
+    const rootRecord = progress.find(
+      (item) =>
+        this.text(item.competencyDefinitionId) === definition.definitionId,
+    );
+    if (
+      rootRecord?.score !== null &&
+      rootRecord?.score !== undefined &&
+      Number.isFinite(Number(rootRecord.score))
+    ) {
       return this.clamp(Math.round(Number(rootRecord.score)));
     }
 
     if (!definition.criteria.length) return 0;
     const points = definition.criteria.map((criterion) => {
       switch (criterion.level) {
-        case "acquired": return 100;
-        case "in_progress": return 60;
-        case "rework": return 25;
-        default: return 0;
+        case "acquired":
+          return 100;
+        case "in_progress":
+          return 60;
+        case "rework":
+          return 25;
+        default:
+          return 0;
       }
     });
-    return this.clamp(Math.round(points.reduce<number>((sum, value) => sum + value, 0) / points.length));
+    return this.clamp(
+      Math.round(
+        points.reduce<number>((sum, value) => sum + value, 0) / points.length,
+      ),
+    );
   }
 
-  linkedSessions(enrollmentId: string, skillCode: string): SkillLinkedSession[] {
-    const student = this.students().find((item) => item.id === enrollmentId) ?? { id: "", firstName: "", lastName: "" };
+  linkedSessions(
+    enrollmentId: string,
+    skillCode: string,
+  ): SkillLinkedSession[] {
+    const student = this.students().find(
+      (item) => item.id === enrollmentId,
+    ) ?? { id: "", firstName: "", lastName: "" };
     const studentName = `${student.firstName} ${student.lastName}`.trim();
     return this.historySignal()
-      .filter((row) => this.rootCodeForDefinition(row?.competencyDefinitionId) === this.text(skillCode))
+      .filter(
+        (row) =>
+          this.rootCodeForDefinition(row?.competencyDefinitionId) ===
+          this.text(skillCode),
+      )
       .map((row) => ({
         id: this.text(row?.id),
         skill: this.text(skillCode),
@@ -181,32 +247,47 @@ export class SkillsApiStoreService {
   ): Promise<void> {
     this.loading.set(true);
     try {
-      const definitionsPromise = firstValueFrom(this.api.competencyDefinitions(referentialVersionId));
+      const definitionsPromise = firstValueFrom(
+        this.api.competencyDefinitions(referentialVersionId),
+      );
       const rowsPromise = selfOnly
         ? this.loadSelfRow()
         : firstValueFrom(this.api.cohortCompetencies(cohortApiId));
 
-      const [definitions, rows] = await Promise.all([definitionsPromise, rowsPromise]);
+      const [definitions, rows] = await Promise.all([
+        definitionsPromise,
+        rowsPromise,
+      ]);
       if (generation !== this.contextGeneration) return;
 
-      this.definitionsSignal.set((Array.isArray(definitions) ? definitions : []).map((row) => this.normalizeDefinition(row)));
-      this.rowsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalizeRow(row)));
+      this.definitionsSignal.set(
+        (Array.isArray(definitions) ? definitions : []).map((row) =>
+          this.normalizeDefinition(row),
+        ),
+      );
+      this.rowsSignal.set(
+        (Array.isArray(rows) ? rows : []).map((row) => this.normalizeRow(row)),
+      );
       this.loadError.set(false);
 
       const current = this.selectedEnrollmentSignal();
-      const selected = this.rowsSignal().some((row) => row.enrollmentId === current)
+      const selected = this.rowsSignal().some(
+        (row) => row.enrollmentId === current,
+      )
         ? current
         : (this.rowsSignal()[0]?.enrollmentId ?? "");
       this.selectedEnrollmentSignal.set(selected);
       this.historySignal.set([]);
-      if (selected) void this.loadHistory(selected, ++this.historyGeneration, notify);
+      if (selected)
+        void this.loadHistory(selected, ++this.historyGeneration, notify);
     } catch {
       if (generation === this.contextGeneration) {
         this.rowsSignal.set([]);
         this.definitionsSignal.set([]);
         this.historySignal.set([]);
         this.loadError.set(true);
-        if (notify) this.notifications.error("skills.real.failed", "/competences");
+        if (notify)
+          this.notifications.error("skills.real.failed", "/competences");
       }
     } finally {
       if (generation === this.contextGeneration) this.loading.set(false);
@@ -217,27 +298,47 @@ export class SkillsApiStoreService {
     const learner = await firstValueFrom(this.api.self());
     const enrollmentId = this.text(learner?.enrollmentId);
     if (!enrollmentId) return [];
-    const competencies = await firstValueFrom(this.api.competencies(enrollmentId));
-    return [{
-      enrollmentId,
-      firstName: this.text(learner?.firstName),
-      lastName: this.text(learner?.lastName),
-      competencies: Array.isArray(competencies) ? competencies : [],
-    }];
+    const competencies = await firstValueFrom(
+      this.api.competencies(enrollmentId),
+    );
+    return [
+      {
+        enrollmentId,
+        firstName: this.text(learner?.firstName),
+        lastName: this.text(learner?.lastName),
+        competencies: Array.isArray(competencies) ? competencies : [],
+      },
+    ];
   }
 
-  private async loadHistory(enrollmentId: string, generation: number, notify = true): Promise<void> {
+  private async loadHistory(
+    enrollmentId: string,
+    generation: number,
+    notify = true,
+  ): Promise<void> {
     this.historyLoading.set(true);
     try {
       const rows = await firstValueFrom(this.api.driving(enrollmentId));
-      if (generation !== this.historyGeneration || enrollmentId !== this.selectedEnrollmentSignal()) return;
-      this.historySignal.set(Array.isArray(rows) ? rows.map((row) => this.normalizeDriving(row)) : []);
+      if (
+        generation !== this.historyGeneration ||
+        enrollmentId !== this.selectedEnrollmentSignal()
+      )
+        return;
+      this.historySignal.set(
+        Array.isArray(rows)
+          ? rows.map((row) => this.normalizeDriving(row))
+          : [],
+      );
       this.historyError.set(false);
     } catch {
-      if (generation === this.historyGeneration && enrollmentId === this.selectedEnrollmentSignal()) {
+      if (
+        generation === this.historyGeneration &&
+        enrollmentId === this.selectedEnrollmentSignal()
+      ) {
         this.historySignal.set([]);
         this.historyError.set(true);
-        if (notify) this.notifications.error("skills.real.drivingFailed", "/competences");
+        if (notify)
+          this.notifications.error("skills.real.drivingFailed", "/competences");
       }
     } finally {
       if (generation === this.historyGeneration) this.historyLoading.set(false);
@@ -245,11 +346,15 @@ export class SkillsApiStoreService {
   }
 
   private row(enrollmentId: string): CohortCompetencyRowApi | undefined {
-    return this.rowsSignal().find((item) => this.text(item.enrollmentId) === this.text(enrollmentId));
+    return this.rowsSignal().find(
+      (item) => this.text(item.enrollmentId) === this.text(enrollmentId),
+    );
   }
 
   private rootCodeForDefinition(definitionId: unknown): string {
-    const byId = new Map(this.definitionsSignal().map((item) => [this.text(item.id), item]));
+    const byId = new Map(
+      this.definitionsSignal().map((item) => [this.text(item.id), item]),
+    );
     let current = byId.get(this.text(definitionId));
     const visited = new Set<string>();
     while (current?.parentId && !visited.has(this.text(current.id))) {
@@ -265,7 +370,10 @@ export class SkillsApiStoreService {
       enrollmentId: this.text(row?.enrollmentId),
       firstName: this.text(row?.firstName),
       lastName: this.text(row?.lastName),
-      competencies: (Array.isArray(row?.competencies) ? row.competencies : []).map((item) => this.normalizeProgress(item)),
+      competencies: (Array.isArray(row?.competencies)
+        ? row.competencies
+        : []
+      ).map((item) => this.normalizeProgress(item)),
     };
   }
 
@@ -276,14 +384,19 @@ export class SkillsApiStoreService {
       code: this.text(row?.code),
       title: this.text(row?.title),
       level: this.text(row?.level) || "not_assessed",
-      score: row?.score === null || row?.score === undefined ? null : this.number(row.score),
+      score:
+        row?.score === null || row?.score === undefined
+          ? null
+          : this.number(row.score),
       comment: this.nullableText(row?.comment),
       evaluatorDisplayName: this.nullableText(row?.evaluatorDisplayName),
       evaluatedAtUtc: this.nullableText(row?.evaluatedAtUtc),
     };
   }
 
-  private normalizeDefinition(row: CompetencyDefinitionApi): CompetencyDefinitionApi {
+  private normalizeDefinition(
+    row: CompetencyDefinitionApi,
+  ): CompetencyDefinitionApi {
     return {
       id: this.text(row?.id),
       parentId: this.nullableText(row?.parentId),
@@ -315,7 +428,12 @@ export class SkillsApiStoreService {
 
   private level(value: unknown): SkillCriterionLevel {
     const normalized = this.text(value).toLowerCase();
-    if (normalized === "acquired" || normalized === "in_progress" || normalized === "rework") return normalized;
+    if (
+      normalized === "acquired" ||
+      normalized === "in_progress" ||
+      normalized === "rework"
+    )
+      return normalized;
     return "not_assessed";
   }
 

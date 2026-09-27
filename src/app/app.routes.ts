@@ -249,7 +249,7 @@ export const routes: Routes = [
       {
         path: "jury",
         canActivate: [roleGuard],
-        data: { permission: "jury.view" },
+        data: { permission: "jury.view", membershipRoles: ["jury"] },
         loadComponent: () =>
           import("./features/jury/jury.component").then((m) => m.JuryComponent),
       },

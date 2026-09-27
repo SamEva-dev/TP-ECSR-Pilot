@@ -17,6 +17,31 @@ export interface ProgramApiDto {
   siteKeys: string[];
   referenceVersion?: string | null;
 }
+
+export interface CreateProgramApiRequest {
+  familyCode: string;
+  code: string;
+  name: string;
+  descriptionKey: string;
+  referenceVersion: string;
+  icon: string;
+  durationHours: number;
+  status: string;
+  enabledModules: string[];
+  externalKey: string | null;
+}
+
+export interface UpdateProgramApiRequest {
+  familyCode: string;
+  name: string;
+  descriptionKey: string;
+  referenceVersion: string;
+  icon: string;
+  durationHours: number;
+  status: string;
+  enabledModules: string[];
+}
+
 @Injectable({ providedIn: "root" })
 export class ProgramCatalogApiService {
   private readonly http = inject(HttpClient);
@@ -30,7 +55,7 @@ export class ProgramCatalogApiService {
       ),
     );
   }
-  create(body: unknown) {
+  create(body: CreateProgramApiRequest) {
     return firstValueFrom(
       this.http.post<ProgramApiDto>(
         `${environment.apiBaseUrl}/api/v1/programs`,
@@ -38,7 +63,7 @@ export class ProgramCatalogApiService {
       ),
     );
   }
-  update(id: string, body: unknown) {
+  update(id: string, body: UpdateProgramApiRequest) {
     return firstValueFrom(
       this.http.put<ProgramApiDto>(
         `${environment.apiBaseUrl}/api/v1/programs/${id}`,

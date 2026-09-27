@@ -1,9 +1,27 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from "@angular/core";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { TranslateService } from "../../../core/i18n/translate.service";
 import { PROGRAM_MODULES } from "../../../core/api-data/runtime-data.store";
-import type { ProgramCatalogCategory, ProgramCatalogItem, ProgramCatalogStatus, ProgramFormValue } from "../../../core/models/programs.models";
+import type {
+  ProgramCatalogCategory,
+  ProgramCatalogItem,
+  ProgramCatalogStatus,
+  ProgramFormValue,
+} from "../../../core/models/programs.models";
 import type { ProgramModule } from "../../../core/models/workspace.models";
 
 @Component({
@@ -22,13 +40,32 @@ export class ProgramDrawerComponent {
   readonly selectedModules = signal<ProgramModule[]>([]);
 
   readonly form = new FormGroup({
-    code: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    category: new FormControl<ProgramCatalogCategory>("teacher", { nonNullable: true }),
-    description: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    referenceVersion: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    durationHours: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
-    status: new FormControl<ProgramCatalogStatus>("active", { nonNullable: true }),
+    code: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    name: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    category: new FormControl<ProgramCatalogCategory>("teacher", {
+      nonNullable: true,
+    }),
+    description: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    referenceVersion: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    durationHours: new FormControl(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1)],
+    }),
+    status: new FormControl<ProgramCatalogStatus>("active", {
+      nonNullable: true,
+    }),
   });
 
   constructor() {
@@ -44,7 +81,15 @@ export class ProgramDrawerComponent {
         durationHours: program?.durationHours ?? 0,
         status: program?.status ?? "active",
       });
-      this.selectedModules.set(program?.enabledModules ?? ["planning", "attendance", "sessions", "documents", "certification"]);
+      this.selectedModules.set(
+        program?.enabledModules ?? [
+          "planning",
+          "attendance",
+          "sessions",
+          "documents",
+          "certification",
+        ],
+      );
     });
   }
 
@@ -53,15 +98,21 @@ export class ProgramDrawerComponent {
   }
 
   toggleModule(module: ProgramModule): void {
-    this.selectedModules.update((items) => items.includes(module) ? items.filter((item) => item !== module) : [...items, module]);
+    this.selectedModules.update((items) =>
+      items.includes(module)
+        ? items.filter((item) => item !== module)
+        : [...items, module],
+    );
   }
 
   submit(): void {
     if (this.form.invalid || this.selectedModules().length === 0) {
       this.form.markAllAsTouched();
+      console.warn("Form is invalid or no modules selected", this.form.value);
       return;
     }
     const raw = this.form.getRawValue();
+    console.log("Submitting program form", raw, this.selectedModules());
     this.saved.emit({ ...raw, enabledModules: this.selectedModules() });
   }
 }

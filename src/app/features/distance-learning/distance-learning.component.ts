@@ -1,5 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import { DistanceLearningApiStoreService } from "../../core/api-data/distance-learning-api-store.service";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
@@ -34,34 +45,86 @@ export class DistanceLearningComponent {
   readonly isDirection = computed(() => this.session.role() === "direction");
   readonly isTrainer = computed(() => this.session.role() === "formateur");
   readonly isStudent = computed(() => this.session.role() === "stagiaire");
-  readonly isSecretariat = computed(() => this.session.role() === "secretariat");
-  readonly canCreate = computed(() => this.isDirection() || this.isTrainer() || this.isSecretariat());
+  readonly isSecretariat = computed(
+    () => this.session.role() === "secretariat",
+  );
+  readonly canCreate = computed(
+    () => this.isDirection() || this.isTrainer() || this.isSecretariat(),
+  );
 
   readonly contextSessions = this.store.sessions;
   readonly contextModules = this.store.modules;
   readonly filteredModules = computed(() => {
     const filter = this.moduleFilter();
-    return this.contextModules().filter((item) => filter === "all" || item.status === filter);
+    return this.contextModules().filter(
+      (item) => filter === "all" || item.status === filter,
+    );
   });
   readonly selectedLive = computed(() => {
     const list = this.contextSessions();
-    return list.find((item) => item.id === this.selectedLiveId()) ?? list.at(0) ?? null;
+    return (
+      list.find((item) => item.id === this.selectedLiveId()) ??
+      list.at(0) ??
+      null
+    );
   });
-  readonly selectedParticipants = computed(() => this.selectedLive()?.participants ?? []);
-  readonly selectedResources = computed(() => [] as Array<{ id: string; titleKey: string; type: DistanceResourceType; viewedBy: number; totalStudents: number }>);
-  readonly selectedInteractions = computed(() => [] as Array<{ id: string; titleKey: string; type: DistanceInteractionType; completed: number; expected: number; successRate?: number }>);
+  readonly selectedParticipants = computed(
+    () => this.selectedLive()?.participants ?? [],
+  );
+  readonly selectedResources = computed(
+    () =>
+      [] as Array<{
+        id: string;
+        titleKey: string;
+        type: DistanceResourceType;
+        viewedBy: number;
+        totalStudents: number;
+      }>,
+  );
+  readonly selectedInteractions = computed(
+    () =>
+      [] as Array<{
+        id: string;
+        titleKey: string;
+        type: DistanceInteractionType;
+        completed: number;
+        expected: number;
+        successRate?: number;
+      }>,
+  );
 
-  readonly presentCount = computed(() => this.selectedParticipants().filter((item) => item.attendance === "present").length);
-  readonly lateCount = computed(() => this.selectedParticipants().filter((item) => item.attendance === "late").length);
-  readonly absentCount = computed(() => this.selectedParticipants().filter((item) => item.attendance === "absent").length);
+  readonly presentCount = computed(
+    () =>
+      this.selectedParticipants().filter(
+        (item) => item.attendance === "present",
+      ).length,
+  );
+  readonly lateCount = computed(
+    () =>
+      this.selectedParticipants().filter((item) => item.attendance === "late")
+        .length,
+  );
+  readonly absentCount = computed(
+    () =>
+      this.selectedParticipants().filter((item) => item.attendance === "absent")
+        .length,
+  );
   readonly liveSessionCount = computed(() => this.contextSessions().length);
   readonly totalLiveHours = this.store.totalLiveHours;
   readonly totalAsyncHours = this.store.totalAsyncHours;
-  readonly lateModuleCount = computed(() => this.contextModules().filter((item) => item.status === "late").length);
+  readonly lateModuleCount = computed(
+    () => this.contextModules().filter((item) => item.status === "late").length,
+  );
   readonly completionRate = computed(() => {
     const modules = this.contextModules();
     if (!modules.length) return 0;
-    return Math.round(modules.reduce((total, item) => total + (Number.isFinite(item.progress) ? item.progress : 0), 0) / modules.length);
+    return Math.round(
+      modules.reduce(
+        (total, item) =>
+          total + (Number.isFinite(item.progress) ? item.progress : 0),
+        0,
+      ) / modules.length,
+    );
   });
   readonly currentSiteMetric = computed(() => ({
     siteId: this.workspace.site()?.id ?? "",
@@ -76,24 +139,38 @@ export class DistanceLearningComponent {
     let remote = 0;
     let total = 0;
     for (const row of this.trainingSessions.apiSessions()) {
-      const minutes = typeof row?.plannedMinutes === "number" && Number.isFinite(row.plannedMinutes) ? Math.max(row.plannedMinutes, 0) : 0;
+      const minutes =
+        typeof row?.plannedMinutes === "number" &&
+        Number.isFinite(row.plannedMinutes)
+          ? Math.max(row.plannedMinutes, 0)
+          : 0;
       total += minutes;
-      if (row?.modality === "remote-live" || row?.modality === "remote-async") remote += minutes;
+      if (row?.modality === "remote-live" || row?.modality === "remote-async")
+        remote += minutes;
     }
     return { remote, total };
   });
   readonly remoteShare = computed(() => {
     const metric = this.modalityMinutes();
-    return metric.total > 0 ? Math.round((metric.remote / metric.total) * 100) : 0;
+    return metric.total > 0
+      ? Math.round((metric.remote / metric.total) * 100)
+      : 0;
   });
   readonly onsiteShare = computed(() => Math.max(100 - this.remoteShare(), 0));
-  readonly modalityGradient = computed(() => `conic-gradient(#2b66a4 0 ${this.onsiteShare()}%, #f5a623 ${this.onsiteShare()}% 100%)`);
+  readonly modalityGradient = computed(
+    () =>
+      `conic-gradient(#2b66a4 0 ${this.onsiteShare()}%, #f5a623 ${this.onsiteShare()}% 100%)`,
+  );
   readonly trainerToCorrect = computed(() => 0);
   readonly trainerQuizzes = computed(() => 0);
   readonly lateStudentCount = computed(() =>
     this.contextModules()
       .filter((item) => item.status === "late")
-      .reduce((total, item) => total + Math.max(item.expectedStudents - item.completedStudents, 0), 0),
+      .reduce(
+        (total, item) =>
+          total + Math.max(item.expectedStudents - item.completedStudents, 0),
+        0,
+      ),
   );
   readonly studentDueThisWeek = computed(() => {
     const now = new Date();
@@ -101,24 +178,41 @@ export class DistanceLearningComponent {
     return this.contextModules().filter((item) => {
       const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(item.dueDate);
       if (!match) return false;
-      const due = new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]), 23, 59, 59);
+      const due = new Date(
+        Number(match[3]),
+        Number(match[2]) - 1,
+        Number(match[1]),
+        23,
+        59,
+        59,
+      );
       return due >= now && due <= end;
     }).length;
   });
-  readonly studentRemoteHours = computed(() => Math.round(this.modalityMinutes().remote / 60));
-  readonly siteMetrics = computed(() => [{
-    name: this.workspace.site()?.name ?? "",
-    live: this.totalLiveHours(),
-    async: this.totalAsyncHours(),
-    students: this.currentSiteMetric().activeStudents,
-    completion: this.completionRate(),
-    late: this.lateModuleCount(),
-  }]);
+  readonly studentRemoteHours = computed(() =>
+    Math.round(this.modalityMinutes().remote / 60),
+  );
+  readonly siteMetrics = computed(() => [
+    {
+      name: this.workspace.site()?.name ?? "",
+      live: this.totalLiveHours(),
+      async: this.totalAsyncHours(),
+      students: this.currentSiteMetric().activeStudents,
+      completion: this.completionRate(),
+      late: this.lateModuleCount(),
+    },
+  ]);
 
   readonly createForm = new FormGroup({
     kind: new FormControl<"live" | "async">("live", { nonNullable: true }),
-    title: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    date: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    title: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    date: new FormControl("", {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     start: new FormControl("", { nonNullable: true }),
     end: new FormControl("", { nonNullable: true }),
     platform: new FormControl<DistancePlatform>("teams", { nonNullable: true }),
@@ -127,8 +221,12 @@ export class DistanceLearningComponent {
     dueDate: new FormControl("", { nonNullable: true }),
   });
 
-  openCreateDrawer(): void { this.drawerOpen.set(true); }
-  closeDrawer(): void { this.drawerOpen.set(false); }
+  openCreateDrawer(): void {
+    this.drawerOpen.set(true);
+  }
+  closeDrawer(): void {
+    this.drawerOpen.set(false);
+  }
 
   async createDistanceItem(): Promise<void> {
     if (this.createForm.invalid) {
@@ -150,7 +248,9 @@ export class DistanceLearningComponent {
     window.setTimeout(() => this.saved.set(false), 1800);
   }
 
-  selectLive(sessionId: string): void { this.selectedLiveId.set(sessionId ?? ""); }
+  selectLive(sessionId: string): void {
+    this.selectedLiveId.set(sessionId ?? "");
+  }
 
   simulateJoin(): void {
     const session = this.selectedLive();
@@ -173,7 +273,10 @@ export class DistanceLearningComponent {
   }
 
   updateModuleFilter(event: Event): void {
-    this.moduleFilter.set(((event.target as HTMLSelectElement)?.value ?? "all") as "all" | DistanceModuleStatus);
+    this.moduleFilter.set(
+      ((event.target as HTMLSelectElement)?.value ?? "all") as
+        "all" | DistanceModuleStatus,
+    );
   }
 
   currentUserName(): string {

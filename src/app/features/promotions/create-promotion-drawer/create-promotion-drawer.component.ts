@@ -8,6 +8,7 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from "@angular/core";
 import {
   FormControl,
@@ -15,17 +16,18 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { PEDAGOGICAL_TEAM } from "../../../core/api-data/runtime-data.store";
+import { firstValueFrom } from "rxjs";
+import { PedagoraAccessApiService } from "../../../core/access/pedagora-access-api.service";
 import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import type { WorkspaceCohort } from "../../../core/models/workspace.models";
-import { SessionService } from "../../../core/session/session.service";
 
 export interface CreatePromotionPayload {
   name: string;
   startDate: string;
   endDate: string;
   studentCount: number;
+  managerUserId: string;
   manager: string;
   referentialVersionId: string;
   status: WorkspaceCohort["status"];
@@ -46,7 +48,7 @@ interface TeamOption {
 })
 export class CreatePromotionDrawerComponent {
   private readonly referentialStore = inject(ReferentialApiStoreService);
-  private readonly session = inject(SessionService);
+  private readonly accessApi = inject(PedagoraAccessApiService);
 
   readonly open = input(false);
   readonly organizationName = input("");
@@ -56,11 +58,16 @@ export class CreatePromotionDrawerComponent {
   readonly closed = output<void>();
   readonly promotionCreated = output<CreatePromotionPayload>();
   readonly submitted = signal(false);
+  readonly team = signal<TeamOption[]>([]);
+  readonly teamLoading = signal(false);
 
   readonly referentials = computed(() =>
-    this.referentialStore.items().filter(
-      (item) => item.programId === this.programId() && item.status !== "archived",
-    ),
+    this.referentialStore
+      .items()
+      .filter(
+        (item) =>
+          item.programId === this.programId() && item.status !== "archived",
+      ),
   );
 
   readonly form = new FormGroup({
@@ -80,8 +87,9 @@ export class CreatePromotionDrawerComponent {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)],
     }),
-    manager: new FormControl("", {
+    managerUserId: new FormControl("", {
       nonNullable: true,
+      validators: [Validators.required],
     }),
     referentialVersionId: new FormControl("", {
       nonNullable: true,
@@ -96,39 +104,8 @@ export class CreatePromotionDrawerComponent {
   constructor() {
     effect(() => {
       if (!this.open()) return;
-      const firstReferential = this.referentials()[0];
-      if (!this.form.controls.referentialVersionId.value && firstReferential)
-        this.form.controls.referentialVersionId.setValue(firstReferential.id, { emitEvent: false });
-
-      if (!this.form.controls.manager.value) {
-        const manager = this.team[0];
-        this.form.controls.manager.setValue(manager ? this.fullName(manager) : "", { emitEvent: false });
-      }
+      untracked(() => void this.refreshCreationSources());
     });
-  }
-
-  get team(): TeamOption[] {
-    const runtime = PEDAGOGICAL_TEAM.map((member: any, index) => ({
-      id: this.text(member?.id) || `trainer-${index}`,
-      firstName: this.text(member?.firstName),
-      lastName: this.text(member?.lastName),
-      name: this.text(member?.name) || this.text(member?.label),
-    })).filter((member) => this.fullName(member));
-
-    if (runtime.length) return runtime;
-
-    const current = this.session.session();
-    if (!current) return [];
-    const firstName = this.text(current.firstName);
-    const lastName = this.text(current.lastName);
-    const name = `${firstName} ${lastName}`.trim() || this.text(current.email);
-    if (!name) return [];
-    return [{
-      id: this.text(current.userId) || this.text(current.email),
-      firstName,
-      lastName,
-      name,
-    }];
   }
 
   @HostListener("document:keydown.escape")
@@ -143,15 +120,27 @@ export class CreatePromotionDrawerComponent {
 
   submit(): void {
     this.submitted.set(true);
-    if (!this.form.controls.referentialVersionId.value && this.referentials().length) {
-      this.form.controls.referentialVersionId.setValue(this.referentials()[0].id);
+    if (
+      !this.form.controls.referentialVersionId.value &&
+      this.referentials().length
+    ) {
+      this.form.controls.referentialVersionId.setValue(
+        this.referentials()[0].id,
+      );
     }
     if (this.form.invalid || this.hasInvalidDates()) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.promotionCreated.emit(this.form.getRawValue());
+    const raw = this.form.getRawValue();
+    const manager = this.team().find(
+      (member) => member.id === raw.managerUserId,
+    );
+    this.promotionCreated.emit({
+      ...raw,
+      manager: manager ? this.fullName(manager) : "",
+    });
     this.resetForm();
   }
 
@@ -166,12 +155,14 @@ export class CreatePromotionDrawerComponent {
       | "startDate"
       | "endDate"
       | "studentCount"
-      | "manager"
+      | "managerUserId"
       | "referentialVersionId"
       | "status",
   ): boolean {
     const control = this.form.controls[controlName];
-    return (this.submitted() || control.touched) && control.hasError("required");
+    return (
+      (this.submitted() || control.touched) && control.hasError("required")
+    );
   }
 
   showStudentCountError(): boolean {
@@ -180,7 +171,56 @@ export class CreatePromotionDrawerComponent {
   }
 
   fullName(member: TeamOption): string {
-    return this.text(member.name) || `${this.text(member.firstName)} ${this.text(member.lastName)}`.trim();
+    return (
+      this.text(member.name) ||
+      `${this.text(member.firstName)} ${this.text(member.lastName)}`.trim()
+    );
+  }
+
+  private async refreshCreationSources(): Promise<void> {
+    await this.referentialStore.reload();
+    const firstReferential = this.referentials()[0];
+    const currentReferential = this.form.controls.referentialVersionId.value;
+    if (
+      !currentReferential ||
+      !this.referentials().some((item) => item.id === currentReferential)
+    )
+      this.form.controls.referentialVersionId.setValue(
+        firstReferential?.id ?? "",
+        { emitEvent: false },
+      );
+    await this.loadTeam();
+  }
+
+  private async loadTeam(): Promise<void> {
+    this.teamLoading.set(true);
+    try {
+      const page = await firstValueFrom(this.accessApi.trainers());
+      const members = (page ?? [])
+        .filter(
+          (account) => account.status === "Active" && !account.isInvitation,
+        )
+        .map((account) => ({
+          id: this.text(account.id),
+          firstName: this.text(account.firstName),
+          lastName: this.text(account.lastName),
+          name:
+            `${this.text(account.firstName)} ${this.text(account.lastName)}`.trim() ||
+            this.text(account.email),
+        }))
+        .filter((member) => member.id && this.fullName(member));
+      this.team.set(members);
+      const current = this.form.controls.managerUserId.value;
+      if (!current || !members.some((member) => member.id === current))
+        this.form.controls.managerUserId.setValue(members[0]?.id ?? "", {
+          emitEvent: false,
+        });
+    } catch {
+      this.team.set([]);
+      this.form.controls.managerUserId.setValue("", { emitEvent: false });
+    } finally {
+      this.teamLoading.set(false);
+    }
   }
 
   private resetForm(): void {
@@ -189,7 +229,7 @@ export class CreatePromotionDrawerComponent {
       startDate: "",
       endDate: "",
       studentCount: 0,
-      manager: "",
+      managerUserId: this.team()[0]?.id ?? "",
       referentialVersionId: this.referentials()[0]?.id ?? "",
       status: "planned",
     });

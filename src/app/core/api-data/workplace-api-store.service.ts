@@ -1,4 +1,11 @@
-import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
+import {
+  Injectable,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import type { InternshipPeriod } from "../models/internships.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
@@ -73,7 +80,9 @@ export class WorkplaceApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
-      const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
+      const referentialVersionId = this.text(
+        this.workspace.cohort()?.referentialVersionId,
+      );
       const role = this.session.role();
       const generation = ++this.generation;
 
@@ -84,7 +93,12 @@ export class WorkplaceApiStoreService {
       this.typesError.set(false);
 
       if (ready && cohortApiId) {
-        void this.loadContext(cohortApiId, referentialVersionId, role, generation);
+        void this.loadContext(
+          cohortApiId,
+          referentialVersionId,
+          role,
+          generation,
+        );
       }
     });
 
@@ -97,23 +111,44 @@ export class WorkplaceApiStoreService {
 
   async reload(notify = true): Promise<boolean> {
     const cohortApiId = this.text(this.workspace.cohort()?.apiId);
-    const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
+    const referentialVersionId = this.text(
+      this.workspace.cohort()?.referentialVersionId,
+    );
     if (!cohortApiId) {
       this.rowsSignal.set([]);
       this.learnersSignal.set([]);
       this.periodTypesSignal.set([]);
       return true;
     }
-    return this.loadContext(cohortApiId, referentialVersionId, this.session.role(), this.generation, notify);
+    return this.loadContext(
+      cohortApiId,
+      referentialVersionId,
+      this.session.role(),
+      this.generation,
+      notify,
+    );
   }
 
-  async create(value: CreateWorkplacePeriodValue): Promise<WorkplacePeriodDto | null> {
+  async create(
+    value: CreateWorkplacePeriodValue,
+  ): Promise<WorkplacePeriodDto | null> {
     if (this.creating()) return null;
 
     const enrollmentId = this.text(value.studentId);
     const periodTypeCode = this.periodTypesSignal()[0] ?? "";
-    if (!enrollmentId || !periodTypeCode || !this.text(value.startDate) || !this.text(value.endDate) || this.number(value.plannedHours) <= 0) {
-      this.notifications.error(periodTypeCode ? "internships.real.createError" : "internships.real.noTypes", "/stages");
+    if (
+      !enrollmentId ||
+      !periodTypeCode ||
+      !this.text(value.startDate) ||
+      !this.text(value.endDate) ||
+      this.number(value.plannedHours) <= 0
+    ) {
+      this.notifications.error(
+        periodTypeCode
+          ? "internships.real.createError"
+          : "internships.real.noTypes",
+        "/stages",
+      );
       return null;
     }
 
@@ -135,7 +170,10 @@ export class WorkplaceApiStoreService {
     this.creating.set(true);
     try {
       const created = this.normalize(await this.api.createPeriod(payload));
-      this.rowsSignal.update((items) => [created, ...items.filter((item) => item.id !== created.id)]);
+      this.rowsSignal.update((items) => [
+        created,
+        ...items.filter((item) => item.id !== created.id),
+      ]);
       await this.reload(false);
       return created;
     } catch {
@@ -166,20 +204,25 @@ export class WorkplaceApiStoreService {
           rows = enrollmentId ? await this.api.getMyPeriods(enrollmentId) : [];
           this.learnersSignal.set(
             enrollmentId
-              ? [{
-                  enrollmentId,
-                  firstName: this.text(self?.firstName),
-                  lastName: this.text(self?.lastName),
-                  displayName: `${this.text(self?.firstName)} ${this.text(self?.lastName)}`.trim(),
-                  externalKey: null,
-                }]
+              ? [
+                  {
+                    enrollmentId,
+                    firstName: this.text(self?.firstName),
+                    lastName: this.text(self?.lastName),
+                    displayName:
+                      `${this.text(self?.firstName)} ${this.text(self?.lastName)}`.trim(),
+                    externalKey: null,
+                  },
+                ]
               : [],
           );
         } else {
           rows = await this.api.getPeriods(cohortApiId);
         }
         if (generation === this.generation && request === this.request) {
-          this.rowsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)));
+          this.rowsSignal.set(
+            (Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)),
+          );
           this.loadError.set(false);
         }
       } catch {
@@ -187,37 +230,55 @@ export class WorkplaceApiStoreService {
         if (generation === this.generation && request === this.request) {
           this.rowsSignal.set([]);
           this.loadError.set(true);
-          if (notify) this.notifications.error("internships.real.loadError", "/stages");
+          if (notify)
+            this.notifications.error("internships.real.loadError", "/stages");
         }
       }
     })();
 
-    const learnersTask = role === "stagiaire"
-      ? Promise.resolve()
-      : (async () => {
-          try {
-            const learners = await this.api.getLearners(cohortApiId);
-            if (generation === this.generation && request === this.request) {
-              this.learnersSignal.set((Array.isArray(learners) ? learners : []).map((row) => this.normalizeLearner(row)));
+    const learnersTask =
+      role === "stagiaire"
+        ? Promise.resolve()
+        : (async () => {
+            try {
+              const learners = await this.api.getLearners(cohortApiId);
+              if (generation === this.generation && request === this.request) {
+                this.learnersSignal.set(
+                  (Array.isArray(learners) ? learners : []).map((row) =>
+                    this.normalizeLearner(row),
+                  ),
+                );
+              }
+            } catch {
+              ok = false;
+              if (generation === this.generation && request === this.request) {
+                this.learnersSignal.set([]);
+                if (notify)
+                  this.notifications.error(
+                    "internships.real.loadError",
+                    "/stages",
+                  );
+              }
             }
-          } catch {
-            ok = false;
-            if (generation === this.generation && request === this.request) {
-              this.learnersSignal.set([]);
-              if (notify) this.notifications.error("internships.real.loadError", "/stages");
-            }
-          }
-        })();
+          })();
 
     const typesTask = (async () => {
-      if (!["direction", "secretariat"].includes(role) || !referentialVersionId) {
+      if (
+        !["direction", "secretariat"].includes(role) ||
+        !referentialVersionId
+      ) {
         this.periodTypesSignal.set([]);
         return;
       }
       try {
         const types = await this.api.getPeriodTypes(referentialVersionId);
         if (generation === this.generation && request === this.request) {
-          this.periodTypesSignal.set((Array.isArray(types) ? types : []).map((value) => this.text(value).trim()).filter(Boolean).sort());
+          this.periodTypesSignal.set(
+            (Array.isArray(types) ? types : [])
+              .map((value) => this.text(value).trim())
+              .filter(Boolean)
+              .sort(),
+          );
           this.typesError.set(false);
         }
       } catch {
@@ -225,13 +286,15 @@ export class WorkplaceApiStoreService {
         if (generation === this.generation && request === this.request) {
           this.periodTypesSignal.set([]);
           this.typesError.set(true);
-          if (notify) this.notifications.error("internships.real.typesError", "/stages");
+          if (notify)
+            this.notifications.error("internships.real.typesError", "/stages");
         }
       }
     })();
 
     await Promise.all([periodTask, learnersTask, typesTask]);
-    if (generation === this.generation && request === this.request) this.loading.set(false);
+    if (generation === this.generation && request === this.request)
+      this.loading.set(false);
     return ok;
   }
 
@@ -251,21 +314,31 @@ export class WorkplaceApiStoreService {
       status: normalized.status,
       trainerVisible: normalized.trainerVisible,
       activities: normalized.activities.map((activity) => ({
-        labelKey: this.text(activity.labelKey) || this.text(activity.title) || this.text(activity.code),
+        labelKey:
+          this.text(activity.labelKey) ||
+          this.text(activity.title) ||
+          this.text(activity.code),
         status: activity.status,
       })),
       tutorObservationKey: this.text(normalized.tutorObservation),
       documents: normalized.documents.map((document) => ({
-        labelKey: this.text(document.labelKey) || this.text(document.title) || this.text(document.code),
+        labelKey:
+          this.text(document.labelKey) ||
+          this.text(document.title) ||
+          this.text(document.code),
         status: document.status,
       })),
     };
   }
 
   private normalize(row: WorkplacePeriodDto): WorkplacePeriodDto {
-    const status = row?.status === "inProgress" || row?.status === "completed" || row?.status === "incomplete" || row?.status === "cancelled"
-      ? row.status
-      : "planned";
+    const status =
+      row?.status === "inProgress" ||
+      row?.status === "completed" ||
+      row?.status === "incomplete" ||
+      row?.status === "cancelled"
+        ? row.status
+        : "planned";
     return {
       id: this.text(row?.id),
       enrollmentId: this.text(row?.enrollmentId),
@@ -296,7 +369,11 @@ export class WorkplaceApiStoreService {
             title: this.text(activity?.title),
             labelKey: this.optionalText(activity?.labelKey),
             mandatory: Boolean(activity?.mandatory),
-            status: activity?.status === "done" || activity?.status === "notApplicable" ? activity.status : "pending",
+            status:
+              activity?.status === "done" ||
+              activity?.status === "notApplicable"
+                ? activity.status
+                : "pending",
             comment: this.optionalText(activity?.comment),
           }))
         : [],
@@ -308,7 +385,11 @@ export class WorkplaceApiStoreService {
             title: this.text(document?.title),
             labelKey: this.optionalText(document?.labelKey),
             mandatory: Boolean(document?.mandatory),
-            status: document?.status === "available" || document?.status === "validated" ? document.status : "missing",
+            status:
+              document?.status === "available" ||
+              document?.status === "validated"
+                ? document.status
+                : "missing",
             documentId: this.optionalText(document?.documentId),
           }))
         : [],
@@ -321,7 +402,10 @@ export class WorkplaceApiStoreService {
             summary: this.text(evaluation?.summary),
             strengths: this.optionalText(evaluation?.strengths),
             improvementAreas: this.optionalText(evaluation?.improvementAreas),
-            validated: typeof evaluation?.validated === "boolean" ? evaluation.validated : null,
+            validated:
+              typeof evaluation?.validated === "boolean"
+                ? evaluation.validated
+                : null,
           }))
         : [],
     };

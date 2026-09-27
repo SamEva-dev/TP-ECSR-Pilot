@@ -10,7 +10,9 @@ const STORAGE_KEY = "tp-ecsr-pilot.attention-read";
 export class AttentionService {
   private readonly access = inject(AccessPolicyService);
   private readonly workspace = inject(WorkspaceContextService);
-  private readonly applicationNotifications = inject(ApplicationNotificationService);
+  private readonly applicationNotifications = inject(
+    ApplicationNotificationService,
+  );
   private readonly readIds = signal<Set<string>>(this.restore());
 
   readonly items = computed(() => {

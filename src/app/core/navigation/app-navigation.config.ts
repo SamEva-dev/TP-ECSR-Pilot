@@ -1,6 +1,7 @@
 import type { AppPermission } from "../access/access.models";
 import type { ProgramModule } from "../models/workspace.models";
 import type { UserRole } from "../models/app.models";
+import type { MembershipRole } from "../models/workspace.models";
 
 export interface AppNavItem {
   path: string;
@@ -9,6 +10,8 @@ export interface AppNavItem {
   permission: AppPermission;
   module?: ProgramModule;
   audiences: readonly UserRole[];
+  /** Optional hard audience constraint for role-exclusive areas such as the jury workspace. */
+  requiredRoles?: readonly MembershipRole[];
 }
 
 export const APP_NAV_ITEMS: readonly AppNavItem[] = [
@@ -154,6 +157,7 @@ export const APP_NAV_ITEMS: readonly AppNavItem[] = [
     icon: "ph-gavel",
     permission: "jury.view",
     audiences: ["jury"],
+    requiredRoles: ["jury"],
   },
   {
     path: "/resultats",
