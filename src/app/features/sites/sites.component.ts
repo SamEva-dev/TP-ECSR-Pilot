@@ -1,19 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { SiteApiStoreService } from "../../core/api-data/site-api-store.service";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import type {
-  SiteFormValue,
-  SiteOperationalStatus,
-  SiteProfile,
-} from "../../core/models/sites.models";
+import { TranslateService } from "../../core/i18n/translate.service";
+import type { SiteFormValue, SiteOperationalStatus, SiteProfile } from "../../core/models/sites.models";
 import { ApplicationNotificationService } from "../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
@@ -27,6 +18,8 @@ import { SiteDrawerComponent } from "./site-drawer/site-drawer.component";
 export class SitesComponent {
   private readonly router = inject(Router);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly translate = inject(TranslateService);
+  readonly access = inject(AccessPolicyService);
   readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(SiteApiStoreService);
   readonly query = signal("");
@@ -35,47 +28,35 @@ export class SitesComponent {
   readonly editingSite = signal<SiteProfile | null>(null);
 
   readonly organizationSites = computed(() =>
-    this.store
-      .sites()
-      .filter(
-        (site) =>
-          site.organizationId === (this.workspace.organization()?.id ?? ""),
-      ),
+    this.store.sites().filter((site) => site.organizationId === (this.workspace.organization()?.id ?? "")),
   );
 
   readonly filteredSites = computed(() => {
     const query = this.query().trim().toLocaleLowerCase("fr-FR");
     const status = this.status();
     return this.organizationSites().filter((site) => {
-      const matchesQuery =
-        !query ||
-        [site.name, site.city, site.code, site.manager]
-          .map((value) => value ?? "")
-          .some((value) => value.toLocaleLowerCase("fr-FR").includes(query));
+      const matchesQuery = !query || [site.name, site.city, site.code, site.manager]
+        .map((value) => value ?? "")
+        .some((value) => value.toLocaleLowerCase("fr-FR").includes(query));
       const matchesStatus = status === "all" || site.status === status;
       return matchesQuery && matchesStatus;
     });
   });
 
-  readonly totals = computed(() =>
-    this.organizationSites().reduce(
-      (acc, site) => ({
-        students: acc.students + (site.students ?? 0),
-        trainers: acc.trainers + (site.trainers ?? 0),
-        programs: acc.programs + (site.programs ?? 0),
-        alerts: acc.alerts + (site.alerts ?? 0),
-      }),
-      { students: 0, trainers: 0, programs: 0, alerts: 0 },
-    ),
-  );
+  readonly totals = computed(() => this.organizationSites().reduce(
+    (acc, site) => ({
+      students: acc.students + (site.students ?? 0),
+      trainers: acc.trainers + (site.trainers ?? 0),
+      programs: acc.programs + (site.programs ?? 0),
+      alerts: acc.alerts + (site.alerts ?? 0),
+    }),
+    { students: 0, trainers: 0, programs: 0, alerts: 0 },
+  ));
 
   constructor() {
     effect(() => {
       if (this.workspace.remoteWorkspaceError())
-        this.notifications.error(
-          "sites.real.workspaceError",
-          "/etablissements",
-        );
+        this.notifications.error("sites.real.workspaceError", "/etablissements");
     });
   }
 
@@ -91,6 +72,15 @@ export class SitesComponent {
   editSite(site: SiteProfile): void {
     this.editingSite.set(site);
     this.drawerOpen.set(true);
+  }
+
+  async deleteSite(site: SiteProfile): Promise<void> {
+    if (!this.access.can("sites.delete")) return;
+    const confirmed = typeof window === "undefined" || window.confirm(
+      this.translate.instant("sites.delete.confirm", { name: site.name }),
+    );
+    if (!confirmed) return;
+    await this.store.delete(site.id);
   }
 
   async saveSite(value: SiteFormValue): Promise<void> {

@@ -11,6 +11,8 @@ export interface CreateCohortRequest {
   startDate: string;
   endDate: string;
   capacity: number;
+  pedagogicalManagerAuthGateUserId: string | null;
+  pedagogicalManagerDisplayName: string | null;
   externalKey: string | null;
 }
 
@@ -27,6 +29,8 @@ export interface CohortResponse {
   endDate: string;
   capacity: number;
   learnerCount: number;
+  pedagogicalManagerAuthGateUserId: string | null;
+  pedagogicalManagerDisplayName: string;
   status: "draft" | "planned" | "active" | "completed" | "cancelled";
 }
 
@@ -72,45 +76,33 @@ export class TrainingCatalogApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/api/v1/cohorts`;
 
-  list(
-    filters: {
-      organizationId?: string;
-      siteId?: string;
-      programId?: string;
-    } = {},
-  ): Promise<CohortResponse[]> {
+  list(filters: {
+    organizationId?: string;
+    siteId?: string;
+    programId?: string;
+  } = {}): Promise<CohortResponse[]> {
     let params = new HttpParams();
-    if (filters.organizationId)
-      params = params.set("organizationId", filters.organizationId);
+    if (filters.organizationId) params = params.set("organizationId", filters.organizationId);
     if (filters.siteId) params = params.set("siteId", filters.siteId);
     if (filters.programId) params = params.set("programId", filters.programId);
-    return firstValueFrom(
-      this.http.get<CohortResponse[]>(this.baseUrl, { params }),
-    );
+    return firstValueFrom(this.http.get<CohortResponse[]>(this.baseUrl, { params }));
   }
 
   createCohort(request: CreateCohortRequest): Promise<CohortResponse> {
+    return firstValueFrom(this.http.post<CohortResponse>(this.baseUrl, request));
+  }
+
+  updateCohort(id: string, request: UpdateCohortRequest): Promise<CohortResponse> {
     return firstValueFrom(
-      this.http.post<CohortResponse>(this.baseUrl, request),
+      this.http.put<CohortResponse>(`${this.baseUrl}/${encodeURIComponent(id)}`, request),
     );
   }
 
-  updateCohort(
-    id: string,
-    request: UpdateCohortRequest,
-  ): Promise<CohortResponse> {
-    return firstValueFrom(
-      this.http.put<CohortResponse>(
-        `${this.baseUrl}/${encodeURIComponent(id)}`,
-        request,
-      ),
-    );
+  deleteCohort(id: string): Promise<void> {
+    return firstValueFrom(this.http.delete<void>(`${this.baseUrl}/${encodeURIComponent(id)}`));
   }
 
-  enroll(
-    cohortId: string,
-    request: EnrollLearnerRequest,
-  ): Promise<LearnerResponse> {
+  enroll(cohortId: string, request: EnrollLearnerRequest): Promise<LearnerResponse> {
     return firstValueFrom(
       this.http.post<LearnerResponse>(
         `${this.baseUrl}/${encodeURIComponent(cohortId)}/learners`,

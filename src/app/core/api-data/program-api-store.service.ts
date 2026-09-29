@@ -168,6 +168,22 @@ export class ProgramApiStoreService {
     }
   }
 
+  async delete(id: string): Promise<boolean> {
+    const current = this.programsSignal().find((item) => item.id === id);
+    if (!current?.apiId) return false;
+    try {
+      await this.api.delete(current.apiId);
+      this.programsSignal.update((items) => items.filter((item) => item.id !== id));
+      await this.workspace.reload();
+      await this.reload();
+      return true;
+    } catch (error: any) {
+      const code = typeof error?.error?.code === "string" ? error.error.code : typeof error?.code === "string" ? error.code : "";
+      this.notifications.error(code ? `backendErrors.${code}` : "programs.real.deleteError", "/formations");
+      return false;
+    }
+  }
+
   async toggleSite(programId: string, siteId: string): Promise<boolean> {
     try {
       const program = this.programsSignal().find((item) => item.id === programId);

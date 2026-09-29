@@ -658,6 +658,7 @@
         "context": "Contexte de création",
         "referential": "Version du référentiel",
         "chooseReferential": "Sélectionner un référentiel",
+        "chooseTrainer": "Sélectionner un formateur",
         "status": "Statut initial",
         "studentCount": "Effectif prévu",
         "studentCountError": "L’effectif doit être supérieur à 0.",
@@ -689,7 +690,12 @@
       "retry": "Réessayer",
       "loading": "Chargement des promotions…",
       "loadFailed": "Impossible de charger les promotions.",
-      "metricsFailed": "Certaines métriques de promotion n’ont pas pu être chargées. Les valeurs indisponibles sont affichées à 0."
+      "metricsFailed": "Certaines métriques de promotion n’ont pas pu être chargées. Les valeurs indisponibles sont affichées à 0.",
+      "deleteFailed": "Impossible de supprimer cette promotion."
+    },
+    "delete": {
+      "action": "Supprimer la promotion",
+      "confirm": "Supprimer définitivement « {{name}} » ? Seules les promotions en brouillon ou à venir et sans données opérationnelles peuvent être supprimées. Cette action est irréversible."
     }
   },
   "sessions": {
@@ -1784,6 +1790,14 @@
         "certification": {
           "title": "Certification / examen",
           "description": "Accès aux sessions, candidats et évaluations de certification selon le rôle."
+        },
+        "sessionsOthers": {
+          "title": "Voir les séances des autres formateurs",
+          "description": "Autorise ce formateur à consulter les séances attribuées à d’autres formateurs dans son périmètre."
+        },
+        "drivingOthers": {
+          "title": "Voir la conduite des autres formateurs",
+          "description": "Autorise ce formateur à consulter les évaluations de conduite réalisées par d’autres formateurs dans son périmètre."
         }
       },
       "studentRule": "Un stagiaire ne peut jamais modifier une évaluation saisie par un formateur, même si d’autres droits lui sont accordés.",
@@ -2831,7 +2845,12 @@
       "noPrograms": "Aucune formation accessible pour cet établissement.",
       "noCohorts": "Aucune promotion accessible pour cet établissement.",
       "workspaceError": "Impossible de charger les établissements.",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "deleteError": "Impossible de supprimer cet établissement."
+    },
+    "delete": {
+      "action": "Supprimer l’établissement",
+      "confirm": "Supprimer définitivement « {{name}} » ? Cette action n’est autorisée que si l’établissement ne contient plus de données opérationnelles. Cette suppression est irréversible."
     }
   },
   "programs": {
@@ -2974,7 +2993,12 @@
       "noSites": "Aucun établissement accessible.",
       "noCohorts": "Aucune promotion rattachée à cette formation.",
       "notFound": "Cette formation est absente ou inaccessible.",
-      "workspaceError": "Impossible de charger le contexte des formations."
+      "workspaceError": "Impossible de charger le contexte des formations.",
+      "deleteError": "Impossible de supprimer cette formation."
+    },
+    "delete": {
+      "action": "Supprimer la formation",
+      "confirm": "Supprimer définitivement « {{name}} » ? La suppression est refusée si la formation, son référentiel ou ses versions sont déjà utilisés. Cette action est irréversible."
     }
   },
   "referentials": {
@@ -3797,7 +3821,12 @@
     "SESSION_TRAINER_IDENTITY_INVALID": "L’identité du formateur associée à la séance est invalide.",
     "WORKPLACE_PERIOD_TYPE_INVALID": "Le type de période en entreprise est invalide.",
     "WORKPLACE_DOCUMENT_REQUIRED": "Le document requis pour cette période en entreprise est obligatoire.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7.",
+    "SITE_DELETE_IN_USE": "Cet établissement ne peut pas être supprimé car il contient déjà des données opérationnelles. Désactivez ou archivez-le plutôt.",
+    "PROGRAM_DELETE_IN_USE": "Cette formation ne peut pas être supprimée car elle est déjà utilisée par une promotion ou une activité de formation.",
+    "PROGRAM_DELETE_REFERENTIAL_IN_USE": "Cette formation ne peut pas être supprimée car son référentiel ou une de ses versions est déjà utilisé.",
+    "COHORT_DELETE_IN_USE": "Cette promotion ne peut pas être supprimée car elle contient déjà des stagiaires ou des données de formation.",
+    "COHORT_DELETE_STATUS_FORBIDDEN": "Cette promotion ne peut plus être supprimée dans son état actuel. Seules les promotions en brouillon ou à venir peuvent être supprimées."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",

@@ -5,7 +5,9 @@ export type AppPermission =
   | "organization.commercial.read"
   | "organization.commercial.manage"
   | "sites.view"
+  | "sites.delete"
   | "programs.view"
+  | "programs.delete"
   | "referentials.view"
   | "planning.view"
   | "remoteWork.view"
@@ -13,8 +15,13 @@ export type AppPermission =
   | "students.view"
   | "studentDetail.view"
   | "promotions.view"
+  | "promotions.delete"
   | "sessions.view"
+  | "sessions.viewOthers"
+  | "sessions.assignTrainer"
   | "driving.view"
+  | "driving.viewOthers"
+  | "driving.assignTrainer"
   | "sheets.view"
   | "skills.view"
   | "attendance.view"
@@ -32,16 +39,16 @@ export type AppPermission =
   | "access.privileged.manage"
   | "administration.manage";
 
-import type {
-  MembershipRole,
-  WorkspaceMembership,
-} from "../models/workspace.models";
+
+import type { MembershipRole, WorkspaceMembership } from "../models/workspace.models";
 
 export type AccessState = "active" | "invited" | "suspended";
 export type AccessPermissionKey =
   | "students"
   | "sessions"
+  | "sessionsOthers"
   | "evaluations"
+  | "drivingOthers"
   | "documents"
   | "certification"
   | "reports"

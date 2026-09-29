@@ -47,29 +47,14 @@ export class AddStudentDrawerComponent {
   });
 
   readonly form = new FormGroup({
-    firstName: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    lastName: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    email: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
+    firstName: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    lastName: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email] }),
     phone: new FormControl("", { nonNullable: true }),
     birthDate: new FormControl("", { nonNullable: true }),
-    promotionId: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    startDate: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    sendInvitation: new FormControl(true, { nonNullable: true }),
+    promotionId: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    startDate: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    sendInvitation: new FormControl({ value: true, disabled: true }, { nonNullable: true }),
   });
 
   constructor() {
@@ -112,14 +97,9 @@ export class AddStudentDrawerComponent {
     this.submitted.set(false);
   }
 
-  showRequired(
-    controlName:
-      "firstName" | "lastName" | "email" | "promotionId" | "startDate",
-  ): boolean {
+  showRequired(controlName: "firstName" | "lastName" | "email" | "promotionId" | "startDate"): boolean {
     const control = this.form.controls[controlName];
-    return (
-      (this.submitted() || control.touched) && control.hasError("required")
-    );
+    return (this.submitted() || control.touched) && control.hasError("required");
   }
 
   showEmailError(): boolean {

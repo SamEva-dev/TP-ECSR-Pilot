@@ -1,11 +1,4 @@
-import {
-  Injectable,
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-} from "@angular/core";
+import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import type {
   DrivingCriterion,
@@ -13,6 +6,7 @@ import type {
   DrivingLevel,
 } from "../models/driving.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
+import { PedagoraAccessApiService } from "../access/pedagora-access-api.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
 import {
@@ -69,6 +63,8 @@ export interface RecordDrivingValue {
   nextGoal: string;
   freeObservation: string;
   date: string;
+  trainerAuthGateUserId: string;
+  trainerDisplayName: string;
 }
 
 @Injectable({ providedIn: "root" })
@@ -78,12 +74,14 @@ export class DrivingApiStoreService {
   private readonly session = inject(SessionService);
   private readonly sessions = inject(TrainingSessionApiStoreService);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly accessApi = inject(PedagoraAccessApiService);
   private readonly realtime = inject(RealtimeService);
 
   private readonly learnersSignal = signal<LearnerProfileApi[]>([]);
   private readonly definitionsSignal = signal<CompetencyDefinitionApi[]>([]);
   private readonly historySignal = signal<DrivingHistoryItem[]>([]);
   private readonly selectedEnrollmentSignal = signal("");
+  private readonly trainersSignal = signal<DrivingTrainerOption[]>([]);
 
   readonly loading = signal(false);
   readonly historyLoading = signal(false);
@@ -100,21 +98,12 @@ export class DrivingApiStoreService {
     })),
   );
 
-  readonly trainers = computed<DrivingTrainerOption[]>(() => {
-    const current = this.session.session();
-    const name =
-      `${this.text(current?.firstName)} ${this.text(current?.lastName)}`.trim();
-    return name ? [{ id: this.text(current?.userId), name }] : [];
-  });
+  readonly trainers = this.trainersSignal.asReadonly();
 
   readonly competencies = computed<DrivingCompetencyOption[]>(() => {
-    const definitions = this.definitionsSignal().filter(
-      (item) => item.active !== false,
-    );
+    const definitions = this.definitionsSignal().filter((item) => item.active !== false);
     const roots = definitions.filter((item) => !this.text(item.parentId));
-    const ecsrRoots = roots.filter((item) =>
-      /^C[1-4]$/i.test(this.text(item.code)),
-    );
+    const ecsrRoots = roots.filter((item) => /^C[1-4]$/i.test(this.text(item.code)));
     return (ecsrRoots.length ? ecsrRoots : roots)
       .slice()
       .sort((a, b) => this.number(a.sortOrder) - this.number(b.sortOrder))
@@ -133,9 +122,7 @@ export class DrivingApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
-      const referentialVersionId = this.text(
-        this.workspace.cohort()?.referentialVersionId,
-      );
+      const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
       const role = this.session.role();
       const generation = ++this.contextGeneration;
       this.learnersSignal.set([]);
@@ -144,13 +131,10 @@ export class DrivingApiStoreService {
       this.selectedEnrollmentSignal.set("");
       this.loadError.set(false);
       this.definitionsError.set(false);
-      if (ready && cohortApiId)
-        void this.loadContext(
-          cohortApiId,
-          referentialVersionId,
-          role === "stagiaire",
-          generation,
-        );
+      if (ready && cohortApiId) {
+        void this.loadContext(cohortApiId, referentialVersionId, role === "stagiaire", generation);
+        if (role !== "stagiaire") void this.loadEligibleTrainers();
+      }
     });
 
     effect(() => {
@@ -163,17 +147,28 @@ export class DrivingApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (
-        !event ||
-        event.typeKey !== "pedagora.learning.driving-evaluation.recorded.v1"
-      )
-        return;
+      if (!event || event.typeKey !== "pedagora.learning.driving-evaluation.recorded.v1") return;
       untracked(() => {
         const enrollmentId = this.selectedEnrollmentSignal();
-        if (enrollmentId)
-          void this.loadHistory(enrollmentId, ++this.historyGeneration, false);
+        if (enrollmentId) void this.loadHistory(enrollmentId, ++this.historyGeneration, false);
       });
     });
+  }
+
+
+  private async loadEligibleTrainers(): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.accessApi.drivingTrainerAssignees());
+      this.trainersSignal.set((rows ?? []).map((row) => ({
+        id: this.text(row.id),
+        name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
+      })).filter((row) => !!row.id && !!row.name));
+    } catch {
+      const current = this.session.session();
+      const id = this.text(current?.userId);
+      const name = this.currentUserName();
+      this.trainersSignal.set(id && name ? [{ id, name }] : []);
+    }
   }
 
   selectStudent(enrollmentId: string): void {
@@ -209,10 +204,7 @@ export class DrivingApiStoreService {
     const start = this.date(session.startsAtUtc);
     const end = this.date(session.endsAtUtc);
     if (!start || !end) return { date: "", start: "", end: "", duration: "" };
-    const minutes = Math.max(
-      0,
-      Math.round((end.getTime() - start.getTime()) / 60000),
-    );
+    const minutes = Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000));
     return {
       date: this.localIsoDate(start),
       start: this.localTime(start),
@@ -224,9 +216,7 @@ export class DrivingApiStoreService {
   async record(value: RecordDrivingValue): Promise<boolean> {
     const enrollmentId = this.text(value.enrollmentId);
     const root = this.definitionByCode(value.competenceCode);
-    const subSkill = root
-      ? this.definitionByCode(value.subSkillCode, root.id)
-      : null;
+    const subSkill = root ? this.definitionByCode(value.subSkillCode, root.id) : null;
     const target = subSkill ?? root;
     const criteria = this.criteria(value.competenceCode, value.subSkillCode);
     if (!enrollmentId || !target?.id || !criteria.length) {
@@ -244,10 +234,7 @@ export class DrivingApiStoreService {
       return false;
     }
 
-    const subject =
-      this.text(value.objective).trim() ||
-      this.text(target.title).trim() ||
-      this.text(target.code).trim();
+    const subject = this.text(value.objective).trim() || this.text(target.title).trim() || this.text(target.code).trim();
     if (!subject) {
       this.notifications.error("drivingSession.real.saveError", "/conduite");
       return false;
@@ -258,17 +245,13 @@ export class DrivingApiStoreService {
       competencyDefinitionId: this.text(target.id),
       trainingSessionId: linkedSession?.id ?? null,
       evaluatedAtUtc: new Date().toISOString(),
-      trainerAuthGateUserId: null,
-      trainerDisplayName: this.currentUserName(),
+      trainerAuthGateUserId: this.nullableText(value.trainerAuthGateUserId),
+      trainerDisplayName: this.text(value.trainerDisplayName).trim() || this.currentUserName(),
       subject,
       positive: this.nullableText(value.positive),
       difficulty: this.nullableText(value.difficulties),
       nextGoal: this.nullableText(value.nextGoal),
-      freeObservation: this.observation(
-        value.freeObservation,
-        value.errors,
-        value.advice,
-      ),
+      freeObservation: this.observation(value.freeObservation, value.errors, value.advice),
       criteria: payloadCriteria.map((criterion) => ({
         code: criterion.code,
         label: criterion.label,
@@ -277,13 +260,8 @@ export class DrivingApiStoreService {
     };
 
     try {
-      const created = await firstValueFrom(
-        this.api.recordDriving(enrollmentId, request),
-      );
-      this.historySignal.update((items) => [
-        this.mapHistory(created, enrollmentId),
-        ...items.filter((item) => item.id !== created.id),
-      ]);
+      const created = await firstValueFrom(this.api.recordDriving(enrollmentId, request));
+      this.historySignal.update((items) => [this.mapHistory(created, enrollmentId), ...items.filter((item) => item.id !== created.id)]);
       await this.loadHistory(enrollmentId, ++this.historyGeneration, false);
       return true;
     } catch {
@@ -292,12 +270,7 @@ export class DrivingApiStoreService {
     }
   }
 
-  private async loadContext(
-    cohortApiId: string,
-    referentialVersionId: string,
-    selfOnly: boolean,
-    generation: number,
-  ): Promise<void> {
+  private async loadContext(cohortApiId: string, referentialVersionId: string, selfOnly: boolean, generation: number): Promise<void> {
     this.loading.set(true);
     const learnersPromise = selfOnly
       ? firstValueFrom(this.api.self()).then((row) => [row])
@@ -306,18 +279,11 @@ export class DrivingApiStoreService {
       ? firstValueFrom(this.api.competencyDefinitions(referentialVersionId))
       : Promise.resolve([] as CompetencyDefinitionApi[]);
 
-    const [learnersResult, definitionsResult] = await Promise.allSettled([
-      learnersPromise,
-      definitionsPromise,
-    ]);
+    const [learnersResult, definitionsResult] = await Promise.allSettled([learnersPromise, definitionsPromise]);
     if (generation !== this.contextGeneration) return;
 
     if (learnersResult.status === "fulfilled") {
-      this.learnersSignal.set(
-        (Array.isArray(learnersResult.value) ? learnersResult.value : []).map(
-          (row) => this.normalizeLearner(row),
-        ),
-      );
+      this.learnersSignal.set((Array.isArray(learnersResult.value) ? learnersResult.value : []).map((row) => this.normalizeLearner(row)));
       this.loadError.set(false);
     } else {
       this.learnersSignal.set([]);
@@ -326,20 +292,12 @@ export class DrivingApiStoreService {
     }
 
     if (definitionsResult.status === "fulfilled") {
-      this.definitionsSignal.set(
-        (Array.isArray(definitionsResult.value)
-          ? definitionsResult.value
-          : []
-        ).map((row) => this.normalizeDefinition(row)),
-      );
+      this.definitionsSignal.set((Array.isArray(definitionsResult.value) ? definitionsResult.value : []).map((row) => this.normalizeDefinition(row)));
       this.definitionsError.set(false);
     } else {
       this.definitionsSignal.set([]);
       this.definitionsError.set(true);
-      this.notifications.error(
-        "drivingSession.real.definitionsError",
-        "/conduite",
-      );
+      this.notifications.error("drivingSession.real.definitionsError", "/conduite");
     }
 
     const firstEnrollment = this.learnersSignal()[0]?.enrollmentId ?? "";
@@ -347,57 +305,32 @@ export class DrivingApiStoreService {
     this.loading.set(false);
   }
 
-  private async loadHistory(
-    enrollmentId: string,
-    generation: number,
-    notify = true,
-  ): Promise<void> {
+  private async loadHistory(enrollmentId: string, generation: number, notify = true): Promise<void> {
     this.historyLoading.set(true);
     try {
       const rows = await firstValueFrom(this.api.driving(enrollmentId));
-      if (
-        generation !== this.historyGeneration ||
-        enrollmentId !== this.selectedEnrollmentSignal()
-      )
-        return;
-      this.historySignal.set(
-        (Array.isArray(rows) ? rows : []).map((row) =>
-          this.mapHistory(row, enrollmentId),
-        ),
-      );
+      if (generation !== this.historyGeneration || enrollmentId !== this.selectedEnrollmentSignal()) return;
+      this.historySignal.set((Array.isArray(rows) ? rows : []).map((row) => this.mapHistory(row, enrollmentId)));
       this.historyError.set(false);
     } catch {
-      if (
-        generation === this.historyGeneration &&
-        enrollmentId === this.selectedEnrollmentSignal()
-      ) {
+      if (generation === this.historyGeneration && enrollmentId === this.selectedEnrollmentSignal()) {
         this.historySignal.set([]);
         this.historyError.set(true);
-        if (notify)
-          this.notifications.error(
-            "drivingSession.real.historyError",
-            "/conduite",
-          );
+        if (notify) this.notifications.error("drivingSession.real.historyError", "/conduite");
       }
     } finally {
       if (generation === this.historyGeneration) this.historyLoading.set(false);
     }
   }
 
-  private mapHistory(
-    row: DrivingEvaluationApi,
-    enrollmentId: string,
-  ): DrivingHistoryItem {
+  private mapHistory(row: DrivingEvaluationApi, enrollmentId: string): DrivingHistoryItem {
     const target = this.definitionById(row?.competencyDefinitionId);
     const root = target ? this.rootOf(target) : null;
-    const student = this.learnersSignal().find(
-      (item) => item.enrollmentId === enrollmentId,
-    );
+    const student = this.learnersSignal().find((item) => item.enrollmentId === enrollmentId);
     return {
       id: this.text(row?.id),
       studentId: this.text(enrollmentId),
-      studentName:
-        `${this.text(student?.firstName)} ${this.text(student?.lastName)}`.trim(),
+      studentName: `${this.text(student?.firstName)} ${this.text(student?.lastName)}`.trim(),
       date: this.shortLocalDate(row?.evaluatedAtUtc),
       competence: this.text(root?.code),
       trainer: this.text(row?.trainerDisplayName),
@@ -405,81 +338,44 @@ export class DrivingApiStoreService {
       positiveKey: this.text(row?.positive),
       difficultyKey: this.text(row?.difficulty),
       nextGoalKey: this.text(row?.nextGoal),
-      evaluations: (Array.isArray(row?.criteria) ? row.criteria : []).map(
-        (criterion) => ({
-          criterionId: this.text(criterion?.code),
-          level: this.fromApiLevel(criterion?.level),
-        }),
-      ),
+      evaluations: (Array.isArray(row?.criteria) ? row.criteria : []).map((criterion) => ({
+        criterionId: this.text(criterion?.code),
+        level: this.fromApiLevel(criterion?.level),
+      })),
     };
   }
 
-  private latestEligibleDrivingSession(
-    enrollmentId: string,
-  ): TrainingSessionApi | null {
+  private latestEligibleDrivingSession(enrollmentId: string): TrainingSessionApi | null {
     const now = Date.now();
-    return (
-      this.sessions
-        .apiSessions()
-        .filter(
-          (row) =>
-            this.isEligibleDrivingSession(row, enrollmentId) &&
-            this.time(row.startsAtUtc) <= now,
-        )
-        .slice()
-        .sort(
-          (a, b) => this.time(b.startsAtUtc) - this.time(a.startsAtUtc),
-        )[0] ?? null
-    );
+    return this.sessions.apiSessions()
+      .filter((row) => this.isEligibleDrivingSession(row, enrollmentId) && this.time(row.startsAtUtc) <= now)
+      .slice()
+      .sort((a, b) => this.time(b.startsAtUtc) - this.time(a.startsAtUtc))[0] ?? null;
   }
 
-  private matchDrivingSession(
-    enrollmentId: string,
-    localDate: string,
-  ): TrainingSessionApi | null {
-    const candidates = this.sessions
-      .apiSessions()
-      .filter(
-        (row) =>
-          this.isEligibleDrivingSession(row, enrollmentId) &&
-          this.time(row.startsAtUtc) <= Date.now(),
-      )
+  private matchDrivingSession(enrollmentId: string, localDate: string): TrainingSessionApi | null {
+    const candidates = this.sessions.apiSessions()
+      .filter((row) => this.isEligibleDrivingSession(row, enrollmentId) && this.time(row.startsAtUtc) <= Date.now())
       .slice()
       .sort((a, b) => this.time(b.startsAtUtc) - this.time(a.startsAtUtc));
     if (!localDate) return candidates[0] ?? null;
-    return (
-      candidates.find((row) => {
-        const date = this.date(row.startsAtUtc);
-        return date ? this.localIsoDate(date) === localDate : false;
-      }) ?? null
-    );
+    return candidates.find((row) => {
+      const date = this.date(row.startsAtUtc);
+      return date ? this.localIsoDate(date) === localDate : false;
+    }) ?? null;
   }
 
-  private isEligibleDrivingSession(
-    row: TrainingSessionApi,
-    enrollmentId: string,
-  ): boolean {
+  private isEligibleDrivingSession(row: TrainingSessionApi, enrollmentId: string): boolean {
     if (row?.type !== "driving" || row?.status === "cancelled") return false;
     if (row?.audienceMode !== "selected-enrollments") return true;
-    return (
-      Array.isArray(row.participantEnrollmentIds)
-        ? row.participantEnrollmentIds
-        : []
-    ).includes(enrollmentId);
+    return (Array.isArray(row.participantEnrollmentIds) ? row.participantEnrollmentIds : []).includes(enrollmentId);
   }
 
-  private definitionByCode(
-    code: string,
-    parentId?: string,
-  ): CompetencyDefinitionApi | null {
+  private definitionByCode(code: string, parentId?: string): CompetencyDefinitionApi | null {
     const normalized = this.text(code).toLowerCase();
-    return (
-      this.definitionsSignal().find(
-        (item) =>
-          this.text(item.code).toLowerCase() === normalized &&
-          (parentId === undefined || this.text(item.parentId) === parentId),
-      ) ?? null
-    );
+    return this.definitionsSignal().find((item) =>
+      this.text(item.code).toLowerCase() === normalized && (parentId === undefined || this.text(item.parentId) === parentId),
+    ) ?? null;
   }
 
   private definitionById(id: unknown): CompetencyDefinitionApi | null {
@@ -489,10 +385,7 @@ export class DrivingApiStoreService {
 
   private childrenOf(parentId: string): CompetencyDefinitionApi[] {
     return this.definitionsSignal()
-      .filter(
-        (item) =>
-          item.active !== false && this.text(item.parentId) === parentId,
-      )
+      .filter((item) => item.active !== false && this.text(item.parentId) === parentId)
       .slice()
       .sort((a, b) => this.number(a.sortOrder) - this.number(b.sortOrder));
   }
@@ -524,9 +417,7 @@ export class DrivingApiStoreService {
     };
   }
 
-  private normalizeDefinition(
-    row: CompetencyDefinitionApi,
-  ): CompetencyDefinitionApi {
+  private normalizeDefinition(row: CompetencyDefinitionApi): CompetencyDefinitionApi {
     return {
       id: this.text(row?.id),
       parentId: this.nullableText(row?.parentId),
@@ -538,9 +429,7 @@ export class DrivingApiStoreService {
     };
   }
 
-  private toApiLevel(
-    level: DrivingLevel | undefined,
-  ): "acquired" | "in_progress" | "rework" | "" {
+  private toApiLevel(level: DrivingLevel | undefined): "acquired" | "in_progress" | "rework" | "" {
     if (level === "acquired") return "acquired";
     if (level === "progress") return "in_progress";
     if (level === "work") return "rework";
@@ -553,11 +442,7 @@ export class DrivingApiStoreService {
     return "work";
   }
 
-  private observation(
-    free: string,
-    errors: string,
-    advice: string,
-  ): string | null {
+  private observation(free: string, errors: string, advice: string): string | null {
     const blocks = [
       this.text(free).trim(),
       this.text(errors).trim() ? `Erreurs : ${this.text(errors).trim()}` : "",
@@ -568,23 +453,16 @@ export class DrivingApiStoreService {
 
   private currentUserName(): string {
     const current = this.session.session();
-    return (
-      `${this.text(current?.firstName)} ${this.text(current?.lastName)}`.trim() ||
-      this.text(current?.email)
-    );
+    return `${this.text(current?.firstName)} ${this.text(current?.lastName)}`.trim() || this.text(current?.email);
   }
 
   private localIsoDate(date: Date): string {
-    const parts = Object.fromEntries(
-      new Intl.DateTimeFormat("en-GB", {
-        timeZone: PARIS_ZONE,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-        .formatToParts(date)
-        .map((part) => [part.type, part.value]),
-    );
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+      timeZone: PARIS_ZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date).map((part) => [part.type, part.value]));
     return `${parts["year"] ?? ""}-${parts["month"] ?? ""}-${parts["day"] ?? ""}`;
   }
 
@@ -609,9 +487,7 @@ export class DrivingApiStoreService {
   }
 
   private formatNumber(value: number): string {
-    return Number.isInteger(value)
-      ? String(value)
-      : String(Math.round(value * 100) / 100);
+    return Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100);
   }
 
   private date(value: unknown): Date | null {

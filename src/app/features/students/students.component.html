@@ -95,7 +95,7 @@
     <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (student of filteredStudents(); track student.id) {
         <a
-          [routerLink]="['/stagiaires', student.id]"
+          [routerLink]="student.enrollmentId ? ['/stagiaires', student.id] : null"
           class="group block rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cce2] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#8eb4db]"
         >
           <div class="flex items-start gap-3">
@@ -109,7 +109,7 @@
                 {{ student.firstName }} {{ student.lastName }}
               </p>
               <p class="mt-0.5 truncate text-[12px] text-[#748094]">
-                {{ student.promotionName }}
+                {{ student.promotionName || ("students.unassigned" | t) }}
               </p>
             </div>
             <span

@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
@@ -34,12 +28,7 @@ export class SessionsComponent {
     "event",
   ];
   readonly sessions = this.store.sessions;
-  readonly modalities: SessionModality[] = [
-    "onsite",
-    "remote-live",
-    "remote-async",
-    "practical",
-  ];
+  readonly modalities: SessionModality[] = ["onsite", "remote-live", "remote-async", "practical"];
 
   date = this.today();
   start = "08:00";
@@ -53,9 +42,7 @@ export class SessionsComponent {
   supports = "";
   comments = "";
 
-  get trainers(): string[] {
-    return this.store.trainers();
-  }
+  get trainers() { return this.store.trainers(); }
 
   get promotions(): Array<{ id: string; name: string }> {
     const cohort = this.contextData.cohort();
@@ -66,8 +53,7 @@ export class SessionsComponent {
     effect(() => {
       this.promotionId = this.contextData.cohort()?.id ?? "";
       const trainers = this.store.trainers();
-      if (!this.trainer || !trainers.includes(this.trainer))
-        this.trainer = trainers[0] ?? "";
+      if (!this.trainer || !trainers.some((item) => item.id === this.trainer)) this.trainer = trainers[0]?.id ?? "";
     });
   }
 
@@ -77,24 +63,15 @@ export class SessionsComponent {
 
   typeBadgeClasses(type: PedagogicalSessionType): string {
     switch (type) {
-      case "classroom":
-        return "bg-[#2b66a4] text-white";
-      case "distance":
-        return "bg-[#efe9ff] text-[#6f4ec7]";
-      case "driving":
-        return "bg-[#e6f2ff] text-[#205a98]";
-      case "internship":
-        return "bg-[#d8f8df] text-[#18a547]";
-      case "presentation":
-        return "bg-[#f0f2f5] text-[#6b7280]";
-      case "evaluation":
-        return "bg-[#fff0c9] text-[#7a5300]";
-      case "sensitization":
-        return "bg-[#d8f8df] text-[#18a547]";
-      case "catchup":
-        return "bg-[#ffe1df] text-[#f04438]";
-      case "event":
-        return "bg-[#e5f2ff] text-[#2b66a4]";
+      case "classroom": return "bg-[#2b66a4] text-white";
+      case "distance": return "bg-[#efe9ff] text-[#6f4ec7]";
+      case "driving": return "bg-[#e6f2ff] text-[#205a98]";
+      case "internship": return "bg-[#d8f8df] text-[#18a547]";
+      case "presentation": return "bg-[#f0f2f5] text-[#6b7280]";
+      case "evaluation": return "bg-[#fff0c9] text-[#7a5300]";
+      case "sensitization": return "bg-[#d8f8df] text-[#18a547]";
+      case "catchup": return "bg-[#ffe1df] text-[#f04438]";
+      case "event": return "bg-[#e5f2ff] text-[#2b66a4]";
     }
   }
 
@@ -104,14 +81,10 @@ export class SessionsComponent {
 
   modalityBadgeClasses(modality: SessionModality): string {
     switch (modality) {
-      case "remote-live":
-        return "bg-[#efe9ff] text-[#6f4ec7]";
-      case "remote-async":
-        return "bg-[#fff0d6] text-[#a26100]";
-      case "practical":
-        return "bg-[#e6f2ff] text-[#205a98]";
-      case "onsite":
-        return "bg-[#f0f3f7] text-[#667085]";
+      case "remote-live": return "bg-[#efe9ff] text-[#6f4ec7]";
+      case "remote-async": return "bg-[#fff0d6] text-[#a26100]";
+      case "practical": return "bg-[#e6f2ff] text-[#205a98]";
+      case "onsite": return "bg-[#f0f3f7] text-[#667085]";
     }
   }
 
@@ -128,9 +101,7 @@ export class SessionsComponent {
   }
 
   attendancePercent(session: ProgrammedSession): number {
-    return session.expected === 0
-      ? 0
-      : Math.round((session.present / session.expected) * 100);
+    return session.expected === 0 ? 0 : Math.round((session.present / session.expected) * 100);
   }
 
   attendanceClasses(session: ProgrammedSession): string {
@@ -146,7 +117,8 @@ export class SessionsComponent {
       date: this.date ?? "",
       startTime: this.start ?? "",
       endTime: this.end ?? "",
-      trainerDisplayName: this.trainer ?? "",
+      trainerAuthGateUserId: this.trainer ?? "",
+      trainerDisplayName: this.trainers.find((item) => item.id === this.trainer)?.name ?? "",
       type: this.selectedType(),
       modality: this.selectedModality(),
       title: this.theme.trim(),
@@ -163,22 +135,19 @@ export class SessionsComponent {
   }
 
   sessionTitle(session: ProgrammedSession): string | null {
-    return session.titleKey.startsWith("sessions.") ||
-      session.titleKey.startsWith("workspaceOperational.")
+    return session.titleKey.startsWith("sessions.") || session.titleKey.startsWith("workspaceOperational.")
       ? session.titleKey
       : null;
   }
 
   sessionObjective(session: ProgrammedSession): string | null {
-    return session.objectiveKey.startsWith("sessions.") ||
-      session.objectiveKey.startsWith("workspaceOperational.")
+    return session.objectiveKey.startsWith("sessions.") || session.objectiveKey.startsWith("workspaceOperational.")
       ? session.objectiveKey
       : null;
   }
 
   sessionSupports(session: ProgrammedSession): string | null {
-    return session.supportsKey.startsWith("sessions.") ||
-      session.supportsKey.startsWith("workspaceOperational.")
+    return session.supportsKey.startsWith("sessions.") || session.supportsKey.startsWith("workspaceOperational.")
       ? session.supportsKey
       : null;
   }
@@ -190,9 +159,7 @@ export class SessionsComponent {
       month: "2-digit",
       day: "2-digit",
     }).formatToParts(new Date());
-    const values = Object.fromEntries(
-      parts.map((part) => [part.type, part.value]),
-    );
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
     return `${values["year"] ?? ""}-${values["month"] ?? ""}-${values["day"] ?? ""}`;
   }
 }

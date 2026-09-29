@@ -658,6 +658,7 @@
         "context": "Creation context",
         "referential": "Framework version",
         "chooseReferential": "Select a framework",
+        "chooseTrainer": "Select a trainer",
         "status": "Initial status",
         "studentCount": "Planned learners",
         "studentCountError": "The learner count must be greater than 0.",
@@ -689,7 +690,12 @@
       "retry": "Try again",
       "loading": "Loading cohorts…",
       "loadFailed": "Unable to load cohorts.",
-      "metricsFailed": "Some cohort metrics could not be loaded. Unavailable values are displayed as 0."
+      "metricsFailed": "Some cohort metrics could not be loaded. Unavailable values are displayed as 0.",
+      "deleteFailed": "This cohort could not be deleted."
+    },
+    "delete": {
+      "action": "Delete cohort",
+      "confirm": "Permanently delete “{{name}}”? Only draft or planned cohorts with no operational data can be deleted. This action cannot be undone."
     }
   },
   "sessions": {
@@ -1784,6 +1790,14 @@
         "certification": {
           "title": "Certification / exam",
           "description": "Access to exam sessions, candidates and certification assessments according to role."
+        },
+        "sessionsOthers": {
+          "title": "View other trainers’ sessions",
+          "description": "Allows this trainer to view sessions assigned to other trainers within their scope."
+        },
+        "drivingOthers": {
+          "title": "View other trainers’ driving records",
+          "description": "Allows this trainer to view driving evaluations recorded by other trainers within their scope."
         }
       },
       "studentRule": "A student can never edit an assessment entered by a trainer, even if other permissions are granted.",
@@ -2831,7 +2845,12 @@
       "noPrograms": "No accessible programs at this site.",
       "noCohorts": "No accessible cohorts at this site.",
       "workspaceError": "Could not load the sites.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "deleteError": "This site could not be deleted."
+    },
+    "delete": {
+      "action": "Delete site",
+      "confirm": "Permanently delete “{{name}}”? This is allowed only when the site no longer contains operational data. This action cannot be undone."
     }
   },
   "programs": {
@@ -2974,7 +2993,12 @@
       "noSites": "No accessible sites.",
       "noCohorts": "No cohorts attached to this program.",
       "notFound": "This program is unavailable or inaccessible.",
-      "workspaceError": "Could not load the program workspace."
+      "workspaceError": "Could not load the program workspace.",
+      "deleteError": "This program could not be deleted."
+    },
+    "delete": {
+      "action": "Delete program",
+      "confirm": "Permanently delete “{{name}}”? Deletion is blocked if the program, its referential or its versions are already in use. This action cannot be undone."
     }
   },
   "referentials": {
@@ -3797,7 +3821,12 @@
     "SESSION_TRAINER_IDENTITY_INVALID": "The trainer identity associated with the session is invalid.",
     "WORKPLACE_PERIOD_TYPE_INVALID": "The workplace period type is invalid.",
     "WORKPLACE_DOCUMENT_REQUIRED": "The required document for this workplace period is mandatory.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7.",
+    "SITE_DELETE_IN_USE": "This site cannot be deleted because it already contains operational data. Deactivate or archive it instead.",
+    "PROGRAM_DELETE_IN_USE": "This program cannot be deleted because it is already used by a cohort or a training activity.",
+    "PROGRAM_DELETE_REFERENTIAL_IN_USE": "This program cannot be deleted because its referential or one of its versions is already in use.",
+    "COHORT_DELETE_IN_USE": "This cohort cannot be deleted because it already contains learners or training data.",
+    "COHORT_DELETE_STATUS_FORBIDDEN": "This cohort can no longer be deleted in its current status. Only draft or planned cohorts can be deleted."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",

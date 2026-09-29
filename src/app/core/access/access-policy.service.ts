@@ -14,7 +14,9 @@ const ALL_PERMISSIONS: AppPermission[] = [
   "organization.commercial.read",
   "organization.commercial.manage",
   "sites.view",
+  "sites.delete",
   "programs.view",
+  "programs.delete",
   "referentials.view",
   "planning.view",
   "remoteWork.view",
@@ -22,8 +24,13 @@ const ALL_PERMISSIONS: AppPermission[] = [
   "students.view",
   "studentDetail.view",
   "promotions.view",
+  "promotions.delete",
   "sessions.view",
+  "sessions.viewOthers",
+  "sessions.assignTrainer",
   "driving.view",
+  "driving.viewOthers",
+  "driving.assignTrainer",
   "sheets.view",
   "skills.view",
   "attendance.view",
@@ -44,12 +51,10 @@ const ALL_PERMISSIONS: AppPermission[] = [
 const ROLE_PERMISSIONS: Record<MembershipRole, readonly AppPermission[]> = {
   platform_admin: [...ALL_PERMISSIONS, "jury.view"],
   organization_admin: ALL_PERMISSIONS,
-  organization_direction: ALL_PERMISSIONS.filter(
-    (permission) =>
-      permission !== "access.privileged.manage" &&
-      permission !== "organization.ownership.transfer" &&
-      permission !== "organization.commercial.manage",
-  ),
+  organization_direction: ALL_PERMISSIONS.filter((permission) =>
+    permission !== "access.privileged.manage"
+    && permission !== "organization.ownership.transfer"
+    && permission !== "organization.commercial.manage"),
   site_direction: [
     "home.view",
     "planning.view",
@@ -222,89 +227,51 @@ export class AccessPolicyService {
     // Transitional mapping: UI permissions map to server permission suffixes until front permission codes are renamed.
     const aliases: Record<string, string[]> = {
       "home.view": [],
-      "organization.dashboard": [
-        "pedagora.statistics.view",
-        "pedagora.organization.manage",
-      ],
-      "organization.ownership.transfer": [
-        "pedagora.organization.ownership.transfer",
-        "organization.ownership.transfer",
-      ],
-      "organization.commercial.read": [
-        "pedagora.organization.commercial.read",
-        "organization.commercial.read",
-      ],
-      "organization.commercial.manage": [
-        "pedagora.organization.commercial.manage",
-        "organization.commercial.manage",
-      ],
+      "organization.dashboard": ["pedagora.statistics.view", "pedagora.organization.manage"],
+      "organization.ownership.transfer": ["pedagora.organization.ownership.transfer", "organization.ownership.transfer"],
+      "organization.commercial.read": ["pedagora.organization.commercial.read", "organization.commercial.read"],
+      "organization.commercial.manage": ["pedagora.organization.commercial.manage", "organization.commercial.manage"],
       "sites.view": ["pedagora.sites.view", "sites.view"],
+      "sites.delete": ["pedagora.sites.delete", "sites.delete"],
       "programs.view": ["pedagora.programs.view", "programs.view"],
+      "programs.delete": ["pedagora.programs.delete", "programs.delete"],
       "referentials.view": ["pedagora.referentials.view", "referentials.view"],
       "planning.view": ["pedagora.sessions.view", "sessions.view"],
       "remoteWork.view": ["pedagora.remote-work.view", "remote-work.view"],
-      "distanceLearning.view": [
-        "pedagora.distance-learning.view",
-        "distance-learning.view",
-      ],
+      "distanceLearning.view": ["pedagora.distance-learning.view", "distance-learning.view"],
       "promotions.view": ["pedagora.cohorts.view", "cohorts.view"],
+      "promotions.delete": ["pedagora.promotions.delete", "promotions.delete", "pedagora.cohorts.delete", "cohorts.delete"],
       "students.view": ["pedagora.learners.view", "learners.view"],
-      "studentDetail.view": [
-        "pedagora.learners.detail.view",
-        "learners.detail.view",
-      ],
+      "studentDetail.view": ["pedagora.learners.detail.view", "learners.detail.view"],
       "sessions.view": ["pedagora.sessions.view", "sessions.view"],
+      "sessions.viewOthers": ["pedagora.sessions.viewOthers", "sessions.viewOthers"],
+      "sessions.assignTrainer": ["pedagora.sessions.assignTrainer", "sessions.assignTrainer"],
       "driving.view": ["pedagora.driving.view", "driving.view"],
+      "driving.viewOthers": ["pedagora.driving.viewOthers", "driving.viewOthers"],
+      "driving.assignTrainer": ["pedagora.driving.assignTrainer", "driving.assignTrainer"],
       "sheets.view": ["pedagora.sheets.view", "sheets.view"],
       "skills.view": ["pedagora.skills.view", "skills.view"],
       "attendance.view": ["pedagora.attendance.view", "attendance.view"],
       "internships.view": ["pedagora.internships.view", "internships.view"],
       "documents.view": ["pedagora.documents.view", "documents.view"],
-      "certification.view": [
-        "pedagora.certification.view",
-        "certification.view",
-      ],
-      "certification.manage": [
-        "pedagora.certification.manage",
-        "certification.manage",
-      ],
-      "candidateCertification.view": [
-        "pedagora.certification.view",
-        "certification.view",
-      ],
+      "certification.view": ["pedagora.certification.view", "certification.view"],
+      "certification.manage": ["pedagora.certification.manage", "certification.manage"],
+      "candidateCertification.view": ["pedagora.certification.view", "certification.view"],
       "jury.view": ["pedagora.jury.evaluate", "jury.evaluate"],
       "results.view": ["pedagora.results.view", "results.view"],
-      "success.view": [
-        "pedagora.results.view",
-        "pedagora.certification.view",
-        "results.view",
-        "certification.view",
-      ],
-      "reports.view": [
-        "pedagora.reports.export",
-        "pedagora.statistics.view",
-        "reports.export",
-      ],
+      "success.view": ["pedagora.results.view", "pedagora.certification.view", "results.view", "certification.view"],
+      "reports.view": ["pedagora.reports.export", "pedagora.statistics.view", "reports.export"],
       "statistics.view": ["pedagora.statistics.view", "statistics.view"],
       "access.manage": ["pedagora.access.manage", "access.manage"],
-      "access.privileged.manage": [
-        "pedagora.access.privileged.manage",
-        "access.privileged.manage",
-      ],
-      "administration.manage": [
-        "pedagora.organization.manage",
-        "organization.manage",
-      ],
+      "access.privileged.manage": ["pedagora.access.privileged.manage", "access.privileged.manage"],
+      "administration.manage": ["pedagora.organization.manage", "organization.manage"],
     };
-    if (permission === "home.view" && session.authMode === "authgate")
-      return permissions.size > 0;
+    if (permission === "home.view" && session.authMode === "authgate") return permissions.size > 0;
     const candidates = [permission, ...(aliases[permission] ?? [])];
     if (candidates.some((candidate) => permissions.has(candidate))) return true;
     // AuthGate permissions are authoritative. Keep role defaults only for the legacy non-AuthGate demo path.
     if (session.authMode === "authgate") return false;
-    return this.effectiveRoles().some((role) =>
-      ROLE_PERMISSIONS[role]?.includes(permission),
-    );
+    return this.effectiveRoles().some((role) => ROLE_PERMISSIONS[role]?.includes(permission));
   }
 
   hasAnyRole(...roles: MembershipRole[]): boolean {
@@ -314,12 +281,7 @@ export class AccessPolicyService {
   }
 
   defaultPath(): string {
-    if (
-      this.hasAnyRole("jury") &&
-      this.can("jury.view") &&
-      !this.can("home.view")
-    )
-      return "/jury";
+    if (this.hasAnyRole("jury") && this.can("jury.view") && !this.can("home.view")) return "/jury";
     if (this.can("home.view")) return "/accueil";
     if (this.hasAnyRole("jury") && this.can("jury.view")) return "/jury";
     if (this.can("planning.view")) return "/planning";

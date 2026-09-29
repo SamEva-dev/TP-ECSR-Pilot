@@ -1,18 +1,9 @@
-import {
-  Injectable,
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-} from "@angular/core";
+import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
 import type { PlanningEvent, PlanningType } from "../models/planning.models";
-import type {
-  PedagogicalSessionType,
-  ProgrammedSession,
-  SessionModality,
-} from "../models/sessions.models";
+import type { PedagogicalSessionType, ProgrammedSession, SessionModality } from "../models/sessions.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
+import { PedagoraAccessApiService } from "../access/pedagora-access-api.service";
+import { firstValueFrom } from "rxjs";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
 import {
@@ -25,6 +16,8 @@ import {
 import { PARIS_ZONE, parisInstant } from "../training-delivery/paris-time";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
+export interface TrainerOption { id: string; name: string; }
+
 export interface CreateSessionValue {
   cohortId: string;
   date: string;
@@ -33,6 +26,7 @@ export interface CreateSessionValue {
   type: TrainingSessionType;
   modality: TrainingSessionModality;
   title: string;
+  trainerAuthGateUserId: string;
   trainerDisplayName: string;
   location: string;
   objective: string;
@@ -47,8 +41,10 @@ export class TrainingSessionApiStoreService {
   private readonly realtime = inject(RealtimeService);
   private readonly session = inject(SessionService);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly accessApi = inject(PedagoraAccessApiService);
 
   private readonly rowsSignal = signal<TrainingSessionApi[]>([]);
+  private readonly trainersSignal = signal<TrainerOption[]>([]);
   readonly loading = signal(false);
   readonly loadError = signal(false);
   private generation = 0;
@@ -59,24 +55,12 @@ export class TrainingSessionApiStoreService {
     this.rowsSignal().map((row) => this.toSession(row)),
   );
   readonly planningEvents = computed<PlanningEvent[]>(() =>
-    this.rowsSignal()
-      .map((row) => this.toPlanning(row))
-      .filter((row): row is PlanningEvent => row !== null),
+    this.rowsSignal().map((row) => this.toPlanning(row)).filter((row): row is PlanningEvent => row !== null),
   );
   readonly drivingProgrammed = computed<PlanningEvent[]>(() =>
     this.planningEvents().filter((row) => row.type === "driving"),
   );
-  readonly trainers = computed<string[]>(() => {
-    const current = this.currentUserName();
-    return [
-      ...new Set(
-        [
-          current,
-          ...this.rowsSignal().map((row) => this.text(row.trainerDisplayName)),
-        ].filter(Boolean),
-      ),
-    ];
-  });
+  readonly trainers = this.trainersSignal.asReadonly();
 
   constructor() {
     void this.realtime.start().catch(() => undefined);
@@ -87,13 +71,15 @@ export class TrainingSessionApiStoreService {
       const generation = ++this.generation;
       this.rowsSignal.set([]);
       this.loadError.set(false);
-      if (ready && cohortApiId) void this.reload(generation, cohortApiId);
+      if (ready && cohortApiId) {
+        void this.reload(generation, cohortApiId);
+        void this.loadEligibleTrainers();
+      }
     });
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.training\.session\./.test(event.typeKey))
-        return;
+      if (!event || !/^pedagora\.training\.session\./.test(event.typeKey)) return;
       untracked(() => {
         if (this.workspace.cohort()?.apiId) void this.reload();
       });
@@ -113,11 +99,8 @@ export class TrainingSessionApiStoreService {
     this.loading.set(true);
     try {
       const rows = await this.api.list(cohortApiId);
-      if (generation !== this.generation || request !== this.request)
-        return false;
-      this.rowsSignal.set(
-        (Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)),
-      );
+      if (generation !== this.generation || request !== this.request) return false;
+      this.rowsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)));
       this.loadError.set(false);
       return true;
     } catch {
@@ -128,34 +111,17 @@ export class TrainingSessionApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request)
-        this.loading.set(false);
+      if (generation === this.generation && request === this.request) this.loading.set(false);
     }
   }
 
-  async create(
-    value: CreateSessionValue,
-    errorPath = "/seances",
-  ): Promise<TrainingSessionApi | null> {
-    const cohort = this.workspace
-      .cohorts()
-      .find((item) => item.id === value.cohortId);
+  async create(value: CreateSessionValue, errorPath = "/seances"): Promise<TrainingSessionApi | null> {
+    const cohort = this.workspace.cohorts().find((item) => item.id === value.cohortId);
     const cohortApiId = this.text(cohort?.apiId);
-    const startsAtUtc = parisInstant(
-      this.text(value.date),
-      this.text(value.startTime),
-    );
-    const endsAtUtc = parisInstant(
-      this.text(value.date),
-      this.text(value.endTime),
-    );
+    const startsAtUtc = parisInstant(this.text(value.date), this.text(value.startTime));
+    const endsAtUtc = parisInstant(this.text(value.date), this.text(value.endTime));
 
-    if (
-      !cohortApiId ||
-      !startsAtUtc ||
-      !endsAtUtc ||
-      endsAtUtc <= startsAtUtc
-    ) {
+    if (!cohortApiId || !startsAtUtc || !endsAtUtc || endsAtUtc <= startsAtUtc) {
       this.notifications.error("sessions.real.saveError", errorPath);
       return null;
     }
@@ -168,7 +134,7 @@ export class TrainingSessionApiStoreService {
       startsAtUtc,
       endsAtUtc,
       timeZoneId: PARIS_ZONE,
-      trainerAuthGateUserId: null,
+      trainerAuthGateUserId: this.nullableText(value.trainerAuthGateUserId),
       trainerDisplayName: this.nullableText(value.trainerDisplayName),
       location: this.nullableText(value.location),
       objective: this.nullableText(value.objective),
@@ -195,15 +161,28 @@ export class TrainingSessionApiStoreService {
     }
   }
 
+
+  private async loadEligibleTrainers(): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.accessApi.sessionTrainerAssignees());
+      this.trainersSignal.set((rows ?? []).map((row) => ({
+        id: this.text(row.id),
+        name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
+      })).filter((row) => !!row.id && !!row.name));
+    } catch {
+      const user = this.session.session();
+      const id = this.text(user?.userId);
+      const name = this.currentUserName();
+      this.trainersSignal.set(id && name ? [{ id, name }] : []);
+    }
+  }
+
   cohortName(cohortApiId: string): string {
     return this.workspace.cohortNameByApiId(this.text(cohortApiId)) ?? "";
   }
 
   private upsert(row: TrainingSessionApi): void {
-    this.rowsSignal.update((items) => [
-      row,
-      ...items.filter((item) => item.id !== row.id),
-    ]);
+    this.rowsSignal.update((items) => [row, ...items.filter((item) => item.id !== row.id)]);
   }
 
   private toSession(row: TrainingSessionApi): ProgrammedSession {
@@ -215,12 +194,8 @@ export class TrainingSessionApiStoreService {
       start: local.start,
       end: local.end,
       trainer: this.text(row.trainerDisplayName),
-      promotion:
-        this.workspace.cohortNameByApiId(this.text(row.cohortId)) ??
-        this.text(this.workspace.cohort()?.name),
-      promotionId:
-        this.workspace.cohorts().find((item) => item.apiId === row.cohortId)
-          ?.id ?? this.text(this.workspace.cohort()?.id),
+      promotion: this.workspace.cohortNameByApiId(this.text(row.cohortId)) ?? this.text(this.workspace.cohort()?.name),
+      promotionId: this.workspace.cohorts().find((item) => item.apiId === row.cohortId)?.id ?? this.text(this.workspace.cohort()?.id),
       type: this.type(row.type) as PedagogicalSessionType,
       modality: this.modality(row.modality) as SessionModality,
       objectiveKey: this.text(row.objective),
@@ -238,9 +213,7 @@ export class TrainingSessionApiStoreService {
     return {
       id: this.text(row.id),
       day: local.day,
-      promotionId:
-        this.workspace.cohorts().find((item) => item.apiId === row.cohortId)
-          ?.id ?? this.text(this.workspace.cohort()?.id),
+      promotionId: this.workspace.cohorts().find((item) => item.apiId === row.cohortId)?.id ?? this.text(this.workspace.cohort()?.id),
       type: this.type(row.type) as PlanningType,
       titleKey: this.text(row.title),
       time: `${local.start}–${local.end}`,
@@ -250,10 +223,7 @@ export class TrainingSessionApiStoreService {
     };
   }
 
-  private localParts(
-    startsAtUtc: unknown,
-    endsAtUtc: unknown,
-  ): {
+  private localParts(startsAtUtc: unknown, endsAtUtc: unknown): {
     displayDate: string;
     start: string;
     end: string;
@@ -261,37 +231,14 @@ export class TrainingSessionApiStoreService {
   } {
     const start = this.date(startsAtUtc);
     const end = this.date(endsAtUtc);
-    if (!start || !end)
-      return { displayDate: "", start: "", end: "", day: null };
-    const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
-      timeZone: PARIS_ZONE,
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const timeFormatter = new Intl.DateTimeFormat("fr-FR", {
-      timeZone: PARIS_ZONE,
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-    });
-    const weekday = new Intl.DateTimeFormat("en-US", {
-      timeZone: PARIS_ZONE,
-      weekday: "long",
-    })
-      .format(start)
-      .toLowerCase();
-    const day = (
-      ["monday", "tuesday", "wednesday", "thursday", "friday"] as const
-    ).includes(weekday as any)
-      ? (weekday as PlanningEvent["day"])
+    if (!start || !end) return { displayDate: "", start: "", end: "", day: null };
+    const dateFormatter = new Intl.DateTimeFormat("fr-FR", { timeZone: PARIS_ZONE, day: "2-digit", month: "2-digit", year: "numeric" });
+    const timeFormatter = new Intl.DateTimeFormat("fr-FR", { timeZone: PARIS_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+    const weekday = new Intl.DateTimeFormat("en-US", { timeZone: PARIS_ZONE, weekday: "long" }).format(start).toLowerCase();
+    const day = (["monday", "tuesday", "wednesday", "thursday", "friday"] as const).includes(weekday as any)
+      ? weekday as PlanningEvent["day"]
       : null;
-    return {
-      displayDate: dateFormatter.format(start),
-      start: timeFormatter.format(start),
-      end: timeFormatter.format(end),
-      day,
-    };
+    return { displayDate: dateFormatter.format(start), start: timeFormatter.format(start), end: timeFormatter.format(end), day };
   }
 
   private normalize(row: TrainingSessionApi): TrainingSessionApi {
@@ -312,21 +259,9 @@ export class TrainingSessionApiStoreService {
       objective: this.nullableText(row?.objective),
       supports: this.nullableText(row?.supports),
       comments: this.nullableText(row?.comments),
-      status:
-        row?.status === "inprogress" ||
-        row?.status === "completed" ||
-        row?.status === "cancelled"
-          ? row.status
-          : "planned",
-      audienceMode:
-        row?.audienceMode === "selected-enrollments"
-          ? "selected-enrollments"
-          : "whole-cohort",
-      participantEnrollmentIds: Array.isArray(row?.participantEnrollmentIds)
-        ? row.participantEnrollmentIds.filter(
-            (id): id is string => typeof id === "string",
-          )
-        : [],
+      status: row?.status === "inprogress" || row?.status === "completed" || row?.status === "cancelled" ? row.status : "planned",
+      audienceMode: row?.audienceMode === "selected-enrollments" ? "selected-enrollments" : "whole-cohort",
+      participantEnrollmentIds: Array.isArray(row?.participantEnrollmentIds) ? row.participantEnrollmentIds.filter((id): id is string => typeof id === "string") : [],
       plannedMinutes: this.number(row?.plannedMinutes),
       expectedLearners: this.number(row?.expectedLearners),
       presentLearners: this.number(row?.presentLearners),
@@ -336,43 +271,17 @@ export class TrainingSessionApiStoreService {
 
   private currentUserName(): string {
     const user = this.session.session();
-    return [this.text(user?.firstName), this.text(user?.lastName)]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
+    return [this.text(user?.firstName), this.text(user?.lastName)].filter(Boolean).join(" ").trim();
   }
 
   private type(value: unknown): TrainingSessionType {
-    return value === "distance" ||
-      value === "driving" ||
-      value === "evaluation" ||
-      value === "internship" ||
-      value === "presentation" ||
-      value === "catchup" ||
-      value === "sensitization" ||
-      value === "event"
-      ? value
-      : "classroom";
+    return value === "distance" || value === "driving" || value === "evaluation" || value === "internship" || value === "presentation" || value === "catchup" || value === "sensitization" || value === "event" ? value : "classroom";
   }
   private modality(value: unknown): TrainingSessionModality {
-    return value === "remote-live" ||
-      value === "remote-async" ||
-      value === "practical"
-      ? value
-      : "onsite";
+    return value === "remote-live" || value === "remote-async" || value === "practical" ? value : "onsite";
   }
-  private text(value: unknown): string {
-    return typeof value === "string" ? value : "";
-  }
-  private nullableText(value: unknown): string | null {
-    const text = this.text(value).trim();
-    return text || null;
-  }
-  private number(value: unknown): number {
-    return typeof value === "number" && Number.isFinite(value) ? value : 0;
-  }
-  private date(value: unknown): Date | null {
-    const d = new Date(this.text(value));
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
+  private text(value: unknown): string { return typeof value === "string" ? value : ""; }
+  private nullableText(value: unknown): string | null { const text = this.text(value).trim(); return text || null; }
+  private number(value: unknown): number { return typeof value === "number" && Number.isFinite(value) ? value : 0; }
+  private date(value: unknown): Date | null { const d = new Date(this.text(value)); return Number.isNaN(d.getTime()) ? null : d; }
 }

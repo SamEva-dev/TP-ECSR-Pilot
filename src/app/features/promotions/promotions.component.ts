@@ -1,14 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { CohortApiStoreService } from "../../core/api-data/cohort-api-store.service";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import { TranslateService } from "../../core/i18n/translate.service";
 import type { ContextualPromotionSummary } from "../../core/models/contextual-promotions.models";
 import type { WorkspaceCohort } from "../../core/models/workspace.models";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
@@ -22,17 +18,14 @@ type PromotionStatusFilter = "all" | WorkspaceCohort["status"];
 
 @Component({
   selector: "app-promotions",
-  imports: [
-    RouterLink,
-    TranslatePipe,
-    ProgressBarComponent,
-    CreatePromotionDrawerComponent,
-  ],
+  imports: [RouterLink, TranslatePipe, ProgressBarComponent, CreatePromotionDrawerComponent],
   templateUrl: "./promotions.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromotionsComponent {
   readonly workspace = inject(WorkspaceContextService);
+  readonly access = inject(AccessPolicyService);
+  private readonly translate = inject(TranslateService);
   readonly store = inject(CohortApiStoreService);
   readonly referentials = inject(ReferentialApiStoreService);
   readonly drawerOpen = signal(false);
@@ -45,22 +38,14 @@ export class PromotionsComponent {
 
   readonly filteredPromotions = computed(() => {
     const filter = this.statusFilter();
-    return this.siteProgramPromotions().filter(
-      (item) => filter === "all" || item.status === filter,
-    );
+    return this.siteProgramPromotions().filter((item) => filter === "all" || item.status === filter);
   });
 
   readonly counts = computed(() => ({
     all: this.siteProgramPromotions().length,
-    active: this.siteProgramPromotions().filter(
-      (item) => item.status === "active",
-    ).length,
-    planned: this.siteProgramPromotions().filter(
-      (item) => item.status === "planned",
-    ).length,
-    completed: this.siteProgramPromotions().filter(
-      (item) => item.status === "completed",
-    ).length,
+    active: this.siteProgramPromotions().filter((item) => item.status === "active").length,
+    planned: this.siteProgramPromotions().filter((item) => item.status === "planned").length,
+    completed: this.siteProgramPromotions().filter((item) => item.status === "completed").length,
   }));
 
   readonly activeStudents = computed(() =>
@@ -72,18 +57,13 @@ export class PromotionsComponent {
   readonly referentialLabel = computed(() => {
     const cohort = this.workspace.cohort();
     if (!cohort) return "";
-    return (
-      this.referentials
-        .items()
-        .find(
-          (item) =>
-            item.apiId === cohort.referentialVersionId ||
-            item.id === cohort.referentialVersionId,
-        )?.version ?? ""
-    );
+    return this.referentials.items().find(
+      (item) => item.apiId === cohort.referentialVersionId || item.id === cohort.referentialVersionId,
+    )?.version ?? "";
   });
 
   openCreateDrawer(): void {
+    void this.referentials.reload();
     this.drawerOpen.set(true);
   }
 
@@ -96,10 +76,17 @@ export class PromotionsComponent {
   }
 
   selectPromotion(item: ContextualPromotionSummary): void {
-    const cohort = this.workspace
-      .cohorts()
-      .find((candidate) => candidate.id === item.id);
+    const cohort = this.workspace.cohorts().find((candidate) => candidate.id === item.id);
     if (cohort) this.workspace.selectCohort(cohort.id);
+  }
+
+  async deletePromotion(item: ContextualPromotionSummary): Promise<void> {
+    if (!this.access.can("promotions.delete")) return;
+    const confirmed = typeof window === "undefined" || window.confirm(
+      this.translate.instant("promotions.delete.confirm", { name: item.name }),
+    );
+    if (!confirmed) return;
+    await this.store.delete(item.id);
   }
 
   async createPromotion(payload: CreatePromotionPayload): Promise<void> {
@@ -110,6 +97,8 @@ export class PromotionsComponent {
       capacity: payload.studentCount,
       referentialVersionId: payload.referentialVersionId,
       status: payload.status,
+      managerUserId: payload.managerUserId,
+      managerDisplayName: payload.manager,
     });
     if (!created) return;
 

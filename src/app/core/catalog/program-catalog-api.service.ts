@@ -71,6 +71,10 @@ export class ProgramCatalogApiService {
       ),
     );
   }
+  delete(id: string) {
+    return firstValueFrom(this.http.delete<void>(`${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}`));
+  }
+
   setOffering(programId: string, siteId: string, active: boolean) {
     return firstValueFrom(
       this.http.put(

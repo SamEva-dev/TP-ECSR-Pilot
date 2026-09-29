@@ -2,6 +2,23 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { environment } from "../../environments/environment";
 
+export interface LearnerDirectoryApi {
+  learnerProfileId: string;
+  personId: string;
+  authGateUserId: string | null;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  email: string;
+  phone: string | null;
+  birthDate: string | null;
+  enrollmentId: string | null;
+  cohortId: string | null;
+  cohortName: string | null;
+  enrollmentStatus: string | null;
+  enrolledOn: string | null;
+}
+
 export interface LearnerProfileApi {
   enrollmentId: string;
   learnerProfileId: string;
@@ -50,10 +67,7 @@ export interface UpdateTopicProgressApiRequest {
   improvements: string | null;
   comment: string | null;
   nextObjective: string | null;
-  evaluationCriteria: {
-    code: string;
-    level: "acquired" | "in_progress" | "review";
-  }[];
+  evaluationCriteria: { code: string; level: "acquired" | "in_progress" | "review" }[];
 }
 
 export interface CompetencyProgressApi {
@@ -104,7 +118,7 @@ export interface RecordDrivingEvaluationApiRequest {
   competencyDefinitionId: string;
   trainingSessionId: string | null;
   evaluatedAtUtc: string;
-  trainerAuthGateUserId: null;
+  trainerAuthGateUserId: string | null;
   trainerDisplayName: string;
   subject: string;
   positive: string | null;
@@ -133,6 +147,9 @@ export class StudentProfileApiService {
   private readonly http = inject(HttpClient);
   private readonly base = environment.apiBaseUrl;
 
+  directory() {
+    return this.http.get<LearnerDirectoryApi[]>(`${this.base}/api/v1/learners`);
+  }
   self() {
     return this.http.get<LearnerProfileApi>(`${this.base}/api/v1/learners/me`);
   }

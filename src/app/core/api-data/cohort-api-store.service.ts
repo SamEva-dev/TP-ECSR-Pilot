@@ -1,21 +1,11 @@
-import {
-  Injectable,
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-} from "@angular/core";
+import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import type { ContextualPromotionSummary } from "../models/contextual-promotions.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { ReportingApiService } from "../reporting/reporting-api.service";
 import type { CohortDashboard } from "../reporting/reporting.models";
-import {
-  TrainingCatalogApiService,
-  type CohortResponse,
-} from "../training/training-catalog-api.service";
+import { TrainingCatalogApiService, type CohortResponse } from "../training/training-catalog-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 import { ReferentialApiStoreService } from "./referential-api-store.service";
 
@@ -29,9 +19,7 @@ export class CohortApiStoreService {
   private readonly notifications = inject(ApplicationNotificationService);
 
   private readonly rowsSignal = signal<CohortResponse[]>([]);
-  private readonly dashboardsSignal = signal<Record<string, CohortDashboard>>(
-    {},
-  );
+  private readonly dashboardsSignal = signal<Record<string, CohortDashboard>>({});
   readonly loading = signal(false);
   readonly loadError = signal(false);
   private generation = 0;
@@ -44,18 +32,13 @@ export class CohortApiStoreService {
     if (!organization || !site || !program) return [];
 
     return this.rowsSignal().map((row) => {
-      const referential = this.referentials
-        .items()
-        .find(
-          (item) =>
-            item.apiId === this.text(row.referentialVersionId) ||
-            item.id === this.text(row.referentialVersionId),
-        );
+      const referential = this.referentials.items().find(
+        (item) => item.apiId === this.text(row.referentialVersionId) || item.id === this.text(row.referentialVersionId),
+      );
       const dashboard = this.dashboardsSignal()[this.text(row.id)];
       const learnerCount = this.number(row.learnerCount);
       const capacity = this.number(row.capacity);
-      const displayedStudents =
-        row.status === "planned" ? capacity : learnerCount;
+      const displayedStudents = row.status === "planned" ? capacity : learnerCount;
       const referenceHours = this.number(referential?.totalHours);
       const plannedHours = dashboard
         ? Math.round(this.number(dashboard.plannedMinutes) / 60)
@@ -76,8 +59,7 @@ export class CohortApiStoreService {
         programName: this.text(program.name),
         programCode: this.text(program.code),
         programIcon: this.text(program.icon),
-        referentialVersionId:
-          this.text(referential?.id) || this.text(row.referentialVersionId),
+        referentialVersionId: this.text(referential?.id) || this.text(row.referentialVersionId),
         referentialVersion: this.text(referential?.version),
         referentialCode: this.text(referential?.code),
         name: this.text(row.name),
@@ -86,7 +68,7 @@ export class CohortApiStoreService {
         end: this.text(row.endDate),
         status: this.status(row.status),
         studentCount: displayedStudents,
-        manager: "",
+        manager: this.text(row.pedagogicalManagerDisplayName),
         plannedHours,
         completedHours,
         remainingHours: Math.max(0, plannedHours - completedHours),
@@ -113,11 +95,7 @@ export class CohortApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (
-        !event ||
-        !/^pedagora\.training\.(cohort|enrollment)\./.test(event.typeKey)
-      )
-        return;
+      if (!event || !/^pedagora\.training\.(cohort|enrollment)\./.test(event.typeKey)) return;
       untracked(() => {
         if (this.workspace.remoteWorkspaceLoaded()) void this.reload();
       });
@@ -138,11 +116,8 @@ export class CohortApiStoreService {
     this.loading.set(true);
     try {
       const rows = await this.api.list(filters);
-      if (generation !== this.generation || request !== this.request)
-        return false;
-      const safeRows = Array.isArray(rows)
-        ? rows.map((row) => this.normalize(row))
-        : [];
+      if (generation !== this.generation || request !== this.request) return false;
+      const safeRows = Array.isArray(rows) ? rows.map((row) => this.normalize(row)) : [];
       this.rowsSignal.set(safeRows);
       this.loadError.set(false);
       await this.loadDashboards(safeRows, generation, request);
@@ -156,8 +131,7 @@ export class CohortApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request)
-        this.loading.set(false);
+      if (generation === this.generation && request === this.request) this.loading.set(false);
     }
   }
 
@@ -168,15 +142,13 @@ export class CohortApiStoreService {
     capacity: number;
     referentialVersionId: string;
     status: CohortResponse["status"];
+    managerUserId: string;
+    managerDisplayName: string;
   }): Promise<ContextualPromotionSummary | null> {
     const offering = this.workspace.activeOfferingForContext();
-    const referential = this.referentials
-      .items()
-      .find(
-        (item) =>
-          item.id === payload.referentialVersionId ||
-          item.apiId === payload.referentialVersionId,
-      );
+    const referential = this.referentials.items().find(
+      (item) => item.id === payload.referentialVersionId || item.apiId === payload.referentialVersionId,
+    );
     if (!offering?.apiId || !referential?.apiId) {
       this.notifications.error("promotions.api.invalidContext", "/promotions");
       return null;
@@ -191,6 +163,8 @@ export class CohortApiStoreService {
         startDate: this.text(payload.startDate),
         endDate: this.text(payload.endDate),
         capacity: Math.max(1, this.number(payload.capacity)),
+        pedagogicalManagerAuthGateUserId: this.text(payload.managerUserId) || null,
+        pedagogicalManagerDisplayName: this.text(payload.managerDisplayName) || null,
         externalKey: null,
       });
       saved = this.normalize(saved);
@@ -207,10 +181,7 @@ export class CohortApiStoreService {
             }),
           );
         } catch {
-          this.notifications.error(
-            "promotions.api.updateFailed",
-            "/promotions",
-          );
+          this.notifications.error("promotions.api.updateFailed", "/promotions");
         }
       }
 
@@ -220,21 +191,31 @@ export class CohortApiStoreService {
       await this.reload();
       if (!workspaceReloaded)
         this.notifications.error("promotions.api.refreshFailed", "/promotions");
-      return (
-        this.promotions().find((item) => item.id === (saved.key || saved.id)) ??
-        null
-      );
+      return this.promotions().find((item) => item.id === (saved.key || saved.id)) ?? null;
     } catch {
       this.notifications.error("promotions.api.createFailed", "/promotions");
       return null;
     }
   }
 
-  private async loadDashboards(
-    rows: CohortResponse[],
-    generation: number,
-    request: number,
-  ): Promise<void> {
+  async delete(id: string): Promise<boolean> {
+    const row = this.rowsSignal().find((item) => (item.key || item.id) === id || item.id === id);
+    if (!row?.id) return false;
+    try {
+      await this.api.deleteCohort(row.id);
+      this.rowsSignal.update((items) => items.filter((item) => item.id !== row.id));
+      const workspaceReloaded = await this.reloadWorkspaceSafely();
+      await this.reload();
+      if (!workspaceReloaded) this.notifications.error("promotions.api.refreshFailed", "/promotions");
+      return true;
+    } catch (error: any) {
+      const code = typeof error?.error?.code === "string" ? error.error.code : typeof error?.code === "string" ? error.code : "";
+      this.notifications.error(code ? `backendErrors.${code}` : "promotions.api.deleteFailed", "/promotions");
+      return false;
+    }
+  }
+
+  private async loadDashboards(rows: CohortResponse[], generation: number, request: number): Promise<void> {
     if (!rows.length) {
       this.dashboardsSignal.set({});
       return;
@@ -252,8 +233,7 @@ export class CohortApiStoreService {
       else failed = true;
     });
     this.dashboardsSignal.set(reports);
-    if (failed)
-      this.notifications.error("promotions.api.metricsFailed", "/promotions");
+    if (failed) this.notifications.error("promotions.api.metricsFailed", "/promotions");
   }
 
   private async reloadWorkspaceSafely(): Promise<boolean> {
@@ -261,11 +241,7 @@ export class CohortApiStoreService {
     return !this.workspace.remoteWorkspaceError();
   }
 
-  private currentFilters(): {
-    organizationId?: string;
-    siteId?: string;
-    programId?: string;
-  } {
+  private currentFilters(): { organizationId?: string; siteId?: string; programId?: string } {
     return {
       organizationId: this.workspace.organization()?.apiId ?? "",
       siteId: this.workspace.site()?.apiId ?? "",
@@ -295,10 +271,9 @@ export class CohortApiStoreService {
       .replace(/^-|-$/g, "")
       .slice(0, 42);
     const year = /^\d{4}/.test(startDate) ? startDate.slice(0, 4) : "0000";
-    const uid =
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID().slice(0, 8).toUpperCase()
-        : Date.now().toString(36).toUpperCase();
+    const uid = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID().slice(0, 8).toUpperCase()
+      : Date.now().toString(36).toUpperCase();
     return `${slug || "PROMO"}-${year}-${uid}`.slice(0, 64);
   }
 
@@ -316,15 +291,14 @@ export class CohortApiStoreService {
       endDate: this.text(row?.endDate),
       capacity: this.number(row?.capacity),
       learnerCount: this.number(row?.learnerCount),
+      pedagogicalManagerAuthGateUserId: this.text(row?.pedagogicalManagerAuthGateUserId) || null,
+      pedagogicalManagerDisplayName: this.text(row?.pedagogicalManagerDisplayName),
       status: this.status(row?.status),
     };
   }
 
   private status(value: unknown): CohortResponse["status"] {
-    return value === "draft" ||
-      value === "active" ||
-      value === "completed" ||
-      value === "cancelled"
+    return value === "draft" || value === "active" || value === "completed" || value === "cancelled"
       ? value
       : "planned";
   }

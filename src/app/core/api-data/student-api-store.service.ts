@@ -3,27 +3,21 @@ import { firstValueFrom } from "rxjs";
 import type { StudentStatus } from "../models/app.models";
 import type { StudentDirectoryItem } from "../models/students.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
+import { PedagoraAccessApiService } from "../access/pedagora-access-api.service";
 import { ReportingApiService } from "../reporting/reporting-api.service";
 import type { CohortLearnerDashboard } from "../reporting/reporting.models";
 import { RealtimeService } from "../realtime/realtime.service";
-import {
-  StudentProfileApiService,
-  type LearnerProfileApi,
-} from "../students/student-profile-api.service";
-import {
-  TrainingCatalogApiService,
-  type LearnerResponse,
-} from "../training/training-catalog-api.service";
+import { StudentProfileApiService, type LearnerDirectoryApi } from "../students/student-profile-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
 @Injectable({ providedIn: "root" })
 export class StudentApiStoreService {
   private readonly profiles = inject(StudentProfileApiService);
-  private readonly training = inject(TrainingCatalogApiService);
   private readonly workspace = inject(WorkspaceContextService);
   private readonly realtime = inject(RealtimeService);
   private readonly reporting = inject(ReportingApiService);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly access = inject(PedagoraAccessApiService);
 
   private readonly itemsSignal = signal<StudentDirectoryItem[]>([]);
   readonly students = this.itemsSignal.asReadonly();
@@ -39,16 +33,13 @@ export class StudentApiStoreService {
       const generation = ++this.generation;
       this.itemsSignal.set([]);
       this.loadError.set(false);
-      if (ready && cohort?.apiId) void this.reload(generation, cohort.apiId);
+      if (ready) void this.reload(generation, cohort?.apiId ?? "");
     });
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.training\.enrollment\./.test(event.typeKey))
-        return;
-      untracked(() => {
-        if (this.workspace.cohort()?.apiId) void this.reload();
-      });
+      if (!event || !(/^(pedagora\.training\.enrollment\.)/.test(event.typeKey) || (event.typeKey === "pedagora.access.invitation.accepted.v1" || event.typeKey === "pedagora.access.member.role-changed.v1"))) return;
+      untracked(() => void this.reload());
     });
   }
 
@@ -56,36 +47,24 @@ export class StudentApiStoreService {
     generation = this.generation,
     cohortApiId = this.workspace.cohort()?.apiId ?? "",
   ): Promise<boolean> {
-    if (!cohortApiId) {
-      this.itemsSignal.set([]);
-      return true;
-    }
-
     const request = ++this.request;
     this.loading.set(true);
     try {
-      const rows = await firstValueFrom(
-        this.profiles.cohortLearners(cohortApiId),
-      );
+      const rows = await firstValueFrom(this.profiles.directory());
       let summaries: CohortLearnerDashboard[] = [];
-      try {
-        const result = await firstValueFrom(
-          this.reporting.cohortLearners(cohortApiId),
-        );
-        summaries = Array.isArray(result) ? result : [];
-      } catch {
-        this.notifications.error("students.api.metricsFailed", "/stagiaires");
+      if (cohortApiId) {
+        try {
+          const result = await firstValueFrom(this.reporting.cohortLearners(cohortApiId));
+          summaries = Array.isArray(result) ? result : [];
+        } catch {
+          this.notifications.error("students.api.metricsFailed", "/stagiaires");
+        }
       }
-      if (generation !== this.generation || request !== this.request)
-        return false;
-      const summaryByEnrollment = new Map(
-        summaries.map((item) => [item.enrollmentId, item]),
-      );
-      this.itemsSignal.set(
-        (Array.isArray(rows) ? rows : []).map((row) =>
-          this.map(row, summaryByEnrollment.get(this.text(row?.enrollmentId))),
-        ),
-      );
+      if (generation !== this.generation || request !== this.request) return false;
+      const summaryByEnrollment = new Map(summaries.map((item) => [item.enrollmentId, item]));
+      this.itemsSignal.set((Array.isArray(rows) ? rows : []).map((row) =>
+        this.mapDirectory(row, summaryByEnrollment.get(this.text(row?.enrollmentId))),
+      ));
       this.loadError.set(false);
       return true;
     } catch {
@@ -96,8 +75,7 @@ export class StudentApiStoreService {
       }
       return false;
     } finally {
-      if (generation === this.generation && request === this.request)
-        this.loading.set(false);
+      if (generation === this.generation && request === this.request) this.loading.set(false);
     }
   }
 
@@ -110,81 +88,63 @@ export class StudentApiStoreService {
     promotionId: string;
     startDate: string;
   }): Promise<StudentDirectoryItem | null> {
-    const cohort = this.workspace
-      .cohorts()
-      .find((item) => item.id === payload.promotionId);
+    const cohort = this.workspace.cohorts().find((item) => item.id === payload.promotionId);
     if (!cohort?.apiId) {
       this.notifications.error("students.api.invalidContext", "/stagiaires");
       return null;
     }
 
     try {
-      const created = await this.training.enroll(cohort.apiId, {
+      await firstValueFrom(this.access.invite({
         firstName: this.text(payload.firstName).trim(),
         lastName: this.text(payload.lastName).trim(),
         email: this.text(payload.email).trim(),
+        role: "student",
+        siteId: this.workspace.site()?.apiId ?? null,
+        programId: this.workspace.program()?.apiId ?? null,
+        cohortId: cohort.apiId,
+        examSessionId: null,
         phone: this.nullableText(payload.phone),
         birthDate: this.nullableText(payload.birthDate),
         enrolledOn: this.nullableText(payload.startDate),
-        authGateUserId: null,
-        personExternalKey: null,
-        learnerExternalKey: null,
-        enrollmentExternalKey: null,
-      });
+      }));
 
-      const mapped = this.map(created);
-      this.itemsSignal.update((items) => [
-        mapped,
-        ...items.filter((item) => item.enrollmentId !== mapped.enrollmentId),
-      ]);
-
-      await this.workspace.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("students.api.refreshFailed", "/stagiaires");
+      // The product-owned invitation provisions OrganizationMember -> StudentProfile -> LearnerProfile
+      // and, because a cohort is supplied here, the Enrollment as part of the same outbox workflow.
       await this.reload();
-      return mapped;
+      return {
+        id: "", enrollmentId: "", firstName: this.text(payload.firstName), lastName: this.text(payload.lastName),
+        promotionId: cohort.id, promotionName: cohort.name, progress: 0, completedHours: 0, catchupHours: 0,
+        preparedSheets: 0, presentedSheets: 0, validatedSheets: 0, status: "good", enrollmentStatus: "pending",
+      };
     } catch {
       this.notifications.error("students.api.createFailed", "/stagiaires");
       return null;
     }
   }
 
-  private map(
-    row: LearnerProfileApi | LearnerResponse,
-    summary?: CohortLearnerDashboard,
-  ): StudentDirectoryItem {
-    const enrollmentStatus = this.enrollmentStatus(row?.enrollmentStatus);
-    const completedHours =
-      Math.round((this.number(summary?.completedMinutes) / 60) * 10) / 10;
-    const catchupHours =
-      Math.round((this.number(summary?.catchupMinutes) / 60) * 10) / 10;
+  private mapDirectory(row: LearnerDirectoryApi, summary?: CohortLearnerDashboard): StudentDirectoryItem {
+    const enrollmentStatus = row?.enrollmentId ? this.enrollmentStatus(row?.enrollmentStatus) : "pending";
+    const completedHours = Math.round(this.number(summary?.completedMinutes) / 60 * 10) / 10;
+    const catchupHours = Math.round(this.number(summary?.catchupMinutes) / 60 * 10) / 10;
     return {
       id: this.text(row?.learnerProfileId),
       enrollmentId: this.text(row?.enrollmentId),
       firstName: this.text(row?.firstName),
       lastName: this.text(row?.lastName),
-      promotionId: this.text(this.workspace.cohort()?.id),
-      promotionName: this.text(this.workspace.cohort()?.name),
+      promotionId: this.text(row?.cohortId),
+      promotionName: this.text(row?.cohortName),
       progress: this.number(summary?.averageCompetencyProgress),
-      completedHours,
-      catchupHours,
-      preparedSheets: this.number(summary?.preparedTopics),
-      presentedSheets: this.number(summary?.presentedTopics),
-      validatedSheets: this.number(summary?.validatedTopics),
+      completedHours, catchupHours,
+      preparedSheets: this.number(summary?.preparedTopics), presentedSheets: this.number(summary?.presentedTopics), validatedSheets: this.number(summary?.validatedTopics),
       status: this.status(enrollmentStatus, catchupHours),
       enrollmentStatus,
     };
   }
 
-  private enrollmentStatus(
-    value: unknown,
-  ): NonNullable<StudentDirectoryItem["enrollmentStatus"]> {
+  private enrollmentStatus(value: unknown): NonNullable<StudentDirectoryItem["enrollmentStatus"]> {
     const normalized = this.text(value).toLowerCase();
-    return normalized === "pending" ||
-      normalized === "suspended" ||
-      normalized === "completed" ||
-      normalized === "withdrawn" ||
-      normalized === "cancelled"
+    return normalized === "pending" || normalized === "suspended" || normalized === "completed" || normalized === "withdrawn" || normalized === "cancelled"
       ? normalized
       : "active";
   }
@@ -193,8 +153,7 @@ export class StudentApiStoreService {
     enrollmentStatus: NonNullable<StudentDirectoryItem["enrollmentStatus"]>,
     catchupHours = 0,
   ): StudentStatus {
-    if (enrollmentStatus !== "active" && enrollmentStatus !== "completed")
-      return "warning";
+    if (enrollmentStatus !== "active" && enrollmentStatus !== "completed") return "warning";
     if (catchupHours > 10) return "late";
     if (catchupHours > 0) return "warning";
     return "good";
