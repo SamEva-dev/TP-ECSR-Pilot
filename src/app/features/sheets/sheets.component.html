@@ -1,10 +1,10 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+      <h1 class="ecsr-page-title">
         {{ "sheets.title" | t }}
       </h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      <p class="ecsr-page-subtitle">
         {{
           "sheets.subtitle"
             | t
@@ -21,7 +21,7 @@
       <button
         type="button"
         (click)="openEvaluation()"
-        class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598e] sm:self-auto"
+        class="ecsr-primary-action self-start sm:self-auto"
       >
         <i class="ph ph-presentation-chart text-[17px]"></i>
         {{ "sheets.evaluate" | t }}

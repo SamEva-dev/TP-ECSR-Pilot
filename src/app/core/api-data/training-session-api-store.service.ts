@@ -164,7 +164,7 @@ export class TrainingSessionApiStoreService {
 
   private async loadEligibleTrainers(): Promise<void> {
     try {
-      const rows = await firstValueFrom(this.accessApi.sessionTrainerAssignees());
+      const rows = await firstValueFrom(this.accessApi.trainers());
       this.trainersSignal.set((rows ?? []).map((row) => ({
         id: this.text(row.id),
         name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),

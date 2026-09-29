@@ -46,3 +46,150 @@ button {
 * {
   box-sizing: border-box;
 }
+
+
+/* Sprint UX consolidation: React reference -> Angular product primitives. */
+.ecsr-page {
+  width: 100%;
+  max-width: 1450px;
+  margin-inline: auto;
+}
+
+.ecsr-page-title {
+  margin: 0;
+  color: var(--ecsr-text);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1px;
+}
+
+.ecsr-page-subtitle {
+  margin-top: 2px;
+  color: var(--ecsr-muted);
+  font-size: 14px;
+}
+
+.ecsr-card {
+  border: 1px solid var(--ecsr-border);
+  border-radius: 17px;
+  background: var(--ecsr-card);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+
+.ecsr-interactive-card {
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+.ecsr-interactive-card:hover {
+  border-color: #b8cce2;
+  box-shadow: 0 10px 24px rgb(30 64 175 / 0.10);
+  transform: translateY(-2px);
+}
+
+.ecsr-interactive-card:focus-visible {
+  outline: 3px solid rgb(43 102 164 / 0.22);
+  outline-offset: 2px;
+  border-color: #7da9d4;
+}
+
+.ecsr-primary-action,
+.ecsr-secondary-action,
+.ecsr-danger-action {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 11px;
+  padding-inline: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.ecsr-primary-action {
+  border: 1px solid #2b66a4;
+  background: #2b66a4;
+  color: white;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+}
+
+.ecsr-primary-action:hover { background: #24598f; border-color: #24598f; }
+.ecsr-primary-action:active,
+.ecsr-secondary-action:active,
+.ecsr-danger-action:active { transform: translateY(1px); }
+
+.ecsr-secondary-action {
+  border: 1px solid #d9e0e9;
+  background: white;
+  color: #2b66a4;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+.ecsr-secondary-action:hover { background: #f7faff; border-color: #b8cce2; }
+
+.ecsr-danger-action {
+  border: 1px solid #f1c9c9;
+  background: white;
+  color: #d43b3b;
+}
+.ecsr-danger-action:hover { background: #fff1f1; border-color: #e8aaaa; }
+
+.ecsr-primary-action:focus-visible,
+.ecsr-secondary-action:focus-visible,
+.ecsr-danger-action:focus-visible {
+  outline: 3px solid rgb(43 102 164 / 0.20);
+  outline-offset: 2px;
+}
+
+.ecsr-control {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid #dce3eb;
+  border-radius: 12px;
+  background: white;
+  color: #475569;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.ecsr-control:focus {
+  outline: none;
+  border-color: #9ab8d7;
+  box-shadow: 0 0 0 3px rgb(219 234 254 / 0.78);
+}
+
+.ecsr-empty-state {
+  border: 1px dashed #cbd5e1;
+  border-radius: 17px;
+  background: white;
+  padding: 44px 24px;
+  text-align: center;
+  color: #718096;
+}
+
+.ecsr-skill-card {
+  position: relative;
+  overflow: hidden;
+}
+.ecsr-skill-card[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #2b66a4;
+}
+
+.ecsr-row-hover {
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.ecsr-row-hover:hover { background: #f8fbff; border-color: #cbdbea; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ecsr-interactive-card,
+  .ecsr-primary-action,
+  .ecsr-secondary-action,
+  .ecsr-danger-action,
+  .ecsr-row-hover { transition: none; }
+  .ecsr-interactive-card:hover { transform: none; }
+}

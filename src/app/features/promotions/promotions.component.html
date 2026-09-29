@@ -1,4 +1,4 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
     <div>
       <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-[#6f7d90]">
@@ -8,10 +8,10 @@
         <i class="ph ph-caret-right text-[11px]"></i>
         <span>{{ workspace.program()?.name }}</span>
       </div>
-      <h1 class="mt-2 text-[30px] font-extrabold tracking-[-1px] text-[#172033]">{{ "promotions.contextual.title" | t }}</h1>
-      <p class="mt-0.5 text-[13px] text-[#6c788b]">{{ "promotions.contextual.subtitle" | t: { site: workspace.site()?.city ?? "", program: workspace.program()?.name ?? "" } }}</p>
+      <h1 class="ecsr-page-title mt-2">{{ "promotions.contextual.title" | t }}</h1>
+      <p class="ecsr-page-subtitle">{{ "promotions.contextual.subtitle" | t: { site: workspace.site()?.city ?? "", program: workspace.program()?.name ?? "" } }}</p>
     </div>
-    <button type="button" (click)="openCreateDrawer()" class="inline-flex h-[40px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] xl:self-auto"><i class="ph ph-plus text-[17px]"></i>{{ "promotions.create" | t }}</button>
+    <button type="button" (click)="openCreateDrawer()" class="ecsr-primary-action self-start xl:self-auto"><i class="ph ph-plus text-[17px]"></i>{{ "promotions.create" | t }}</button>
   </div>
 
   @if (createdPromotionName()) {
@@ -44,7 +44,7 @@
 
   <div class="mt-4 space-y-4">
     @for (promotion of filteredPromotions(); track promotion.id) {
-      <article class="overflow-hidden rounded-[18px] border border-[#dfe5ec] bg-white shadow-sm">
+      <article class="ecsr-card overflow-hidden rounded-[18px] transition hover:border-[#c3d4e5] hover:shadow-md">
         <div class="p-4 sm:p-5">
           <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div class="min-w-0">

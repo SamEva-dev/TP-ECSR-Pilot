@@ -1,16 +1,16 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+      <h1 class="ecsr-page-title">
         {{ "planning.title" | t }}
       </h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      <p class="ecsr-page-subtitle">
         {{ "planning.subtitle" | t }}
       </p>
     </div>
     <a
       routerLink="/planning/nouveau"
-      class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm sm:self-auto"
+      class="ecsr-primary-action self-start sm:self-auto"
     >
       <i class="ph ph-plus text-[17px]"></i>
       {{ "planning.add" | t }}
@@ -79,68 +79,15 @@
   </article>
 
   @if (canSeeWorkModes()) {
-    <article
-      class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
-    >
+    <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 class="text-[14px] font-bold text-[#172033]">
-            {{ "planning.workModes.title" | t }}
-          </h2>
-          <p class="mt-0.5 text-[11px] text-[#768295]">
-            {{ "planning.workModes.subtitle" | t }}
-          </p>
-        </div>
-        <a
-          routerLink="/teletravail"
-          class="inline-flex h-[34px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold text-[#2a64a2]"
-          ><i class="ph ph-house-line text-[15px]"></i
-          >{{ "planning.workModes.open" | t }}</a
-        >
+        <div><h2 class="text-[14px] font-bold text-[#172033]">{{ "planning.workModes.title" | t }}</h2><p class="mt-0.5 text-[11px] text-[#768295]">{{ "planning.workModes.subtitle" | t }}</p></div>
+        <a routerLink="/teletravail" class="inline-flex h-[34px] items-center gap-2 rounded-[10px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold text-[#2a64a2]"><i class="ph ph-house-line text-[15px]"></i>{{ "planning.workModes.open" | t }}</a>
       </div>
       <div class="mt-3 overflow-x-auto">
         <table class="min-w-[720px] w-full text-left text-[11px]">
-          <thead>
-            <tr
-              class="border-b border-[#edf1f5] text-[9.5px] uppercase text-[#7a8697]"
-            >
-              <th class="pb-2">{{ "remoteWork.columns.employee" | t }}</th>
-              <th class="pb-2">{{ "remoteWork.days.monday" | t }}</th>
-              <th class="pb-2">{{ "remoteWork.days.tuesday" | t }}</th>
-              <th class="pb-2">{{ "remoteWork.days.wednesday" | t }}</th>
-              <th class="pb-2">{{ "remoteWork.days.thursday" | t }}</th>
-              <th class="pb-2">{{ "remoteWork.days.friday" | t }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (row of teamWorkModes().slice(0, 4); track row.userId) {
-              <tr class="border-b border-[#f0f3f7] last:border-0">
-                <td class="py-2.5 pr-3 font-semibold text-[#263247]">
-                  {{ row.userName }}
-                </td>
-                @for (
-                  mode of [
-                    row.monday,
-                    row.tuesday,
-                    row.wednesday,
-                    row.thursday,
-                    row.friday,
-                  ];
-                  track $index
-                ) {
-                  <td class="py-2.5 pr-2">
-                    <span
-                      [class]="
-                        'inline-flex rounded-full px-2 py-1 text-[9.5px] font-semibold ' +
-                        workModeClass(mode)
-                      "
-                      >{{ "remoteWork.workModes." + mode | t }}</span
-                    >
-                  </td>
-                }
-              </tr>
-            }
-          </tbody>
+          <thead><tr class="border-b border-[#edf1f5] text-[9.5px] uppercase text-[#7a8697]"><th class="pb-2">{{ "remoteWork.columns.employee" | t }}</th><th class="pb-2">{{ "remoteWork.days.monday" | t }}</th><th class="pb-2">{{ "remoteWork.days.tuesday" | t }}</th><th class="pb-2">{{ "remoteWork.days.wednesday" | t }}</th><th class="pb-2">{{ "remoteWork.days.thursday" | t }}</th><th class="pb-2">{{ "remoteWork.days.friday" | t }}</th></tr></thead>
+          <tbody>@for (row of teamWorkModes().slice(0,4); track row.userId) {<tr class="border-b border-[#f0f3f7] last:border-0"><td class="py-2.5 pr-3 font-semibold text-[#263247]">{{ row.userName }}</td>@for (mode of [row.monday,row.tuesday,row.wednesday,row.thursday,row.friday]; track $index) {<td class="py-2.5 pr-2"><span [class]="'inline-flex rounded-full px-2 py-1 text-[9.5px] font-semibold ' + workModeClass(mode)">{{ ('remoteWork.workModes.' + mode) | t }}</span></td>}</tr>}</tbody>
         </table>
       </div>
     </article>
@@ -195,7 +142,7 @@
         </h3>
         <div class="mt-3 space-y-2">
           @for (event of eventsForDay(day.id); track event.id) {
-            <div class="rounded-[14px] bg-[#f0f3f7] p-3">
+            <div class="ecsr-row-hover rounded-[14px] border border-transparent bg-[#f0f3f7] p-3">
               <span
                 [class]="
                   'inline-flex rounded-full px-2.5 py-1 text-[10.5px] font-semibold ' +

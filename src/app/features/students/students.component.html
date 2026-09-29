@@ -1,10 +1,10 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+      <h1 class="ecsr-page-title">
         {{ "students.title" | t }}
       </h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      <p class="ecsr-page-subtitle">
         {{
           "students.resultCount"
             | t: { displayed: filteredStudents().length, total: total() }
@@ -14,7 +14,7 @@
     <button
       type="button"
       (click)="openAddDrawer()"
-      class="inline-flex h-[39px] items-center justify-center gap-2 self-start rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#24598f] sm:self-auto"
+      class="ecsr-primary-action self-start sm:self-auto"
     >
       <i class="ph ph-user-plus text-[17px]"></i>
       {{ "students.add" | t }}
@@ -95,8 +95,8 @@
     <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (student of filteredStudents(); track student.id) {
         <a
-          [routerLink]="student.enrollmentId ? ['/stagiaires', student.id] : null"
-          class="group block rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#b8cce2] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#8eb4db]"
+          [routerLink]="['/stagiaires', student.id]"
+          class="ecsr-card ecsr-interactive-card group block p-4"
         >
           <div class="flex items-start gap-3">
             <div
@@ -119,6 +119,7 @@
               "
               >{{ statusLabelKey(student.status) | t }}</span
             >
+            <i class="ph ph-caret-right shrink-0 text-[16px] text-[#9aa8b9] transition group-hover:translate-x-0.5 group-hover:text-[#2b66a4]"></i>
           </div>
 
           <app-progress-bar

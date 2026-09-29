@@ -1,16 +1,16 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ 'drivingSession.title' | t }}</h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">{{ 'drivingSession.subtitle' | t }}</p>
+      <h1 class="ecsr-page-title">{{ 'drivingSession.title' | t }}</h1>
+      <p class="ecsr-page-subtitle">{{ 'drivingSession.subtitle' | t }}</p>
     </div>
     @if (canEdit()) {
-      <button type="button" (click)="save()" class="inline-flex h-[39px] items-center justify-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm">
+      <button type="button" (click)="save()" class="ecsr-primary-action">
         <i [class]="saved() ? 'ph ph-check-circle text-[17px]' : 'ph ph-steering-wheel text-[17px]'"></i>
         {{ (saved() ? 'drivingSession.actions.saved' : 'drivingSession.actions.validate') | t }}
       </button>
     } @else {
-      <button type="button" (click)="scrollToHistory()" class="inline-flex h-[39px] items-center justify-center gap-2 rounded-[11px] border border-[#d9e0e9] bg-white px-4 text-[13px] font-semibold text-[#2b66a4] shadow-sm">
+      <button type="button" (click)="scrollToHistory()" class="ecsr-secondary-action">
         <i class="ph ph-clock-counter-clockwise text-[17px]"></i>{{ 'drivingSession.actions.history' | t }}
       </button>
     }
@@ -67,13 +67,13 @@
 
       <div class="mt-4">
         <p class="text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.competence' | t }}</p>
-        <div class="mt-2 flex flex-wrap gap-2">@for (competence of competencies; track competence.id) {<button type="button" (click)="selectCompetence(competence.id)" [disabled]="!canEdit()" [class]="selectedCompetence() === competence.id ? 'rounded-full bg-[#2b66a4] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-semibold text-[#334155] disabled:cursor-default'">{{ competence.id }}</button>}</div>
+        <div class="mt-2 flex flex-wrap gap-2">@for (competence of competencies; track competence.id) {<button type="button" (click)="selectCompetence(competence.id)" [disabled]="!canEdit()" [class]="selectedCompetence() === competence.id ? 'rounded-full bg-[#2b66a4] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-semibold text-[#334155] transition hover:border-[#aac6e0] hover:bg-[#f7fbff] disabled:cursor-default disabled:hover:border-[#dfe5ec] disabled:hover:bg-white'">{{ competence.id }}</button>}</div>
         <p class="mt-2 text-[11px] text-[#718096]">{{ selectedCompetenceInfo().descriptionKey | t }}</p>
       </div>
 
       <div class="mt-4">
         <p class="text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.subSkill' | t }}</p>
-        <div class="mt-2 flex flex-wrap gap-2">@for (skill of subSkills(); track skill.id) {<button type="button" (click)="selectSubSkill(skill.id)" [disabled]="!canEdit()" [class]="selectedSubSkill() === skill.id ? 'rounded-full bg-[#f6a51e] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-medium text-[#334155] disabled:cursor-default'">{{ skill.labelKey | t }}</button>}</div>
+        <div class="mt-2 flex flex-wrap gap-2">@for (skill of subSkills(); track skill.id) {<button type="button" (click)="selectSubSkill(skill.id)" [disabled]="!canEdit()" [class]="selectedSubSkill() === skill.id ? 'rounded-full bg-[#f6a51e] px-3.5 py-2 text-[11px] font-semibold text-white' : 'rounded-full border border-[#dfe5ec] bg-white px-3.5 py-2 text-[11px] font-medium text-[#334155] transition hover:border-[#e4bd70] hover:bg-[#fffaf0] disabled:cursor-default disabled:hover:border-[#dfe5ec] disabled:hover:bg-white'">{{ skill.labelKey | t }}</button>}</div>
       </div>
 
       <div class="mt-4">

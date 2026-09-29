@@ -11,6 +11,8 @@ export interface ProductAccount {
   firstName: string;
   lastName: string;
   status: "Active" | "Suspended" | "Invited";
+  /** Canonical role for this PedagoraPilot application membership. */
+  primaryRole?: string;
   roles: string[];
   permissions: ProductPermission[];
   assignments: WorkspaceMembership[];
@@ -23,7 +25,19 @@ export interface ProductAccountPage {
   pageSize: number;
   rolesAvailable: string[];
 }
-export interface InviteProductAccountRequest { firstName: string; lastName: string; email: string; role: MembershipRole; siteId?: string | null; programId?: string | null; cohortId?: string | null; examSessionId?: string | null; phone?: string | null; birthDate?: string | null; enrolledOn?: string | null; }
+export interface InviteProductAccountRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: MembershipRole;
+  siteId?: string | null;
+  programId?: string | null;
+  cohortId?: string | null;
+  examSessionId?: string | null;
+  phone?: string | null;
+  birthDate?: string | null;
+  enrolledOn?: string | null;
+}
 export interface AddScopeAssignmentRequest {
   role: MembershipRole;
   scope: MembershipScope;
@@ -45,8 +59,6 @@ export class PedagoraAccessApiService {
   }
 
   trainers() { return this.http.get<ProductAccount[]>(`${this.url}/trainers`); }
-  sessionTrainerAssignees() { return this.http.get<ProductAccount[]>(`${this.url}/trainers/session-assignees`); }
-  drivingTrainerAssignees() { return this.http.get<ProductAccount[]>(`${this.url}/trainers/driving-assignees`); }
   invite(request: InviteProductAccountRequest) { return this.http.post<ProductAccount>(`${this.url}/invite`, request); }
   revokeInvitation(invitationId: string) { return this.http.delete<void>(`${this.url}/invitations/${encodeURIComponent(invitationId)}`); }
   setRole(userId: string, role: MembershipRole) { return this.http.put<void>(`${this.url}/${encodeURIComponent(userId)}/roles`, { roles: [role] }); }

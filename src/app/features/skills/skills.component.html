@@ -1,10 +1,10 @@
-<section class="mx-auto w-full max-w-[1450px]">
+<section class="ecsr-page">
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-[30px] font-extrabold tracking-[-1px] text-[#172033]">
+      <h1 class="ecsr-page-title">
         {{ "skills.title" | t }}
       </h1>
-      <p class="mt-0.5 text-[14px] text-[#6c788b]">
+      <p class="ecsr-page-subtitle">
         {{
           "skills.subtitle"
             | t
@@ -39,13 +39,33 @@
     }
   </div>
 
+  @if (store.loading()) {
+    <div class="ecsr-card mt-5 px-5 py-8 text-center text-[13px] text-[#718096]">
+      <i class="ph ph-spinner-gap mr-2 inline-block animate-spin text-[18px] text-[#2b66a4]"></i>{{ "skills.real.loading" | t }}
+    </div>
+  } @else if (store.loadError()) {
+    <div class="mt-5 rounded-[17px] border border-[#f0caca] bg-[#fff6f6] px-5 py-5 text-[13px] text-[#b23b3b]">
+      <i class="ph ph-warning-circle mr-2 text-[18px]"></i>{{ "skills.real.failed" | t }}
+    </div>
+  } @else if (!students().length) {
+    <div class="ecsr-empty-state mt-5">
+      <i class="ph ph-student text-[32px] text-[#8aa3bd]"></i>
+      <p class="mt-2 text-[13px] font-semibold text-[#334155]">{{ "skills.real.noStudents" | t }}</p>
+    </div>
+  } @else if (!definitions().length) {
+    <div class="ecsr-empty-state mt-5">
+      <i class="ph ph-list-checks text-[32px] text-[#8aa3bd]"></i>
+      <p class="mt-2 text-[13px] font-semibold text-[#334155]">{{ "skills.real.noDefinitions" | t }}</p>
+    </div>
+  } @else {
   <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
     @for (skill of definitions(); track skill.code) {
       <button
         type="button"
         (click)="selectSkill(skill.code)"
+        [attr.aria-pressed]="selectedSkill() === skill.code"
         [class]="
-          'min-h-[104px] rounded-[17px] border p-4 text-left transition ' +
+          'ecsr-skill-card ecsr-interactive-card min-h-[96px] rounded-[17px] border p-4 text-left ' +
           cardClasses(skill.code)
         "
       >
@@ -207,4 +227,5 @@
       </table>
     </div>
   </article>
+  }
 </section>
