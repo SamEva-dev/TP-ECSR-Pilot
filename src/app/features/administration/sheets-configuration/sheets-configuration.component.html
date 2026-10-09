@@ -1,4 +1,14 @@
 <section class="mx-auto w-full max-w-[1450px]">
+  @if (!contextReady()) {
+    <div class="mb-5 rounded-[16px] border border-[#f1d59a] bg-[#fff8e8] px-4 py-3 text-[12px] text-[#8b6508]">
+      <i class="ph ph-info mr-1 text-[15px]"></i>{{ "sheetConfig.contextRequired" | t }}
+    </div>
+  } @else {
+    <div class="mb-5 flex flex-wrap items-center gap-2 rounded-[14px] bg-[#eef5fc] px-4 py-3 text-[12px] text-[#47627e]">
+      <i class="ph ph-target text-[15px] text-[#2a64a2]"></i><span>{{ "sheetConfig.currentContext" | t: { program: contextProgramName() } }}</span>
+    </div>
+  }
+
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <a

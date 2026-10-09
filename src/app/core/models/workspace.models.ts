@@ -86,6 +86,8 @@ export interface WorkspaceSelection {
   siteId: string;
   programId: string;
   cohortId: string;
+  /** Explicit business context selected by the user. */
+  level?: Exclude<WorkspaceScope, "platform">;
 }
 
 export interface WorkspaceAccessRule {

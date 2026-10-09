@@ -1,20 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-  untracked,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from "@angular/core";
 import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
-import type {
-  ReferentialVersionFormValue,
-  TrainingReferential,
-} from "../../../core/models/referentials.models";
+import type { ReferentialVersionFormValue, TrainingReferential } from "../../../core/models/referentials.models";
 
 @Component({
   selector: "app-referential-version-drawer",
@@ -41,19 +28,18 @@ export class ReferentialVersionDrawerComponent {
   readonly effectiveFrom = signal("");
   readonly status = signal<ReferentialVersionFormValue["status"]>("draft");
 
-  readonly effectiveProgramId = computed(
-    () =>
-      this.programId() ||
-      this.referentials().find((item) => item.id === this.defaultSourceId())
-        ?.programId ||
-      this.referentials()[0]?.programId ||
-      "",
-  );
-  readonly sources = computed(() =>
-    this.referentials().filter(
-      (item) => item.programId === this.effectiveProgramId(),
-    ),
-  );
+  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || this.referentials()[0]?.programId || "");
+  readonly sources = computed(() => {
+    const selectedId = this.effectiveProgramId();
+    const selectedProgram = this.programStore.programs().find(
+      (program) => program.id === selectedId || program.apiId === selectedId,
+    );
+    return this.referentials().filter((item) =>
+      item.programId === selectedId
+      || item.programApiId === selectedId
+      || (!!selectedProgram && (item.programId === selectedProgram.id || item.programApiId === selectedProgram.apiId)),
+    );
+  });
   private wasOpen = false;
 
   constructor() {
@@ -77,28 +63,18 @@ export class ReferentialVersionDrawerComponent {
     const source = this.referentials().find((item) => item.id === value);
     if (source) this.code.set(source.certificationCode ?? source.code ?? "");
   }
-  setVersion(event: Event): void {
-    this.version.set((event.target as HTMLInputElement).value);
-  }
-  setCode(event: Event): void {
-    this.code.set((event.target as HTMLInputElement).value);
-  }
-  setEffectiveFrom(event: Event): void {
-    this.effectiveFrom.set((event.target as HTMLInputElement).value);
-  }
-  setStatus(event: Event): void {
-    this.status.set(
-      (event.target as HTMLSelectElement)
-        .value as ReferentialVersionFormValue["status"],
-    );
-  }
+  setVersion(event: Event): void { this.version.set((event.target as HTMLInputElement).value); }
+  setCode(event: Event): void { this.code.set((event.target as HTMLInputElement).value); }
+  setEffectiveFrom(event: Event): void { this.effectiveFrom.set((event.target as HTMLInputElement).value); }
+  setStatus(event: Event): void { this.status.set((event.target as HTMLSelectElement).value as ReferentialVersionFormValue["status"]); }
 
   initialise(): void {
-    const source =
-      this.referentials().find((item) => item.id === this.defaultSourceId()) ??
-      this.referentials()[0];
+    const source = this.referentials().find((item) => item.id === this.defaultSourceId()) ?? this.referentials()[0];
     if (!source) return;
-    this.programId.set(source.programId);
+    const matchingProgram = this.programStore.programs().find(
+      (program) => program.id === source.programId || program.apiId === source.programApiId,
+    );
+    this.programId.set(matchingProgram?.id ?? source.programId);
     this.sourceId.set(source.id);
     this.version.set(source.version);
     this.code.set(source.certificationCode ?? source.code ?? "");

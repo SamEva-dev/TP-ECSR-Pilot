@@ -80,15 +80,37 @@
               <div class="rounded-[14px] bg-[#f3f6f9] px-3 py-2.5"><p class="text-[10px] text-[#7b8798]">{{ "promotions.metrics.attendance" | t }}</p><p class="mt-1 text-[15px] font-extrabold text-[#172033]">{{ metricValue(promotion.attendanceRate, ' %') }}</p></div>
             </div>
 
+          } @else {
+            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.start" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ formatDate(promotion.start) }}</p></div>
+              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.capacity" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.capacity }} {{ "promotions.contextual.planned.students" | t }}</p></div>
+              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.volume" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.capacity > 0 ? (promotion.plannedHours / promotion.capacity) : 0 }} h / {{ "promotions.contextual.planned.student" | t }}</p></div>
+            </div>
+          }
+
+          @if (promotion.students.length || promotion.status !== 'planned') {
             <div class="mt-4">
               <div class="mb-1.5 flex items-center justify-between gap-3"><p class="text-[11.5px] font-bold text-[#263143]">{{ "promotions.averageProgress" | t }}</p><span class="text-[11.5px] font-bold text-[#2b66a4]">{{ promotion.averageProgress }} %</span></div>
               <app-progress-bar [value]="promotion.averageProgress" heightClass="h-[9px]" />
             </div>
-          } @else {
-            <div class="mt-4 grid gap-3 sm:grid-cols-3">
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.start" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ formatDate(promotion.start) }}</p></div>
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.capacity" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.studentCount }} {{ "promotions.contextual.planned.students" | t }}</p></div>
-              <div class="rounded-[14px] border border-[#e2e8f0] bg-[#f8fafc] p-3"><p class="text-[10px] text-[#7b8798]">{{ "promotions.contextual.planned.volume" | t }}</p><p class="mt-1 text-[13px] font-bold text-[#263143]">{{ promotion.plannedHours / promotion.studentCount }} h / {{ "promotions.contextual.planned.student" | t }}</p></div>
+          }
+
+          @if (promotion.students.length) {
+            <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              @for (student of promotion.students; track student.enrollmentId) {
+                <a [routerLink]="['/stagiaires', student.learnerProfileId]" class="group flex min-w-0 items-center gap-3 rounded-[14px] border border-[#dfe5ec] bg-white px-3 py-2.5 transition hover:border-[#b8cce2] hover:bg-[#fbfdff] hover:shadow-sm">
+                  <span class="grid size-[38px] shrink-0 place-items-center rounded-full bg-[#e6f2ff] text-[11.5px] font-bold text-[#2a64a2]">{{ learnerInitials(student.firstName, student.lastName) }}</span>
+                  <span class="min-w-0 flex-1">
+                    <span class="block truncate text-[12.5px] font-bold text-[#172033]">{{ student.firstName }} {{ student.lastName }}</span>
+                    <span class="mt-0.5 block text-[10.5px] text-[#748094]">{{ student.progress }} % · {{ metricValue(student.completedHours, ' h') }}</span>
+                  </span>
+                  <span [class]="'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ' + learnerStatusClass(student.status)">{{ ('students.status.' + student.status) | t }}</span>
+                </a>
+              }
+            </div>
+          } @else if (promotion.studentCount === 0) {
+            <div class="mt-4 rounded-[14px] border border-dashed border-[#d6dee8] bg-[#fafbfd] px-4 py-4 text-center text-[11px] text-[#7b8798]">
+              {{ "promotions.drawer.emptyPromotion" | t }}
             </div>
           }
 

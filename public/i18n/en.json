@@ -331,7 +331,10 @@
     "save": "Save",
     "yes": "Yes",
     "no": "No",
-    "more": "More"
+    "more": "More",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading…"
   },
   "nav": {
     "home": "Home",
@@ -2253,7 +2256,9 @@
       "message": "Sheet no. {{number}} “{{title}}” will be removed from the local framework. This can only be undone by resetting the catalogue or recreating the sheet.",
       "cancel": "Cancel",
       "confirm": "Delete"
-    }
+    },
+    "contextRequired": "Select a Program or Cohort in the Work context to configure pedagogical sheets.",
+    "currentContext": "Pedagogical configuration for: {{program}}"
   },
   "certification": {
     "title": "Certification / Final exam",
@@ -3294,6 +3299,10 @@
       "remoteWork": {
         "title": "Remote work",
         "description": "Policy, requests, planning and remote activities."
+      },
+      "competencies": {
+        "title": "Competencies",
+        "description": "Configure the active competencies and sub-competencies for the referential."
       }
     },
     "identity": {
@@ -3472,6 +3481,24 @@
       "remoteWorkSaveError": "Unable to save the remote-work policy.",
       "reportingError": "Unable to load the organization metrics.",
       "auditError": "Unable to load the organization audit history."
+    },
+    "pedagogicalSheets": {
+      "title": "Pedagogical sheets",
+      "count": "{{count}} configurable sheets",
+      "chooseProgram": "Configuration follows the work context",
+      "description": "Sheet count, numbering and titles can be configured for {{context}}.",
+      "contextDescription": "Select a Program or Cohort in the Work context to display its pedagogical configuration.",
+      "configure": "Configure {{count}} sheets",
+      "selectInContext": "Select a program"
+    },
+    "competencies": {
+      "title": "Competencies",
+      "count": "{{count}} active competencies",
+      "chooseProgram": "Configuration linked to the working context",
+      "description": "Active competencies and sub-competencies can be configured for {{context}}. Only active competencies appear in the Competencies menu.",
+      "contextDescription": "Select a Program or Cohort in the working context to configure its competency framework.",
+      "configure": "Configure competencies",
+      "selectInContext": "Select a program"
     }
   },
   "remoteWork": {
@@ -4047,7 +4074,11 @@
     "SESSION_TRAINER_IDENTITY_INVALID": "The trainer identity associated with the session is invalid.",
     "WORKPLACE_PERIOD_TYPE_INVALID": "The workplace period type is invalid.",
     "WORKPLACE_DOCUMENT_REQUIRED": "The required document for this workplace period is mandatory.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7.",
+    "COMPETENCY_CODE_CONFLICT": "This competency code already exists in this referential.",
+    "COMPETENCY_KIND_INVALID": "The competency type is invalid.",
+    "COMPETENCY_PARENT_INVALID": "The selected parent competency is invalid.",
+    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -4280,7 +4311,11 @@
     "AUDIT_ACTION_REQUIRED": "The audit action is required.",
     "AUDIT_ENTITY_TYPE_REQUIRED": "The audited entity type is required.",
     "PROGRAM_OFFERING_ACTIVE_COHORTS": "Cannot deactivate this offering while cohorts remain open.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "The maximum number of remote-work days must be between 0 and 7.",
+    "COMPETENCY_CODE_CONFLICT": "This competency code already exists in this referential.",
+    "COMPETENCY_KIND_INVALID": "The competency type is invalid.",
+    "COMPETENCY_PARENT_INVALID": "The selected parent competency is invalid.",
+    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted."
   },
   "accessPolicy": {
     "readOnly": "Read-only access"
@@ -4297,5 +4332,46 @@
     "empty": "No results.",
     "quickAccess": "Quick access",
     "results": "Results"
+  },
+  "competencyConfig": {
+    "back": "Back to administration",
+    "title": "Competency configuration",
+    "subtitle": "Competencies are attached to the referential version in the current context. Only active competencies appear in the Competencies menu.",
+    "importReact": "Load competencies from the React version",
+    "addRoot": "Add competency",
+    "addChild": "Add sub-competency",
+    "chooseProgram": "Select a program or cohort to configure its referential.",
+    "total": "Items",
+    "roots": "Competencies",
+    "active": "Active",
+    "search": "Search by code or label…",
+    "empty": "No competency is configured for this referential.",
+    "noChildren": "No sub-competency.",
+    "enable": "Enable",
+    "disable": "Disable",
+    "noParent": "None (main competency)",
+    "deleteTitle": "Delete competency",
+    "deleteText": "Delete {{code}}? Deletion is refused when the item is already used by an assessment or has sub-competencies.",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "editor": {
+      "title": "Competency / sub-competency"
+    },
+    "fields": {
+      "code": "Code",
+      "title": "Label",
+      "parent": "Parent competency",
+      "kind": "Type",
+      "order": "Display order",
+      "active": "Active"
+    },
+    "api": {
+      "loadError": "Unable to load competency configuration.",
+      "saveError": "Unable to save the competency.",
+      "deleteError": "Unable to delete this competency. It may already be in use.",
+      "importError": "Unable to load the TP ECSR competency set from the React version."
+    }
   }
 }

@@ -129,6 +129,70 @@
     }
   </div>
 
+  <article class="mt-4 rounded-[22px] border border-[#dfe5ec] bg-white px-7 py-7 shadow-sm">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div class="max-w-[850px]">
+        <div class="flex items-center gap-3">
+          <span class="grid size-11 place-items-center rounded-[13px] bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-presentation-chart text-[21px]"></i></span>
+          <div>
+            <h2 class="text-[20px] font-semibold text-[#172033]">{{ "organizationAdmin.pedagogicalSheets.title" | t }}</h2>
+            @if (hasPedagogicalContext()) {
+              <p class="mt-0.5 text-[15px] text-[#6c788b]">{{ "organizationAdmin.pedagogicalSheets.count" | t: { count: pedagogicalSheetCount() } }}</p>
+            } @else {
+              <p class="mt-0.5 text-[15px] text-[#6c788b]">{{ "organizationAdmin.pedagogicalSheets.chooseProgram" | t }}</p>
+            }
+          </div>
+        </div>
+        <p class="mt-5 text-[15px] leading-[1.55] text-[#5f6f85]">
+          @if (hasPedagogicalContext()) {
+            {{ "organizationAdmin.pedagogicalSheets.description" | t: { context: pedagogicalContextLabel() } }}
+          } @else {
+            {{ "organizationAdmin.pedagogicalSheets.contextDescription" | t }}
+          }
+        </p>
+      </div>
+      @if (hasPedagogicalContext()) {
+        <a routerLink="/administration/fiches" class="inline-flex h-[48px] items-center justify-center rounded-[13px] border border-[#d2dde9] bg-white px-5 text-[14px] font-semibold text-[#172033] shadow-sm transition hover:border-[#afc4da] hover:bg-[#f8fbfe]">
+          {{ "organizationAdmin.pedagogicalSheets.configure" | t: { count: pedagogicalSheetCount() } }}
+        </a>
+      } @else {
+        <button type="button" disabled class="inline-flex h-[48px] items-center justify-center rounded-[13px] border border-[#dce3eb] bg-[#f4f6f8] px-5 text-[14px] font-semibold text-[#98a2b3]">{{ "organizationAdmin.pedagogicalSheets.selectInContext" | t }}</button>
+      }
+    </div>
+  </article>
+
+  <article class="mt-4 rounded-[22px] border border-[#dfe5ec] bg-white px-7 py-7 shadow-sm">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div class="max-w-[850px]">
+        <div class="flex items-center gap-3">
+          <span class="grid size-11 place-items-center rounded-[13px] bg-[#e6f2ff] text-[#2a64a2]"><i class="ph ph-target text-[21px]"></i></span>
+          <div>
+            <h2 class="text-[20px] font-semibold text-[#172033]">{{ "organizationAdmin.competencies.title" | t }}</h2>
+            @if (hasPedagogicalContext()) {
+              <p class="mt-0.5 text-[15px] text-[#6c788b]">{{ "organizationAdmin.competencies.count" | t: { count: competencyCount() } }}</p>
+            } @else {
+              <p class="mt-0.5 text-[15px] text-[#6c788b]">{{ "organizationAdmin.competencies.chooseProgram" | t }}</p>
+            }
+          </div>
+        </div>
+        <p class="mt-5 text-[15px] leading-[1.55] text-[#5f6f85]">
+          @if (hasPedagogicalContext()) {
+            {{ "organizationAdmin.competencies.description" | t: { context: pedagogicalContextLabel() } }}
+          } @else {
+            {{ "organizationAdmin.competencies.contextDescription" | t }}
+          }
+        </p>
+      </div>
+      @if (hasPedagogicalContext()) {
+        <a routerLink="/administration/competences" class="inline-flex h-[48px] items-center justify-center rounded-[13px] border border-[#d2dde9] bg-white px-5 text-[14px] font-semibold text-[#172033] shadow-sm transition hover:border-[#afc4da] hover:bg-[#f8fbfe]">
+          {{ "organizationAdmin.competencies.configure" | t }}
+        </a>
+      } @else {
+        <button type="button" disabled class="inline-flex h-[48px] items-center justify-center rounded-[13px] border border-[#dce3eb] bg-[#f4f6f8] px-5 text-[14px] font-semibold text-[#98a2b3]">{{ "organizationAdmin.competencies.selectInContext" | t }}</button>
+      }
+    </div>
+  </article>
+
   <div class="mt-4 grid gap-4 xl:grid-cols-[1.25fr_.75fr]">
     <article
       class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"

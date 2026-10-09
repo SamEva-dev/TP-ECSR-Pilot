@@ -331,7 +331,10 @@
     "save": "Enregistrer",
     "yes": "Oui",
     "no": "Non",
-    "more": "Plus"
+    "more": "Plus",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "loading": "Chargement…"
   },
   "nav": {
     "home": "Accueil",
@@ -2253,7 +2256,9 @@
       "message": "La fiche n°{{number}} « {{title}} » sera retirée du référentiel local. Cette action pourra être annulée uniquement en réinitialisant le catalogue ou en recréant la fiche.",
       "cancel": "Annuler",
       "confirm": "Supprimer"
-    }
+    },
+    "contextRequired": "Sélectionnez une Formation ou une Promotion dans le Contexte de travail pour configurer les fiches pédagogiques.",
+    "currentContext": "Configuration pédagogique de : {{program}}"
   },
   "certification": {
     "title": "Certification / Examen final",
@@ -3294,6 +3299,10 @@
       "remoteWork": {
         "title": "Télétravail",
         "description": "Politique, demandes, planning et activité à distance."
+      },
+      "competencies": {
+        "title": "Compétences",
+        "description": "Configurer les compétences et sous-compétences actives du référentiel."
       }
     },
     "identity": {
@@ -3472,6 +3481,24 @@
       "remoteWorkSaveError": "Impossible d’enregistrer la politique de télétravail.",
       "reportingError": "Impossible de charger les indicateurs de l’organisation.",
       "auditError": "Impossible de charger l’historique d’audit de l’organisation."
+    },
+    "pedagogicalSheets": {
+      "title": "Fiches pédagogiques",
+      "count": "{{count}} fiches configurables",
+      "chooseProgram": "Configuration liée au contexte de travail",
+      "description": "Le nombre de fiches, leur numérotation et leurs intitulés sont paramétrables pour {{context}}.",
+      "contextDescription": "Sélectionnez une Formation ou une Promotion dans le Contexte de travail pour afficher sa configuration pédagogique.",
+      "configure": "Configurer les {{count}} fiches",
+      "selectInContext": "Sélectionner une formation"
+    },
+    "competencies": {
+      "title": "Compétences",
+      "count": "{{count}} compétences actives",
+      "chooseProgram": "Configuration liée au contexte de travail",
+      "description": "Les compétences et sous-compétences actives sont paramétrables pour {{context}}. Seules les compétences actives apparaissent dans le menu Compétences.",
+      "contextDescription": "Sélectionnez une Formation ou une Promotion dans le Contexte de travail pour configurer son référentiel de compétences.",
+      "configure": "Configurer les compétences",
+      "selectInContext": "Sélectionner une formation"
     }
   },
   "remoteWork": {
@@ -4047,7 +4074,11 @@
     "SESSION_TRAINER_IDENTITY_INVALID": "L’identité du formateur associée à la séance est invalide.",
     "WORKPLACE_PERIOD_TYPE_INVALID": "Le type de période en entreprise est invalide.",
     "WORKPLACE_DOCUMENT_REQUIRED": "Le document requis pour cette période en entreprise est obligatoire.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7.",
+    "COMPETENCY_CODE_CONFLICT": "Ce code de compétence existe déjà dans ce référentiel.",
+    "COMPETENCY_KIND_INVALID": "Le type de compétence est invalide.",
+    "COMPETENCY_PARENT_INVALID": "La compétence parente sélectionnée est invalide.",
+    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -4280,7 +4311,11 @@
     "AUDIT_ACTION_REQUIRED": "L’action d’audit est obligatoire.",
     "AUDIT_ENTITY_TYPE_REQUIRED": "Le type d’entité audité est obligatoire.",
     "PROGRAM_OFFERING_ACTIVE_COHORTS": "Impossible de désactiver cette offre : des promotions sont encore ouvertes.",
-    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7."
+    "REMOTE_WORK_MAX_DAYS_INVALID": "Le nombre maximal de jours de télétravail doit être compris entre 0 et 7.",
+    "COMPETENCY_CODE_CONFLICT": "Ce code de compétence existe déjà dans ce référentiel.",
+    "COMPETENCY_KIND_INVALID": "Le type de compétence est invalide.",
+    "COMPETENCY_PARENT_INVALID": "La compétence parente sélectionnée est invalide.",
+    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée."
   },
   "accessPolicy": {
     "readOnly": "Accès en lecture seule"
@@ -4297,5 +4332,46 @@
     "empty": "Aucun résultat.",
     "quickAccess": "Accès rapide",
     "results": "Résultats"
+  },
+  "competencyConfig": {
+    "back": "Retour à l’administration",
+    "title": "Configuration des compétences",
+    "subtitle": "Les compétences sont rattachées à la version de référentiel du contexte courant. Seules les compétences actives apparaissent dans le menu Compétences.",
+    "importReact": "Charger les compétences de la version React",
+    "addRoot": "Ajouter une compétence",
+    "addChild": "Ajouter une sous-compétence",
+    "chooseProgram": "Sélectionnez une formation ou une promotion pour configurer son référentiel.",
+    "total": "Éléments",
+    "roots": "Compétences",
+    "active": "Actifs",
+    "search": "Rechercher par code ou libellé…",
+    "empty": "Aucune compétence configurée pour ce référentiel.",
+    "noChildren": "Aucune sous-compétence.",
+    "enable": "Activer",
+    "disable": "Désactiver",
+    "noParent": "Aucune (compétence principale)",
+    "deleteTitle": "Supprimer la compétence",
+    "deleteText": "Supprimer {{code}} ? La suppression est refusée si cet élément est déjà utilisé dans une évaluation ou possède des sous-compétences.",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "editor": {
+      "title": "Compétence / sous-compétence"
+    },
+    "fields": {
+      "code": "Code",
+      "title": "Libellé",
+      "parent": "Compétence parente",
+      "kind": "Type",
+      "order": "Ordre d’affichage",
+      "active": "Actif"
+    },
+    "api": {
+      "loadError": "Impossible de charger la configuration des compétences.",
+      "saveError": "Impossible d’enregistrer la compétence.",
+      "deleteError": "Impossible de supprimer cette compétence. Elle est peut-être déjà utilisée.",
+      "importError": "Impossible de charger le jeu de compétences TP ECSR de la version React."
+    }
   }
 }

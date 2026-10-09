@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
+import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type { AccessAccount, AccessPermissionKey } from "../../core/access/access.models";
 import { PedagoraAccessApiService, type ProductAccount } from "../../core/access/pedagora-access-api.service";
@@ -22,6 +23,7 @@ export class AccessComponent {
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly accessPolicy = inject(AccessPolicyService);
   private readonly realtime = inject(RealtimeService);
+  readonly programStore = inject(ProgramApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
 
   readonly accounts = signal<AccessAccount[]>([]);
@@ -81,7 +83,7 @@ export class AccessComponent {
       if (!event) return;
       if (event.typeKey === "pedagora.access.invitation.created.v1"
         || event.typeKey === "pedagora.access.invitation.accepted.v1"
-        || event.typeKey === "pedagora.access.member.role-changed.v1") {
+        || event.typeKey.startsWith("pedagora.access.member.")) {
         untracked(() => void this.reload(false));
       }
     });
@@ -92,6 +94,36 @@ export class AccessComponent {
   }
   roleKey(role: MembershipRole): string { return `access.roles.${role}`; }
   stateKey(account: AccessAccount): string { return `access.states.${account.access}`; }
+
+  roleBadgeClasses(role: MembershipRole): string {
+    if (role === "read_only") return "bg-[#f1f4f8] text-[#64748b]";
+    if (role === "jury") return "bg-[#f4ebff] text-[#7c3aed]";
+    return "bg-[#e5f2ff] text-[#2a64a2]";
+  }
+
+  stateBadgeClasses(account: AccessAccount): string {
+    return account.access === "active"
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : account.access === "invited"
+        ? "bg-[#fff0c9] text-[#8b5e00]"
+        : "bg-[#ffe1df] text-[#f22b2b]";
+  }
+
+  toggleAccessLabelKey(account: AccessAccount): string {
+    return account.access === "active" ? "access.accounts.suspend" : "access.accounts.activate";
+  }
+
+  responsiblePrograms(account: AccessAccount) {
+    return this.programStore.programs().filter(program => program.responsibleTrainerAuthGateUserId === account.id);
+  }
+
+  responsibleProgramsTitle(account: AccessAccount): string { return this.responsiblePrograms(account).map(x => x.name).join(" · "); }
+
+  toggleAccessButtonClasses(account: AccessAccount): string {
+    return account.access === "active"
+      ? "border-[#d9e0e9] bg-white text-[#172033] hover:bg-[#f8fafc]"
+      : "border-[#cfe0f1] bg-[#eef6ff] text-[#2a64a2] hover:bg-[#e5f2ff]";
+  }
 
   organizationName(id?: string): string {
     if (!id) return "";
@@ -192,21 +224,49 @@ export class AccessComponent {
     if (!selected || !this.canManageAccount(selected)) return;
     if (selected.isInvitation) { this.notifications.error("access.api.pendingActionError", "/acces"); return; }
     const org = this.workspace.organizations().find((x) => x.id === assignment.organizationId || x.apiId === assignment.organizationId);
-    const site = this.workspace.sites().find((x) => x.id === assignment.siteId || x.apiId === assignment.siteId);
+    let site = this.workspace.sites().find((x) => x.id === assignment.siteId || x.apiId === assignment.siteId) ?? null;
     let program: any = null;
-    if (assignment.programId) {
-      for (const candidateSite of this.workspace.sites()) {
-        program = this.workspace.sitePrograms(candidateSite.id).find((x) => x.id === assignment.programId || x.apiId === assignment.programId);
-        if (program) break;
-      }
-    }
     let cohort: any = null;
+
+    // For cohort/exam scopes, the cohort is the authoritative business target.
+    // Derive its owning site + program from the workspace snapshot so we never send
+    // a stale SiteId/ProgramId combination to AuthGate/Pedagora scope validation.
     if (assignment.cohortId) {
       for (const candidateSite of this.workspace.sites()) {
-        cohort = this.workspace.siteCohorts(candidateSite.id).find((x) => x.id === assignment.cohortId || x.apiId === assignment.cohortId);
-        if (cohort) break;
+        const candidateCohort = this.workspace.siteCohorts(candidateSite.id)
+          .find((x) => x.id === assignment.cohortId || x.apiId === assignment.cohortId);
+        if (!candidateCohort) continue;
+        cohort = candidateCohort;
+        site = candidateSite;
+        program = this.workspace.sitePrograms(candidateSite.id)
+          .find((x) => x.id === candidateCohort.programId || x.apiId === candidateCohort.programId) ?? null;
+        break;
       }
     }
+
+    if (!program && assignment.programId && site) {
+      program = this.workspace.sitePrograms(site.id)
+        .find((x) => x.id === assignment.programId || x.apiId === assignment.programId) ?? null;
+    }
+    if (!program && assignment.programId) {
+      for (const candidateSite of this.workspace.sites()) {
+        program = this.workspace.sitePrograms(candidateSite.id)
+          .find((x) => x.id === assignment.programId || x.apiId === assignment.programId) ?? null;
+        if (program) {
+          site ??= candidateSite;
+          break;
+        }
+      }
+    }
+
+    const requiresSite = ["site", "program", "cohort", "exam"].includes(assignment.scope);
+    const requiresProgram = ["program", "cohort", "exam"].includes(assignment.scope);
+    const requiresCohort = ["cohort", "exam"].includes(assignment.scope);
+    if (!org?.apiId || (requiresSite && !site?.apiId) || (requiresProgram && !program?.apiId) || (requiresCohort && !cohort?.apiId)) {
+      this.notifications.error("access.api.assignmentError", "/acces");
+      return;
+    }
+
     try {
       await firstValueFrom(this.api.addAssignment(selected.id, {
         role: assignment.role,

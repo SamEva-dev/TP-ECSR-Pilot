@@ -126,6 +126,14 @@ export class SkillsApiStoreService {
     });
   }
 
+  refreshContext(notify = false): void {
+    const cohortApiId = this.text(this.workspace.cohort()?.apiId);
+    const referentialVersionId = this.text(this.workspace.cohort()?.referentialVersionId);
+    const selfOnly = this.session.role() === "stagiaire";
+    if (!referentialVersionId || (!selfOnly && !cohortApiId)) return;
+    void this.loadContext(cohortApiId, referentialVersionId, selfOnly, ++this.contextGeneration, notify);
+  }
+
   selectStudent(enrollmentId: string): void {
     const normalized = this.text(enrollmentId);
     if (normalized === this.selectedEnrollmentSignal()) return;

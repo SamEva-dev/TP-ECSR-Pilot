@@ -184,8 +184,10 @@
   </div>
 </section>
 
-<app-create-internship-drawer
-  [open]="drawerOpen()"
-  (closed)="closeDrawer()"
-  (periodCreated)="addPeriod($event)"
-/>
+@if (drawerOpen()) {
+  <app-create-internship-drawer
+    [open]="true"
+    (closed)="closeDrawer()"
+    (periodCreated)="addPeriod($event)"
+  />
+}

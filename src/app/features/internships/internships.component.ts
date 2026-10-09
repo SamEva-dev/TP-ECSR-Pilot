@@ -76,6 +76,7 @@ export class InternshipsComponent {
   }
 
   openDrawer(): void {
+    if (!this.canCreate()) return;
     this.drawerOpen.set(true);
   }
 

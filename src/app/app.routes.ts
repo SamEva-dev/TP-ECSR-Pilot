@@ -317,6 +317,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "administration/competences",
+        canActivate: [roleGuard],
+        data: { permission: "administration.manage" },
+        loadComponent: () =>
+          import("./features/administration/competencies-configuration/competencies-configuration.component").then(
+            (m) => m.CompetenciesConfigurationComponent,
+          ),
+      },
+      {
         path: "administration",
         canActivate: [roleGuard],
         data: { permission: "administration.manage" },

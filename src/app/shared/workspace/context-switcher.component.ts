@@ -29,14 +29,17 @@ export class ContextSwitcherComponent {
 
   selectOrganization(id: string): void {
     this.workspace.selectOrganization(id);
+    this.close();
   }
 
   selectSite(id: string): void {
     this.workspace.selectSite(id);
+    this.close();
   }
 
   selectProgram(id: string): void {
     this.workspace.selectProgram(id);
+    this.close();
   }
 
   selectCohort(id: string): void {

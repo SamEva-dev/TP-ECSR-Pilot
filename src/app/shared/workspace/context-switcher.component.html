@@ -68,29 +68,19 @@
           <div
             class="mt-3 flex flex-wrap items-center gap-1.5 text-[10.5px] font-semibold text-[#5f6e82]"
           >
-            <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{
-              workspace.organization()?.shortName
-            }}</span>
-            <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
-            <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{
-              workspace.site()?.city
-            }}</span>
-            <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
-            <span
-              class="inline-flex items-center gap-1.5 rounded-full bg-[#eef4fb] px-2.5 py-1"
-              ><i
-                [class]="
-                  'ph text-[12px] ' +
-                  (workspace.program()?.icon ?? 'ph-graduation-cap')
-                "
-              ></i
-              >{{ workspace.program()?.name }}</span
-            >
-            <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
-            <span
-              class="rounded-full bg-[#fff1d3] px-2.5 py-1 text-[#8a5b00]"
-              >{{ workspace.cohort()?.shortName }}</span
-            >
+            <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{ workspace.organization()?.shortName }}</span>
+            @if (workspace.site()) {
+              <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
+              <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{ workspace.site()?.city }}</span>
+            }
+            @if (workspace.program()) {
+              <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-[#eef4fb] px-2.5 py-1"><i [class]="'ph text-[12px] ' + (workspace.program()?.icon ?? 'ph-graduation-cap')"></i>{{ workspace.program()?.name }}</span>
+            }
+            @if (workspace.cohort()) {
+              <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
+              <span class="rounded-full bg-[#fff1d3] px-2.5 py-1 text-[#8a5b00]">{{ workspace.cohort()?.shortName }}</span>
+            }
           </div>
         </div>
         <button

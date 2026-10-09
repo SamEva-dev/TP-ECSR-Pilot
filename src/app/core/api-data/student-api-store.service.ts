@@ -38,7 +38,9 @@ export class StudentApiStoreService {
 
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !(/^(pedagora\.training\.enrollment\.)/.test(event.typeKey) || (event.typeKey === "pedagora.access.invitation.accepted.v1" || event.typeKey === "pedagora.access.member.role-changed.v1"))) return;
+      if (!event || !( /^(pedagora\.training\.enrollment\.)/.test(event.typeKey)
+        || event.typeKey === "pedagora.access.invitation.accepted.v1"
+        || event.typeKey.startsWith("pedagora.access.member.") )) return;
       untracked(() => void this.reload());
     });
   }

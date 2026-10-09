@@ -16,6 +16,9 @@ export interface ProgramApiDto {
   enabledModules: string[];
   siteKeys: string[];
   referenceVersion?: string | null;
+  responsibleTrainerAuthGateUserId?: string | null;
+  responsibleTrainerDisplayName?: string | null;
+  responsibleTrainerActive?: boolean;
 }
 
 export interface CreateProgramApiRequest {
@@ -29,6 +32,8 @@ export interface CreateProgramApiRequest {
   status: string;
   enabledModules: string[];
   externalKey: string | null;
+  responsibleTrainerAuthGateUserId: string | null;
+  responsibleTrainerDisplayName: string | null;
 }
 
 export interface UpdateProgramApiRequest {
@@ -40,6 +45,8 @@ export interface UpdateProgramApiRequest {
   durationHours: number;
   status: string;
   enabledModules: string[];
+  responsibleTrainerAuthGateUserId: string | null;
+  responsibleTrainerDisplayName: string | null;
 }
 
 @Injectable({ providedIn: "root" })
@@ -72,9 +79,10 @@ export class ProgramCatalogApiService {
     );
   }
   delete(id: string) {
-    return firstValueFrom(this.http.delete<void>(`${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}`));
+    return firstValueFrom(
+      this.http.delete<void>(`${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}`),
+    );
   }
-
   setOffering(programId: string, siteId: string, active: boolean) {
     return firstValueFrom(
       this.http.put(

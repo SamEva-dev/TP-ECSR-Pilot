@@ -102,6 +102,8 @@ export class ProgramApiStoreService {
         status: this.status(value.status),
         enabledModules: Array.isArray(value.enabledModules) ? value.enabledModules : [],
         externalKey: null,
+        responsibleTrainerAuthGateUserId: this.nullableText(value.responsibleTrainerAuthGateUserId),
+        responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
       this.programsSignal.update((items) => [...items, this.map(created)]);
       const currentSite = this.workspace.site();
@@ -110,10 +112,6 @@ export class ProgramApiStoreService {
       }
       await this.reload();
       await this.workspace.reload();
-      if (currentSite?.id && created?.key) {
-        this.workspace.selectSite(currentSite.id);
-        this.workspace.selectProgram(this.text(created.key));
-      }
       if (this.workspace.remoteWorkspaceError())
         this.notifications.error("programs.real.workspaceError", "/formations");
       return true;
@@ -143,6 +141,8 @@ export class ProgramApiStoreService {
         durationHours: this.number(value.durationHours),
         status: this.status(value.status),
         enabledModules: Array.isArray(value.enabledModules) ? value.enabledModules : [],
+        responsibleTrainerAuthGateUserId: this.nullableText(value.responsibleTrainerAuthGateUserId),
+        responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
 
       const mapped = this.map(saved);
@@ -178,8 +178,15 @@ export class ProgramApiStoreService {
       await this.reload();
       return true;
     } catch (error: any) {
-      const code = typeof error?.error?.code === "string" ? error.error.code : typeof error?.code === "string" ? error.code : "";
-      this.notifications.error(code ? `backendErrors.${code}` : "programs.real.deleteError", "/formations");
+      const code = typeof error?.error?.code === "string"
+        ? error.error.code
+        : typeof error?.code === "string"
+          ? error.code
+          : "";
+      this.notifications.error(
+        code ? `backendErrors.${code}` : "programs.real.deleteError",
+        "/formations",
+      );
       return false;
     }
   }
@@ -252,6 +259,9 @@ export class ProgramApiStoreService {
       trainers: 0,
       activeCohorts: cohorts.filter((cohort) => cohort.status === "active").length,
       successRate: 0,
+      responsibleTrainerAuthGateUserId: this.text(item?.responsibleTrainerAuthGateUserId),
+      responsibleTrainerDisplayName: this.text(item?.responsibleTrainerDisplayName),
+      responsibleTrainerActive: !!item?.responsibleTrainerActive,
     };
   }
 
@@ -279,6 +289,11 @@ export class ProgramApiStoreService {
         "first-aid": "ph-first-aid-kit",
       } as Record<string, string>
     )[category] ?? "";
+  }
+
+  private nullableText(value: unknown): string | null {
+    const text = this.text(value).trim();
+    return text || null;
   }
 
   private text(value: unknown): string {

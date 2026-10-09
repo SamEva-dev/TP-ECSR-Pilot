@@ -144,6 +144,18 @@ export class PromotionsComponent {
     return `${this.number(value).toLocaleString("fr-FR")}${suffix}`;
   }
 
+  learnerInitials(firstName: string, lastName: string): string {
+    return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
+  }
+
+  learnerStatusClass(status: "good" | "warning" | "late"): string {
+    return status === "good"
+      ? "bg-[#d8f8df] text-[#18a547]"
+      : status === "warning"
+        ? "bg-[#fff1d2] text-[#a16a00]"
+        : "bg-[#ffe3e3] text-[#c33c3c]";
+  }
+
   private number(value: unknown): number {
     return typeof value === "number" && Number.isFinite(value) ? value : 0;
   }

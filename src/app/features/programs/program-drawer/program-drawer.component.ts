@@ -1,27 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from "@angular/core";
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from "@angular/core";
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { firstValueFrom } from "rxjs";
+import { PedagoraAccessApiService, type ProductAccount } from "../../../core/access/pedagora-access-api.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { TranslateService } from "../../../core/i18n/translate.service";
 import { PROGRAM_MODULES } from "../../../core/api-data/runtime-data.store";
-import type {
-  ProgramCatalogCategory,
-  ProgramCatalogItem,
-  ProgramCatalogStatus,
-  ProgramFormValue,
-} from "../../../core/models/programs.models";
+import type { ProgramCatalogCategory, ProgramCatalogItem, ProgramCatalogStatus, ProgramFormValue } from "../../../core/models/programs.models";
 import type { ProgramModule } from "../../../core/models/workspace.models";
 
 @Component({
@@ -32,6 +16,8 @@ import type { ProgramModule } from "../../../core/models/workspace.models";
 })
 export class ProgramDrawerComponent {
   private readonly translate = inject(TranslateService);
+  private readonly accessApi = inject(PedagoraAccessApiService);
+  readonly trainers = signal<ProductAccount[]>([]);
   readonly open = input(false);
   readonly program = input<ProgramCatalogItem | null>(null);
   readonly closed = output<void>();
@@ -40,32 +26,14 @@ export class ProgramDrawerComponent {
   readonly selectedModules = signal<ProgramModule[]>([]);
 
   readonly form = new FormGroup({
-    code: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    name: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    category: new FormControl<ProgramCatalogCategory>("teacher", {
-      nonNullable: true,
-    }),
-    description: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    referenceVersion: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    durationHours: new FormControl(0, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.min(1)],
-    }),
-    status: new FormControl<ProgramCatalogStatus>("active", {
-      nonNullable: true,
-    }),
+    code: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    category: new FormControl<ProgramCatalogCategory>("teacher", { nonNullable: true }),
+    description: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    referenceVersion: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+    durationHours: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
+    status: new FormControl<ProgramCatalogStatus>("active", { nonNullable: true }),
+    responsibleTrainerAuthGateUserId: new FormControl("", { nonNullable: true }),
   });
 
   constructor() {
@@ -80,16 +48,10 @@ export class ProgramDrawerComponent {
         referenceVersion: program?.referenceVersion ?? "",
         durationHours: program?.durationHours ?? 0,
         status: program?.status ?? "active",
+        responsibleTrainerAuthGateUserId: program?.responsibleTrainerAuthGateUserId ?? "",
       });
-      this.selectedModules.set(
-        program?.enabledModules ?? [
-          "planning",
-          "attendance",
-          "sessions",
-          "documents",
-          "certification",
-        ],
-      );
+      this.selectedModules.set(program?.enabledModules ?? ["planning", "attendance", "sessions", "documents", "certification"]);
+      void this.loadTrainers();
     });
   }
 
@@ -98,21 +60,25 @@ export class ProgramDrawerComponent {
   }
 
   toggleModule(module: ProgramModule): void {
-    this.selectedModules.update((items) =>
-      items.includes(module)
-        ? items.filter((item) => item !== module)
-        : [...items, module],
-    );
+    this.selectedModules.update((items) => items.includes(module) ? items.filter((item) => item !== module) : [...items, module]);
   }
+
+  private async loadTrainers(): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.accessApi.trainers());
+      this.trainers.set((Array.isArray(rows) ? rows : []).filter(x => x.status === "Active"));
+    } catch { this.trainers.set([]); }
+  }
+
+  trainerName(trainer: ProductAccount): string { return `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim(); }
 
   submit(): void {
     if (this.form.invalid || this.selectedModules().length === 0) {
       this.form.markAllAsTouched();
-      console.warn("Form is invalid or no modules selected", this.form.value);
       return;
     }
     const raw = this.form.getRawValue();
-    console.log("Submitting program form", raw, this.selectedModules());
-    this.saved.emit({ ...raw, enabledModules: this.selectedModules() });
+    const trainer = this.trainers().find((x) => x.id === raw.responsibleTrainerAuthGateUserId);
+    this.saved.emit({ ...raw, responsibleTrainerDisplayName: trainer ? `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim() : "", enabledModules: this.selectedModules() });
   }
 }

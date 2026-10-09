@@ -13,6 +13,8 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ApplicationNotificationService } from "../../core/notifications/application-notification.service";
 import { ReportingApiService } from "../../core/reporting/reporting-api.service";
+import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
+import { LearningApiService } from "../../core/learning/learning-api.service";
 import type { AuditEntry } from "../../core/reporting/reporting.models";
 import {
   OrganizationAdministrationApiService,
@@ -164,6 +166,8 @@ export class AdministrationComponent {
   private readonly api = inject(OrganizationAdministrationApiService);
   private readonly reporting = inject(ReportingApiService);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly referentials = inject(ReferentialApiStoreService);
+  private readonly learning = inject(LearningApiService);
 
   readonly profile = signal<OrganizationAdminProfile>({ ...EMPTY_PROFILE });
   readonly branding = signal<OrganizationBrandingSettings>({
@@ -216,22 +220,56 @@ export class AdministrationComponent {
   private lastDto: OrganizationAdministrationDto | null = null;
   private loadSequence = 0;
 
-  readonly sites = computed(() => this.workspace.sites() ?? []);
+  readonly sites = computed(() => {
+    const level = this.workspace.activeLevel();
+    if (level === "organization") return this.workspace.sites() ?? [];
+    const site = this.workspace.site();
+    return site ? [site] : [];
+  });
   readonly programs = computed(() => {
+    const level = this.workspace.activeLevel();
+    if (level === "program" || level === "cohort") return this.workspace.program() ? [this.workspace.program()] : [];
     const byId = new Map<string, any>();
     for (const site of this.sites())
-      for (const program of this.workspace.sitePrograms(site.id))
-        byId.set(program.id, program);
+      for (const program of this.workspace.sitePrograms(site.id)) byId.set(program.id, program);
     return [...byId.values()];
   });
   readonly cohorts = computed(() => {
+    const level = this.workspace.activeLevel();
+    if (level === "cohort") return this.workspace.cohort() ? [this.workspace.cohort()] : [];
     const byId = new Map<string, any>();
-    for (const site of this.sites())
-      for (const cohort of this.workspace.siteCohorts(site.id))
+    for (const site of this.sites()) {
+      for (const cohort of this.workspace.siteCohorts(site.id)) {
+        if (level === "program" && cohort.programId !== this.workspace.program()?.id) continue;
         byId.set(cohort.id, cohort);
+      }
+    }
     return [...byId.values()];
   });
+
+  readonly pedagogicalReferential = computed(() => {
+    const level = this.workspace.activeLevel();
+    if (level === "organization" || level === "site") return null;
+    const cohortVersionId = level === "cohort" ? this.workspace.cohort()?.referentialVersionId ?? "" : "";
+    if (cohortVersionId) {
+      return this.referentials.items().find((item) => item.apiId === cohortVersionId || item.id === cohortVersionId) ?? null;
+    }
+    const program = this.workspace.program();
+    if (!program) return null;
+    return this.referentials.items()
+      .filter((item) => item.programId === program.id || item.programId === program.apiId)
+      .sort((a, b) => Number(b.status === "active") - Number(a.status === "active") || (b.effectiveFrom ?? "").localeCompare(a.effectiveFrom ?? ""))[0] ?? null;
+  });
+  readonly pedagogicalSheetCount = computed(() => this.pedagogicalReferential()?.sheetCount ?? 0);
+  readonly hasPedagogicalContext = computed(() => this.workspace.activeLevel() === "program" || this.workspace.activeLevel() === "cohort");
+  readonly pedagogicalContextLabel = computed(() => {
+    if (!this.hasPedagogicalContext()) return "";
+    const program = this.workspace.program()?.name ?? "";
+    const version = this.pedagogicalReferential()?.version ?? "";
+    return [program, version].filter(Boolean).join(" · ");
+  });
   readonly activeCohorts = computed(() => this.metrics().activeCohorts ?? 0);
+  readonly competencyCount = signal(0);
 
   readonly managementCards = [
     {
@@ -280,6 +318,29 @@ export class AdministrationComponent {
       }
       untracked(() => void this.load(id));
     });
+
+    effect(() => {
+      const referentialVersionId = this.pedagogicalReferential()?.apiId ?? "";
+      if (!referentialVersionId || !this.hasPedagogicalContext()) {
+        this.competencyCount.set(0);
+        return;
+      }
+      untracked(() => void this.loadCompetencyCount(referentialVersionId));
+    });
+  }
+
+
+  private async loadCompetencyCount(referentialVersionId: string): Promise<void> {
+    try {
+      const rows = await firstValueFrom(
+        this.learning.getCompetencyCatalog(referentialVersionId),
+      );
+      this.competencyCount.set(
+        (Array.isArray(rows) ? rows : []).filter((item) => item?.active !== false).length,
+      );
+    } catch {
+      this.competencyCount.set(0);
+    }
   }
 
   updateProfile(field: keyof OrganizationAdminProfile, value: string): void {

@@ -21,6 +21,9 @@ export interface ProgramCatalogItem {
   trainers: number;
   activeCohorts: number;
   successRate: number;
+  responsibleTrainerAuthGateUserId: string;
+  responsibleTrainerDisplayName: string;
+  responsibleTrainerActive: boolean;
 }
 
 export interface ProgramFormValue {
@@ -32,4 +35,6 @@ export interface ProgramFormValue {
   durationHours: number;
   status: ProgramCatalogStatus;
   enabledModules: ProgramModule[];
+  responsibleTrainerAuthGateUserId: string;
+  responsibleTrainerDisplayName: string;
 }

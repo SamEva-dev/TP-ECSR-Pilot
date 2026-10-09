@@ -14,6 +14,18 @@ export interface ContextualPromotionExam {
   successRate?: number;
 }
 
+
+export interface ContextualPromotionLearnerSummary {
+  enrollmentId: string;
+  learnerProfileId: string;
+  firstName: string;
+  lastName: string;
+  progress: number;
+  completedHours: number;
+  catchupHours: number;
+  status: "good" | "warning" | "late";
+}
+
 export interface ContextualPromotionSummary {
   id: string;
   offeringId: string;
@@ -35,6 +47,8 @@ export interface ContextualPromotionSummary {
   end: string;
   status: WorkspaceCohort["status"];
   studentCount: number;
+  capacity: number;
+  students: ContextualPromotionLearnerSummary[];
   manager: string;
   plannedHours: number;
   completedHours: number;

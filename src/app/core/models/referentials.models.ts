@@ -1,8 +1,7 @@
 import type { ProgramModule } from "./workspace.models";
 
 export type ReferentialStatus = "active" | "draft" | "archived";
-export type VolumeCategory =
-  "classroom" | "driving" | "internship" | "assessment" | "other";
+export type VolumeCategory = "classroom" | "driving" | "internship" | "assessment" | "other";
 
 export interface ReferentialSubCompetency {
   id: string;
@@ -57,6 +56,7 @@ export interface TrainingReferential {
   apiId: string;
   referentialId: string;
   programId: string;
+  programApiId: string;
   code: string;
   name: string;
   version: string;

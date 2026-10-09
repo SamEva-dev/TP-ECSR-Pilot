@@ -135,20 +135,17 @@ export class WorkplaceApiStoreService {
     if (this.creating()) return null;
 
     const enrollmentId = this.text(value.studentId);
-    const periodTypeCode = this.periodTypesSignal()[0] ?? "";
+    // A stage period must remain creatable even when the referential has not yet
+    // configured activity/document requirements. The backend accepts STAGE only
+    // as a bootstrap type when no workplace period type exists for the referential.
+    const periodTypeCode = this.periodTypesSignal()[0] ?? "STAGE";
     if (
       !enrollmentId ||
-      !periodTypeCode ||
       !this.text(value.startDate) ||
       !this.text(value.endDate) ||
       this.number(value.plannedHours) <= 0
     ) {
-      this.notifications.error(
-        periodTypeCode
-          ? "internships.real.createError"
-          : "internships.real.noTypes",
-        "/stages",
-      );
+      this.notifications.error("internships.real.createError", "/stages");
       return null;
     }
 

@@ -15,6 +15,7 @@ import { LearningApiService } from "../../../core/learning/learning-api.service"
 import type { PedagogicalTopicDto } from "../../../core/learning/learning.models";
 import { ApplicationNotificationService } from "../../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
+import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 
 type SheetCategory =
   "rules" | "risk" | "vehicle" | "pedagogy" | "exam" | "mobility";
@@ -65,7 +66,8 @@ const SHEET_CATEGORIES: readonly SheetCategory[] = [
 export class SheetsConfigurationComponent {
   private readonly translate = inject(TranslateService);
   private readonly api = inject(LearningApiService);
-  private readonly workspace = inject(WorkspaceContextService);
+  readonly workspace = inject(WorkspaceContextService);
+  private readonly referentials = inject(ReferentialApiStoreService);
   private readonly notifications = inject(ApplicationNotificationService);
   private loadSequence = 0;
 
@@ -81,9 +83,19 @@ export class SheetsConfigurationComponent {
   readonly selected = signal<SheetCatalogItem | null>(null);
   readonly pendingDelete = signal<SheetCatalogItem | null>(null);
   readonly duplicateNumber = signal(false);
-  private readonly referentialVersionId = computed(() =>
-    String(this.workspace.cohort()?.referentialVersionId ?? ""),
-  );
+  private readonly referentialVersionId = computed(() => {
+    const level = this.workspace.activeLevel();
+    if (level === "cohort") return String(this.workspace.cohort()?.referentialVersionId ?? "");
+    if (level !== "program") return "";
+    const program = this.workspace.program();
+    if (!program) return "";
+    const current = this.referentials.items()
+      .filter((item) => item.programId === program.id || item.programId === program.apiId)
+      .sort((a, b) => Number(b.status === "active") - Number(a.status === "active") || (b.effectiveFrom ?? "").localeCompare(a.effectiveFrom ?? ""))[0];
+    return String(current?.apiId ?? "");
+  });
+  readonly contextReady = computed(() => !!this.referentialVersionId());
+  readonly contextProgramName = computed(() => this.workspace.program()?.name ?? "");
 
   draft: SheetDraft = this.emptyDraft();
 

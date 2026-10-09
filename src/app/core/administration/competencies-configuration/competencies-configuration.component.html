@@ -1,0 +1,51 @@
+<section class="mx-auto w-full max-w-[1450px]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <a routerLink="/administration" class="text-[12px] font-semibold text-[#2a64a2]">← {{ "competencyConfig.back" | t }}</a>
+      <h1 class="mt-2 text-[29px] font-extrabold tracking-[-1px] text-[#172033]">{{ "competencyConfig.title" | t }}</h1>
+      <p class="mt-1 text-[14px] text-[#6c788b]">{{ "competencyConfig.subtitle" | t }}</p>
+    </div>
+    @if (contextReady()) {
+      <div class="flex flex-wrap gap-2">
+        <button type="button" (click)="importReact()" class="h-[40px] rounded-[11px] border border-[#cfd9e5] bg-white px-4 text-[12px] font-semibold text-[#334155]">{{ "competencyConfig.importReact" | t }}</button>
+        <button type="button" (click)="openCreate()" class="h-[40px] rounded-[11px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"><i class="ph ph-plus mr-1"></i>{{ "competencyConfig.addRoot" | t }}</button>
+      </div>
+    }
+  </div>
+
+  @if (!contextReady()) {
+    <div class="ecsr-empty-state mt-5"><i class="ph ph-target text-[34px] text-[#8aa3bd]"></i><p class="mt-2 text-[13px] font-semibold text-[#334155]">{{ "competencyConfig.chooseProgram" | t }}</p></div>
+  } @else {
+    <div class="mt-5 grid gap-3 sm:grid-cols-3">
+      <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4"><p class="text-[11px] uppercase text-[#738095]">{{ "competencyConfig.total" | t }}</p><p class="mt-1 text-[25px] font-extrabold">{{ items().length }}</p></article>
+      <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4"><p class="text-[11px] uppercase text-[#738095]">{{ "competencyConfig.roots" | t }}</p><p class="mt-1 text-[25px] font-extrabold">{{ roots().length }}</p></article>
+      <article class="rounded-[16px] border border-[#dfe5ec] bg-white p-4"><p class="text-[11px] uppercase text-[#738095]">{{ "competencyConfig.active" | t }}</p><p class="mt-1 text-[25px] font-extrabold">{{ activeCount() }}</p></article>
+    </div>
+    <div class="mt-4"><input [value]="query()" (input)="updateQuery($event)" [placeholder]="'competencyConfig.search' | t" class="h-[42px] w-full rounded-[11px] border border-[#dbe2ea] bg-white px-4 text-[13px] outline-none" /></div>
+
+    @if (loading()) { <div class="ecsr-card mt-4 p-8 text-center text-[13px] text-[#718096]">{{ "common.loading" | t }}</div> }
+    @else if (!filteredRoots().length) { <div class="ecsr-empty-state mt-4"><p>{{ "competencyConfig.empty" | t }}</p></div> }
+    @else {
+      <div class="mt-4 space-y-3">
+        @for (root of filteredRoots(); track root.id) {
+          <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div><div class="flex items-center gap-2"><span class="rounded-full bg-[#e6f2ff] px-2.5 py-1 text-[11px] font-bold text-[#2a64a2]">{{ root.code }}</span><span [class]="root.active ? 'text-[11px] font-semibold text-[#159447]' : 'text-[11px] font-semibold text-[#98a2b3]'">{{ (root.active ? 'competencyConfig.status.active' : 'competencyConfig.status.inactive') | t }}</span></div><h2 class="mt-2 text-[15px] font-bold text-[#172033]">{{ root.title }}</h2></div>
+              <div class="flex flex-wrap gap-2"><button type="button" (click)="openCreate(root.id)" class="rounded-[9px] border px-3 py-2 text-[11px] font-semibold">+ {{ "competencyConfig.addChild" | t }}</button><button type="button" (click)="toggle(root)" class="rounded-[9px] border px-3 py-2 text-[11px] font-semibold">{{ (root.active ? 'competencyConfig.disable' : 'competencyConfig.enable') | t }}</button><button type="button" (click)="openEdit(root)" class="rounded-[9px] border px-3 py-2 text-[11px] font-semibold">{{ "common.edit" | t }}</button><button type="button" (click)="requestDelete(root)" class="rounded-[9px] border border-[#f0cccc] px-3 py-2 text-[11px] font-semibold text-[#c94738]">{{ "common.delete" | t }}</button></div>
+            </div>
+            <div class="mt-4 space-y-2">
+              @for (child of children(root.id); track child.id) {
+                <div class="flex flex-col gap-2 rounded-[12px] bg-[#f6f8fb] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><div><span class="text-[11px] font-bold text-[#2a64a2]">{{ child.code }}</span><span class="ml-2 text-[12px] font-medium text-[#334155]">{{ child.title }}</span></div><div class="flex gap-2"><button type="button" (click)="toggle(child)" class="text-[11px] font-semibold text-[#526075]">{{ (child.active ? 'competencyConfig.disable' : 'competencyConfig.enable') | t }}</button><button type="button" (click)="openEdit(child)" class="text-[11px] font-semibold text-[#2a64a2]">{{ "common.edit" | t }}</button><button type="button" (click)="requestDelete(child)" class="text-[11px] font-semibold text-[#c94738]">{{ "common.delete" | t }}</button></div></div>
+              } @empty { <p class="text-[12px] text-[#8490a1]">{{ "competencyConfig.noChildren" | t }}</p> }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>
+
+@if (editorOpen()) {
+  <div class="fixed inset-0 z-50 grid place-items-center bg-slate-950/35 p-4"><form (ngSubmit)="save()" class="w-full max-w-[620px] rounded-[20px] bg-white p-6 shadow-2xl"><div class="flex items-center justify-between"><h2 class="text-[18px] font-bold">{{ "competencyConfig.editor.title" | t }}</h2><button type="button" (click)="closeEditor()"><i class="ph ph-x text-[20px]"></i></button></div><div class="mt-5 grid gap-4 sm:grid-cols-2"><label class="text-[12px] font-semibold">{{ "competencyConfig.fields.code" | t }}<input [(ngModel)]="draft.code" name="code" class="mt-1.5 h-[42px] w-full rounded-[10px] border px-3" /></label><label class="text-[12px] font-semibold">{{ "competencyConfig.fields.order" | t }}<input type="number" [(ngModel)]="draft.sortOrder" name="sortOrder" class="mt-1.5 h-[42px] w-full rounded-[10px] border px-3" /></label><label class="sm:col-span-2 text-[12px] font-semibold">{{ "competencyConfig.fields.title" | t }}<input [(ngModel)]="draft.title" name="title" class="mt-1.5 h-[42px] w-full rounded-[10px] border px-3" /></label><label class="text-[12px] font-semibold">{{ "competencyConfig.fields.parent" | t }}<select [(ngModel)]="draft.parentId" name="parentId" class="mt-1.5 h-[42px] w-full rounded-[10px] border px-3"><option value="">{{ "competencyConfig.noParent" | t }}</option>@for(root of roots();track root.id){<option [value]="root.id">{{ root.code }} — {{ root.title }}</option>}</select></label><label class="text-[12px] font-semibold">{{ "competencyConfig.fields.kind" | t }}<select [(ngModel)]="draft.kind" name="kind" class="mt-1.5 h-[42px] w-full rounded-[10px] border px-3"><option value="learning">Learning</option><option value="professional">Professional</option><option value="transversal">Transversal</option></select></label><label class="sm:col-span-2 flex items-center gap-2 text-[12px] font-semibold"><input type="checkbox" [(ngModel)]="draft.active" name="active" />{{ "competencyConfig.fields.active" | t }}</label></div><div class="mt-6 flex justify-end gap-2"><button type="button" (click)="closeEditor()" class="rounded-[10px] border px-4 py-2 text-[12px] font-semibold">{{ "common.cancel" | t }}</button><button type="submit" class="rounded-[10px] bg-[#2b66a4] px-4 py-2 text-[12px] font-semibold text-white">{{ "common.save" | t }}</button></div></form></div>
+}
+@if (deleteOpen()) { <div class="fixed inset-0 z-50 grid place-items-center bg-slate-950/35 p-4"><div class="w-full max-w-[440px] rounded-[20px] bg-white p-6"><h2 class="text-[17px] font-bold">{{ "competencyConfig.deleteTitle" | t }}</h2><p class="mt-2 text-[13px] text-[#667085]">{{ "competencyConfig.deleteText" | t: { code: pendingDelete()?.code ?? '' } }}</p><div class="mt-5 flex justify-end gap-2"><button type="button" (click)="cancelDelete()" class="rounded-[10px] border px-4 py-2 text-[12px] font-semibold">{{ "common.cancel" | t }}</button><button type="button" (click)="confirmDelete()" class="rounded-[10px] bg-[#c94738] px-4 py-2 text-[12px] font-semibold text-white">{{ "common.delete" | t }}</button></div></div></div> }

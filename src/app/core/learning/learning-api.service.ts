@@ -21,6 +21,21 @@ export class LearningApiService {
       `${this.base}/referentials/${referentialVersionId}/competencies`,
     );
   }
+  getCompetencyCatalog(referentialVersionId: string): Observable<CompetencyDefinitionDto[]> {
+    return this.http.get<CompetencyDefinitionDto[]>(`${this.base}/referentials/${referentialVersionId}/competencies/catalog`);
+  }
+  createCompetency(referentialVersionId: string, body: unknown): Observable<CompetencyDefinitionDto> {
+    return this.http.post<CompetencyDefinitionDto>(`${this.base}/referentials/${referentialVersionId}/competencies`, body);
+  }
+  updateCompetency(referentialVersionId: string, id: string, body: unknown): Observable<CompetencyDefinitionDto> {
+    return this.http.put<CompetencyDefinitionDto>(`${this.base}/referentials/${referentialVersionId}/competencies/${id}`, body);
+  }
+  deleteCompetency(referentialVersionId: string, id: string): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.base}/referentials/${referentialVersionId}/competencies/${id}`);
+  }
+  importTpEcsrReactCompetencies(referentialVersionId: string): Observable<CompetencyDefinitionDto[]> {
+    return this.http.post<CompetencyDefinitionDto[]>(`${this.base}/referentials/${referentialVersionId}/competencies/import/tp-ecsr-react`, {});
+  }
   getLearnerCompetencies(
     enrollmentId: string,
   ): Observable<LearnerCompetencyDto[]> {
@@ -57,6 +72,12 @@ export class LearningApiService {
     return this.http.post<PedagogicalTopicDto>(
       `${this.base}/referentials/${referentialVersionId}/topics`,
       body,
+    );
+  }
+  importTpEcsr58Topics(referentialVersionId: string): Observable<PedagogicalTopicDto[]> {
+    return this.http.post<PedagogicalTopicDto[]>(
+      `${this.base}/referentials/${referentialVersionId}/topics/import/tp-ecsr-58`,
+      {},
     );
   }
   updateTopicCatalog(

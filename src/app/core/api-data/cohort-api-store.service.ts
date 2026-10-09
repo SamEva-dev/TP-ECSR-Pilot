@@ -4,7 +4,7 @@ import type { ContextualPromotionSummary } from "../models/contextual-promotions
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { ReportingApiService } from "../reporting/reporting-api.service";
-import type { CohortDashboard } from "../reporting/reporting.models";
+import type { CohortDashboard, CohortLearnerDashboard } from "../reporting/reporting.models";
 import { TrainingCatalogApiService, type CohortResponse } from "../training/training-catalog-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 import { ReferentialApiStoreService } from "./referential-api-store.service";
@@ -20,6 +20,7 @@ export class CohortApiStoreService {
 
   private readonly rowsSignal = signal<CohortResponse[]>([]);
   private readonly dashboardsSignal = signal<Record<string, CohortDashboard>>({});
+  private readonly learnersSignal = signal<Record<string, CohortLearnerDashboard[]>>({});
   readonly loading = signal(false);
   readonly loadError = signal(false);
   private generation = 0;
@@ -36,9 +37,13 @@ export class CohortApiStoreService {
         (item) => item.apiId === this.text(row.referentialVersionId) || item.id === this.text(row.referentialVersionId),
       );
       const dashboard = this.dashboardsSignal()[this.text(row.id)];
-      const learnerCount = this.number(row.learnerCount);
+      const learnerRows = (this.learnersSignal()[this.text(row.id)] ?? []).filter((learner) => {
+        const status = this.text(learner?.enrollmentStatus).toLowerCase();
+        return status !== "withdrawn" && status !== "cancelled";
+      });
+      const learnerCount = learnerRows.length || this.number(row.learnerCount);
       const capacity = this.number(row.capacity);
-      const displayedStudents = row.status === "planned" ? capacity : learnerCount;
+      const displayedStudents = learnerCount;
       const referenceHours = this.number(referential?.totalHours);
       const plannedHours = dashboard
         ? Math.round(this.number(dashboard.plannedMinutes) / 60)
@@ -68,13 +73,19 @@ export class CohortApiStoreService {
         end: this.text(row.endDate),
         status: this.status(row.status),
         studentCount: displayedStudents,
+        capacity,
+        students: learnerRows.map((learner) => this.learnerSummary(learner)),
         manager: this.text(row.pedagogicalManagerDisplayName),
         plannedHours,
         completedHours,
         remainingHours: Math.max(0, plannedHours - completedHours),
-        catchupHours: 0,
-        attendanceRate: this.number(dashboard?.attendanceRate),
-        averageProgress: this.number(dashboard?.averageCompetencyProgress),
+        catchupHours: this.round1(learnerRows.reduce((sum, learner) => sum + this.number(learner.catchupMinutes), 0) / 60),
+        attendanceRate: dashboard
+          ? this.number(dashboard.attendanceRate)
+          : this.average(learnerRows.map((learner) => this.number(learner.attendanceRate))),
+        averageProgress: dashboard
+          ? this.number(dashboard.averageCompetencyProgress)
+          : this.average(learnerRows.map((learner) => this.number(learner.averageCompetencyProgress))),
       };
     });
   });
@@ -88,6 +99,7 @@ export class CohortApiStoreService {
       const generation = ++this.generation;
       this.rowsSignal.set([]);
       this.dashboardsSignal.set({});
+      this.learnersSignal.set({});
       this.loadError.set(false);
       if (ready && organizationId && siteId && programId)
         void this.reload(generation, { organizationId, siteId, programId });
@@ -109,6 +121,7 @@ export class CohortApiStoreService {
     if (!filters.organizationId || !filters.siteId || !filters.programId) {
       this.rowsSignal.set([]);
       this.dashboardsSignal.set({});
+      this.learnersSignal.set({});
       return true;
     }
 
@@ -126,6 +139,7 @@ export class CohortApiStoreService {
       if (generation === this.generation && request === this.request) {
         this.rowsSignal.set([]);
         this.dashboardsSignal.set({});
+        this.learnersSignal.set({});
         this.loadError.set(true);
         this.notifications.error("promotions.api.loadFailed", "/promotions");
       }
@@ -218,21 +232,33 @@ export class CohortApiStoreService {
   private async loadDashboards(rows: CohortResponse[], generation: number, request: number): Promise<void> {
     if (!rows.length) {
       this.dashboardsSignal.set({});
+      this.learnersSignal.set({});
       return;
     }
 
-    const settled = await Promise.allSettled(
-      rows.map((row) => firstValueFrom(this.reporting.cohortDashboard(row.id))),
+    const settled = await Promise.all(
+      rows.map(async (row) => {
+        const [dashboard, learners] = await Promise.allSettled([
+          firstValueFrom(this.reporting.cohortDashboard(row.id)),
+          firstValueFrom(this.reporting.cohortLearners(row.id)),
+        ]);
+        return { dashboard, learners };
+      }),
     );
     if (generation !== this.generation || request !== this.request) return;
 
     const reports: Record<string, CohortDashboard> = {};
+    const learnersByCohort: Record<string, CohortLearnerDashboard[]> = {};
     let failed = false;
     settled.forEach((result, index) => {
-      if (result.status === "fulfilled") reports[rows[index].id] = result.value;
+      const id = rows[index].id;
+      if (result.dashboard.status === "fulfilled") reports[id] = result.dashboard.value;
       else failed = true;
+      if (result.learners.status === "fulfilled") learnersByCohort[id] = Array.isArray(result.learners.value) ? result.learners.value : [];
+      else { failed = true; learnersByCohort[id] = []; }
     });
     this.dashboardsSignal.set(reports);
+    this.learnersSignal.set(learnersByCohort);
     if (failed) this.notifications.error("promotions.api.metricsFailed", "/promotions");
   }
 
@@ -301,6 +327,38 @@ export class CohortApiStoreService {
     return value === "draft" || value === "active" || value === "completed" || value === "cancelled"
       ? value
       : "planned";
+  }
+
+  private learnerSummary(row: CohortLearnerDashboard) {
+    const progress = this.round1(this.number(row?.averageCompetencyProgress));
+    const catchupHours = this.round1(this.number(row?.catchupMinutes) / 60);
+    const completedHours = this.round1(this.number(row?.completedMinutes) / 60);
+    const enrollment = this.text(row?.enrollmentStatus).toLowerCase();
+    const status: "good" | "warning" | "late" =
+      catchupHours > 0 || this.number(row?.absentCount) > 0 || ["suspended", "withdrawn", "cancelled"].includes(enrollment)
+        ? "late"
+        : enrollment === "pending"
+          ? "warning"
+          : "good";
+    return {
+      enrollmentId: this.text(row?.enrollmentId),
+      learnerProfileId: this.text(row?.learnerProfileId),
+      firstName: this.text(row?.firstName),
+      lastName: this.text(row?.lastName),
+      progress,
+      completedHours,
+      catchupHours,
+      status,
+    };
+  }
+
+  private average(values: number[]): number {
+    if (!values.length) return 0;
+    return this.round1(values.reduce((sum, value) => sum + this.number(value), 0) / values.length);
+  }
+
+  private round1(value: number): number {
+    return Math.round(this.number(value) * 10) / 10;
   }
 
   private text(value: unknown): string {
