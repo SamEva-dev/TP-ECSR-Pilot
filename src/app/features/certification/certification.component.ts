@@ -42,14 +42,17 @@ export class CertificationComponent {
   readonly currentCandidate = computed(() => {
     const candidates = this.store.candidates();
     const selfEnrollmentId = this.store.selfEnrollmentId();
-    return (
-      candidates.find((item) => {
-        const raw = this.store.rawCandidate(item.id);
-        return raw?.enrollmentId === selfEnrollmentId;
-      }) ??
-      candidates[0] ??
-      null
-    );
+    // A student's dossier must never fall back to an unrelated candidate.
+    // The API enforces self-access, but the view also requires a proven match.
+    if (this.role() === "stagiaire") {
+      if (!selfEnrollmentId) return null;
+      return (
+        candidates.find((item) =>
+          this.store.rawCandidate(item.id)?.enrollmentId === selfEnrollmentId,
+        ) ?? null
+      );
+    }
+    return candidates[0] ?? null;
   });
 
   get examSession() {

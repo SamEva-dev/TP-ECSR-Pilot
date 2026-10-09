@@ -3,12 +3,22 @@ import { firstValueFrom } from "rxjs";
 import type { StudentStatus } from "../models/app.models";
 import type { StudentDirectoryItem } from "../models/students.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
-import { PedagoraAccessApiService } from "../access/pedagora-access-api.service";
 import { ReportingApiService } from "../reporting/reporting-api.service";
 import type { CohortLearnerDashboard } from "../reporting/reporting.models";
 import { RealtimeService } from "../realtime/realtime.service";
 import { StudentProfileApiService, type LearnerDirectoryApi } from "../students/student-profile-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
+
+/** An invitation receipt is not a learner directory entry or enrollment. */
+export interface StudentInvitationResult {
+  kind: "invitation";
+  invitationId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  cohortId: string;
+  status: "invited";
+}
 
 @Injectable({ providedIn: "root" })
 export class StudentApiStoreService {
@@ -17,7 +27,6 @@ export class StudentApiStoreService {
   private readonly realtime = inject(RealtimeService);
   private readonly reporting = inject(ReportingApiService);
   private readonly notifications = inject(ApplicationNotificationService);
-  private readonly access = inject(PedagoraAccessApiService);
 
   private readonly itemsSignal = signal<StudentDirectoryItem[]>([]);
   readonly students = this.itemsSignal.asReadonly();
@@ -89,7 +98,7 @@ export class StudentApiStoreService {
     birthDate: string;
     promotionId: string;
     startDate: string;
-  }): Promise<StudentDirectoryItem | null> {
+  }): Promise<StudentInvitationResult | null> {
     const cohort = this.workspace.cohorts().find((item) => item.id === payload.promotionId);
     if (!cohort?.apiId) {
       this.notifications.error("students.api.invalidContext", "/stagiaires");
@@ -97,32 +106,59 @@ export class StudentApiStoreService {
     }
 
     try {
-      await firstValueFrom(this.access.invite({
+      // Learners.Create is the permission for this action; Access.Manage is not required.
+      const receipt = await firstValueFrom(this.profiles.inviteToCohort(cohort.apiId, {
         firstName: this.text(payload.firstName).trim(),
         lastName: this.text(payload.lastName).trim(),
         email: this.text(payload.email).trim(),
-        role: "student",
-        siteId: this.workspace.site()?.apiId ?? null,
-        programId: this.workspace.program()?.apiId ?? null,
-        cohortId: cohort.apiId,
-        examSessionId: null,
         phone: this.nullableText(payload.phone),
         birthDate: this.nullableText(payload.birthDate),
         enrolledOn: this.nullableText(payload.startDate),
       }));
 
-      // The product-owned invitation provisions OrganizationMember -> StudentProfile -> LearnerProfile
-      // and, because a cohort is supplied here, the Enrollment as part of the same outbox workflow.
+      // Fail closed on a malformed receipt. Never synthesize LearnerProfile/Enrollment IDs.
+      if (!receipt?.id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(receipt.id)
+        || receipt.status !== "Invited"
+        || this.text(receipt.email).trim().toLowerCase() !== this.text(payload.email).trim().toLowerCase()) {
+        this.notifications.error("students.api.invitationReceiptInvalid", "/stagiaires");
+        return null;
+      }
+
+      // In normal mode, the directory remains unchanged until the invitation is accepted.
+      // In development bypass mode, reloading may already return the real learner profile.
       await this.reload();
       return {
-        id: "", enrollmentId: "", firstName: this.text(payload.firstName), lastName: this.text(payload.lastName),
-        promotionId: cohort.id, promotionName: cohort.name, progress: 0, completedHours: 0, catchupHours: 0,
-        preparedSheets: 0, presentedSheets: 0, validatedSheets: 0, status: "good", enrollmentStatus: "pending",
+        kind: "invitation",
+        invitationId: receipt.id,
+        firstName: this.text(receipt.firstName),
+        lastName: this.text(receipt.lastName),
+        email: this.text(receipt.email),
+        cohortId: cohort.apiId,
+        status: "invited",
       };
-    } catch {
-      this.notifications.error("students.api.createFailed", "/stagiaires");
+    } catch (error: unknown) {
+      const status = this.httpStatus(error);
+      const code = this.httpErrorCode(error);
+      const key = status === 409 && code === "LEARNER_ALREADY_ENROLLED"
+        ? "students.api.alreadyEnrolled"
+        : status === 409 ? "students.api.invitationConflict"
+        : status === 403 ? "students.api.invitationForbidden" : "students.api.invitationFailed";
+      this.notifications.error(key, "/stagiaires");
       return null;
     }
+  }
+
+  private httpStatus(error: unknown): number {
+    if (typeof error !== "object" || error === null || !("status" in error)) return 0;
+    const status = (error as { status: unknown }).status;
+    return typeof status === "number" ? status : 0;
+  }
+
+  private httpErrorCode(error: unknown): string {
+    if (typeof error !== "object" || error === null || !("error" in error)) return "";
+    const payload = (error as { error: unknown }).error;
+    if (typeof payload !== "object" || payload === null || !("code" in payload)) return "";
+    return this.text((payload as { code: unknown }).code);
   }
 
   private mapDirectory(row: LearnerDirectoryApi, summary?: CohortLearnerDashboard): StudentDirectoryItem {

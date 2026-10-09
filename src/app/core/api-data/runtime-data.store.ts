@@ -23,7 +23,7 @@ import type { StudentDetailTab } from "../models/student-detail.models";
  * revision and refreshes every dependent OnPush screen.
  */
 export const RUNTIME_DATA_REVISION = signal(0);
-const runtimeArrays: unknown[][] = [];
+const runtimeArrays: { target: unknown[]; proxy: unknown[] }[] = [];
 
 const ARRAY_MUTATORS = new Set([
   "copyWithin",
@@ -39,9 +39,7 @@ const ARRAY_MUTATORS = new Set([
 
 function createRuntimeArray<T>(): T[] {
   const target: T[] = [];
-  runtimeArrays.push(target);
-
-  return new Proxy(target, {
+  const proxy = new Proxy(target, {
     get(array, property, receiver) {
       RUNTIME_DATA_REVISION();
       const value = Reflect.get(array, property, receiver);
@@ -74,14 +72,17 @@ function createRuntimeArray<T>(): T[] {
       return result;
     },
   });
+  runtimeArrays.push({ target, proxy });
+  return proxy;
 }
 
 /** Drop all cached tenant projections when the authenticated identity changes. */
 export function clearRuntimeData(): void {
-  for (const array of runtimeArrays) array.length = 0;
+  for (const array of runtimeArrays) array.target.length = 0;
   (globalThis as any).__pedagoraCertificationSchemes = [];
   RUNTIME_DATA_REVISION.update((revision) => revision + 1);
 }
+
 
 export const ORGANIZATIONS: any[] = createRuntimeArray();
 export const TRAINING_SITES: any[] = createRuntimeArray();
@@ -210,11 +211,29 @@ export const REMOTE_WORK_POLICY: any = {
 export const ORGANIZATION_MODULE_SETTINGS: any[] = [];
 export const ORGANIZATION_PREFERENCES: OrganizationPreference[] = [];
 
+/** Context switches never retain rows from the previously selected cohort/site. */
+export function clearContextRuntimeData(): void {
+  const workspaceCollections = new Set<unknown[]>([
+    ORGANIZATIONS,
+    TRAINING_SITES,
+    TRAINING_PROGRAMS,
+    PROGRAM_OFFERINGS,
+    WORKSPACE_COHORTS,
+    CONTEXTUAL_PROMOTIONS,
+  ]);
+  for (const array of runtimeArrays) {
+    if (!workspaceCollections.has(array.proxy)) array.target.length = 0;
+  }
+  (globalThis as any).__pedagoraCertificationSchemes = [];
+  RUNTIME_DATA_REVISION.update((revision) => revision + 1);
+}
+
+/** Never spread an arbitrary API payload or turn null into a synthetic record. */
 export function replaceRuntimeArray(
   target: any[],
   values: readonly any[] | null | undefined,
 ): void {
-  target.splice(0, target.length, ...(values ?? []));
+  target.splice(0, target.length, ...(Array.isArray(values) ? values : []));
 }
 
 export function workspaceAccessFor(session: any): any {

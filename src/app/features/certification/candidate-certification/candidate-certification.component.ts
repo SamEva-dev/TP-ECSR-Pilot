@@ -66,23 +66,22 @@ export class CandidateCertificationComponent {
     const candidates = this.store.candidates();
     if (this.sessionService.role() === "stagiaire") {
       const enrollmentId = this.store.selfEnrollmentId();
+      if (!enrollmentId) return EMPTY_CANDIDATE;
       return (
         candidates.find(
           (item) =>
             this.store.rawCandidate(item.id)?.enrollmentId === enrollmentId,
-        ) ??
-        candidates[0] ??
-        EMPTY_CANDIDATE
+        ) ?? EMPTY_CANDIDATE
       );
     }
+    // An unknown route parameter must not silently select the first dossier.
+    if (!this.requestedCandidateId) return EMPTY_CANDIDATE;
     return (
       candidates.find(
         (item) =>
           item.id === this.requestedCandidateId ||
           item.studentId === this.requestedCandidateId,
-      ) ??
-      candidates[0] ??
-      EMPTY_CANDIDATE
+      ) ?? EMPTY_CANDIDATE
     );
   });
 
@@ -96,7 +95,10 @@ export class CandidateCertificationComponent {
   });
   readonly evaluationSaved = signal(false);
   readonly juryLevels = signal<Record<string, JuryLevel>>({});
-  readonly evaluationLocked = signal(false);
+  readonly evaluationLocked = computed(() => {
+    const status = (this.store.rawCandidate(this.candidate().id)?.status ?? "").toLowerCase();
+    return status === "assessmentsvalidated" || status === "completed" || status === "published";
+  });
   juryNotes = "";
 
   constructor() {
@@ -107,10 +109,12 @@ export class CandidateCertificationComponent {
         const levels: Record<string, JuryLevel> = {};
         for (const assessment of raw?.assessments ?? []) {
           const stepId = assessment.stepDefinitionId ?? "";
-          if (stepId)
-            levels[stepId] = this.store.levelForAssessment(
-              assessment.outcome ?? "",
-            );
+          if (stepId) {
+            const outcome = (assessment.outcome ?? "").toLowerCase();
+            // Pending is a draft, never a final decision or an unrecorded criterion.
+            if (["passed", "failed", "absent", "pending"].includes(outcome))
+              levels[stepId] = this.store.levelForAssessment(assessment.outcome ?? "");
+          }
         }
         this.juryLevels.set(levels);
         this.juryNotes =
@@ -133,7 +137,7 @@ export class CandidateCertificationComponent {
 
   async saveDraft(): Promise<void> {
     const candidate = this.candidate();
-    if (!candidate.id) return;
+    if (!candidate.id || this.store.saving() || this.evaluationLocked()) return;
     const saved = await this.store.saveAssessments(
       candidate.id,
       this.juryLevels(),
@@ -144,7 +148,7 @@ export class CandidateCertificationComponent {
 
   async validateEvaluation(): Promise<void> {
     const candidate = this.candidate();
-    if (!candidate.id) return;
+    if (!candidate.id || this.store.saving() || this.evaluationLocked()) return;
     const criteria = this.scheme().juryCriteria;
     if (
       criteria.length &&
@@ -155,9 +159,9 @@ export class CandidateCertificationComponent {
       candidate.id,
       this.juryLevels(),
       this.juryNotes ?? "",
+      true,
     );
     this.evaluationSaved.set(saved);
-    if (saved) this.evaluationLocked.set(true);
   }
 
   unitStatus(unitId: string): CertificationUnitStatus {

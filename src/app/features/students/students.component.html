@@ -27,7 +27,7 @@
     >
       <i class="ph ph-check-circle text-[18px]"></i>
       <span>{{
-        "students.drawer.created" | t: { name: createdStudentName() }
+        "students.drawer.invitationRegistered" | t: { name: createdStudentName() }
       }}</span>
     </div>
   }
@@ -191,5 +191,6 @@
 <app-add-student-drawer
   [open]="drawerOpen()"
   (closed)="closeAddDrawer()"
+  [busy]="creatingStudent()"
   (studentCreated)="createStudent($event)"
 />

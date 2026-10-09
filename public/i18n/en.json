@@ -393,7 +393,7 @@
     },
     "drawer": {
       "title": "Add a student",
-      "subtitle": "Create the learning record and assign it to a cohort.",
+      "subtitle": "Invite a learner to join the cohort. Their profile and enrollment will be created after acceptance.",
       "close": "Close panel",
       "identity": {
         "title": "Student information",
@@ -411,21 +411,22 @@
         "title": "Training assignment",
         "promotion": "Cohort",
         "startDate": "Training start date",
-        "initialStateTitle": "Record initialized automatically",
-        "initialStateHelp": "The new student starts at 0 h, 0 sheets and 0% progress. Counters will then evolve with sessions, attendance, internships and assessments."
+        "initialStateTitle": "Record created after acceptance",
+        "initialStateHelp": "After the invitation is accepted, the learner starts with 0 hours, 0 sheets and 0% progress."
       },
       "access": {
         "sendInvitation": "Send an access invitation",
-        "sendInvitationHelp": "An invitation can be sent to this email address once the backend and authentication are connected."
+        "sendInvitationHelp": "The invitation is sent to this email. Enrollment is created after acceptance."
       },
       "requiredHint": "* Required fields",
       "cancel": "Cancel",
-      "submit": "Add student",
+      "submit": "Send invitation",
       "errors": {
         "required": "This field is required.",
         "email": "Enter a valid email address."
       },
-      "created": "The learner was created."
+      "created": "The learner was created.",
+      "invitationRegistered": "Invitation recorded for {name}. An email will be sent automatically. The learner record will appear after acceptance."
     },
     "api": {
       "createFailed": "Enrollment was not saved. Check the details and try again.",
@@ -434,7 +435,12 @@
       "conflict": "This student is already enrolled in the cohort, or capacity has been reached.",
       "forbidden": "You cannot enroll this student in this organization.",
       "loadFailed": "Unable to load students. Check your connection and permissions, then try again.",
-      "metricsFailed": "Learners were loaded, but their metrics could not be retrieved."
+      "metricsFailed": "Learners were loaded, but their metrics could not be retrieved.",
+      "invitationConflict": "An invitation is already pending for this email in the organization. Check Access.",
+      "invitationForbidden": "You cannot invite a learner to this cohort.",
+      "invitationFailed": "The invitation could not be saved. Check the details and try again.",
+      "invitationReceiptInvalid": "Invalid invitation confirmation. Check Access before trying again.",
+      "alreadyEnrolled": "This learner is already enrolled in this cohort. Check their record before sending another invitation."
     },
     "enrollmentStatus": {
       "pending": "Pending",
@@ -443,7 +449,8 @@
       "completed": "Completed",
       "withdrawn": "Withdrawn",
       "cancelled": "Cancelled"
-    }
+    },
+    "unassigned": "Not assigned to a cohort"
   },
   "planning": {
     "title": "Schedule",
@@ -694,7 +701,9 @@
       "loading": "Loading cohorts…",
       "loadFailed": "Unable to load cohorts.",
       "metricsFailed": "Some cohort metrics could not be loaded. Unavailable values are displayed as 0.",
-      "deleteFailed": "This cohort could not be deleted."
+      "deleteFailed": "This cohort could not be deleted.",
+      "invalidResponse": "The server response does not match the current context. Refresh before trying again.",
+      "initialStatusMismatch": "The cohort was created, but the saved status differs from the requested status. Check the cohort list."
     },
     "delete": {
       "action": "Delete cohort",
@@ -1750,7 +1759,8 @@
       "scopeRule": "Context-aware access",
       "searchExtended": "Search by name, email, site or program…",
       "assignmentCount": "{{count}} assignment(s)",
-      "loading": "Loading accounts and access rights…"
+      "loading": "Loading accounts and access rights…",
+      "programResponsible": "Program manager"
     },
     "userDetails": {
       "marc": "Trainer · Driving · Competency C3",
@@ -2355,7 +2365,9 @@
       "logisticsTitle": "Session logistics",
       "location": "Location",
       "period": "Period",
-      "candidateListSubtitle": "Files, exam times and readiness status."
+      "candidateListSubtitle": "Files, exam times and readiness status.",
+      "startSession": "Start session",
+      "startingSession": "Starting session…"
     },
     "workflow": {
       "preparation": "Preparation",
@@ -2480,7 +2492,13 @@
     "api": {
       "loadFailed": "Unable to load certification data.",
       "candidatesLoadFailed": "Unable to load certification candidates.",
-      "saveFailed": "Unable to save the certification assessment."
+      "saveFailed": "Unable to save the certification assessment.",
+      "startFailed": "Unable to start the session. Check its current status and try again.",
+      "startConflict": "This session has changed state. Refresh the data before trying again.",
+      "startForbidden": "You are not authorized to start this session.",
+      "saveConflict": "Another user changed this assessment grid. Reload the candidate before retrying.",
+      "partialNotFinal": "A “partial” assessment is provisional and cannot be validated as a final result.",
+      "refreshFailed": "The grid was saved, but synchronization failed. Reload the page."
     }
   },
   "jury": {
@@ -2908,7 +2926,12 @@
       "status": "Status",
       "referenceVersion": "Framework / version",
       "duration": "Training hours",
-      "description": "Description"
+      "description": "Description",
+      "responsibleTrainer": "Program manager",
+      "responsibleTrainerHint": "Choose an active trainer from your organization.",
+      "responsibleTrainerNone": "No manager assigned",
+      "responsibleBadge": "Manager",
+      "responsibleMissing": "No manager assigned"
     },
     "modules": {
       "planning": "Planning",
@@ -3480,7 +3503,12 @@
       "saveError": "Unable to save organization settings.",
       "remoteWorkSaveError": "Unable to save the remote-work policy.",
       "reportingError": "Unable to load the organization metrics.",
-      "auditError": "Unable to load the organization audit history."
+      "auditError": "Unable to load the organization audit history.",
+      "contextError": "Cannot save: organization context has not loaded. Reload the page.",
+      "conflictError": "A concurrent change was detected. Your changes remain in the form: copy them before reloading the page to obtain the latest version.",
+      "forbiddenError": "You do not have permission to change this organization.",
+      "refreshError": "Changes were saved, but some data could not be refreshed. Reload the page.",
+      "invalidResponse": "The save response was incomplete. Verify the data before continuing."
     },
     "pedagogicalSheets": {
       "title": "Pedagogical sheets",
@@ -3853,7 +3881,19 @@
     "PROGRAM_DELETE_IN_USE": "This program cannot be deleted because it is already used by a cohort or a training activity.",
     "PROGRAM_DELETE_REFERENTIAL_IN_USE": "This program cannot be deleted because its referential or one of its versions is already in use.",
     "COHORT_DELETE_IN_USE": "This cohort cannot be deleted because it already contains learners or training data.",
-    "COHORT_DELETE_STATUS_FORBIDDEN": "This cohort can no longer be deleted in its current status. Only draft or planned cohorts can be deleted."
+    "COHORT_DELETE_STATUS_FORBIDDEN": "This cohort can no longer be deleted in its current status. Only draft or planned cohorts can be deleted.",
+    "COHORT_PEDAGOGICAL_MANAGER_INVALID": "Pedagogical manager must be an active trainer in this organization.",
+    "COHORT_PEDAGOGICAL_MANAGER_REQUIRED": "A pedagogical manager is required.",
+    "COHORT_STATUS_INVALID": "Invalid cohort status.",
+    "COHORT_CLOSED": "A closed cohort cannot be modified.",
+    "COMPETENCY_ENROLLMENT_NOT_ACTIVE": "Only an active enrollment can receive a new competency assessment.",
+    "WORKPLACE_ENROLLMENT_COHORT_MISMATCH": "The placement does not belong to the cohort's organization.",
+    "WORKPLACE_ENROLLMENT_NOT_ELIGIBLE": "This enrollment status does not allow creation of a new workplace period.",
+    "CERTIFICATION_SESSION_NOT_WRITABLE": "The certification session cannot be changed in its current state.",
+    "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "All required assessment steps must have an outcome before the jury decision.",
+    "CERTIFICATION_ASSESSMENTS_REQUIRED": "At least one assessment step is required.",
+    "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "The same assessment step appears more than once in the grid.",
+    "CERTIFICATION_COMMENT_TOO_LONG": "The comment exceeds the allowed length."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -3943,6 +3983,17 @@
     "ATTENDANCE_ENTRY_NOT_FOUND": "The learner is not part of this attendance sheet.",
     "ATTENDANCE_STATUS_INVALID": "The attendance status is invalid.",
     "ATTENDANCE_ENROLLMENT_COHORT_MISMATCH": "The learner is not enrolled in the cohort for this session.",
+    "ATTENDANCE_ENROLLMENT_NOT_ELIGIBLE": "This learner is not eligible to attend this session.",
+    "ATTENDANCE_DUPLICATE_ENROLLMENT": "A learner appears more than once in this attendance submission.",
+    "ATTENDANCE_NO_ENTRIES": "Record at least one attendance status before saving the sheet.",
+    "ATTENDANCE_TIME_PAIR_REQUIRED": "Arrival and departure times must be provided together.",
+    "ATTENDANCE_LATE_TIMES_REQUIRED": "Arrival and departure times are required for a late attendance.",
+    "ATTENDANCE_LATE_ARRIVAL_INVALID": "Late attendance requires arrival after the session starts.",
+    "ATTENDANCE_OUTSIDE_SESSION": "Attendance timestamps must be within the training session.",
+    "ATTENDANCE_PRESENT_MINUTES_INVALID": "Present minutes must be positive and within the session duration.",
+    "ATTENDANCE_DURATION_MISMATCH": "Reported attendance duration does not match arrival and departure times.",
+    "ATTENDANCE_ABSENCE_TIME_INVALID": "An absent or excused learner cannot have attendance times or present minutes.",
+    "ATTENDANCE_COMMENT_TOO_LONG": "Attendance comments are limited to 1,000 characters.",
     "SESSION_AUDIENCE_MODE_INVALID": "The session audience mode is invalid.",
     "SESSION_PARTICIPANTS_REQUIRED": "Select at least one learner for this session.",
     "SESSION_PARTICIPANT_ENROLLMENT_REQUIRED": "A learner enrollment is required for a participant.",
@@ -4078,7 +4129,26 @@
     "COMPETENCY_CODE_CONFLICT": "This competency code already exists in this referential.",
     "COMPETENCY_KIND_INVALID": "The competency type is invalid.",
     "COMPETENCY_PARENT_INVALID": "The selected parent competency is invalid.",
-    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted."
+    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted.",
+    "ACCESS_INVITATION_BIRTH_DATE_INVALID": "Date of birth cannot be in the future.",
+    "ACCESS_INVITATION_SCOPE_INVALID": "The cohort, site and program do not match.",
+    "ACCESS_INVITATION_ALREADY_EXISTS": "An invitation for this email is already pending.",
+    "ACCESS_INVITATION_EMAIL_REQUIRED": "An email address is required.",
+    "ACCESS_ROLE_INVALID": "The requested role is not allowed.",
+    "ENROLLMENT_STATUS_TRANSITION_FORBIDDEN": "This enrollment status transition is not allowed.",
+    "ENROLLMENT_TERMINAL_REENROLLMENT_FORBIDDEN": "This enrollment is closed. Re-enrollment requires a separate procedure.",
+    "ENROLLMENT_END_DATE_BEFORE_START": "The closure date cannot precede the enrollment date.",
+    "ENROLLMENT_END_DATE_ONLY_FOR_CLOSURE": "An end date is allowed only when closing an enrollment.",
+    "ENROLLMENT_END_DATE_CHANGE_FORBIDDEN": "The end date cannot be changed without a dedicated business action.",
+    "ENROLLMENT_CAPACITY_TRANSACTION_REQUIRED": "Seat validation requires a database transaction.",
+    "COMPETENCY_ENROLLMENT_NOT_ACTIVE": "Only an active enrollment can receive a new competency assessment.",
+    "WORKPLACE_ENROLLMENT_COHORT_MISMATCH": "The placement does not belong to the cohort's organization.",
+    "WORKPLACE_ENROLLMENT_NOT_ELIGIBLE": "This enrollment status does not allow creation of a new workplace period.",
+    "CERTIFICATION_SESSION_NOT_WRITABLE": "The certification session cannot be changed in its current state.",
+    "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "All required assessment steps must have an outcome before the jury decision.",
+    "CERTIFICATION_ASSESSMENTS_REQUIRED": "At least one assessment step is required.",
+    "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "The same assessment step appears more than once in the grid.",
+    "CERTIFICATION_COMMENT_TOO_LONG": "The comment exceeds the allowed length."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -4315,7 +4385,18 @@
     "COMPETENCY_CODE_CONFLICT": "This competency code already exists in this referential.",
     "COMPETENCY_KIND_INVALID": "The competency type is invalid.",
     "COMPETENCY_PARENT_INVALID": "The selected parent competency is invalid.",
-    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted."
+    "COMPETENCY_IN_USE": "This competency is already in use or has sub-competencies and cannot be deleted.",
+    "ACCESS_INVITATION_BIRTH_DATE_INVALID": "Date of birth cannot be in the future.",
+    "ACCESS_INVITATION_SCOPE_INVALID": "The cohort, site and program do not match.",
+    "ACCESS_INVITATION_ALREADY_EXISTS": "An invitation for this email is already pending.",
+    "ACCESS_INVITATION_EMAIL_REQUIRED": "An email address is required.",
+    "ACCESS_ROLE_INVALID": "The requested role is not allowed.",
+    "ENROLLMENT_STATUS_TRANSITION_FORBIDDEN": "This enrollment status transition is not allowed.",
+    "ENROLLMENT_TERMINAL_REENROLLMENT_FORBIDDEN": "This enrollment is closed. Re-enrollment requires a separate procedure.",
+    "ENROLLMENT_END_DATE_BEFORE_START": "The closure date cannot precede the enrollment date.",
+    "ENROLLMENT_END_DATE_ONLY_FOR_CLOSURE": "An end date is allowed only when closing an enrollment.",
+    "ENROLLMENT_END_DATE_CHANGE_FORBIDDEN": "The end date cannot be changed without a dedicated business action.",
+    "ENROLLMENT_CAPACITY_TRANSACTION_REQUIRED": "Seat validation requires a database transaction."
   },
   "accessPolicy": {
     "readOnly": "Read-only access"
@@ -4337,7 +4418,6 @@
     "back": "Back to administration",
     "title": "Competency configuration",
     "subtitle": "Competencies are attached to the referential version in the current context. Only active competencies appear in the Competencies menu.",
-    "importReact": "Load competencies from the React version",
     "addRoot": "Add competency",
     "addChild": "Add sub-competency",
     "chooseProgram": "Select a program or cohort to configure its referential.",
@@ -4370,8 +4450,7 @@
     "api": {
       "loadError": "Unable to load competency configuration.",
       "saveError": "Unable to save the competency.",
-      "deleteError": "Unable to delete this competency. It may already be in use.",
-      "importError": "Unable to load the TP ECSR competency set from the React version."
+      "deleteError": "Unable to delete this competency. It may already be in use."
     }
   }
 }

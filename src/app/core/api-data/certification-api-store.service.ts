@@ -181,63 +181,119 @@ export class CertificationApiStoreService {
     }
   }
 
+  /** Checks a real session loaded from the current API context. */
+  hasSession(sessionId: string): boolean {
+    const id = this.text(sessionId);
+    return !!id && this.sessionsSignal().some((item) => item.id === id);
+  }
+
+  /** Starts only a planned session, using the persisted response as the UI source of truth. */
+  async startExamSession(sessionId: string): Promise<boolean> {
+    const id = this.text(sessionId);
+    const current = this.sessionsSignal().find((item) => item.id === id);
+    const cohortId = this.text(this.workspace.cohort()?.apiId);
+    if (
+      !id || !cohortId || !current || this.saving() ||
+      this.text(current.cohortId) !== cohortId ||
+      this.text(current.status).toLowerCase() !== "planned"
+    ) return false;
+
+    this.saving.set(true);
+    try {
+      const response = await firstValueFrom(this.api.startSession(id));
+      if (
+        this.text(response?.id) !== id ||
+        this.text(response?.cohortId) !== cohortId ||
+        this.text(response?.status).toLowerCase() !== "inprogress"
+      ) {
+        throw new Error("CERTIFICATION_START_RESPONSE_INVALID");
+      }
+      // Never allow a late response from a previous cohort to overwrite the current page.
+      if (this.text(this.workspace.cohort()?.apiId) !== cohortId) return true;
+      const saved = this.normalizeSession(response);
+      this.sessionsSignal.update((sessions) =>
+        sessions.map((session) => session.id === id ? saved : session),
+      );
+      return true;
+    } catch (error: unknown) {
+      if (this.text(this.workspace.cohort()?.apiId) === cohortId) {
+        const status = (error as { status?: number } | null)?.status;
+        const key = status === 403
+          ? "certification.api.startForbidden"
+          : status === 409
+            ? "certification.api.startConflict"
+            : "certification.api.startFailed";
+        this.notifications.error(key, `/certification/sessions/${encodeURIComponent(id)}`);
+        if (status === 409) void this.reload(false);
+      }
+      return false;
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   async saveAssessments(
     candidateId: string,
     levels: Record<string, "satisfactory" | "partial" | "insufficient">,
     comment: string,
+    finalize = false,
   ): Promise<boolean> {
+    if (this.saving()) return false;
     const candidate = this.candidatesSignal().find(
       (item) => this.text(item?.id) === this.text(candidateId),
     );
-    if (!candidate) {
-      this.notifications.error(
-        "certification.api.saveFailed",
-        "/certification",
-      );
+    const sessionId = this.text(candidate?.examSessionId);
+    const cohortId = this.text(this.workspace.cohort()?.apiId);
+    if (!candidate || !sessionId || !cohortId || sessionId !== this.selectedSessionIdSignal()) {
+      this.notifications.error("certification.api.saveFailed", "/certification");
       return false;
     }
-
-    const entries = Object.entries(levels).filter(([stepId]) =>
-      Boolean(stepId),
-    );
-    if (!entries.length) return true;
-
+    const juryDisplayName = this.currentUserName();
+    if (!juryDisplayName) {
+      this.notifications.error("certification.api.saveFailed", "/certification");
+      return false;
+    }
+    const knownSteps = new Set((this.currentSchemeApi()?.steps ?? []).map(step => this.text(step?.id)));
+    const entries = Object.entries(levels).filter(([id]) => knownSteps.has(id));
+    if (!entries.length || Object.keys(levels).length !== entries.length) {
+      this.notifications.error("certification.api.saveFailed", "/certification");
+      return false;
+    }
+    if (finalize && (knownSteps.size !== entries.length || entries.some(([, level]) => level === "partial"))) {
+      // A partial result is provisional (Pending), not a finalized jury assessment.
+      this.notifications.error("certification.api.partialNotFinal", "/certification");
+      return false;
+    }
     this.saving.set(true);
     try {
-      let updated = candidate;
-      const juryDisplayName = this.currentUserName();
-      if (!juryDisplayName) {
+      const updated = await firstValueFrom(this.api.saveAssessmentBatch(this.text(candidateId), {
+        assessments: entries.map(([stepDefinitionId, level]) => ({
+          stepDefinitionId,
+          juryDisplayName,
+          outcome: level === "satisfactory" ? "Passed" : level === "insufficient" ? "Failed" : "Pending",
+          // The grid records qualitative assessments, not a regulatory numeric score.
+          score: null,
+          comment: this.optionalText(comment),
+        })),
+        finalize,
+      }));
+      if (this.text(updated?.id) !== this.text(candidateId))
+        throw new Error("CERTIFICATION_BATCH_RESPONSE_INVALID");
+      // Late responses must never overwrite a different workspace/session.
+      if (this.text(this.workspace.cohort()?.apiId) !== cohortId || this.selectedSessionIdSignal() !== sessionId)
+        return true;
+      this.replaceCandidate(this.normalizeCandidate(updated));
+      // The API response is authoritative, even if reloading the list subsequently fails.
+      await this.loadCandidates(sessionId, false, true);
+      return true;
+    } catch (error: unknown) {
+      if (this.text(this.workspace.cohort()?.apiId) === cohortId) {
+        const status = (error as { status?: number } | null)?.status;
         this.notifications.error(
-          "certification.api.saveFailed",
+          status === 409 ? "certification.api.saveConflict" : "certification.api.saveFailed",
           "/certification",
         );
-        return false;
       }
-      for (const [stepDefinitionId, level] of entries) {
-        updated = await firstValueFrom(
-          this.api.addAssessment(this.text(candidateId), {
-            stepDefinitionId,
-            juryDisplayName,
-            outcome:
-              level === "satisfactory"
-                ? "Passed"
-                : level === "insufficient"
-                  ? "Failed"
-                  : "Pending",
-            score:
-              level === "satisfactory" ? 100 : level === "partial" ? 50 : 0,
-            comment: this.optionalText(comment),
-          }),
-        );
-      }
-      this.replaceCandidate(this.normalizeCandidate(updated));
-      await this.loadCandidates(this.selectedSessionIdSignal(), false);
-      return true;
-    } catch {
-      this.notifications.error(
-        "certification.api.saveFailed",
-        "/certification",
-      );
       return false;
     } finally {
       this.saving.set(false);
@@ -312,6 +368,7 @@ export class CertificationApiStoreService {
   private async loadCandidates(
     sessionId: string,
     notify: boolean,
+    preserveOnError = false,
   ): Promise<void> {
     if (!sessionId) {
       this.candidatesSignal.set([]);
@@ -321,13 +378,17 @@ export class CertificationApiStoreService {
       const candidates = await firstValueFrom(
         this.api.getCandidates(sessionId),
       );
+      if (this.selectedSessionIdSignal() !== sessionId) return;
       this.candidatesSignal.set(
         (Array.isArray(candidates) ? candidates : []).map((item) =>
           this.normalizeCandidate(item),
         ),
       );
     } catch {
-      this.candidatesSignal.set([]);
+      if (this.selectedSessionIdSignal() !== sessionId) return;
+      if (!preserveOnError) this.candidatesSignal.set([]);
+      if (preserveOnError)
+        this.notifications.error("certification.api.refreshFailed", "/certification");
       if (notify)
         this.notifications.error(
           "certification.api.candidatesLoadFailed",

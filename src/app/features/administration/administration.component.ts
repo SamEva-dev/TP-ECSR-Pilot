@@ -8,6 +8,7 @@ import {
   untracked,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { HttpErrorResponse } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
@@ -21,6 +22,7 @@ import {
   type OrganizationAdministrationDto,
   type UpdateOrganizationAdministrationRequest,
 } from "../../core/administration/organization-administration-api.service";
+import { SerializedSaveQueue } from "../../core/administration/serialized-save-queue";
 import type {
   OrganizationAdminProfile,
   OrganizationBrandingSettings,
@@ -219,6 +221,9 @@ export class AdministrationComponent {
   });
   private lastDto: OrganizationAdministrationDto | null = null;
   private loadSequence = 0;
+  private editRevision = 0;
+  private readonly saveQueue = new SerializedSaveQueue();
+  private conflictOrganizationId = "";
 
   readonly sites = computed(() => {
     const level = this.workspace.activeLevel();
@@ -313,6 +318,7 @@ export class AdministrationComponent {
     effect(() => {
       const id = this.workspace.organization()?.apiId ?? "";
       if (!id) {
+        ++this.loadSequence;
         this.reset();
         return;
       }
@@ -344,24 +350,29 @@ export class AdministrationComponent {
   }
 
   updateProfile(field: keyof OrganizationAdminProfile, value: string): void {
+    this.editRevision++;
     this.profile.update((x) => ({ ...x, [field]: value ?? "" }));
   }
   updateBranding(
     field: "primaryColor" | "secondaryColor" | "loginTagline" | "logoLabel",
     value: string,
   ): void {
+    this.editRevision++;
     this.branding.update((x) => ({ ...x, [field]: value ?? "" }));
   }
   toggleBranding(field: "whiteLabel" | "allowSiteOverrides"): void {
+    this.editRevision++;
     this.branding.update((x) => ({ ...x, [field]: !x[field] }));
   }
   async toggleModule(id: string): Promise<void> {
+    this.editRevision++;
     this.modules.update((xs) =>
       xs.map((x) => (x.id === id ? { ...x, enabled: !x.enabled } : x)),
     );
     await this.persist("organizationAdmin.api.saveError");
   }
   async togglePreference(id: string): Promise<void> {
+    this.editRevision++;
     this.preferences.update((xs) =>
       xs.map((x) => (x.id === id ? { ...x, enabled: !x.enabled } : x)),
     );
@@ -378,10 +389,12 @@ export class AdministrationComponent {
   toggleRemoteWorkPolicy(
     field: "enabled" | "approvalRequired" | "halfDayAllowed" | "endOfDayReport",
   ): void {
+    this.editRevision++;
     this.remoteWorkPolicy.update((x) => ({ ...x, [field]: !x[field] }));
   }
   updateRemoteWorkMaxDays(event: Event): void {
     const value = Number((event.target as HTMLSelectElement)?.value ?? 0);
+    this.editRevision++;
     this.remoteWorkPolicy.update((x) => ({
       ...x,
       maxDaysPerWeek: Number.isFinite(value) ? value : 0,
@@ -396,6 +409,7 @@ export class AdministrationComponent {
     event: Event,
   ): Promise<void> {
     const value = (event.target as HTMLSelectElement)?.value ?? "";
+    this.editRevision++;
     this.generalSettings.update((x) => ({ ...x, [field]: value }));
     await this.persist("organizationAdmin.api.saveError");
   }
@@ -454,7 +468,11 @@ export class AdministrationComponent {
           return { items: [], page: 1, pageSize: 20, total: 0 };
         }),
       ]);
-      if (seq !== this.loadSequence) return;
+      if (seq !== this.loadSequence || this.workspace.organization()?.apiId !== organizationId) return;
+      if (!dto || dto.organizationId !== organizationId || !Number.isSafeInteger(dto.version)) {
+        throw new Error("Invalid organization administration response");
+      }
+      this.conflictOrganizationId = "";
       this.apply(dto);
       this.metrics.set({
         users: 0,
@@ -464,7 +482,7 @@ export class AdministrationComponent {
       });
       this.auditSignal.set((audit?.items ?? []).map((x) => this.mapAudit(x)));
     } catch {
-      if (seq !== this.loadSequence) return;
+      if (seq !== this.loadSequence || this.workspace.organization()?.apiId !== organizationId) return;
       this.reset();
       this.notifications.error(
         "organizationAdmin.api.loadError",
@@ -520,7 +538,7 @@ export class AdministrationComponent {
     });
   }
 
-  private request(): UpdateOrganizationAdministrationRequest {
+  private request(): Omit<UpdateOrganizationAdministrationRequest, "expectedVersion"> {
     const p = this.profile(),
       b = this.branding(),
       g = this.generalSettings(),
@@ -567,19 +585,65 @@ export class AdministrationComponent {
     };
   }
 
-  private async persist(errorKey: string): Promise<boolean> {
-    const id = this.workspace.organization()?.apiId ?? "";
-    if (!id) return false;
-    try {
-      const dto = await firstValueFrom(this.api.update(id, this.request()));
-      this.apply(dto);
-      await this.workspace.reload();
-      return true;
-    } catch {
-      this.notifications.error(errorKey, "/administration");
-      if (this.lastDto) this.apply(this.lastDto);
-      return false;
+  private persist(errorKey: string): Promise<boolean> {
+    const organizationId = this.workspace.organization()?.apiId ?? "";
+    // Capture the complete draft at click time; the queue serializes writes, not user edits.
+    const draft = this.request();
+    const revisionAtEnqueue = this.editRevision;
+    if (!organizationId || !this.lastDto || this.lastDto.organizationId !== organizationId) {
+      this.notifications.error("organizationAdmin.api.contextError", "/administration");
+      return Promise.resolve(false);
     }
+
+    return this.saveQueue.enqueue(async () => {
+      if (this.workspace.organization()?.apiId !== organizationId) return false;
+      if (this.conflictOrganizationId === organizationId) {
+        this.notifications.error("organizationAdmin.api.conflictError", "/administration");
+        return false;
+      }
+      const storedVersion = this.lastDto?.version;
+      if (this.lastDto?.organizationId !== organizationId ||
+          !Number.isSafeInteger(storedVersion) || (storedVersion ?? -1) < 0) {
+        this.notifications.error("organizationAdmin.api.contextError", "/administration");
+        return false;
+      }
+
+      try {
+        const dto = await firstValueFrom(
+          this.api.update(organizationId, { ...draft, expectedVersion: storedVersion! }),
+        );
+        if (this.workspace.organization()?.apiId !== organizationId) return false;
+        if (!dto || dto.organizationId !== organizationId ||
+            !Number.isSafeInteger(dto.version) || dto.version <= storedVersion!) {
+          this.notifications.error("organizationAdmin.api.invalidResponse", "/administration");
+          return false;
+        }
+        // Update the revision even when the user is editing another field during the HTTP call.
+        this.lastDto = dto;
+        if (revisionAtEnqueue === this.editRevision) this.apply(dto);
+        // A read-side refresh failure must not turn a committed PUT into a failed save.
+        try {
+          await this.workspace.reload();
+        } catch {
+          if (this.workspace.organization()?.apiId === organizationId)
+            this.notifications.error("organizationAdmin.api.refreshError", "/administration");
+        }
+        return true;
+      } catch (error: unknown) {
+        if (this.workspace.organization()?.apiId !== organizationId) return false;
+        const status = error instanceof HttpErrorResponse ? error.status : 0;
+        if (status === 409) {
+          this.conflictOrganizationId = organizationId;
+          this.notifications.error("organizationAdmin.api.conflictError", "/administration");
+        } else if (status === 403) {
+          this.notifications.error("organizationAdmin.api.forbiddenError", "/administration");
+        } else {
+          this.notifications.error(errorKey, "/administration");
+        }
+        // Preserve unsaved fields instead of overwriting them with a stale server snapshot.
+        return false;
+      }
+    });
   }
   private flash(target: { set(v: boolean): void }): void {
     target.set(true);
@@ -625,6 +689,7 @@ export class AdministrationComponent {
   }
   private reset(): void {
     this.lastDto = null;
+    this.conflictOrganizationId = "";
     this.profile.set({ ...EMPTY_PROFILE });
     this.branding.set({ ...EMPTY_BRANDING });
     this.modules.set(MODULE_META.map((x) => ({ ...x, enabled: false })));

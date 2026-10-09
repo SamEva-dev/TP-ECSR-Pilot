@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
 } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { CertificationApiStoreService } from "../../../core/api-data/certification-api-store.service";
+import { AccessPolicyService } from "../../../core/access/access-policy.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
@@ -18,6 +20,8 @@ import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component"
 })
 export class ExamSessionDetailComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly access = inject(AccessPolicyService);
+  readonly routeSessionId = this.route.snapshot.paramMap.get("id") ?? "";
   readonly store = inject(CertificationApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly exam = this.store.examSession;
@@ -32,9 +36,28 @@ export class ExamSessionDetailComponent {
     Math.round((this.ready() / Math.max(this.candidates().length, 1)) * 100),
   );
 
+  readonly canStartSession = computed(() =>
+    this.access.can("certification.manage") &&
+    this.exam().id === this.routeSessionId &&
+    this.exam().status === "ready" &&
+    !this.store.loading(),
+  );
+
   constructor() {
-    const sessionId = this.route.snapshot.paramMap.get("id") ?? "";
-    if (sessionId) void this.store.selectSession(sessionId);
+    // Route activation may precede asynchronous loading of the cohort sessions.
+    effect(() => {
+      if (
+        !this.routeSessionId || this.store.loading() ||
+        !this.store.hasSession(this.routeSessionId) ||
+        this.exam().id === this.routeSessionId
+      ) return;
+      void this.store.selectSession(this.routeSessionId);
+    });
+  }
+
+  async startSession(): Promise<void> {
+    if (!this.canStartSession() || this.store.saving()) return;
+    await this.store.startExamSession(this.routeSessionId);
   }
 
   initials(item: { firstName: string; lastName: string }): string {

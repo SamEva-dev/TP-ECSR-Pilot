@@ -40,6 +40,7 @@ export class AttendanceComponent {
   readonly attendance = inject(AttendanceApiStoreService);
   readonly students = signal<AttendanceStudent[]>([]);
   readonly saved = signal(false);
+  readonly saving = signal(false);
 
   get session() {
     return this.attendance.session();
@@ -104,7 +105,7 @@ export class AttendanceComponent {
   }
 
   setStatus(studentId: string, status: AttendanceStatus) {
-    if (!this.canEdit() || !studentId) return;
+    if (!this.canEdit() || this.saving() || !studentId) return;
     const expectedHours = this.attendance.expectedHours();
     this.students.update((students) =>
       students.map((student) => {
@@ -113,15 +114,16 @@ export class AttendanceComponent {
           status === "absent" || status === "excused"
             ? 0
             : status === "late"
-              ? Math.min(
-                  this.number(student.duration) || expectedHours,
-                  expectedHours,
-                )
+              ? student.arrival && student.departure
+                ? this.durationBetween(student.arrival, student.departure, expectedHours) ?? 0
+                : 0
               : expectedHours;
         const missedHours = Math.max(0, expectedHours - duration);
         return {
           ...student,
           status,
+          arrival: status === "absent" || status === "excused" ? "" : student.arrival,
+          departure: status === "absent" || status === "excused" ? "" : student.departure,
           duration: this.roundHours(duration),
           missedHours: this.roundHours(missedHours),
           addToCatchup:
@@ -139,7 +141,7 @@ export class AttendanceComponent {
     field: "arrival" | "departure" | "comment",
     event: Event,
   ) {
-    if (!this.canEdit() || !studentId) return;
+    if (!this.canEdit() || this.saving() || !studentId) return;
     const value =
       (event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "";
     this.students.update((students) =>
@@ -174,8 +176,14 @@ export class AttendanceComponent {
   }
 
   async save() {
-    if (!this.canEdit()) return;
-    this.saved.set(await this.attendance.save(this.students()));
+    if (!this.canEdit() || this.saving()) return;
+    this.saving.set(true);
+    this.saved.set(false);
+    try {
+      this.saved.set(await this.attendance.save(this.students()));
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   statusClasses(status: AttendanceStatus, active: boolean) {

@@ -4,6 +4,7 @@ import { environment } from "../../environments/environment";
 
 export interface OrganizationAdministrationDto {
   organizationId: string;
+  version: number;
   code: string;
   legalName: string;
   shortName: string;
@@ -52,9 +53,10 @@ export interface OrganizationAdministrationDto {
   billingCustomerReference: string;
 }
 
-export type UpdateOrganizationAdministrationRequest = Omit<
+export type UpdateOrganizationAdministrationRequest = { expectedVersion: number } & Omit<
   OrganizationAdministrationDto,
   | "organizationId"
+  | "version"
   | "code"
   | "verificationStatus"
   | "verificationSubmittedAtUtc"

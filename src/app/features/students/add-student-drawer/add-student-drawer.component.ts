@@ -38,6 +38,7 @@ export interface CreateStudentPayload {
 export class AddStudentDrawerComponent {
   readonly contextData = inject(ContextualTrainingDataService);
   readonly open = input(false);
+  readonly busy = input(false);
   readonly closed = output<void>();
   readonly studentCreated = output<CreateStudentPayload>();
   readonly submitted = signal(false);
@@ -59,6 +60,17 @@ export class AddStudentDrawerComponent {
 
   constructor() {
     effect(() => {
+      // A failed request must keep the user's input. Clear only after closing.
+      if (this.open()) return;
+      const cohort = this.contextData.cohort();
+      this.form.reset({
+        firstName: "", lastName: "", email: "", phone: "", birthDate: "",
+        promotionId: cohort?.id ?? "", startDate: cohort?.start ?? "", sendInvitation: true,
+      });
+      this.submitted.set(false);
+    });
+
+    effect(() => {
       const cohort = this.contextData.cohort();
       if (!cohort) return;
       this.form.controls.promotionId.setValue(cohort.id, { emitEvent: false });
@@ -72,29 +84,18 @@ export class AddStudentDrawerComponent {
   }
 
   requestClose(): void {
-    this.submitted.set(false);
+    if (this.busy()) return;
     this.closed.emit();
   }
 
   submit(): void {
+    if (this.busy()) return;
     this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
     this.studentCreated.emit(this.form.getRawValue());
-    const cohort = this.contextData.cohort();
-    this.form.reset({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      birthDate: "",
-      promotionId: cohort?.id ?? "",
-      startDate: cohort?.start ?? "",
-      sendInvitation: true,
-    });
-    this.submitted.set(false);
   }
 
   showRequired(controlName: "firstName" | "lastName" | "email" | "promotionId" | "startDate"): boolean {

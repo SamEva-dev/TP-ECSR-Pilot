@@ -113,14 +113,14 @@ export class SessionService {
     if (s) {
       const n = { ...s, promotionId: id };
       this.sessionSignal.set(n);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(n));
+      this.persistSession(n);
     }
   }
 
   disconnect(): void {
     this.sessionSignal.set(null);
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LEGACY_KEY);
+    this.promotionSignal.set("");
+    this.clearStoredSession();
   }
 
   initials(): string {
@@ -135,39 +135,64 @@ export class SessionService {
   private connect(s: DemoSession): void {
     this.sessionSignal.set(s);
     this.promotionSignal.set(s.promotionId);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    localStorage.removeItem(LEGACY_KEY);
+    this.persistSession(s);
   }
 
   private restore(): DemoSession | null {
-    if (typeof localStorage === "undefined") return null;
+    if (typeof localStorage === "undefined" || typeof sessionStorage === "undefined")
+      return null;
 
     const token = this.tokens.accessToken();
     const payload = token ? this.decodeJwt(token) : {};
     if (!payload.exp || payload.exp * 1000 <= Date.now()) {
-      // Keep the refresh token available so authGuard can renew the session.
-      localStorage.removeItem(STORAGE_KEY);
+      // The refresh token must remain available for authGuard to renew the session.
+      this.clearStoredSession();
       return null;
     }
 
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const session = JSON.parse(raw) as DemoSession;
-        if (
-          session.authMode === "authgate" &&
-          session.userId === payload.sub &&
-          session.organizationId === (payload.org_id ?? payload.organization_id)
-        ) {
-          return this.sessionFromPayload(payload, session.promotionId ?? "");
-        }
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
+    const preferred = this.tokens.rememberMe() ? localStorage : sessionStorage;
+    // Read the legacy location once so an already open session survives deployment.
+    const raw = preferred.getItem(STORAGE_KEY) ??
+      (preferred === localStorage ? sessionStorage : localStorage).getItem(STORAGE_KEY);
+    if (!raw) return null;
+
+    try {
+      const session = JSON.parse(raw) as DemoSession;
+      if (
+        session.authMode === "authgate" &&
+        session.userId === payload.sub &&
+        session.organizationId === (payload.org_id ?? payload.organization_id)
+      ) {
+        const restored = this.sessionFromPayload(payload, session.promotionId ?? "");
+        this.persistSession(restored);
+        return restored;
       }
+    } catch {
+      // Invalid or obsolete session data must not survive restoration.
     }
 
+    this.clearStoredSession();
     return null;
+  }
+
+  private persistSession(session: DemoSession): void {
+    if (typeof localStorage === "undefined" || typeof sessionStorage === "undefined")
+      return;
+    const persistent = this.tokens.rememberMe();
+    this.clearStoredSession();
+    (persistent ? localStorage : sessionStorage).setItem(
+      STORAGE_KEY,
+      JSON.stringify(session),
+    );
+  }
+
+  private clearStoredSession(): void {
+    if (typeof localStorage === "undefined" || typeof sessionStorage === "undefined")
+      return;
+    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_KEY);
+    sessionStorage.removeItem(LEGACY_KEY);
   }
 
   private decodeJwt(token: string): JwtPayload {

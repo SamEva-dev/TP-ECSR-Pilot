@@ -19,6 +19,18 @@ const AUTHGATE_PROTECTED_PREFIXES = [
   "/api/Auth/me",
 ];
 
+function isAtOrBelowBase(url: string, base: string): boolean {
+  const normalized = base.replace(/\/+$/, "");
+  return url === normalized || url.startsWith(`${normalized}/`) || url.startsWith(`${normalized}?`);
+}
+
+function isProtectedAuthGatePath(path: string): boolean {
+  return AUTHGATE_PROTECTED_PREFIXES.some(
+    (prefix) =>
+      path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`),
+  );
+}
+
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const tokens = inject(AuthTokenStore);
   const refresh = inject(AuthRefreshService);
@@ -26,16 +38,13 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const session = inject(SessionService);
   const token = tokens.accessToken();
 
-  const isPedagoraApi = request.url.startsWith(environment.apiBaseUrl);
-  const isAuthGate = request.url.startsWith(environment.authGateBaseUrl);
+  const isPedagoraApi = isAtOrBelowBase(request.url, environment.apiBaseUrl);
+  const isAuthGate = isAtOrBelowBase(request.url, environment.authGateBaseUrl);
+  const authGateBase = environment.authGateBaseUrl.replace(/\/+$/, "");
   const authGatePath = isAuthGate
-    ? request.url.slice(environment.authGateBaseUrl.length)
+    ? request.url.slice(authGateBase.length)
     : "";
-  const isProtectedAuthGateCall =
-    isAuthGate &&
-    AUTHGATE_PROTECTED_PREFIXES.some((prefix) =>
-      authGatePath.startsWith(prefix),
-    );
+  const isProtectedAuthGateCall = isAuthGate && isProtectedAuthGatePath(authGatePath);
   const shouldAuthorize = isPedagoraApi || isProtectedAuthGateCall;
 
   if (!shouldAuthorize || request.headers.has("Authorization")) {
@@ -66,9 +75,17 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
             }),
           ),
         ),
-        catchError(() => {
-          void router.navigateByUrl("/connexion");
-          return throwError(() => error);
+        catchError((retryError: { status?: number }) => {
+          // A rejected refreshed token is invalid; other failures (403/5xx/network)
+          // must retain their actual status and must not forcibly sign out the user.
+          if (retryError?.status === 401) {
+            tokens.clear();
+            session.disconnect();
+          }
+          if (retryError?.status === 401 || !tokens.accessToken()) {
+            void router.navigateByUrl("/connexion");
+          }
+          return throwError(() => retryError);
         }),
       );
     }),

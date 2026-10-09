@@ -34,6 +34,12 @@ export class CertificationApiService {
       {},
     );
   }
+  startSession(id: string) {
+    return this.http.post<CertificationExamSession>(
+      `${this.base}/sessions/${encodeURIComponent(id)}/start`,
+      {},
+    );
+  }
   registerCohortCandidates(id: string) {
     return this.http.post<number>(
       `${this.base}/sessions/${id}/candidates/from-cohort`,
@@ -58,6 +64,15 @@ export class CertificationApiService {
   addAssessment(candidateId: string, body: unknown) {
     return this.http.post<CertificationCandidate>(
       `${this.base}/candidates/${candidateId}/assessments`,
+      body,
+    );
+  }
+  saveAssessmentBatch(
+    candidateId: string,
+    body: { assessments: { stepDefinitionId: string; juryDisplayName: string; outcome: string; score: number | null; comment: string | null }[]; finalize: boolean },
+  ) {
+    return this.http.put<CertificationCandidate>(
+      `${this.base}/candidates/${encodeURIComponent(candidateId)}/assessments/batch`,
       body,
     );
   }

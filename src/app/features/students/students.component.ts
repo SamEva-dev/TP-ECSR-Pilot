@@ -32,6 +32,7 @@ export class StudentsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
   readonly store = inject(StudentApiStoreService);
   readonly drawerOpen = signal(false);
+  readonly creatingStudent = signal(false);
   readonly createdStudentName = signal("");
   readonly search = signal("");
   readonly promotionId = signal("all");
@@ -69,18 +70,24 @@ export class StudentsComponent {
   }
 
   closeAddDrawer(): void {
+    if (this.creatingStudent()) return;
     this.drawerOpen.set(false);
   }
 
   async createStudent(payload: CreateStudentPayload): Promise<void> {
-    const student = await this.store.create(payload);
-    if (!student) return;
+    if (this.creatingStudent()) return;
+    this.creatingStudent.set(true);
+    try {
+      const receipt = await this.store.create(payload);
+      if (!receipt || receipt.kind !== "invitation") return;
 
-    this.createdStudentName.set(
-      `${student.firstName} ${student.lastName}`.trim(),
-    );
-    this.drawerOpen.set(false);
-    setTimeout(() => this.createdStudentName.set(""), 3500);
+      // Confirmation is deliberately about the invitation, NOT a persisted enrollment.
+      this.createdStudentName.set(`${receipt.firstName} ${receipt.lastName}`.trim());
+      this.drawerOpen.set(false);
+      setTimeout(() => this.createdStudentName.set(""), 3500);
+    } finally {
+      this.creatingStudent.set(false);
+    }
   }
 
   updateSearch(event: Event): void {

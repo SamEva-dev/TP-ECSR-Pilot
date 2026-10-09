@@ -393,7 +393,7 @@
     },
     "drawer": {
       "title": "Ajouter un stagiaire",
-      "subtitle": "Créez le dossier pédagogique et rattachez-le à une promotion.",
+      "subtitle": "Invitez un stagiaire à rejoindre la promotion. Son dossier et son inscription seront créés après acceptation.",
       "close": "Fermer le panneau",
       "identity": {
         "title": "Informations du stagiaire",
@@ -411,21 +411,22 @@
         "title": "Affectation à la formation",
         "promotion": "Promotion",
         "startDate": "Date d'entrée en formation",
-        "initialStateTitle": "Dossier initialisé automatiquement",
-        "initialStateHelp": "Le nouveau stagiaire démarre à 0 h, 0 fiche et 0 % de progression. Les compteurs évolueront ensuite avec les séances, présences, stages et évaluations."
+        "initialStateTitle": "Dossier créé après acceptation",
+        "initialStateHelp": "Après acceptation de l'invitation, le dossier débute à 0 h, 0 fiche et 0 % de progression."
       },
       "access": {
         "sendInvitation": "Envoyer une invitation d'accès",
-        "sendInvitationHelp": "Une invitation pourra être envoyée à cette adresse email lorsque le backend et l'authentification seront connectés."
+        "sendInvitationHelp": "L'invitation est envoyée à cette adresse. L'inscription sera créée après son acceptation."
       },
       "requiredHint": "* Champs obligatoires",
       "cancel": "Annuler",
-      "submit": "Ajouter le stagiaire",
+      "submit": "Envoyer l’invitation",
       "errors": {
         "required": "Ce champ est obligatoire.",
         "email": "Saisissez une adresse email valide."
       },
-      "created": "Le stagiaire a été créé."
+      "created": "Le stagiaire a été créé.",
+      "invitationRegistered": "Invitation enregistrée pour {name}. L’e-mail sera envoyé automatiquement. Le dossier apparaîtra après acceptation."
     },
     "api": {
       "createFailed": "L'inscription n'a pas été enregistrée. Vérifiez les informations et réessayez.",
@@ -434,7 +435,12 @@
       "conflict": "Ce stagiaire est déjà inscrit dans cette promotion ou la capacité est atteinte.",
       "forbidden": "Vous ne pouvez pas inscrire ce stagiaire dans cette organisation.",
       "loadFailed": "Impossible de charger les stagiaires. Vérifiez votre connexion et vos droits, puis réessayez.",
-      "metricsFailed": "Les stagiaires ont été chargés, mais leurs indicateurs n'ont pas pu être récupérés."
+      "metricsFailed": "Les stagiaires ont été chargés, mais leurs indicateurs n'ont pas pu être récupérés.",
+      "invitationConflict": "Une invitation est déjà en attente pour cette adresse dans l'organisation. Consultez l'espace Accès.",
+      "invitationForbidden": "Vous n'êtes pas autorisé à inviter un stagiaire dans cette promotion.",
+      "invitationFailed": "L'invitation n'a pas pu être enregistrée. Vérifiez les informations et réessayez.",
+      "invitationReceiptInvalid": "La confirmation de l'invitation est invalide. Vérifiez l'espace Accès avant de renouveler la demande.",
+      "alreadyEnrolled": "Ce stagiaire possède déjà une inscription dans cette promotion. Consultez son dossier avant toute nouvelle invitation."
     },
     "enrollmentStatus": {
       "pending": "En attente",
@@ -443,7 +449,8 @@
       "completed": "Terminé",
       "withdrawn": "Désinscrit",
       "cancelled": "Annulé"
-    }
+    },
+    "unassigned": "Non affecté à une promotion"
   },
   "planning": {
     "title": "Planning",
@@ -694,7 +701,9 @@
       "loading": "Chargement des promotions…",
       "loadFailed": "Impossible de charger les promotions.",
       "metricsFailed": "Certaines métriques de promotion n’ont pas pu être chargées. Les valeurs indisponibles sont affichées à 0.",
-      "deleteFailed": "Impossible de supprimer cette promotion."
+      "deleteFailed": "Impossible de supprimer cette promotion.",
+      "invalidResponse": "La réponse du serveur est incohérente avec le contexte courant. Actualisez la page avant toute nouvelle tentative.",
+      "initialStatusMismatch": "La promotion a été créée, mais son statut enregistré diffère du statut demandé. Vérifiez-le dans la liste."
     },
     "delete": {
       "action": "Supprimer la promotion",
@@ -1750,7 +1759,8 @@
       "scopeRule": "Droits contextualisés",
       "searchExtended": "Rechercher un nom, email, site ou formation…",
       "assignmentCount": "{{count}} affectation(s)",
-      "loading": "Chargement des comptes et des accès…"
+      "loading": "Chargement des comptes et des accès…",
+      "programResponsible": "Responsable de programme"
     },
     "userDetails": {
       "marc": "Formateur · Conduite · Compétence C3",
@@ -2355,7 +2365,9 @@
       "logisticsTitle": "Organisation de la session",
       "location": "Lieu",
       "period": "Période",
-      "candidateListSubtitle": "Dossiers, horaires de passage et état de préparation."
+      "candidateListSubtitle": "Dossiers, horaires de passage et état de préparation.",
+      "startSession": "Démarrer la session",
+      "startingSession": "Démarrage en cours…"
     },
     "workflow": {
       "preparation": "Préparation",
@@ -2480,7 +2492,13 @@
     "api": {
       "loadFailed": "Impossible de charger les données de certification.",
       "candidatesLoadFailed": "Impossible de charger les candidats à la certification.",
-      "saveFailed": "Impossible d’enregistrer l’évaluation de certification."
+      "saveFailed": "Impossible d’enregistrer l’évaluation de certification.",
+      "startFailed": "Impossible de démarrer la session. Réessayez après vérification de son état.",
+      "startConflict": "Cette session a changé d’état. Actualisez les données avant de réessayer.",
+      "startForbidden": "Vous ne disposez pas de l’autorisation nécessaire pour démarrer cette session.",
+      "saveConflict": "La grille a été modifiée par un autre utilisateur. Rechargez le candidat avant de réessayer.",
+      "partialNotFinal": "Une appréciation « partielle » reste provisoire et ne peut pas être validée comme épreuve finale.",
+      "refreshFailed": "La grille est enregistrée, mais sa synchronisation a échoué. Rechargez la page."
     }
   },
   "jury": {
@@ -2908,7 +2926,12 @@
       "status": "Statut",
       "referenceVersion": "Référentiel / version",
       "duration": "Volume horaire",
-      "description": "Description"
+      "description": "Description",
+      "responsibleTrainer": "Responsable du programme",
+      "responsibleTrainerHint": "Choisissez un formateur actif de votre organisation.",
+      "responsibleTrainerNone": "Aucun responsable désigné",
+      "responsibleBadge": "Responsable",
+      "responsibleMissing": "Responsable non renseigné"
     },
     "modules": {
       "planning": "Planning",
@@ -3480,7 +3503,12 @@
       "saveError": "Impossible d’enregistrer les paramètres de l’organisation.",
       "remoteWorkSaveError": "Impossible d’enregistrer la politique de télétravail.",
       "reportingError": "Impossible de charger les indicateurs de l’organisation.",
-      "auditError": "Impossible de charger l’historique d’audit de l’organisation."
+      "auditError": "Impossible de charger l’historique d’audit de l’organisation.",
+      "contextError": "Impossible d’enregistrer : organisation non chargée. Rechargez la page.",
+      "conflictError": "Une modification concurrente a été détectée. Vos changements sont conservés dans le formulaire : copiez-les avant de recharger la page pour obtenir la dernière version.",
+      "forbiddenError": "Vous ne disposez pas des droits nécessaires pour modifier cette organisation.",
+      "refreshError": "Modification enregistrée, mais certaines données n’ont pas pu être actualisées. Rechargez la page.",
+      "invalidResponse": "La réponse de sauvegarde est incomplète. Vérifiez les données avant de poursuivre."
     },
     "pedagogicalSheets": {
       "title": "Fiches pédagogiques",
@@ -3853,7 +3881,19 @@
     "PROGRAM_DELETE_IN_USE": "Cette formation ne peut pas être supprimée car elle est déjà utilisée par une promotion ou une activité de formation.",
     "PROGRAM_DELETE_REFERENTIAL_IN_USE": "Cette formation ne peut pas être supprimée car son référentiel ou une de ses versions est déjà utilisé.",
     "COHORT_DELETE_IN_USE": "Cette promotion ne peut pas être supprimée car elle contient déjà des stagiaires ou des données de formation.",
-    "COHORT_DELETE_STATUS_FORBIDDEN": "Cette promotion ne peut plus être supprimée dans son état actuel. Seules les promotions en brouillon ou à venir peuvent être supprimées."
+    "COHORT_DELETE_STATUS_FORBIDDEN": "Cette promotion ne peut plus être supprimée dans son état actuel. Seules les promotions en brouillon ou à venir peuvent être supprimées.",
+    "COHORT_PEDAGOGICAL_MANAGER_INVALID": "Le responsable pédagogique doit être un formateur actif de cette organisation.",
+    "COHORT_PEDAGOGICAL_MANAGER_REQUIRED": "Un responsable pédagogique est obligatoire.",
+    "COHORT_STATUS_INVALID": "Statut de promotion invalide.",
+    "COHORT_CLOSED": "Impossible de modifier une promotion clôturée.",
+    "COMPETENCY_ENROLLMENT_NOT_ACTIVE": "Seule une inscription active permet une nouvelle évaluation de compétence.",
+    "WORKPLACE_ENROLLMENT_COHORT_MISMATCH": "La période de stage ne correspond pas à l'organisation de la promotion.",
+    "WORKPLACE_ENROLLMENT_NOT_ELIGIBLE": "Le statut de l'inscription ne permet pas de créer une période de stage.",
+    "CERTIFICATION_SESSION_NOT_WRITABLE": "Cette session de certification ne peut plus être modifiée dans son état actuel.",
+    "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les épreuves requises doivent avoir un résultat avant la décision du jury.",
+    "CERTIFICATION_ASSESSMENTS_REQUIRED": "Au moins une épreuve est obligatoire.",
+    "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "Une même épreuve figure plusieurs fois dans la grille.",
+    "CERTIFICATION_COMMENT_TOO_LONG": "Le commentaire dépasse la longueur autorisée."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -3943,6 +3983,17 @@
     "ATTENDANCE_ENTRY_NOT_FOUND": "L’apprenant n’existe pas dans cette feuille d’émargement.",
     "ATTENDANCE_STATUS_INVALID": "Le statut de présence est invalide.",
     "ATTENDANCE_ENROLLMENT_COHORT_MISMATCH": "L’apprenant n’est pas inscrit dans la promotion de cette séance.",
+    "ATTENDANCE_ENROLLMENT_NOT_ELIGIBLE": "Cet apprenant ne fait pas partie des participants autorisés à cette séance.",
+    "ATTENDANCE_DUPLICATE_ENROLLMENT": "Un apprenant apparaît plusieurs fois dans le même émargement.",
+    "ATTENDANCE_NO_ENTRIES": "Renseignez au moins un statut de présence avant d’enregistrer l’émargement.",
+    "ATTENDANCE_TIME_PAIR_REQUIRED": "Les heures d’arrivée et de départ doivent être renseignées ensemble.",
+    "ATTENDANCE_LATE_TIMES_REQUIRED": "Pour un retard, indiquez les heures d’arrivée et de départ.",
+    "ATTENDANCE_LATE_ARRIVAL_INVALID": "Un retard correspond à une arrivée postérieure au début de la séance.",
+    "ATTENDANCE_OUTSIDE_SESSION": "Les horaires de présence doivent être compris dans ceux de la séance.",
+    "ATTENDANCE_PRESENT_MINUTES_INVALID": "La durée de présence doit être positive et ne pas dépasser celle de la séance.",
+    "ATTENDANCE_DURATION_MISMATCH": "La durée déclarée ne correspond pas aux heures d’arrivée et de départ.",
+    "ATTENDANCE_ABSENCE_TIME_INVALID": "Une absence ne peut pas comporter de durée de présence ni d’horaires.",
+    "ATTENDANCE_COMMENT_TOO_LONG": "Le commentaire est limité à 1 000 caractères.",
     "SESSION_AUDIENCE_MODE_INVALID": "Le mode de participation à la séance est invalide.",
     "SESSION_PARTICIPANTS_REQUIRED": "Sélectionnez au moins un apprenant pour cette séance.",
     "SESSION_PARTICIPANT_ENROLLMENT_REQUIRED": "Une inscription apprenant est obligatoire pour un participant.",
@@ -4078,7 +4129,26 @@
     "COMPETENCY_CODE_CONFLICT": "Ce code de compétence existe déjà dans ce référentiel.",
     "COMPETENCY_KIND_INVALID": "Le type de compétence est invalide.",
     "COMPETENCY_PARENT_INVALID": "La compétence parente sélectionnée est invalide.",
-    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée."
+    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée.",
+    "ACCESS_INVITATION_BIRTH_DATE_INVALID": "La date de naissance ne peut pas être future.",
+    "ACCESS_INVITATION_SCOPE_INVALID": "La promotion, le site et le programme ne sont pas compatibles.",
+    "ACCESS_INVITATION_ALREADY_EXISTS": "Une invitation est déjà en attente pour cet email.",
+    "ACCESS_INVITATION_EMAIL_REQUIRED": "Une adresse email est obligatoire.",
+    "ACCESS_ROLE_INVALID": "Le rôle demandé n'est pas autorisé.",
+    "ENROLLMENT_STATUS_TRANSITION_FORBIDDEN": "Transition de statut interdite pour cette inscription.",
+    "ENROLLMENT_TERMINAL_REENROLLMENT_FORBIDDEN": "Cette inscription est clôturée. Une réinscription nécessite une nouvelle procédure.",
+    "ENROLLMENT_END_DATE_BEFORE_START": "La date de clôture ne peut pas précéder la date d’inscription.",
+    "ENROLLMENT_END_DATE_ONLY_FOR_CLOSURE": "Une date de fin n’est autorisée que pour une inscription clôturée.",
+    "ENROLLMENT_END_DATE_CHANGE_FORBIDDEN": "La date de fin ne peut pas être modifiée sans une action métier dédiée.",
+    "ENROLLMENT_CAPACITY_TRANSACTION_REQUIRED": "La validation des places requiert une transaction de base de données.",
+    "COMPETENCY_ENROLLMENT_NOT_ACTIVE": "Seule une inscription active permet une nouvelle évaluation de compétence.",
+    "WORKPLACE_ENROLLMENT_COHORT_MISMATCH": "La période de stage ne correspond pas à l'organisation de la promotion.",
+    "WORKPLACE_ENROLLMENT_NOT_ELIGIBLE": "Le statut de l'inscription ne permet pas de créer une période de stage.",
+    "CERTIFICATION_SESSION_NOT_WRITABLE": "Cette session de certification ne peut plus être modifiée dans son état actuel.",
+    "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les épreuves requises doivent avoir un résultat avant la décision du jury.",
+    "CERTIFICATION_ASSESSMENTS_REQUIRED": "Au moins une épreuve est obligatoire.",
+    "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "Une même épreuve figure plusieurs fois dans la grille.",
+    "CERTIFICATION_COMMENT_TOO_LONG": "Le commentaire dépasse la longueur autorisée."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -4315,7 +4385,18 @@
     "COMPETENCY_CODE_CONFLICT": "Ce code de compétence existe déjà dans ce référentiel.",
     "COMPETENCY_KIND_INVALID": "Le type de compétence est invalide.",
     "COMPETENCY_PARENT_INVALID": "La compétence parente sélectionnée est invalide.",
-    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée."
+    "COMPETENCY_IN_USE": "Cette compétence est déjà utilisée ou possède des sous-compétences et ne peut pas être supprimée.",
+    "ACCESS_INVITATION_BIRTH_DATE_INVALID": "La date de naissance ne peut pas être future.",
+    "ACCESS_INVITATION_SCOPE_INVALID": "La promotion, le site et le programme ne sont pas compatibles.",
+    "ACCESS_INVITATION_ALREADY_EXISTS": "Une invitation est déjà en attente pour cet email.",
+    "ACCESS_INVITATION_EMAIL_REQUIRED": "Une adresse email est obligatoire.",
+    "ACCESS_ROLE_INVALID": "Le rôle demandé n'est pas autorisé.",
+    "ENROLLMENT_STATUS_TRANSITION_FORBIDDEN": "Transition de statut interdite pour cette inscription.",
+    "ENROLLMENT_TERMINAL_REENROLLMENT_FORBIDDEN": "Cette inscription est clôturée. Une réinscription nécessite une nouvelle procédure.",
+    "ENROLLMENT_END_DATE_BEFORE_START": "La date de clôture ne peut pas précéder la date d’inscription.",
+    "ENROLLMENT_END_DATE_ONLY_FOR_CLOSURE": "Une date de fin n’est autorisée que pour une inscription clôturée.",
+    "ENROLLMENT_END_DATE_CHANGE_FORBIDDEN": "La date de fin ne peut pas être modifiée sans une action métier dédiée.",
+    "ENROLLMENT_CAPACITY_TRANSACTION_REQUIRED": "La validation des places requiert une transaction de base de données."
   },
   "accessPolicy": {
     "readOnly": "Accès en lecture seule"
@@ -4337,7 +4418,6 @@
     "back": "Retour à l’administration",
     "title": "Configuration des compétences",
     "subtitle": "Les compétences sont rattachées à la version de référentiel du contexte courant. Seules les compétences actives apparaissent dans le menu Compétences.",
-    "importReact": "Charger les compétences de la version React",
     "addRoot": "Ajouter une compétence",
     "addChild": "Ajouter une sous-compétence",
     "chooseProgram": "Sélectionnez une formation ou une promotion pour configurer son référentiel.",
@@ -4370,8 +4450,7 @@
     "api": {
       "loadError": "Impossible de charger la configuration des compétences.",
       "saveError": "Impossible d’enregistrer la compétence.",
-      "deleteError": "Impossible de supprimer cette compétence. Elle est peut-être déjà utilisée.",
-      "importError": "Impossible de charger le jeu de compétences TP ECSR de la version React."
+      "deleteError": "Impossible de supprimer cette compétence. Elle est peut-être déjà utilisée."
     }
   }
 }

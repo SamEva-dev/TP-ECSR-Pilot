@@ -70,7 +70,6 @@ export class CompetenciesConfigurationComponent {
   requestDelete(item: CompetencyDefinitionDto){ this.pendingDelete.set(item); this.deleteOpen.set(true); }
   cancelDelete(){ this.pendingDelete.set(null); this.deleteOpen.set(false); }
   async confirmDelete(){ const item=this.pendingDelete(),v=this.referentialVersionId(); if(!item||!v)return; try { await firstValueFrom(this.api.deleteCompetency(v,item.id)); await this.reload(v); this.skills.refreshContext(); this.cancelDelete(); } catch { this.notifications.error("competencyConfig.api.deleteError","/administration/competences"); } }
-  async importReact(){ const v=this.referentialVersionId(); if(!v)return; try { await firstValueFrom(this.api.importTpEcsrReactCompetencies(v)); await this.reload(v); this.skills.refreshContext(); } catch { this.notifications.error("competencyConfig.api.importError","/administration/competences"); } }
   private async reload(v:string){ const seq=++this.loadSequence; if(!v){this.items.set([]);return;} this.loading.set(true); try{ const rows=await firstValueFrom(this.api.getCompetencyCatalog(v)); if(seq===this.loadSequence)this.items.set(Array.isArray(rows)?rows:[]);}catch{if(seq===this.loadSequence){this.items.set([]);this.notifications.error("competencyConfig.api.loadError","/administration/competences");}}finally{if(seq===this.loadSequence)this.loading.set(false);} }
   private emptyDraft():Draft{return {parentId:"",code:"",title:"",kind:"learning",sortOrder:0,active:true};}
 }

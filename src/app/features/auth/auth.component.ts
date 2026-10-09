@@ -70,36 +70,36 @@ export class AuthComponent {
       role: "direction",
       titleKey: "auth.demoProfiles.direction.title",
       descriptionKey: "auth.demoProfiles.direction.description",
-      email: "claire@demo.pedagorapilot.fr",
-      password: "Demo2026!",
+      email: "",
+      password: "",
     },
     {
       role: "formateur",
       titleKey: "auth.demoProfiles.trainer.title",
       descriptionKey: "auth.demoProfiles.trainer.description",
-      email: "marc@demo.pedagorapilot.fr",
-      password: "Demo2026!",
+      email: "",
+      password: "",
     },
     {
       role: "stagiaire",
       titleKey: "auth.demoProfiles.student.title",
       descriptionKey: "auth.demoProfiles.student.description",
-      email: "sam@demo.pedagorapilot.fr",
-      password: "Demo2026!",
+      email: "",
+      password: "",
     },
     {
       role: "secretariat",
       titleKey: "auth.demoProfiles.secretariat.title",
       descriptionKey: "auth.demoProfiles.secretariat.description",
-      email: "nadia@demo.pedagorapilot.fr",
-      password: "Demo2026!",
+      email: "",
+      password: "",
     },
     {
       role: "jury",
       titleKey: "auth.demoProfiles.jury.title",
       descriptionKey: "auth.demoProfiles.jury.description",
-      email: "jean@demo.pedagorapilot.fr",
-      password: "Demo2026!",
+      email: "",
+      password: "",
     },
   ];
 
@@ -207,7 +207,7 @@ export class AuthComponent {
       }
 
       // Demo mode uses a REAL AuthGate token and the REAL Pedagora APIs.
-      // The profile cards only pre-fill credentials; they do not create a fake session.
+      // Role cards are illustrative only: credentials must be entered for a real AuthGate account.
       this.session.connectAuthenticatedToken(result.accessToken);
 
       await this.router.navigateByUrl(

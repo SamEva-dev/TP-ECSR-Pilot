@@ -33,9 +33,6 @@ export class LearningApiService {
   deleteCompetency(referentialVersionId: string, id: string): Observable<boolean> {
     return this.http.delete<boolean>(`${this.base}/referentials/${referentialVersionId}/competencies/${id}`);
   }
-  importTpEcsrReactCompetencies(referentialVersionId: string): Observable<CompetencyDefinitionDto[]> {
-    return this.http.post<CompetencyDefinitionDto[]>(`${this.base}/referentials/${referentialVersionId}/competencies/import/tp-ecsr-react`, {});
-  }
   getLearnerCompetencies(
     enrollmentId: string,
   ): Observable<LearnerCompetencyDto[]> {

@@ -30,6 +30,7 @@ export class PromotionsComponent {
   readonly referentials = inject(ReferentialApiStoreService);
   readonly drawerOpen = signal(false);
   readonly createdPromotionName = signal("");
+  readonly creatingPromotion = signal(false);
   readonly statusFilter = signal<PromotionStatusFilter>("all");
 
   readonly siteProgramPromotions = computed(() =>
@@ -90,7 +91,10 @@ export class PromotionsComponent {
   }
 
   async createPromotion(payload: CreatePromotionPayload): Promise<void> {
-    const created = await this.store.create({
+    if (this.creatingPromotion()) return;
+    this.creatingPromotion.set(true);
+    try {
+      const created = await this.store.create({
       name: payload.name,
       startDate: payload.startDate,
       endDate: payload.endDate,
@@ -99,12 +103,15 @@ export class PromotionsComponent {
       status: payload.status,
       managerUserId: payload.managerUserId,
       managerDisplayName: payload.manager,
-    });
-    if (!created) return;
+      });
+      if (!created) return;
 
-    this.createdPromotionName.set(created.name);
-    this.drawerOpen.set(false);
-    setTimeout(() => this.createdPromotionName.set(""), 3500);
+      this.createdPromotionName.set(created.name);
+      this.drawerOpen.set(false);
+      setTimeout(() => this.createdPromotionName.set(""), 3500);
+    } finally {
+      this.creatingPromotion.set(false);
+    }
   }
 
   formatDate(value: string): string {

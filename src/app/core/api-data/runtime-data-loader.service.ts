@@ -58,7 +58,9 @@ import {
   TRAINING_SITES,
   WORKSPACE_COHORTS,
   replaceRuntimeArray,
+  clearContextRuntimeData,
 } from "./runtime-data.store";
+import { apiCollection } from "./api-response-normalizers";
 
 @Injectable({ providedIn: "root" })
 export class RuntimeDataLoaderService {
@@ -168,6 +170,7 @@ export class RuntimeDataLoaderService {
     isCurrent: () => boolean = () => true,
   ): Promise<void> {
     const generation = ++this.contextGeneration;
+    clearContextRuntimeData();
     const cohort =
       (dto?.cohorts ?? []).find(
         (x) => x.id === selection.cohortId || x.key === selection.cohortId,
@@ -286,7 +289,7 @@ export class RuntimeDataLoaderService {
     if (generation !== this.contextGeneration || !isCurrent()) return;
     replaceRuntimeArray(
       TRAINING_REFERENTIALS,
-      (data.referentials ?? []).map((x: any) => ({
+      apiCollection(data.referentials).map((x: any) => ({
         ...x,
         id: x.key ?? x.id,
         apiId: x.id,
@@ -298,7 +301,7 @@ export class RuntimeDataLoaderService {
     );
     replaceRuntimeArray(
       PROGRAM_CATALOG,
-      (data.programs ?? []).map((x: any) => ({
+      apiCollection(data.programs).map((x: any) => ({
         ...x,
         id: x.key ?? x.id,
         apiId: x.id,
@@ -311,7 +314,7 @@ export class RuntimeDataLoaderService {
       })),
     );
 
-    const learners = (data.learners ?? []).map((x: any) => ({
+    const learners = apiCollection(data.learners).map((x: any) => ({
       id: x.learnerProfileId,
       apiId: x.learnerProfileId,
       enrollmentId: x.enrollmentId,
@@ -333,10 +336,21 @@ export class RuntimeDataLoaderService {
     replaceRuntimeArray(STUDENT_DIRECTORY, learners);
     replaceRuntimeArray(TRAINER_STUDENTS, learners);
 
-    const sessions = (data.sessions ?? []).map((x: any) => {
+    const sessions = apiCollection(data.sessions).flatMap((x: any) => {
+      if (
+        typeof x.startsAtUtc !== "string" || !x.startsAtUtc.trim() ||
+        typeof x.endsAtUtc !== "string" || !x.endsAtUtc.trim()
+      ) {
+        partialFailure = true;
+        return [];
+      }
       const start = new Date(x.startsAtUtc);
       const end = new Date(x.endsAtUtc);
-      return {
+      if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end < start) {
+        partialFailure = true;
+        return [];
+      }
+      return [{
         id: x.id,
         apiId: x.id,
         promotionId: cohort?.key ?? cohort?.id ?? "",
@@ -357,7 +371,7 @@ export class RuntimeDataLoaderService {
         supportsKey: "",
         modality: x.modality,
         status: x.status,
-      };
+      }];
     });
     replaceRuntimeArray(PROGRAMMED_SESSIONS, sessions);
     replaceRuntimeArray(
@@ -376,7 +390,7 @@ export class RuntimeDataLoaderService {
     );
     replaceRuntimeArray(PEDAGOGICAL_TEAM, SESSION_TRAINERS);
 
-    const periods = (data.workplace ?? []).map((x: any) => ({
+    const periods = apiCollection(data.workplace).map((x: any) => ({
       id: x.id,
       studentId: x.learnerExternalKey ?? x.enrollmentId,
       studentName: x.learnerDisplayName,
@@ -395,16 +409,16 @@ export class RuntimeDataLoaderService {
     }));
     replaceRuntimeArray(INTERNSHIP_PERIODS, periods);
 
-    replaceRuntimeArray(EXAM_SESSIONS, data.certSessions ?? []);
+    replaceRuntimeArray(EXAM_SESSIONS, apiCollection(data.certSessions));
     let candidates: any[] = [];
-    const firstExam = (data.certSessions ?? [])[0];
+    const firstExam = apiCollection(data.certSessions)[0];
     if (firstExam?.id) {
       try {
-        candidates = await firstValueFrom(
+        candidates = apiCollection(await firstValueFrom(
           this.http.get<any[]>(
             `${this.api}/api/v1/certification/sessions/${firstExam.id}/candidates`,
           ),
-        );
+        ));
       } catch {
         partialFailure = true;
       }
@@ -427,9 +441,9 @@ export class RuntimeDataLoaderService {
         steps: x.assessments ?? [],
       })),
     );
-    (globalThis as any).__pedagoraCertificationSchemes = data.certSchemes ?? [];
+    (globalThis as any).__pedagoraCertificationSchemes = apiCollection(data.certSchemes);
 
-    const topics = (data.topics ?? []).map((x: any) => ({
+    const topics = apiCollection(data.topics).map((x: any) => ({
       id: x.id,
       apiId: x.id,
       number: x.number,
@@ -442,7 +456,7 @@ export class RuntimeDataLoaderService {
       status: "not_started",
     }));
     replaceRuntimeArray(DEFAULT_SHEET_CATALOG, topics);
-    const comps = (data.competencies ?? []).map((x: any) => ({
+    const comps = apiCollection(data.competencies).map((x: any) => ({
       id: x.id,
       apiId: x.id,
       code: x.code,
@@ -469,16 +483,16 @@ export class RuntimeDataLoaderService {
     replaceRuntimeArray(DRIVING_CRITERIA, []);
     replaceRuntimeArray(SKILL_LINKED_SESSIONS, sessions);
 
-    replaceRuntimeArray(DISTANCE_LIVE_SESSIONS, data.distanceLive ?? []);
-    replaceRuntimeArray(DISTANCE_ASYNC_MODULES, data.distanceAsync ?? []);
-    replaceRuntimeArray(REMOTE_WORK_REQUESTS, data.remoteWork ?? []);
+    replaceRuntimeArray(DISTANCE_LIVE_SESSIONS, apiCollection(data.distanceLive));
+    replaceRuntimeArray(DISTANCE_ASYNC_MODULES, apiCollection(data.distanceAsync));
+    replaceRuntimeArray(REMOTE_WORK_REQUESTS, apiCollection(data.remoteWork));
     replaceRuntimeArray(
       REMOTE_WORK_ACTIVITIES,
-      (data.remoteWork ?? []).flatMap((x: any) => x.activities ?? []),
+      apiCollection(data.remoteWork).flatMap((x: any) => x.activities ?? []),
     );
     replaceRuntimeArray(TEAM_WORK_MODE_WEEK, []);
 
-    const audit = data.audit?.items ?? [];
+    const audit = apiCollection(data.audit?.items);
     replaceRuntimeArray(ORGANIZATION_AUDIT, audit);
     replaceRuntimeArray(ORGANIZATION_ACTIVITY, audit.slice(0, 10));
     const orgDash = data.orgDashboard;

@@ -14,6 +14,7 @@ export interface CreateCohortRequest {
   pedagogicalManagerAuthGateUserId: string | null;
   pedagogicalManagerDisplayName: string | null;
   externalKey: string | null;
+  initialStatus: "draft" | "planned" | "active";
 }
 
 export interface CohortResponse {
@@ -96,6 +97,13 @@ export class TrainingCatalogApiService {
     return firstValueFrom(
       this.http.put<CohortResponse>(`${this.baseUrl}/${encodeURIComponent(id)}`, request),
     );
+  }
+
+  reassignPedagogicalManager(id: string, authGateUserId: string): Promise<CohortResponse> {
+    return firstValueFrom(this.http.put<CohortResponse>(
+      `${this.baseUrl}/${encodeURIComponent(id)}/pedagogical-manager`,
+      { authGateUserId },
+    ));
   }
 
   deleteCohort(id: string): Promise<void> {

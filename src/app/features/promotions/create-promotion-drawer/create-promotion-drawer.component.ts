@@ -102,7 +102,10 @@ export class CreatePromotionDrawerComponent {
 
   constructor() {
     effect(() => {
-      if (!this.open()) return;
+      if (!this.open()) {
+        untracked(() => this.resetForm());
+        return;
+      }
       untracked(() => void this.refreshCreationSources());
     });
 
@@ -139,7 +142,7 @@ export class CreatePromotionDrawerComponent {
       ...raw,
       manager: manager ? this.fullName(manager) : "",
     });
-    this.resetForm();
+    // Parent closes only after the server confirms persistence; preserve form on 4xx/5xx.
   }
 
   hasInvalidDates(): boolean {

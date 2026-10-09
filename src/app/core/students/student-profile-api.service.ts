@@ -19,6 +19,25 @@ export interface LearnerDirectoryApi {
   enrolledOn: string | null;
 }
 
+/** Receipt confirming that a product invitation was persisted; not an Enrollment or LearnerProfile. */
+export interface LearnerInvitationReceiptApi {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status: "Invited";
+}
+
+export interface InviteCohortLearnerApiRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  birthDate: string | null;
+  enrolledOn: string | null;
+}
+
 export interface LearnerProfileApi {
   enrollmentId: string;
   learnerProfileId: string;
@@ -163,6 +182,13 @@ export class StudentProfileApiService {
       `${this.base}/api/v1/learning/enrollments/${encodeURIComponent(id)}/topics`,
     );
   }
+  /** Invitation is asynchronous; learner and enrollment are provisioned on acceptance. */
+  inviteToCohort(cohortId: string, request: InviteCohortLearnerApiRequest) {
+    return this.http.post<LearnerInvitationReceiptApi>(
+      `${this.base}/api/v1/cohorts/${encodeURIComponent(cohortId)}/invitations`, request,
+    );
+  }
+
   cohortLearners(cohortId: string) {
     return this.http.get<LearnerProfileApi[]>(
       `${this.base}/api/v1/cohorts/${encodeURIComponent(cohortId)}/learners`,

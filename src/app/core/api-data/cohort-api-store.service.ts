@@ -158,7 +158,7 @@ export class CohortApiStoreService {
     status: CohortResponse["status"];
     managerUserId: string;
     managerDisplayName: string;
-  }): Promise<ContextualPromotionSummary | null> {
+  }): Promise<CohortResponse | null> {
     const offering = this.workspace.activeOfferingForContext();
     const referential = this.referentials.items().find(
       (item) => item.id === payload.referentialVersionId || item.apiId === payload.referentialVersionId,
@@ -169,7 +169,7 @@ export class CohortApiStoreService {
     }
 
     try {
-      let saved = await this.api.createCohort({
+      const response = await this.api.createCohort({
         programOfferingId: offering.apiId,
         referentialVersionId: referential.apiId,
         code: this.createCode(payload.name, payload.startDate),
@@ -180,32 +180,31 @@ export class CohortApiStoreService {
         pedagogicalManagerAuthGateUserId: this.text(payload.managerUserId) || null,
         pedagogicalManagerDisplayName: this.text(payload.managerDisplayName) || null,
         externalKey: null,
+        initialStatus: payload.status === "draft" || payload.status === "active" ? payload.status : "planned",
       });
-      saved = this.normalize(saved);
-
-      if (payload.status !== "planned") {
-        try {
-          saved = this.normalize(
-            await this.api.updateCohort(saved.id, {
-              name: saved.name,
-              startDate: saved.startDate,
-              endDate: saved.endDate,
-              capacity: saved.capacity,
-              status: payload.status,
-            }),
-          );
-        } catch {
-          this.notifications.error("promotions.api.updateFailed", "/promotions");
-        }
+      if (!response?.id || !response?.organizationId || !response?.siteId ||
+          response.organizationId !== this.currentFilters().organizationId ||
+          response.siteId !== this.currentFilters().siteId) {
+        this.notifications.error("promotions.api.invalidResponse", "/promotions");
+        return null;
       }
+      const saved = this.normalize(response);
+      // A previous server version could commit a different initial status. Do not hide
+      // the committed cohort or encourage another POST; show its actual state and warn.
+      if (saved.status !== payload.status)
+        this.notifications.error("promotions.api.initialStatusMismatch", "/promotions");
 
       this.upsert(saved);
       this.workspace.applySavedCohort(saved);
       const workspaceReloaded = await this.reloadWorkspaceSafely();
-      await this.reload();
-      if (!workspaceReloaded)
+      const refreshed = await this.reload();
+      if (!workspaceReloaded || !refreshed) {
+        // The POST already committed: preserve its canonical representation on read failures.
+        if (!refreshed) this.upsert(saved);
         this.notifications.error("promotions.api.refreshFailed", "/promotions");
-      return this.promotions().find((item) => item.id === (saved.key || saved.id)) ?? null;
+      }
+      // Return the committed server resource, independent of reporting or workspace GET availability.
+      return saved;
     } catch {
       this.notifications.error("promotions.api.createFailed", "/promotions");
       return null;
@@ -263,8 +262,12 @@ export class CohortApiStoreService {
   }
 
   private async reloadWorkspaceSafely(): Promise<boolean> {
-    await this.workspace.reload();
-    return !this.workspace.remoteWorkspaceError();
+    try {
+      await this.workspace.reload();
+      return !this.workspace.remoteWorkspaceError();
+    } catch {
+      return false;
+    }
   }
 
   private currentFilters(): { organizationId?: string; siteId?: string; programId?: string } {

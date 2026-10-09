@@ -51,6 +51,7 @@ export class AttendanceApiStoreService {
   readonly loading = signal(false);
   readonly loadError = signal(false);
   private generation = 0;
+  private saving = false;
 
   readonly selectedSession = computed<TrainingSessionApi | null>(() =>
     this.pickSession(this.sessions.apiSessions()),
@@ -110,6 +111,7 @@ export class AttendanceApiStoreService {
   }
 
   async save(students: AttendanceStudent[]): Promise<boolean> {
+    if (this.saving) return false;
     const row = this.selectedSession();
     if (!row?.id) {
       this.notifications.error("attendance.real.saveFailed", "/presences");
@@ -122,6 +124,8 @@ export class AttendanceApiStoreService {
       return false;
     }
 
+    this.saving = true;
+    const generation = this.generation;
     try {
       const entries = students
         .filter((student) => student.status !== "pending")
@@ -130,7 +134,7 @@ export class AttendanceApiStoreService {
             ? parisInstant(localDate, student.arrival)
             : null;
           const departureAtUtc = student.departure
-            ? parisInstant(localDate, student.departure)
+            ? parisInstant(this.localIsoDate(row.endsAtUtc) || localDate, student.departure)
             : null;
           if (
             (student.arrival && !arrivalAtUtc) ||
@@ -138,27 +142,42 @@ export class AttendanceApiStoreService {
           ) {
             throw new Error("ATTENDANCE_TIME_INVALID");
           }
+          if (Boolean(arrivalAtUtc) !== Boolean(departureAtUtc)) {
+            throw new Error("ATTENDANCE_TIME_PAIR_REQUIRED");
+          }
+          if (student.status === "late" && !arrivalAtUtc)
+            throw new Error("ATTENDANCE_LATE_TIMES_REQUIRED");
+          const absent = student.status === "absent" || student.status === "excused";
+          const minutesFromClock = arrivalAtUtc && departureAtUtc
+            ? Math.round((new Date(departureAtUtc).getTime() - new Date(arrivalAtUtc).getTime()) / 60000)
+            : null;
           return {
             enrollmentId: this.text(student.id),
             status: student.status as "present" | "late" | "absent" | "excused",
-            arrivalAtUtc,
-            departureAtUtc,
-            presentMinutes: Math.max(
-              0,
-              Math.round(this.number(student.duration) * 60),
-            ),
+            arrivalAtUtc: absent ? null : arrivalAtUtc,
+            departureAtUtc: absent ? null : departureAtUtc,
+            presentMinutes: absent ? 0 : minutesFromClock ?? Math.round(this.number(student.duration) * 60),
             addToCatchup: Boolean(student.addToCatchup),
             comment: this.nullableText(student.comment),
           };
         });
 
+      if (!entries.length) {
+        this.notifications.error("attendance.real.saveFailed", "/presences");
+        return false;
+      }
       const saved = await this.api.saveAttendance(row.id, { entries });
+      // A late response from another session must never overwrite the active one.
+      if (generation !== this.generation || row.id !== (this.selectedSession()?.id ?? ""))
+        return false;
       this.sheetSignal.set(this.normalizeSheet(saved));
       this.loadError.set(false);
       return true;
     } catch {
       this.notifications.error("attendance.real.saveFailed", "/presences");
       return false;
+    } finally {
+      this.saving = false;
     }
   }
 
