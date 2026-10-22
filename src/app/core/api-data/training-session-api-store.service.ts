@@ -66,14 +66,18 @@ export class TrainingSessionApiStoreService {
     void this.realtime.start().catch(() => undefined);
 
     effect(() => {
-      const cohortApiId = this.workspace.cohort()?.apiId ?? "";
       const ready = this.workspace.remoteWorkspaceLoaded();
+      const cohortApiIds = this.visibleCohortApiIds();
       const generation = ++this.generation;
+      ++this.request;
       this.rowsSignal.set([]);
       this.loadError.set(false);
-      if (ready && cohortApiId) {
-        void this.reload(generation, cohortApiId);
-        void this.loadEligibleTrainers();
+      if (ready && cohortApiIds.length) {
+        void this.reload(generation, cohortApiIds);
+        void this.loadEligibleTrainers(generation);
+      } else {
+        this.loading.set(false);
+        this.trainersSignal.set([]);
       }
     });
 
@@ -81,28 +85,54 @@ export class TrainingSessionApiStoreService {
       const event = this.realtime.lastEvent();
       if (!event || !/^pedagora\.training\.session\./.test(event.typeKey)) return;
       untracked(() => {
-        if (this.workspace.cohort()?.apiId) void this.reload();
+        if (this.visibleCohortApiIds().length) void this.reload();
       });
     });
   }
 
+  private visibleCohortApiIds(): string[] {
+    const level = this.workspace.activeLevel();
+    const selectedCohort = this.workspace.cohort();
+    if (level === "cohort") {
+      const cohort = this.workspace.cohorts().find((item) => item.id === selectedCohort?.id);
+      return cohort?.apiId ? [this.text(cohort.apiId)] : [];
+    }
+    // At broader levels, workspace.cohorts() only covers the selected offering.
+    // siteCohorts() enforces access rules for each site and exposes programId.
+    const sites = level === "organization"
+      ? this.workspace.sites()
+      : this.workspace.site() ? [this.workspace.site()!] : [];
+    const selectedProgramId = level === "program" ? this.workspace.program()?.id : null;
+    const cohorts = sites.flatMap((site) => this.workspace.siteCohorts(site.id))
+      .filter((cohort) => !selectedProgramId || cohort.programId === selectedProgramId);
+    return [...new Set(cohorts.map((item) => this.text(item.apiId)).filter(Boolean))];
+  }
+
   async reload(
     generation = this.generation,
-    cohortApiId = this.workspace.cohort()?.apiId ?? "",
+    cohortApiIds: string[] = this.visibleCohortApiIds(),
   ): Promise<boolean> {
-    if (!cohortApiId) {
+    const request = ++this.request;
+    if (!cohortApiIds.length) {
       this.rowsSignal.set([]);
+      this.loading.set(false);
       return true;
     }
 
-    const request = ++this.request;
     this.loading.set(true);
     try {
-      const rows = await this.api.list(cohortApiId);
+      const results = await Promise.allSettled(cohortApiIds.map((id) => this.api.list(id)));
       if (generation !== this.generation || request !== this.request) return false;
-      this.rowsSignal.set((Array.isArray(rows) ? rows : []).map((row) => this.normalize(row)));
-      this.loadError.set(false);
-      return true;
+      const rows = results.flatMap((result) =>
+        result.status === "fulfilled" && Array.isArray(result.value) ? result.value : [],
+      );
+      this.rowsSignal.set(
+        [...new Map(rows.map((row) => [row.id, this.normalize(row)])).values()],
+      );
+      const failed = results.some((result) => result.status === "rejected");
+      this.loadError.set(failed);
+      if (failed) this.notifications.error("sessions.real.loadError", "/seances");
+      return !failed;
     } catch {
       if (generation === this.generation && request === this.request) {
         this.rowsSignal.set([]);
@@ -116,12 +146,15 @@ export class TrainingSessionApiStoreService {
   }
 
   async create(value: CreateSessionValue, errorPath = "/seances"): Promise<TrainingSessionApi | null> {
-    const cohort = this.workspace.cohorts().find((item) => item.id === value.cohortId);
+    const allowedIds = new Set(this.visibleCohortApiIds());
+    const cohort = this.workspace.cohorts().find((item) => item.id === value.cohortId)
+      ?? this.workspace.sites().flatMap((site) => this.workspace.siteCohorts(site.id))
+        .find((item) => item.id === value.cohortId);
     const cohortApiId = this.text(cohort?.apiId);
     const startsAtUtc = parisInstant(this.text(value.date), this.text(value.startTime));
     const endsAtUtc = parisInstant(this.text(value.date), this.text(value.endTime));
 
-    if (!cohortApiId || !startsAtUtc || !endsAtUtc || endsAtUtc <= startsAtUtc) {
+    if (!cohortApiId || !allowedIds.has(cohortApiId) || !startsAtUtc || !endsAtUtc || endsAtUtc <= startsAtUtc) {
       this.notifications.error("sessions.real.saveError", errorPath);
       return null;
     }
@@ -150,7 +183,29 @@ export class TrainingSessionApiStoreService {
       return null;
     }
 
+    // Ne jamais envoyer l'identité du Directeur (ou une identité obsolète)
+    // à la place d'un formateur présent dans l'annuaire de l'organisation.
+    const selectedTrainerId = this.text(request.trainerAuthGateUserId).trim();
+    if (!selectedTrainerId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(selectedTrainerId)) {
+      this.notifications.error("sessions.real.saveError", errorPath);
+      return null;
+    }
     try {
+      // Vérifier sur une liste fraîche au moment de l'écriture : le rôle ou le
+      // rattachement organisationnel peut avoir changé depuis l'ouverture.
+      const directory = await firstValueFrom(this.accessApi.trainers());
+      const eligible = (Array.isArray(directory) ? directory : []).find((item) =>
+        item.status === "Active"
+        && !item.isInvitation
+        && this.text(item.id).toLowerCase() === selectedTrainerId.toLowerCase()
+      );
+      if (!eligible) {
+        this.notifications.error("sessions.real.saveError", errorPath);
+        return null;
+      }
+      request.trainerAuthGateUserId = this.text(eligible.id);
+      request.trainerDisplayName = [this.text(eligible.firstName), this.text(eligible.lastName)]
+        .filter(Boolean).join(" ").trim();
       const created = this.normalize(await this.api.create(request));
       this.upsert(created);
       await this.reload();
@@ -162,19 +217,28 @@ export class TrainingSessionApiStoreService {
   }
 
 
-  private async loadEligibleTrainers(): Promise<void> {
+  private async loadEligibleTrainers(generation: number): Promise<void> {
     try {
       const rows = await firstValueFrom(this.accessApi.trainers());
-      this.trainersSignal.set((rows ?? []).map((row) => ({
+      if (generation !== this.generation) return;
+      this.trainersSignal.set((Array.isArray(rows) ? rows : [])
+        .filter((row) => row.status === "Active" && !row.isInvitation)
+        .map((row) => ({
         id: this.text(row.id),
         name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
       })).filter((row) => !!row.id && !!row.name));
     } catch {
-      const user = this.session.session();
-      const id = this.text(user?.userId);
-      const name = this.currentUserName();
-      this.trainersSignal.set(id && name ? [{ id, name }] : []);
+      if (generation !== this.generation) return;
+      this.trainersSignal.set([]);
+      this.notifications.error("sessions.real.loadError", "/seances");
     }
+  }
+
+  private visibleCohorts(): any[] {
+    const ids = new Set(this.visibleCohortApiIds());
+    return this.workspace.sites()
+      .flatMap((site) => this.workspace.siteCohorts(site.id))
+      .filter((cohort) => ids.has(this.text(cohort.apiId)));
   }
 
   cohortName(cohortApiId: string): string {
@@ -194,8 +258,8 @@ export class TrainingSessionApiStoreService {
       start: local.start,
       end: local.end,
       trainer: this.text(row.trainerDisplayName),
-      promotion: this.workspace.cohortNameByApiId(this.text(row.cohortId)) ?? this.text(this.workspace.cohort()?.name),
-      promotionId: this.workspace.cohorts().find((item) => item.apiId === row.cohortId)?.id ?? this.text(this.workspace.cohort()?.id),
+      promotion: this.visibleCohorts().find((item) => item.apiId === row.cohortId)?.name ?? "",
+      promotionId: this.visibleCohorts().find((item) => item.apiId === row.cohortId)?.id ?? "",
       type: this.type(row.type) as PedagogicalSessionType,
       modality: this.modality(row.modality) as SessionModality,
       objectiveKey: this.text(row.objective),
@@ -213,7 +277,7 @@ export class TrainingSessionApiStoreService {
     return {
       id: this.text(row.id),
       day: local.day,
-      promotionId: this.workspace.cohorts().find((item) => item.apiId === row.cohortId)?.id ?? this.text(this.workspace.cohort()?.id),
+      promotionId: this.visibleCohorts().find((item) => item.apiId === row.cohortId)?.id ?? "",
       type: this.type(row.type) as PlanningType,
       titleKey: this.text(row.title),
       time: `${local.start}–${local.end}`,

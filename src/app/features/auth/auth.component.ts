@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -23,6 +24,7 @@ import {
 } from "../../core/session/auth-gate.service";
 import { AuthTokenStore } from "../../core/session/auth-token.store";
 import { SessionService } from "../../core/session/session.service";
+import { PublishedBrandingService } from "../../core/branding/published-branding.service";
 import { environment } from "../../environments/environment";
 
 type DemoProfile = {
@@ -46,6 +48,19 @@ export class AuthComponent {
   private readonly tokens = inject(AuthTokenStore);
   private readonly session = inject(SessionService);
   private readonly translate = inject(TranslateService);
+  readonly publishedBranding = inject(PublishedBrandingService);
+  readonly publishedTheme = this.publishedBranding.configuration;
+  readonly publishedLogo = computed(() => this.publishedBranding.assetUrl(this.publishedTheme()?.logoAssetId));
+  readonly publishedBackground = computed(() => this.publishedBranding.assetUrl(this.publishedTheme()?.backgroundAssetId));
+
+  constructor() {
+    // Resolve the published theme whenever the login URL changes.
+    // The public endpoint currently accepts organization GUIDs only.
+    this.route.queryParamMap.subscribe(params => {
+      void this.publishedBranding.load(params.get("org"));
+    });
+  }
+
 
   readonly demoLoginEnabled = environment.demoLoginEnabled;
   readonly mode = signal<"login" | "register">(
@@ -171,6 +186,13 @@ export class AuthComponent {
     this.submitted.set(false);
   }
 
+  private signInRedirect(): string {
+    const destination = this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
+    // Whitelist internal signing routes: never use untrusted external redirects.
+    return /^\/signatures\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(destination)
+      ? destination : (this.session.role() === 'jury' ? '/jury' : '/accueil');
+  }
+
   async submitDemoLogin(): Promise<void> {
     this.submitted.set(true);
     this.error.set("");
@@ -211,7 +233,7 @@ export class AuthComponent {
       this.session.connectAuthenticatedToken(result.accessToken);
 
       await this.router.navigateByUrl(
-        this.session.role() === "jury" ? "/jury" : "/accueil",
+        this.signInRedirect(),
       );
     } catch (e) {
       this.error.set(this.backendMessage(e));
@@ -325,7 +347,7 @@ export class AuthComponent {
         this.pendingMfaToken = "";
         this.session.connectAuthenticatedToken(result.accessToken);
         await this.router.navigateByUrl(
-          this.session.role() === "jury" ? "/jury" : "/accueil",
+          this.signInRedirect(),
         );
         return;
       }
@@ -385,7 +407,7 @@ export class AuthComponent {
     this.pendingMfaToken = "";
     this.session.connectAuthenticatedToken(result.accessToken);
     await this.router.navigateByUrl(
-      this.session.role() === "jury" ? "/jury" : "/accueil",
+      this.signInRedirect(),
     );
   }
 

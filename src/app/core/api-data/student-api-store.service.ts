@@ -37,12 +37,12 @@ export class StudentApiStoreService {
 
   constructor() {
     effect(() => {
-      const cohort = this.workspace.cohort();
+      const cohortIds = this.workspace.contextCohorts().map((item) => item.apiId).join("|");
       const ready = this.workspace.remoteWorkspaceLoaded();
       const generation = ++this.generation;
       this.itemsSignal.set([]);
       this.loadError.set(false);
-      if (ready) void this.reload(generation, cohort?.apiId ?? "");
+      if (ready) void this.reload(generation, cohortIds);
     });
 
     effect(() => {
@@ -56,26 +56,27 @@ export class StudentApiStoreService {
 
   async reload(
     generation = this.generation,
-    cohortApiId = this.workspace.cohort()?.apiId ?? "",
+    cohortApiId = this.workspace.contextCohorts().map((item) => item.apiId).join("|"),
   ): Promise<boolean> {
     const request = ++this.request;
     this.loading.set(true);
     try {
       const rows = await firstValueFrom(this.profiles.directory());
+      const allowedIds = new Set(cohortApiId.split("|").filter(Boolean));
       let summaries: CohortLearnerDashboard[] = [];
-      if (cohortApiId) {
-        try {
-          const result = await firstValueFrom(this.reporting.cohortLearners(cohortApiId));
-          summaries = Array.isArray(result) ? result : [];
-        } catch {
+      if (allowedIds.size) {
+        const outcomes = await Promise.allSettled([...allowedIds].map((id) =>
+          firstValueFrom(this.reporting.cohortLearners(id)),
+        ));
+        summaries = outcomes.flatMap((outcome) => outcome.status === "fulfilled" && Array.isArray(outcome.value) ? outcome.value : []);
+        if (outcomes.some((outcome) => outcome.status === "rejected") && generation === this.generation && request === this.request)
           this.notifications.error("students.api.metricsFailed", "/stagiaires");
-        }
       }
       if (generation !== this.generation || request !== this.request) return false;
       const summaryByEnrollment = new Map(summaries.map((item) => [item.enrollmentId, item]));
-      this.itemsSignal.set((Array.isArray(rows) ? rows : []).map((row) =>
-        this.mapDirectory(row, summaryByEnrollment.get(this.text(row?.enrollmentId))),
-      ));
+      this.itemsSignal.set((Array.isArray(rows) ? rows : [])
+        .filter((row) => allowedIds.has(this.text(row?.cohortId)))
+        .map((row) => this.mapDirectory(row, summaryByEnrollment.get(this.text(row?.enrollmentId)))));
       this.loadError.set(false);
       return true;
     } catch {

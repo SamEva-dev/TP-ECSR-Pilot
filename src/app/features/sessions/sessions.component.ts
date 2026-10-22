@@ -9,6 +9,7 @@ import type {
   SessionModality,
 } from "../../core/models/sessions.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
 @Component({
   selector: "app-sessions",
@@ -18,6 +19,7 @@ import { ContextualTrainingDataService } from "../../core/workspace/contextual-t
 })
 export class SessionsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  private readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(TrainingSessionApiStoreService);
   readonly types: PedagogicalSessionType[] = [
     "classroom",
@@ -45,13 +47,18 @@ export class SessionsComponent {
   get trainers() { return this.store.trainers(); }
 
   get promotions(): Array<{ id: string; name: string }> {
-    const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id ?? "", name: cohort.name ?? "" }] : [];
+    return this.workspace.cohorts().map((cohort) => ({
+      id: cohort.id ?? "", name: cohort.name ?? "",
+    }));
   }
 
   constructor() {
     effect(() => {
-      this.promotionId = this.contextData.cohort()?.id ?? "";
+      const options = this.promotions;
+      if (!options.some((item) => item.id === this.promotionId)) {
+        const selected = this.contextData.cohort()?.id ?? "";
+        this.promotionId = options.some((item) => item.id === selected) ? selected : "";
+      }
       const trainers = this.store.trainers();
       if (!this.trainer || !trainers.some((item) => item.id === this.trainer)) this.trainer = trainers[0]?.id ?? "";
     });
@@ -111,7 +118,8 @@ export class SessionsComponent {
   }
 
   async createSession(): Promise<void> {
-    if (!this.theme.trim() || !this.promotionId) return;
+    if (!this.theme.trim() || !this.promotions.some((item) => item.id === this.promotionId) ||
+        (this.trainer && !this.trainers.some((item) => item.id === this.trainer))) return;
     const created = await this.store.create({
       cohortId: this.promotionId,
       date: this.date ?? "",

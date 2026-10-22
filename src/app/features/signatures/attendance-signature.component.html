@@ -1,0 +1,39 @@
+<section class="mx-auto max-w-[950px] space-y-4">
+  <a routerLink="/presences" class="text-[13px] font-semibold text-[#245c97]">{{ 'signatures.attendance.back' | t }}</a>
+  <h1 class="text-[23px] font-bold">{{ 'signatures.attendance.title' | t }}</h1>
+  @if (loading()) { <p>{{ 'signatures.observations.loading' | t }}</p> }
+  @else if (error() || !document()) {
+    <p class="rounded-xl border p-5 text-[13px]" role="alert">{{ 'signatures.errors.load' | t }}</p>
+  } @else if (document(); as record) {
+    <article class="space-y-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <p class="text-[12px] text-[#748094]">{{ 'signatures.observations.reference' | t }} : {{ record.envelope.id }}</p>
+      <p class="break-all text-[11px] font-mono">{{ record.envelope.contentSha256 }}</p>
+      <p class="text-[12px] font-semibold">{{ 'signatures.status.' + record.envelope.status | t }}</p>
+      @if (attendance(); as item) {
+        <h2 class="text-[18px] font-semibold">{{ item.Title || '' }}</h2>
+        <dl class="grid gap-3 text-[13px] sm:grid-cols-2">
+          <div><dt class="font-semibold">{{ 'signatures.attendance.sessionStart' | t }}</dt><dd>{{ item.StartsAtUtc || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.sessionEnd' | t }}</dt><dd>{{ item.EndsAtUtc || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.status' | t }}</dt><dd>{{ item.Status || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.arrival' | t }}</dt><dd>{{ item.ArrivalAtUtc || '—' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.departure' | t }}</dt><dd>{{ item.DepartureAtUtc || '—' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.present' | t }}</dt><dd>{{ item.PresentMinutes ?? 0 }} min</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.attendance.missed' | t }}</dt><dd>{{ item.MissedMinutes ?? 0 }} min</dd></div>
+        </dl>
+      }
+      <p class="rounded-[12px] bg-[#f1f4f8] p-4 text-[13px]">{{ 'signatures.attendance.disclaimer' | t }}</p>
+      @if (record.responseComment) { <p class="rounded-xl border p-3 text-[13px]">{{ record.responseComment }}</p> }
+      @if (record.canRespond) {
+        <textarea class="min-h-[80px] w-full rounded-lg border border-[#dfe5ec] p-3 text-[13px]"
+          maxlength="2000" [value]="comment()" (input)="updateComment($event)"
+          [placeholder]="'signatures.attendance.comment' | t"></textarea>
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="rounded-lg bg-[#2a64a2] px-4 py-2 text-white disabled:opacity-50"
+            [disabled]="saving()" (click)="respond(true)">{{ 'signatures.attendance.confirm' | t }}</button>
+          <button type="button" class="rounded-lg border border-[#dfe5ec] px-4 py-2 disabled:opacity-50"
+            [disabled]="saving()" (click)="respond(false)">{{ 'signatures.attendance.contest' | t }}</button>
+        </div>
+      }
+    </article>
+  }
+</section>

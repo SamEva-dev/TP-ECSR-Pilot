@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { SiteApiStoreService } from "../../core/api-data/site-api-store.service";
+import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { TranslateService } from "../../core/i18n/translate.service";
@@ -22,6 +23,7 @@ export class SitesComponent {
   readonly access = inject(AccessPolicyService);
   readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(SiteApiStoreService);
+  private readonly referentialStore = inject(ReferentialApiStoreService);
   readonly query = signal("");
   readonly status = signal<"all" | SiteOperationalStatus>("all");
   readonly drawerOpen = signal(false);
@@ -89,6 +91,7 @@ export class SitesComponent {
       ? await this.store.update(current.id, value)
       : await this.store.create(this.workspace.organization()?.id ?? "", value);
     if (!saved) return;
+    await this.referentialStore.reload();
     this.drawerOpen.set(false);
     this.editingSite.set(null);
   }

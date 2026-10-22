@@ -16,6 +16,7 @@ import type {
 import type { WorkMode } from "../../core/models/remote-work.models";
 import { SessionService } from "../../core/session/session.service";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
 const PLANNING_DAYS: Array<{ id: PlanningEvent["day"]; labelKey: string }> = [
   { id: "monday", labelKey: "planning.days.monday" },
@@ -33,6 +34,7 @@ const PLANNING_DAYS: Array<{ id: PlanningEvent["day"]; labelKey: string }> = [
 })
 export class PlanningComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  private readonly workspace = inject(WorkspaceContextService);
   readonly sessions = inject(TrainingSessionApiStoreService);
   readonly session = inject(SessionService);
   readonly teamWorkModes = computed(() =>
@@ -48,8 +50,9 @@ export class PlanningComponent {
   readonly type = signal<"all" | PlanningType>("all");
   readonly view = signal<"day" | "week" | "month">("week");
   readonly promotions = computed(() => {
-    const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id ?? "", name: cohort.name ?? "" }] : [];
+    return this.workspace.cohorts().map((cohort) => ({
+      id: cohort.id ?? "", name: cohort.name ?? "",
+    }));
   });
 
   readonly typeLegend: PlanningType[] = [
@@ -65,7 +68,9 @@ export class PlanningComponent {
   readonly filteredEvents = computed(() => {
     const promotionId = this.promotionId();
     const type = this.type();
+    const eligible = new Set(this.promotions().map((cohort) => cohort.id));
     return this.sessions.planningEvents().filter((event) => {
+      if (!eligible.has(event.promotionId ?? "")) return false;
       const promotionMatch =
         promotionId === "all" || (event.promotionId ?? "") === promotionId;
       const typeMatch = type === "all" || event.type === type;

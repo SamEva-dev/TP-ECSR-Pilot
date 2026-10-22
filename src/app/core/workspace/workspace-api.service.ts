@@ -26,6 +26,7 @@ export interface WorkspaceSiteApi {
   phone: string;
   email: string;
   manager: string;
+  managerAuthGateUserId?: string | null;
   status: "active" | "attention" | "inactive" | string;
   active: boolean;
 }
@@ -120,7 +121,7 @@ export function normalizeWorkspaceBootstrapResponse(
         code: text(x["code"]), name: text(x["name"]), city: text(x["city"]),
         address: text(x["address"]), postalCode: text(x["postalCode"]),
         phone: text(x["phone"]), email: text(x["email"]),
-        manager: text(x["manager"]), status: text(x["status"]),
+        manager: text(x["manager"]), managerAuthGateUserId: text(x["managerAuthGateUserId"]) || null, status: text(x["status"]),
         active: x["active"] === true,
       }))
       .filter((x) => !!x.id && !!x.key),

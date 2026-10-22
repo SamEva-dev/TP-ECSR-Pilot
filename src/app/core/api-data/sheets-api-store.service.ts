@@ -90,7 +90,7 @@ export class SheetsApiStoreService {
 
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
-      const cohortApiId = this.text(this.workspace.cohort()?.apiId);
+      const cohortApiIds = this.contextCohortIds();
       const selfOnly = this.session.role() === "stagiaire";
       const generation = ++this.contextGeneration;
 
@@ -100,8 +100,8 @@ export class SheetsApiStoreService {
       this.loadError.set(false);
       this.topicsError.set(false);
 
-      if (!ready || (!selfOnly && !cohortApiId)) return;
-      void this.loadLearners(cohortApiId, selfOnly, generation);
+      if (!ready || (!selfOnly && !cohortApiIds.length)) return;
+      void this.loadLearners(cohortApiIds, selfOnly, generation);
     });
 
     effect(() => {
@@ -217,24 +217,50 @@ export class SheetsApiStoreService {
     }
   }
 
+  private contextCohortIds(): string[] {
+    const selected = this.text(this.workspace.cohort()?.apiId);
+    if (selected) return [selected];
+    const site = this.workspace.site();
+    const cohorts = this.workspace.program()
+      ? this.workspace.cohorts()
+      : site
+        ? this.workspace.siteCohorts(site.id)
+        : this.workspace.sites().flatMap((item) => this.workspace.siteCohorts(item.id));
+    return [...new Set(cohorts.map((row) => this.text(row?.apiId)).filter(Boolean))];
+  }
+
   private async loadLearners(
-    cohortApiId: string,
+    cohortApiIds: string[],
     selfOnly: boolean,
     generation: number,
   ): Promise<void> {
     this.loading.set(true);
     try {
-      const rows = selfOnly
-        ? [await firstValueFrom(this.api.self())]
-        : await firstValueFrom(this.api.cohortLearners(cohortApiId));
+      const outcomes = selfOnly
+        ? [{ status: "fulfilled" as const, value: [await firstValueFrom(this.api.self())] }]
+        : await Promise.allSettled(
+            cohortApiIds.map((id) => firstValueFrom(this.api.cohortLearners(id))),
+          );
+      const failed = outcomes.some((result) => result.status === "rejected");
+      const rows = outcomes.flatMap((result) =>
+        result.status === "fulfilled" && Array.isArray(result.value)
+          ? result.value
+          : [],
+      );
       if (generation !== this.contextGeneration) return;
 
       this.learnersSignal.set(
-        (Array.isArray(rows) ? rows : []).map((row) =>
-          this.normalizeLearner(row),
+        Array.from(
+          new Map(
+            rows.map((row) => {
+              const learner = this.normalizeLearner(row);
+              return [learner.enrollmentId, learner] as const;
+            }).filter(([id]) => Boolean(id)),
+          ).values(),
         ),
       );
-      this.loadError.set(false);
+      this.loadError.set(failed);
+      if (failed) this.notifications.error("sheets.real.rosterFailed", "/fiches");
 
       const current = this.selectedEnrollmentSignal();
       const selected = this.learnersSignal().some(

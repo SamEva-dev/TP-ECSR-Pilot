@@ -105,6 +105,10 @@ export class ProgramApiStoreService {
         responsibleTrainerAuthGateUserId: this.nullableText(value.responsibleTrainerAuthGateUserId),
         responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
+      const requestedResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
+      if (requestedResponsible && created?.id) {
+        await this.api.assignResponsible(this.text(created.id), requestedResponsible);
+      }
       this.programsSignal.update((items) => [...items, this.map(created)]);
       const currentSite = this.workspace.site();
       if (currentSite?.apiId && created?.id) {
@@ -145,7 +149,20 @@ export class ProgramApiStoreService {
         responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
 
+      // Updating program metadata does not update the responsible in the backend.
+      // Reassignment is a distinct command with its own membership checks.
+      const nextResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
+      const previousResponsible = this.text(current.responsibleTrainerAuthGateUserId).trim();
+      if (nextResponsible !== previousResponsible) {
+        if (!nextResponsible) throw new Error("A responsible trainer is required");
+        await this.api.assignResponsible(current.apiId, nextResponsible);
+      }
       const mapped = this.map(saved);
+      if (nextResponsible !== previousResponsible) {
+        mapped.responsibleTrainerAuthGateUserId = nextResponsible;
+        mapped.responsibleTrainerDisplayName = this.text(value.responsibleTrainerDisplayName);
+        mapped.responsibleTrainerActive = true;
+      }
       this.programsSignal.update((items) =>
         items.map((item) =>
           item.id === id

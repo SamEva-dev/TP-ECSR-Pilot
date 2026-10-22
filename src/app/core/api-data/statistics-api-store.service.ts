@@ -324,7 +324,7 @@ export class StatisticsApiStoreService {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const role = this.session.role();
       const cohortRows = this.workspace
-        .cohorts()
+        .contextCohorts()
         .map((cohort) => ({
           id: this.text(cohort.id),
           apiId: this.text(cohort.apiId),
@@ -366,7 +366,7 @@ export class StatisticsApiStoreService {
       return cohortApiId ? this.loadStudent(generation, cohortApiId) : true;
     }
     const cohorts = this.workspace
-      .cohorts()
+      .contextCohorts()
       .map((cohort) => ({
         id: this.text(cohort.id),
         apiId: this.text(cohort.apiId),

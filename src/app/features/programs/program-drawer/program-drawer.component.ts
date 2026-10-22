@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { firstValueFrom } from "rxjs";
 import { PedagoraAccessApiService, type ProductAccount } from "../../../core/access/pedagora-access-api.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { TranslateService } from "../../../core/i18n/translate.service";
@@ -65,7 +64,7 @@ export class ProgramDrawerComponent {
 
   private async loadTrainers(): Promise<void> {
     try {
-      const rows = await firstValueFrom(this.accessApi.trainers());
+      const rows = await this.accessApi.membersWithRole("pedagogical_manager");
       this.trainers.set((Array.isArray(rows) ? rows : []).filter(x => x.status === "Active"));
     } catch { this.trainers.set([]); }
   }
@@ -78,6 +77,7 @@ export class ProgramDrawerComponent {
       return;
     }
     const raw = this.form.getRawValue();
+    if (raw.responsibleTrainerAuthGateUserId && !this.trainers().some(x => x.id === raw.responsibleTrainerAuthGateUserId)) return;
     const trainer = this.trainers().find((x) => x.id === raw.responsibleTrainerAuthGateUserId);
     this.saved.emit({ ...raw, responsibleTrainerDisplayName: trainer ? `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim() : "", enabledModules: this.selectedModules() });
   }

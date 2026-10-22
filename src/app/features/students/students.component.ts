@@ -11,6 +11,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type { StudentStatus } from "../../core/models/app.models";
 import type { StudentDirectoryItem } from "../../core/models/students.models";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 import {
   AddStudentDrawerComponent,
@@ -30,6 +31,7 @@ import {
 })
 export class StudentsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  private readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(StudentApiStoreService);
   readonly drawerOpen = signal(false);
   readonly creatingStudent = signal(false);
@@ -39,8 +41,7 @@ export class StudentsComponent {
   readonly status = signal<"all" | StudentStatus>("all");
 
   readonly promotions = computed(() => {
-    const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id ?? "", name: cohort.name ?? "" }] : [];
+    return this.workspace.contextCohorts().map((cohort) => ({ id: cohort.apiId ?? "", name: cohort.name ?? "" }));
   });
 
   readonly students = computed(() => this.store.students());

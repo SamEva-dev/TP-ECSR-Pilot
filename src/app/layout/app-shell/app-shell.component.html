@@ -1,6 +1,7 @@
 <div class="min-h-screen bg-[#f5f8fc] text-[#10182b]">
   <aside
     class="fixed inset-y-0 left-0 z-40 hidden w-[260px] flex-col bg-[#1d497d] px-[18px] py-6 text-white lg:flex"
+    [style.background-color]="publishedTheme()?.primaryColor ?? null"
   >
     <a [routerLink]="homePath()" class="block min-w-0 px-1">
       <app-program-logo />
@@ -53,6 +54,7 @@
     ></button>
     <aside
       class="fixed inset-y-0 left-0 z-50 flex w-[290px] flex-col bg-[#1d497d] px-[18px] py-6 text-white shadow-2xl lg:hidden"
+      [style.background-color]="publishedTheme()?.primaryColor ?? null"
     >
       <div class="flex items-center justify-between">
         <a

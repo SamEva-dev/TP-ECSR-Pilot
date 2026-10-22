@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, u
 import { FormsModule } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
+import { StudentApiStoreService } from "../../core/api-data/student-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type { AccessAccount, AccessPermissionKey } from "../../core/access/access.models";
 import { PedagoraAccessApiService, type ProductAccount } from "../../core/access/pedagora-access-api.service";
@@ -20,6 +21,7 @@ import { AccessAssignmentDrawerComponent } from "./access-assignment-drawer/acce
 })
 export class AccessComponent {
   private readonly api = inject(PedagoraAccessApiService);
+  private readonly studentStore = inject(StudentApiStoreService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly accessPolicy = inject(AccessPolicyService);
   private readonly realtime = inject(RealtimeService);
@@ -294,6 +296,24 @@ export class AccessComponent {
     const lastName = this.inviteLastName.trim();
     const email = this.inviteEmail.trim();
     if (!firstName || !lastName || !email) return;
+    if (this.inviteRole === "student") {
+      // Use exactly the same invitation/receipt flow as the Stagiaires screen.
+      // The access form has no cohort selector: never pick an arbitrary promotion.
+      const cohort = this.workspace.cohort();
+      if (!cohort?.apiId || !this.workspace.cohorts().some((item) => item.id === cohort.id && item.apiId === cohort.apiId)) {
+        this.notifications.error("students.api.invalidContext", "/acces");
+        return;
+      }
+      const receipt = await this.studentStore.create({
+        firstName, lastName, email,
+        phone: "", birthDate: "", promotionId: cohort.id, startDate: "",
+      });
+      if (!receipt) return; // Never display a false success or clear a failed form.
+      this.inviteFirstName = ""; this.inviteLastName = ""; this.inviteEmail = ""; this.inviteRole = "trainer";
+      await this.reload(false);
+      this.selectedId.set(this.accounts().find((account) => account.email.toLowerCase() === receipt.email.toLowerCase())?.id ?? "");
+      return;
+    }
     try {
       const created = await firstValueFrom(this.api.invite({ firstName, lastName, email, role: this.inviteRole }));
       this.inviteFirstName = ""; this.inviteLastName = ""; this.inviteEmail = ""; this.inviteRole = "trainer";

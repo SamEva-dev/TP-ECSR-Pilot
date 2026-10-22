@@ -78,6 +78,12 @@ export class ProgramCatalogApiService {
       ),
     );
   }
+  assignResponsible(id: string, authGateUserId: string) {
+    return firstValueFrom(this.http.put<ProgramApiDto>(
+      `${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}/responsible`,
+      { authGateUserId },
+    ));
+  }
   delete(id: string) {
     return firstValueFrom(
       this.http.delete<void>(`${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}`),

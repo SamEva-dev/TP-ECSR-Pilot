@@ -23,6 +23,7 @@ import { AuthGateService } from "../../core/session/auth-gate.service";
 import { SessionService } from "../../core/session/session.service";
 import { ApplicationNotificationService } from "../../core/notifications/application-notification.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { PublishedBrandingService } from "../../core/branding/published-branding.service";
 import { ProgramLogoComponent } from "../../shared/branding/program-logo.component";
 import { ContextSwitcherComponent } from "../../shared/workspace/context-switcher.component";
 
@@ -53,6 +54,8 @@ export class AppShellComponent {
   private readonly authGate = inject(AuthGateService);
   private readonly notifications = inject(ApplicationNotificationService);
   readonly workspace = inject(WorkspaceContextService);
+  readonly publishedBranding = inject(PublishedBrandingService);
+  readonly publishedTheme = this.publishedBranding.configuration;
   readonly access = inject(AccessPolicyService);
   readonly attention = inject(AttentionService);
   private readonly globalSearch = inject(GlobalSearchService);
@@ -94,6 +97,9 @@ export class AppShellComponent {
   );
 
   constructor() {
+    effect(() => {
+      void this.publishedBranding.load(this.workspace.organization()?.apiId ?? "");
+    });
     effect(() => {
       const notificationId = this.attention.lastApplicationNotificationId();
       if (!notificationId) return;

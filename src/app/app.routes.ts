@@ -24,6 +24,23 @@ export const routes: Routes = [
       ),
     children: [
       {
+        path: 'signatures/centre',
+        canActivate: [roleGuard],
+        data: { permission: 'signatures.view' },
+        loadComponent: () => import('./features/signatures/signature-center.component')
+          .then(m => m.SignatureCenterComponent),
+      },
+      {
+        path: 'signatures/attendance/:id',
+        loadComponent: () => import('./features/signatures/attendance-signature.component')
+          .then(m => m.AttendanceSignatureComponent),
+      },
+      {
+        path: 'signatures/:id',
+        loadComponent: () => import('./features/signatures/observation-signature.component')
+          .then(m => m.ObservationSignatureComponent),
+      },
+      {
         path: "accueil",
         canActivate: [roleGuard],
         data: { permission: "home.view" },
@@ -306,6 +323,12 @@ export const routes: Routes = [
           import("./features/access/access.component").then(
             (m) => m.AccessComponent,
           ),
+      },
+      {
+        path: "administration/identite-visuelle",
+        canActivate: [roleGuard],
+        data: { permission: "administration.manage" },
+        loadComponent: () => import("./features/administration/branding/branding-studio.component").then(m => m.BrandingStudioComponent),
       },
       {
         path: "administration/fiches",

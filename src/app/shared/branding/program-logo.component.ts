@@ -6,6 +6,7 @@ import {
   input,
 } from "@angular/core";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { PublishedBrandingService } from "../../core/branding/published-branding.service";
 import { brandingForProgram } from "./program-branding.config";
 
 @Component({
@@ -15,18 +16,23 @@ import { brandingForProgram } from "./program-branding.config";
     <span class="flex min-w-0 items-center gap-3">
       <span
         [class]="iconContainerClass()"
-        [style.background]="branding().accentColor"
+        [style.background]="organizationBrand()?.secondaryColor ?? branding().accentColor"
         [attr.title]="workspace.program()?.name ?? branding().brandName"
       >
-        <i
-          [class]="'ph ' + branding().icon + ' text-[20px]'"
-          aria-hidden="true"
-        ></i>
+        @if (organizationLogo(); as logo) {
+          <img [src]="logo" [alt]="organizationBrand()?.name || 'Logo'" class="max-h-full max-w-full object-contain" />
+        } @else {
+          <i [class]="'ph ' + branding().icon + ' text-[20px]'" aria-hidden="true"></i>
+        }
       </span>
 
       <span [class]="labelClass()">
-        <span class="truncate">{{ branding().brandName }}</span>
-        <span class="shrink-0 text-[#f8a11a]">Pilot</span>
+        @if (organizationBrand()?.name) {
+          <span class="truncate">{{ organizationBrand()?.name }}</span>
+        } @else {
+          <span class="truncate">{{ branding().brandName }}</span>
+          <span class="shrink-0 text-[#f8a11a]">Pilot</span>
+        }
       </span>
     </span>
   `,
@@ -34,6 +40,9 @@ import { brandingForProgram } from "./program-branding.config";
 })
 export class ProgramLogoComponent {
   readonly workspace = inject(WorkspaceContextService);
+  readonly publishedBranding = inject(PublishedBrandingService);
+  readonly organizationBrand = this.publishedBranding.configuration;
+  readonly organizationLogo = computed(() => this.publishedBranding.assetUrl(this.organizationBrand()?.logoAssetId));
   readonly compact = input(false);
   readonly theme = input<"dark" | "light">("dark");
   readonly branding = computed(() =>

@@ -28,7 +28,7 @@ export class ReferentialVersionDrawerComponent {
   readonly effectiveFrom = signal("");
   readonly status = signal<ReferentialVersionFormValue["status"]>("draft");
 
-  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || this.referentials()[0]?.programId || "");
+  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || this.programStore.programs()[0]?.id || "");
   readonly sources = computed(() => {
     const selectedId = this.effectiveProgramId();
     const selectedProgram = this.programStore.programs().find(
@@ -70,7 +70,17 @@ export class ReferentialVersionDrawerComponent {
 
   initialise(): void {
     const source = this.referentials().find((item) => item.id === this.defaultSourceId()) ?? this.referentials()[0];
-    if (!source) return;
+    if (!source) {
+      // A program may exist without a version in the loaded catalogue. The
+      // selection must still be initialized; the API cannot clone a missing source.
+      this.programId.set(this.programStore.programs()[0]?.id ?? "");
+      this.sourceId.set("");
+      this.version.set("");
+      this.code.set("");
+      this.effectiveFrom.set("");
+      this.status.set("draft");
+      return;
+    }
     const matchingProgram = this.programStore.programs().find(
       (program) => program.id === source.programId || program.apiId === source.programApiId,
     );
@@ -84,7 +94,10 @@ export class ReferentialVersionDrawerComponent {
 
   submit(): void {
     const sourceId = this.sourceId() || this.sources()[0]?.id || "";
-    if (!sourceId || !this.version().trim() || !this.effectiveFrom()) return;
+    const source = this.sources().find((item) => item.id === sourceId);
+    // Creating a version is a clone of an existing referential. Never send a
+    // version from another training program or a fabricated source identifier.
+    if (!this.effectiveProgramId() || !source || !this.version().trim() || !this.effectiveFrom()) return;
     this.saved.emit({
       programId: this.effectiveProgramId(),
       sourceReferentialId: sourceId,

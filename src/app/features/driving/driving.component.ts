@@ -12,6 +12,9 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type { DrivingHistoryItem, DrivingLevel } from "../../core/models/driving.models";
 import { SessionService } from "../../core/session/session.service";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
+import { firstValueFrom } from 'rxjs';
+import { SignatureApiService, type DailyObservationSignatureCandidate } from '../../core/signatures/signature-api.service';
+import { ApplicationNotificationService } from '../../core/notifications/application-notification.service';
 
 const EMPTY_HISTORY: DrivingHistoryItem = {
   id: "",
@@ -37,6 +40,79 @@ export class DrivingComponent {
   readonly sessionService = inject(SessionService);
   readonly store = inject(DrivingApiStoreService);
   readonly accessPolicy = inject(AccessPolicyService);
+  private readonly signatureApi = inject(SignatureApiService);
+  private readonly notifications = inject(ApplicationNotificationService);
+  readonly dailyCandidates = signal<DailyObservationSignatureCandidate[]>([]);
+  readonly selectedForDailySend = signal<ReadonlySet<string>>(new Set());
+  readonly dailyDate = signal(new Date().toISOString().slice(0, 10));
+  readonly dailyBusy = signal(false);
+  // Les observations quotidiennes nécessitent DEUX permissions côté API.
+  readonly canLoadDailyObservations = computed(() => {
+    const session = this.sessionService.session();
+    if (!session || this.isStudent()) return false;
+    if (session.authMode !== "authgate") {
+      return this.accessPolicy.can("driving.view") && this.accessPolicy.can("signatures.view");
+    }
+    const permissions = new Set(session.permissions ?? []);
+    return (permissions.has("pedagora.signatures.request") || permissions.has("signatures.request"))
+      && (permissions.has("pedagora.driving.view") || permissions.has("driving.view"));
+  });
+  readonly dailyBatchResult = signal<{sent: number; failed: number} | null>(null);
+  private dailyGeneration = 0;
+
+
+  updateDailyDate(event: Event): void {
+    this.dailyDate.set((event.target as HTMLInputElement).value);
+    void this.loadDailyCandidates();
+  }
+
+  async loadDailyCandidates(): Promise<void> {
+    const generation = ++this.dailyGeneration;
+    this.dailyCandidates.set([]);
+    this.selectedForDailySend.set(new Set());
+    if (!this.canLoadDailyObservations() || !this.dailyDate()) return;
+    try {
+      const rows = await firstValueFrom(this.signatureApi.myDailyObservations(this.dailyDate()));
+      if (generation === this.dailyGeneration) this.dailyCandidates.set(Array.isArray(rows) ? rows : []);
+    } catch {
+      if (generation === this.dailyGeneration) this.notifications.error('signatures.errors.load', '/conduite');
+    }
+  }
+
+  toggleDailyCandidate(sourceId: string, checked: boolean): void {
+    if (this.dailyBusy()) return;
+    this.selectedForDailySend.update((old) => {
+      const next = new Set(old);
+      if (checked) next.add(sourceId); else next.delete(sourceId);
+      return next;
+    });
+  }
+
+  async sendDailySelection(): Promise<void> {
+    if (this.dailyBusy() || !this.canLoadDailyObservations()) return;
+    const selected = this.dailyCandidates().filter((item) => item.signatureStatus === 'not-requested'
+      && this.selectedForDailySend().has(item.sourceId));
+    if (!selected.length) return;
+    this.dailyBusy.set(true);
+    this.dailyBatchResult.set(null);
+    let sent = 0, failed = 0;
+    try {
+      for (const candidate of selected) {
+        try {
+          const draft = await firstValueFrom(this.signatureApi.createDraft({
+            sourceType: 'pedagogical-observation',
+            sourceId: candidate.sourceId, enrollmentId: candidate.enrollmentId,
+          }));
+          if (!draft?.id) throw new Error('Invalid envelope');
+          await firstValueFrom(this.signatureApi.requestObservation(draft.id));
+          sent++;
+        } catch { failed++; }
+      }
+      this.dailyBatchResult.set({sent, failed});
+      if (failed) this.notifications.error('signatures.errors.request', '/conduite');
+      await this.loadDailyCandidates();
+    } finally { this.dailyBusy.set(false); }
+  }
 
   get students() {
     return this.store.students();
@@ -86,6 +162,15 @@ export class DrivingComponent {
   );
 
   constructor() {
+    effect(() => {
+      // Rafraîchir à l'arrivée/changement de la session AuthGate ; invalider les anciennes réponses.
+      if (this.canLoadDailyObservations()) void this.loadDailyCandidates();
+      else {
+        ++this.dailyGeneration;
+        this.dailyCandidates.set([]);
+        this.selectedForDailySend.set(new Set());
+      }
+    });
     effect(() => {
       const students = this.store.students();
       const current = this.selectedStudentId();

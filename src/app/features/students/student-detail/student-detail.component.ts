@@ -21,6 +21,7 @@ import { WorkspaceContextService } from '../../../core/workspace/workspace-conte
 import { ApplicationNotificationService } from '../../../core/notifications/application-notification.service';
 import { RealtimeService } from '../../../core/realtime/realtime.service';
 import { DocumentApiService } from '../../../core/documents/document-api.service';
+import { SignatureApiService, type SignatureEnvelope } from '../../../core/signatures/signature-api.service';
 
 interface AuditViewItem {
   id: string;
@@ -60,6 +61,13 @@ export class StudentDetailComponent {
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly realtime = inject(RealtimeService);
   private readonly documentsApi = inject(DocumentApiService);
+  private readonly signatureApi = inject(SignatureApiService);
+  readonly observationSignatures = signal<SignatureEnvelope[]>([]);
+  readonly checkedObservations = signal<ReadonlySet<string>>(new Set<string>());
+  readonly sendingObservations = signal(false);
+  readonly lastSignatureBatch = signal<{sent: number; failed: number} | null>(null);
+  private signatureLoadGeneration = 0;
+
 
   private readonly detail = signal<LearnerDetailReport | null>(null);
   readonly selectedTab = signal<StudentDetailTab>('overview');
@@ -122,10 +130,78 @@ export class StudentDetailComponent {
           ? await firstValueFrom(this.reporting.learnerDetail(this.requestedId))
           : null;
       this.detail.set(result ?? null);
+      const enrollmentId = result?.enrollmentId ?? '';
+      await this.loadObservationSignatures(enrollmentId);
     } catch {
       this.detail.set(null);
+      this.observationSignatures.set([]);
       this.notifications.error('studentDetail.api.loadFailed', self ? '/accueil' : `/stagiaires/${this.requestedId}`);
     }
+  }
+
+  private async loadObservationSignatures(enrollmentId: string): Promise<void> {
+    const generation = ++this.signatureLoadGeneration;
+    this.observationSignatures.set([]);
+    this.checkedObservations.set(new Set());
+    if (!enrollmentId || /^0{8}-0{4}-0{4}-0{4}-0{12}$/i.test(enrollmentId)) return;
+    try {
+      const rows = await firstValueFrom(this.signatureApi.observationHistory(enrollmentId));
+      if (generation === this.signatureLoadGeneration && this.student.enrollmentId === enrollmentId)
+        this.observationSignatures.set(Array.isArray(rows) ? rows : []);
+    } catch {
+      if (generation === this.signatureLoadGeneration)
+        this.notifications.error('signatures.errors.load', `/stagiaires/${this.requestedId}`);
+    }
+  }
+
+  observationSignature(evaluationId: string): SignatureEnvelope | undefined {
+    return this.observationSignatures().find((entry) => entry.sourceId === evaluationId);
+  }
+
+  toggleObservation(evaluationId: string, checked: boolean): void {
+    if (this.isSelfView() || this.sendingObservations()) return;
+    this.checkedObservations.update((old) => {
+      const next = new Set(old);
+      if (checked) next.add(evaluationId); else next.delete(evaluationId);
+      return next;
+    });
+  }
+
+  async sendObservation(evaluationId: string): Promise<void> {
+    if (this.isSelfView() || this.sendingObservations() || !evaluationId || !this.student.enrollmentId) return;
+    this.checkedObservations.set(new Set([evaluationId]));
+    await this.sendSelectedObservations();
+  }
+
+  async sendSelectedObservations(): Promise<void> {
+    const enrollmentId = this.student.enrollmentId;
+    const selected = [...this.checkedObservations()].filter((id) => this.drivingHistory.some((item) => item.id === id));
+    if (this.sendingObservations() || this.isSelfView() || !enrollmentId || selected.length === 0) return;
+    this.sendingObservations.set(true);
+    this.lastSignatureBatch.set(null);
+    const completed: string[] = [];
+    let failed = 0;
+    try {
+      // Independent envelopes: one failure must not block another trainee/observation.
+      for (const sourceId of selected) {
+        try {
+          const draft = await firstValueFrom(this.signatureApi.createDraft({
+            sourceType: 'pedagogical-observation', sourceId, enrollmentId,
+          }));
+          if (!draft?.id) throw new Error('Missing persisted signature ID');
+          await firstValueFrom(this.signatureApi.requestObservation(draft.id));
+          completed.push(sourceId);
+        } catch { failed++ }
+      }
+      this.checkedObservations.update((existing) => {
+        const updated = new Set(existing);
+        for (const id of completed) updated.delete(id);
+        return updated;
+      });
+      this.lastSignatureBatch.set({sent: completed.length, failed});
+      if (failed) this.notifications.error('signatures.errors.request', `/stagiaires/${this.requestedId}`);
+      await this.loadObservationSignatures(enrollmentId);
+    } finally { this.sendingObservations.set(false); }
   }
 
   selectTab(tab: StudentDetailTab): void { this.selectedTab.set(tab); }

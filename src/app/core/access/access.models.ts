@@ -25,6 +25,7 @@ export type AppPermission =
   | "sheets.view"
   | "skills.view"
   | "attendance.view"
+  | "signatures.view"
   | "internships.view"
   | "documents.view"
   | "certification.view"

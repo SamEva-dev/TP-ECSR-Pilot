@@ -3,9 +3,14 @@ import {
   Component,
   computed,
   effect,
+  untracked,
   inject,
   signal,
 } from "@angular/core";
+import { firstValueFrom } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { SignatureApiService, type SignatureEnvelope } from '../../core/signatures/signature-api.service';
+import { ApplicationNotificationService } from '../../core/notifications/application-notification.service';
 import { AttendanceApiStoreService } from "../../core/api-data/attendance-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
@@ -31,13 +36,21 @@ const EMPTY_STUDENT: AttendanceStudent = {
 
 @Component({
   selector: "app-attendance",
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, RouterLink],
   templateUrl: "./attendance.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceComponent {
   readonly sessionService = inject(SessionService);
   readonly attendance = inject(AttendanceApiStoreService);
+  private readonly signaturesApi = inject(SignatureApiService);
+  private readonly notifications = inject(ApplicationNotificationService);
+  readonly signatureHistory = signal<SignatureEnvelope[]>([]);
+  readonly mySignatures = signal<SignatureEnvelope[]>([]);
+  readonly selectedForSignature = signal<ReadonlySet<string>>(new Set<string>());
+  readonly sendingSignatures = signal(false);
+  readonly signatureBatchResult = signal<{ sent: number; failed: number } | null>(null);
+  private signatureLoadGeneration = 0;
   readonly students = signal<AttendanceStudent[]>([]);
   readonly saved = signal(false);
   readonly saving = signal(false);
@@ -47,6 +60,22 @@ export class AttendanceComponent {
   }
 
   constructor() {
+    effect(() => {
+      const sessionId = this.attendance.session().id;
+      // Invalidate the previous session's data synchronously to avoid cross-session leakage.
+      this.signatureHistory.set([]);
+      this.selectedForSignature.set(new Set<string>());
+      this.signatureBatchResult.set(null);
+      const generation = ++this.signatureLoadGeneration;
+      if (sessionId && this.canViewSignatures()) {
+        untracked(() => void this.loadSignatureHistory(sessionId, generation));
+      }
+      if (this.isStudent()) {
+        untracked(() => void this.loadMySignatures(generation));
+      } else {
+        this.mySignatures.set([]);
+      }
+    });
     effect(() => {
       this.students.set(
         this.attendance.students().map((student) => ({ ...student })),
@@ -65,7 +94,8 @@ export class AttendanceComponent {
   readonly visibleStudents = computed(() => {
     const students = this.students();
     if (!this.isStudent()) return students;
-    return [students[0] ?? EMPTY_STUDENT];
+    // Backend self-view contract yields at most one attendee. Never substitute another record.
+    return students.length === 1 ? [students[0]] : [];
   });
 
   readonly metrics = computed(() => {
@@ -86,6 +116,32 @@ export class AttendanceComponent {
     };
   });
 
+  readonly canViewSignatures = computed(() => {
+    const permissions = this.sessionService.session()?.permissions ?? [];
+    return !this.isStudent() && permissions.some((value) =>
+      /^(pedagora\.)?signatures\.view$/i.test(value));
+  });
+
+  readonly canRequestSignature = computed(() => {
+    const permissions = this.sessionService.session()?.permissions ?? [];
+    return !this.isStudent() && permissions.some((value) =>
+      /^(pedagora\.)?signatures\.request$/i.test(value));
+  });
+
+  readonly unsavedChanges = computed(() =>
+    JSON.stringify(this.students()) !== JSON.stringify(this.attendance.students()));
+
+  readonly readyForSignature = computed(() =>
+    this.canRequestSignature() && !this.saving() && !this.sendingSignatures() &&
+    !this.attendance.loading() && !this.attendance.loadError() &&
+    !this.unsavedChanges() && Boolean(this.session.id));
+
+  readonly signableStudents = computed(() =>
+    this.students().filter((student) => Boolean(student.id) &&
+      (student.status === 'present' || student.status === 'late') &&
+      this.attendance.students().some((row) => row.id === student.id && row.status === student.status) &&
+      !this.isRequested(student.id)));
+
   readonly studentMetrics = computed(() => {
     const student = this.visibleStudents()[0] ?? EMPTY_STUDENT;
     return {
@@ -96,6 +152,89 @@ export class AttendanceComponent {
     };
   });
 
+  isRequested(enrollmentId: string): boolean {
+    const envelope = this.signatureHistory().find((row) => row.enrollmentId === enrollmentId);
+    return envelope?.status === 'pending' || envelope?.status === 'viewed' || envelope?.status === 'signed';
+  }
+
+  statusForSignature(enrollmentId: string): string {
+    return this.signatureHistory().find((row) => row.enrollmentId === enrollmentId)?.status ?? '';
+  }
+
+  async loadSignatureHistory(sessionId: string, generation = this.signatureLoadGeneration): Promise<void> {
+    if (!this.canViewSignatures()) {
+      if (generation === this.signatureLoadGeneration) this.signatureHistory.set([]);
+      return;
+    }
+    try {
+      const rows = await firstValueFrom(this.signaturesApi.attendanceBySession(sessionId));
+      if (generation === this.signatureLoadGeneration && sessionId === this.session.id && this.canViewSignatures())
+        this.signatureHistory.set(Array.isArray(rows) ? rows : []);
+    } catch {
+      if (generation === this.signatureLoadGeneration) {
+        this.signatureHistory.set([]);
+        this.notifications.error('signatures.errors.load', '/presences');
+      }
+    }
+  }
+
+  async loadMySignatures(generation = this.signatureLoadGeneration): Promise<void> {
+    try {
+      const rows = await firstValueFrom(this.signaturesApi.myAttendance());
+      if (generation === this.signatureLoadGeneration && this.isStudent())
+        this.mySignatures.set(Array.isArray(rows) ? rows : []);
+    } catch {
+      if (generation === this.signatureLoadGeneration && this.isStudent()) {
+        this.mySignatures.set([]);
+        this.notifications.error('signatures.errors.load', '/presences');
+      }
+    }
+  }
+
+  toggleSignatureSelection(enrollmentId: string, checked: boolean): void {
+    if (!this.readyForSignature() || !this.signableStudents().some((s) => s.id === enrollmentId)) return;
+    this.selectedForSignature.update((current) => {
+      const next = new Set(current);
+      if (checked) next.add(enrollmentId); else next.delete(enrollmentId);
+      return next;
+    });
+  }
+
+  sendSelectedSignatures(): void {
+    void this.sendSignature([...this.selectedForSignature()]);
+  }
+
+  async sendSignature(enrollmentIds: string[]): Promise<void> {
+    if (!this.readyForSignature()) return;
+    const ids = [...new Set(enrollmentIds)].filter((id) =>
+      this.signableStudents().some((s) => s.id === id));
+    if (!ids.length) return;
+    const sessionId = this.session.id;
+    const generation = this.signatureLoadGeneration;
+    this.sendingSignatures.set(true);
+    this.signatureBatchResult.set(null);
+    let sent = 0, failed = 0;
+    try {
+      for (const enrollmentId of ids) {
+        try {
+          if (this.session.id !== sessionId || generation !== this.signatureLoadGeneration) break;
+          const draft = await firstValueFrom(this.signaturesApi.createDraft({
+            sourceType: 'attendance', sourceId: sessionId, enrollmentId,
+          }));
+          if (!draft?.id) throw new Error('SIGNATURE_DRAFT_ID_MISSING');
+          await firstValueFrom(this.signaturesApi.requestAttendance(draft.id));
+          sent++;
+        } catch { failed++; }
+      }
+      if (generation === this.signatureLoadGeneration && sessionId === this.session.id) {
+        this.signatureBatchResult.set({ sent, failed });
+        this.selectedForSignature.set(new Set<string>());
+        await this.loadSignatureHistory(sessionId, generation);
+        if (failed) this.notifications.error('signatures.errors.request', '/presences');
+      }
+    } finally { this.sendingSignatures.set(false); }
+  }
+
   initials(student: AttendanceStudent) {
     return `${this.text(student.firstName).charAt(0)}${this.text(student.lastName).charAt(0)}`.toUpperCase();
   }
@@ -105,7 +244,7 @@ export class AttendanceComponent {
   }
 
   setStatus(studentId: string, status: AttendanceStatus) {
-    if (!this.canEdit() || this.saving() || !studentId) return;
+    if (!this.canEdit() || this.saving() || this.sendingSignatures() || !studentId) return;
     const expectedHours = this.attendance.expectedHours();
     this.students.update((students) =>
       students.map((student) => {
@@ -141,7 +280,7 @@ export class AttendanceComponent {
     field: "arrival" | "departure" | "comment",
     event: Event,
   ) {
-    if (!this.canEdit() || this.saving() || !studentId) return;
+    if (!this.canEdit() || this.saving() || this.sendingSignatures() || !studentId) return;
     const value =
       (event.target as HTMLInputElement | HTMLTextAreaElement).value ?? "";
     this.students.update((students) =>
@@ -176,11 +315,16 @@ export class AttendanceComponent {
   }
 
   async save() {
-    if (!this.canEdit() || this.saving()) return;
+    if (!this.canEdit() || this.saving() || this.sendingSignatures()) return;
     this.saving.set(true);
     this.saved.set(false);
     try {
-      this.saved.set(await this.attendance.save(this.students()));
+      const success = await this.attendance.save(this.students());
+      this.saved.set(success);
+      if (success) {
+        this.selectedForSignature.set(new Set<string>());
+        if (this.session.id) await this.loadSignatureHistory(this.session.id);
+      }
     } finally {
       this.saving.set(false);
     }

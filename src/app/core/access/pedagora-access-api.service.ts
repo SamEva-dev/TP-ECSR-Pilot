@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
 import type { AccessPermissionKey } from "./access.models";
 import type { MembershipRole, MembershipScope, WorkspaceMembership } from "../models/workspace.models";
@@ -59,6 +60,29 @@ export class PedagoraAccessApiService {
   }
 
   trainers() { return this.http.get<ProductAccount[]>(`${this.url}/trainers`); }
+
+  /** Active, accepted organization members with the exact product role; never invitations. */
+  async membersWithRole(role: "pedagogical_manager" | "site_direction"): Promise<ProductAccount[]> {
+    const matches: ProductAccount[] = [];
+    let page = 1;
+    const pageSize = 100;
+    while (true) {
+      const response = await firstValueFrom(this.list(page, "", pageSize));
+      const items = Array.isArray(response?.items) ? response.items : [];
+      for (const account of items) {
+        const roles = [account.primaryRole, ...(account.roles ?? [])]
+          .filter((value): value is string => typeof value === "string")
+          .map(value => value.toLowerCase().replace(/[^a-z]/g, ""));
+        const expected = role === "pedagogical_manager" ? "pedagogicalmanager" : "sitedirection";
+        if (account.status === "Active" && !account.isInvitation && roles.some(value => value === expected || value === `pedagorapilot${expected}`))
+          matches.push(account);
+      }
+      if (!items.length || page * pageSize >= (response?.totalCount ?? 0)) break;
+      page++;
+    }
+    return [...new Map(matches.map(item => [item.id, item])).values()];
+  }
+
   invite(request: InviteProductAccountRequest) { return this.http.post<ProductAccount>(`${this.url}/invite`, request); }
   revokeInvitation(invitationId: string) { return this.http.delete<void>(`${this.url}/invitations/${encodeURIComponent(invitationId)}`); }
   setRole(userId: string, role: MembershipRole) { return this.http.put<void>(`${this.url}/${encodeURIComponent(userId)}/roles`, { roles: [role] }); }

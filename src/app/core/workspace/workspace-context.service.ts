@@ -166,6 +166,18 @@ export class WorkspaceContextService {
         };
       });
   }
+  /** Authorized cohort choices for the current workspace level. Never infer a cohort from a broader scope. */
+  contextCohorts(): any[] {
+    const level = this.activeLevel();
+    const selected = this.cohort();
+    if (level === "cohort") return selected && this.cohorts().some((item) => item.apiId === selected.apiId) ? [selected] : [];
+    const siteRows = level === "organization" ? this.sites() : this.site() ? [this.site()] : [];
+    const candidates = siteRows.flatMap((site) => this.siteCohorts(site.id));
+    const programId = this.program()?.id;
+    const filtered = level === "program" ? candidates.filter((item) => item.programId === programId) : candidates;
+    return [...new Map(filtered.filter((item) => item.apiId).map((item) => [item.apiId, item])).values()];
+  }
+
   activeOfferingForContext(): ProgramOffering | null {
     const site = this.site();
     const program = this.program();

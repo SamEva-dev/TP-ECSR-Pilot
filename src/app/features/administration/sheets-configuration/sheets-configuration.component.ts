@@ -18,7 +18,8 @@ import { WorkspaceContextService } from "../../../core/workspace/workspace-conte
 import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 
 type SheetCategory =
-  "rules" | "risk" | "vehicle" | "pedagogy" | "exam" | "mobility";
+  "rules" | "risk" | "vehicle" | "pedagogy" | "exam" | "mobility"
+  | "intersections" | "speed" | "permitsDocuments" | "vehicleRegulations" | "psychophysiology" | "substances" | "roadUsers" | "degradedEnvironment" | "mechanics" | "insurance" | "roadSafetyCulture";
 
 interface SheetCatalogItem {
   id: string;
@@ -168,6 +169,18 @@ export class SheetsConfigurationComponent {
       pedagogy: "bg-[#f0eaff] text-[#7652b5]",
       exam: "bg-[#ffe8e4] text-[#c94738]",
       mobility: "bg-[#e8f7f5] text-[#287e74]",
+      intersections: "bg-[#e6f2ff] text-[#2a64a2]",
+      speed: "bg-[#e6f2ff] text-[#2a64a2]",
+      permitsDocuments: "bg-[#e6f2ff] text-[#2a64a2]",
+      vehicleRegulations: "bg-[#e6f2ff] text-[#2a64a2]",
+      psychophysiology: "bg-[#e6f2ff] text-[#2a64a2]",
+      substances: "bg-[#e6f2ff] text-[#2a64a2]",
+      roadUsers: "bg-[#e6f2ff] text-[#2a64a2]",
+      degradedEnvironment: "bg-[#e6f2ff] text-[#2a64a2]",
+      mechanics: "bg-[#e6f2ff] text-[#2a64a2]",
+      insurance: "bg-[#e6f2ff] text-[#2a64a2]",
+      roadSafetyCulture: "bg-[#e6f2ff] text-[#2a64a2]",
+
     };
     return classes[category];
   }

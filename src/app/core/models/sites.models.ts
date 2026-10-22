@@ -12,6 +12,7 @@ export interface SiteProfile {
   phone: string;
   email: string;
   manager: string;
+  managerAuthGateUserId?: string | null;
   status: SiteOperationalStatus;
   students: number;
   trainers: number;
@@ -33,5 +34,6 @@ export interface SiteFormValue {
   phone: string;
   email: string;
   manager: string;
+  managerAuthGateUserId?: string | null;
   status: SiteOperationalStatus;
 }

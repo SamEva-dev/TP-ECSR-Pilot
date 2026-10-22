@@ -5,7 +5,7 @@ import { AuthRefreshService } from "./auth-refresh.service";
 import { AuthTokenStore } from "./auth-token.store";
 import { SessionService } from "./session.service";
 
-export const authGuard: CanActivateFn = async () => {
+export const authGuard: CanActivateFn = async (_route, state) => {
   const session = inject(SessionService);
   const tokens = inject(AuthTokenStore);
   const router = inject(Router);
@@ -23,5 +23,5 @@ export const authGuard: CanActivateFn = async () => {
 
   session.disconnect();
   tokens.clear();
-  return router.createUrlTree(["/connexion"]);
+  return router.createUrlTree(["/connexion"], { queryParams: { returnUrl: state.url.startsWith("/signatures/") ? state.url : undefined } });
 };

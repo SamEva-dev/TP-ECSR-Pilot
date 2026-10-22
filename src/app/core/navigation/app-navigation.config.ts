@@ -136,6 +136,13 @@ export const APP_NAV_ITEMS: readonly AppNavItem[] = [
     audiences: ["direction", "formateur", "stagiaire", "secretariat"],
   },
   {
+    path: "/signatures/centre",
+    labelKey: "nav.signaturesCenter",
+    icon: "ph-signature",
+    permission: "signatures.view",
+    audiences: ["direction", "formateur", "secretariat"],
+  },
+  {
     path: "/documents",
     labelKey: "nav.documents",
     icon: "ph-folder-open",

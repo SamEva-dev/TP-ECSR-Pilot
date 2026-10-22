@@ -74,6 +74,8 @@ export class CertificationApiStoreService {
   private readonly candidatesSignal = signal<CertificationCandidateApi[]>([]);
   private readonly selectedSessionIdSignal = signal("");
   private readonly selfEnrollmentIdSignal = signal("");
+  private contextLoadSequence = 0;
+  private candidateLoadSequence = 0;
 
   readonly loading = signal(false);
   readonly loadError = signal(false);
@@ -139,12 +141,15 @@ export class CertificationApiStoreService {
       const referentialVersionId = this.text(
         this.workspace.cohort()?.referentialVersionId,
       );
+      this.contextLoadSequence++;
+      this.candidateLoadSequence++;
       this.schemesSignal.set([]);
       this.sessionsSignal.set([]);
       this.candidatesSignal.set([]);
       this.selectedSessionIdSignal.set("");
       this.selfEnrollmentIdSignal.set("");
       this.loadError.set(false);
+      this.loading.set(false);
       if (ready && cohortApiId)
         void this.loadContext(cohortApiId, referentialVersionId);
     });
@@ -162,9 +167,14 @@ export class CertificationApiStoreService {
       this.workspace.cohort()?.referentialVersionId,
     );
     if (!cohortApiId) {
+      this.contextLoadSequence++;
+      this.candidateLoadSequence++;
       this.schemesSignal.set([]);
       this.sessionsSignal.set([]);
       this.candidatesSignal.set([]);
+      this.selectedSessionIdSignal.set("");
+      this.selfEnrollmentIdSignal.set("");
+      this.loading.set(false);
       return true;
     }
     return this.loadContext(cohortApiId, referentialVersionId, notify);
@@ -173,6 +183,8 @@ export class CertificationApiStoreService {
   async selectSession(sessionId: string): Promise<void> {
     const id = this.text(sessionId);
     this.selectedSessionIdSignal.set(id);
+    this.candidateLoadSequence++;
+    this.candidatesSignal.set([]);
     if (
       id &&
       this.sessionsSignal().some((item) => this.text(item?.id) === id)
@@ -323,6 +335,10 @@ export class CertificationApiStoreService {
     referentialVersionId: string,
     notify = true,
   ): Promise<boolean> {
+    const sequence = ++this.contextLoadSequence;
+    const isCurrent = () => sequence === this.contextLoadSequence &&
+      this.text(this.workspace.cohort()?.apiId) === cohortApiId &&
+      this.text(this.workspace.cohort()?.referentialVersionId) === referentialVersionId;
     this.loading.set(true);
     let ok = true;
     try {
@@ -330,6 +346,7 @@ export class CertificationApiStoreService {
         firstValueFrom(this.api.getSchemes(referentialVersionId || undefined)),
         firstValueFrom(this.api.getSessions(cohortApiId)),
       ]);
+      if (!isCurrent()) return false;
       this.schemesSignal.set(
         (Array.isArray(schemes) ? schemes : []).map((item) =>
           this.normalizeScheme(item),
@@ -346,9 +363,12 @@ export class CertificationApiStoreService {
         : this.text(this.sessionsSignal()[0]?.id);
       this.selectedSessionIdSignal.set(selected);
       await this.loadCandidates(selected, notify);
-      if (this.session.role() === "stagiaire") await this.loadSelfEnrollment();
+      if (!isCurrent()) return false;
+      if (this.session.role() === "stagiaire") await this.loadSelfEnrollment(cohortApiId);
+      if (!isCurrent()) return false;
       this.loadError.set(false);
     } catch {
+      if (!isCurrent()) return false;
       ok = false;
       this.schemesSignal.set([]);
       this.sessionsSignal.set([]);
@@ -360,7 +380,7 @@ export class CertificationApiStoreService {
           "/certification",
         );
     } finally {
-      this.loading.set(false);
+      if (sequence === this.contextLoadSequence) this.loading.set(false);
     }
     return ok;
   }
@@ -370,6 +390,11 @@ export class CertificationApiStoreService {
     notify: boolean,
     preserveOnError = false,
   ): Promise<void> {
+    const sequence = ++this.candidateLoadSequence;
+    const cohortId = this.text(this.workspace.cohort()?.apiId);
+    const isCurrent = () => sequence === this.candidateLoadSequence &&
+      this.text(this.workspace.cohort()?.apiId) === cohortId &&
+      this.selectedSessionIdSignal() === sessionId;
     if (!sessionId) {
       this.candidatesSignal.set([]);
       return;
@@ -378,14 +403,14 @@ export class CertificationApiStoreService {
       const candidates = await firstValueFrom(
         this.api.getCandidates(sessionId),
       );
-      if (this.selectedSessionIdSignal() !== sessionId) return;
+      if (!isCurrent()) return;
       this.candidatesSignal.set(
         (Array.isArray(candidates) ? candidates : []).map((item) =>
           this.normalizeCandidate(item),
         ),
       );
     } catch {
-      if (this.selectedSessionIdSignal() !== sessionId) return;
+      if (!isCurrent()) return;
       if (!preserveOnError) this.candidatesSignal.set([]);
       if (preserveOnError)
         this.notifications.error("certification.api.refreshFailed", "/certification");
@@ -397,11 +422,13 @@ export class CertificationApiStoreService {
     }
   }
 
-  private async loadSelfEnrollment(): Promise<void> {
+  private async loadSelfEnrollment(cohortId: string): Promise<void> {
     try {
       const self = await firstValueFrom(this.studentProfile.self());
+      if (this.text(this.workspace.cohort()?.apiId) !== cohortId) return;
       this.selfEnrollmentIdSignal.set(this.text(self?.enrollmentId));
     } catch {
+      if (this.text(this.workspace.cohort()?.apiId) !== cohortId) return;
       this.selfEnrollmentIdSignal.set("");
       this.notifications.error(
         "certification.api.loadFailed",

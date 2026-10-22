@@ -65,7 +65,7 @@ export class CreatePromotionDrawerComponent {
 
   readonly referentials = computed(() =>
     this.referentialStore.items().filter(
-      (item) => item.programId === this.programId() && item.status !== "archived",
+      (item) => (item.programId === this.programId() || item.programApiId === this.programId()) && item.status === "active",
     ),
   );
 
@@ -131,7 +131,9 @@ export class CreatePromotionDrawerComponent {
     if (!this.form.controls.referentialVersionId.value && this.referentials().length) {
       this.form.controls.referentialVersionId.setValue(this.referentials()[0].id);
     }
-    if (this.form.invalid || this.hasInvalidDates()) {
+    if (this.form.invalid || this.hasInvalidDates() ||
+        !this.referentials().some((version) => version.id === this.form.controls.referentialVersionId.value) ||
+        !this.team().some((member) => member.id === this.form.controls.managerUserId.value)) {
       this.form.markAllAsTouched();
       return;
     }
@@ -185,7 +187,7 @@ export class CreatePromotionDrawerComponent {
   private async loadTeam(): Promise<void> {
     this.teamLoading.set(true);
     try {
-      const page = await firstValueFrom(this.accessApi.trainers());
+      const page = await this.accessApi.membersWithRole("pedagogical_manager");
       const members = (page ?? [])
         .filter((account) => account.status === "Active" && !account.isInvitation)
         .map((account) => ({
@@ -198,7 +200,7 @@ export class CreatePromotionDrawerComponent {
       this.team.set(members);
       const current = this.form.controls.managerUserId.value;
       if (!current || !members.some((member) => member.id === current))
-        this.form.controls.managerUserId.setValue(members[0]?.id ?? "", { emitEvent: false });
+        this.form.controls.managerUserId.setValue("", { emitEvent: false });
     } catch {
       this.team.set([]);
       this.form.controls.managerUserId.setValue("", { emitEvent: false });
@@ -213,7 +215,7 @@ export class CreatePromotionDrawerComponent {
       startDate: "",
       endDate: "",
       studentCount: 0,
-      managerUserId: this.team()[0]?.id ?? "",
+      managerUserId: "",
       referentialVersionId: this.referentials()[0]?.id ?? "",
       status: "planned",
     });

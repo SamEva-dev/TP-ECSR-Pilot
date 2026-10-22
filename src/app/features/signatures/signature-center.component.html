@@ -1,0 +1,80 @@
+<section class="mx-auto max-w-[1180px] space-y-5">
+  <header class="flex flex-wrap items-center justify-between gap-3">
+    <div><h1 class="text-[23px] font-bold">{{ 'signatures.center.title' | t }}</h1>
+      <p class="text-[13px] text-[#748094]">{{ 'signatures.center.subtitle' | t }}</p></div>
+    <button type="button" class="rounded-lg border border-[#dfe5ec] px-4 py-2 text-[13px]" (click)="load()" [disabled]="pending()">{{ 'signatures.center.refresh' | t }}</button>
+  </header>
+  <article class="space-y-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+    <div class="flex flex-wrap gap-2 text-[12px]">
+      @for (state of ['pending', 'viewed', 'signed', 'declined', 'expired']; track state) {
+        <span class="rounded-lg bg-[#f1f4f8] px-3 py-2">{{ 'signatures.status.' + state | t }} : {{ data().statusCounts[state] ?? 0 }}</span>
+      }
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <label class="text-[12px] font-medium">{{ 'signatures.center.statusFilter' | t }}
+        <select class="ml-2 rounded-lg border border-[#dfe5ec] bg-white px-3 py-2" [value]="status()" (change)="chooseStatus($event)">
+          <option value="">{{ 'signatures.center.all' | t }}</option>
+          @for (state of ['draft', 'pending', 'viewed', 'signed', 'declined', 'expired', 'cancelled']; track state) {
+            <option [value]="state">{{ 'signatures.status.' + state | t }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex items-center gap-2 text-[12px]"><input type="checkbox" [checked]="team()" (change)="setTeam($event)" />{{ 'signatures.center.team' | t }}</label>
+      <span class="ml-auto text-[12px] text-[#748094]">{{ data().total }} {{ 'signatures.center.results' | t }}</span>
+    </div>
+    @if (pending()) { <p class="text-[13px]">{{ 'signatures.center.loading' | t }}</p> }
+    @else if (!data().items.length) { <p class="rounded-xl bg-[#f5f7fa] p-4 text-[13px]">{{ 'signatures.center.empty' | t }}</p> }
+    @else {
+      <div class="space-y-2">
+        @for (row of data().items; track row.envelope.id) {
+          <div class="flex flex-wrap items-center gap-3 rounded-xl border border-[#e4e9ef] px-3 py-3 text-[12px]">
+            <input type="checkbox" [checked]="selected().has(row.envelope.id)" [disabled]="!canSend(row) || mutating()" (change)="select(row.envelope.id, $event)" />
+            <div class="min-w-[180px] flex-1">
+              <p class="font-semibold">{{ row.learnerName || row.envelope.enrollmentId }} · {{ 'signatures.source.' + row.envelope.sourceType | t }}</p>
+              <p class="break-all text-[11px] text-[#748094]">{{ row.envelope.enrollmentId }} · {{ row.envelope.createdAtUtc }}</p>
+              @if (row.envelope.status === 'declined' && row.responseComment) {
+                <p class="mt-2 rounded-lg bg-[#fff4ec] px-3 py-2 text-[11px]">{{ 'signatures.center.dispute' | t }} : {{ row.responseComment }}</p>
+              }
+            </div>
+            <span class="rounded-lg bg-[#edf2f8] px-3 py-1">{{ 'signatures.status.' + row.envelope.status | t }}</span>
+            <a class="font-semibold text-[#245c97]" [routerLink]="routeTo(row)">{{ 'signatures.center.view' | t }}</a>
+            @if ((row.envelope.status === 'signed' || row.envelope.status === 'declined') && row.envelope.archivedAtUtc) {
+              <button type="button" class="rounded-lg border border-[#dfe5ec] px-3 py-2 disabled:opacity-40" [disabled]="mutating()" (click)="downloadArchive(row.envelope.id)">{{ 'signatures.center.downloadPdf' | t }}</button>
+              <button type="button" class="rounded-lg border border-[#dfe5ec] px-3 py-2 disabled:opacity-40" [disabled]="mutating()" (click)="downloadArchive(row.envelope.id, true)">{{ 'signatures.center.downloadEvidence' | t }}</button>
+            }
+            <button type="button" class="rounded-lg border border-[#dfe5ec] px-3 py-2 disabled:opacity-40" [disabled]="!canRemind(row) || mutating()" (click)="remind(row.envelope.id)">{{ 'signatures.center.remind' | t }}</button>
+          </div>
+        }
+      </div>
+    }
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <button type="button" class="rounded-lg bg-[#245c97] px-4 py-2 text-[12px] text-white disabled:opacity-50" [disabled]="!selectedCount() || mutating()" (click)="sendSelected()">{{ 'signatures.center.sendSelected' | t }} ({{ selectedCount() }})</button>
+      <div class="flex gap-2">
+        <button type="button" class="rounded-lg border px-3 py-2 text-[12px] disabled:opacity-40" [disabled]="page() <= 1 || pending()" (click)="navigatePage(-1)">‹</button>
+        <span class="self-center text-[12px]">{{ page() }} / {{ totalPages() }}</span>
+        <button type="button" class="rounded-lg border px-3 py-2 text-[12px] disabled:opacity-40" [disabled]="page() >= totalPages() || pending()" (click)="navigatePage(1)">›</button>
+      </div>
+    </div>
+  </article>
+  @if (canRequest()) {
+    <article class="space-y-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5">
+      <h2 class="font-bold">{{ 'signatures.center.dailyTitle' | t }}</h2>
+      <p class="text-[12px] text-[#748094]">{{ 'signatures.center.dailyInfo' | t }}</p>
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="text-[12px]">{{ 'signatures.center.day' | t }}<input type="date" class="mt-1 block rounded-lg border px-3 py-2" [value]="date()" (change)="updateDate($event)" /></label>
+        <button type="button" class="rounded-lg border px-4 py-2 text-[12px]" [disabled]="mutating()" (click)="loadDaily()">{{ 'signatures.center.listDaily' | t }}</button>
+      </div>
+      @for (candidate of daily(); track candidate.sourceId) {
+        <label class="flex items-center gap-3 rounded-lg border border-[#e4e9ef] px-3 py-2 text-[12px]">
+          <input type="checkbox" [checked]="selectedDaily().has(candidate.sourceId)" [disabled]="mutating()" (change)="toggleDaily(candidate.sourceId, $event)" />
+          <span class="font-semibold">{{ candidate.learnerName }}</span>
+          <span class="flex-1">{{ candidate.subject }}</span>
+          <span>{{ candidate.evaluatedAtUtc }}</span>
+          <span class="text-[#748094]">{{ 'signatures.status.' + candidate.signatureStatus | t }}</span>
+        </label>
+      }
+      @if (daily().length === 0) { <p class="text-[12px] text-[#748094]">{{ 'signatures.center.dailyEmpty' | t }}</p> }
+      <button type="button" class="rounded-lg bg-[#245c97] px-4 py-2 text-[12px] text-white disabled:opacity-50" [disabled]="mutating() || !dailyGroups().length" (click)="sendDailyRecaps()">{{ 'signatures.center.sendRecaps' | t }} ({{ dailyGroups().length }})</button>
+    </article>
+  }
+</section>

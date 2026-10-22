@@ -2,15 +2,23 @@
   <section
     class="relative hidden min-h-screen overflow-hidden bg-[linear-gradient(140deg,#17477f_0%,#285f9e_70%,#6f8798_100%)] px-[62px] py-[62px] text-white lg:flex lg:flex-col lg:justify-between"
     aria-label="Pedagora Pilot"
+    [style.background-color]="publishedTheme()?.primaryColor ?? null"
+    [style.background-image]="publishedBackground() ? 'linear-gradient(rgba(0,0,0,' + ((publishedTheme()?.overlayOpacity ?? 0) / 100) + '), rgba(0,0,0,' + ((publishedTheme()?.overlayOpacity ?? 0) / 100) + ')), url(' + publishedBackground() + ')' : null"
+    [style.background-position]="publishedTheme()?.backgroundPosition ?? null"
+    [style.background-size]="publishedBackground() ? 'cover' : null"
   >
     <div class="flex items-center gap-4">
       <div
         class="flex size-[54px] items-center justify-center rounded-full bg-[var(--ecsr-orange)] text-[#152033]"
       >
-        <i class="ph ph-graduation-cap text-[27px]" aria-hidden="true"></i>
+        @if (publishedLogo(); as logo) {
+          <img [src]="logo" [alt]="publishedTheme()?.name || 'Logo'" class="max-h-full max-w-full object-contain" />
+        } @else {
+          <i class="ph ph-graduation-cap text-[27px]" aria-hidden="true"></i>
+        }
       </div>
       <div class="text-[26px] font-extrabold tracking-[-0.8px]">
-        Pedagora <span class="text-[var(--ecsr-orange)]">Pilot</span>
+        @if (publishedTheme()?.name) { {{ publishedTheme()?.name }} } @else { Pedagora <span class="text-[var(--ecsr-orange)]">Pilot</span> }
       </div>
     </div>
 
@@ -18,7 +26,7 @@
       <h1
         class="max-w-[530px] text-[37px] leading-[1.22] font-extrabold tracking-[-1.2px]"
       >
-        {{ "brand.tagline" | t }}
+        {{ publishedTheme()?.tagline || ("brand.tagline" | t) }}
       </h1>
       <p class="mt-5 max-w-[550px] text-[20px] leading-[1.45] text-white/88">
         {{ "brand.description" | t }}
@@ -52,6 +60,21 @@
       </div>
     </div>
 
+    @if (publishedTheme()?.layers?.length) {
+      <div class="pointer-events-none absolute inset-0 z-20" aria-label="Identité visuelle">
+        @for (layer of publishedTheme()!.layers!; track layer.id) {
+          <div class="absolute flex items-center justify-center overflow-hidden text-center font-semibold leading-tight"
+            [style.left.%]="layer.x" [style.top.%]="layer.y" [style.width.%]="layer.width"
+            [style.height.%]="layer.height" [style.zIndex]="layer.zIndex+1" [style.opacity]="layer.opacity/100">
+            @if (layer.type === 'image' && layer.assetId) {
+              @if (publishedBranding.assetUrl(layer.assetId); as url) {<img [src]="url" alt="" class="size-full object-contain" />}
+            } @else if (layer.type === 'text') {
+              <span class="w-full whitespace-pre-wrap break-words" [style.color]="layer.color" [style.fontSize.px]="layer.fontSize">{{ layer.text }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
     <p class="text-[14px] text-white/65">Pedagora Pilot</p>
   </section>
 

@@ -80,6 +80,7 @@ export class WorkplaceApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
+      const availableCohortIds = this.contextCohortIds();
       const referentialVersionId = this.text(
         this.workspace.cohort()?.referentialVersionId,
       );
@@ -92,7 +93,9 @@ export class WorkplaceApiStoreService {
       this.loadError.set(false);
       this.typesError.set(false);
 
-      if (ready && cohortApiId) {
+      if (ready && !cohortApiId && availableCohortIds.length) {
+        void this.loadBroadContext(availableCohortIds, role, generation);
+      } else if (ready && cohortApiId) {
         void this.loadContext(
           cohortApiId,
           referentialVersionId,
@@ -114,6 +117,9 @@ export class WorkplaceApiStoreService {
     const referentialVersionId = this.text(
       this.workspace.cohort()?.referentialVersionId,
     );
+    if (!cohortApiId && this.contextCohortIds().length) {
+      return this.loadBroadContext(this.contextCohortIds(), this.session.role(), this.generation, notify);
+    }
     if (!cohortApiId) {
       this.rowsSignal.set([]);
       this.learnersSignal.set([]);
@@ -135,6 +141,12 @@ export class WorkplaceApiStoreService {
     if (this.creating()) return null;
 
     const enrollmentId = this.text(value.studentId);
+    // Creation requires a selected cohort, otherwise the referential/type is ambiguous.
+    if (!this.text(this.workspace.cohort()?.apiId) ||
+        !this.learnersSignal().some((item) => this.text(item.enrollmentId) === enrollmentId)) {
+      this.notifications.error("internships.real.createError", "/stages");
+      return null;
+    }
     // A stage period must remain creatable even when the referential has not yet
     // configured activity/document requirements. The backend accepts STAGE only
     // as a bootstrap type when no workplace period type exists for the referential.
@@ -179,6 +191,67 @@ export class WorkplaceApiStoreService {
     } finally {
       this.creating.set(false);
     }
+  }
+
+  private contextCohortIds(): string[] {
+    const selected = this.text(this.workspace.cohort()?.apiId);
+    if (selected) return [selected];
+    const site = this.workspace.site();
+    const cohorts = this.workspace.program()
+      ? this.workspace.cohorts()
+      : site
+        ? this.workspace.siteCohorts(site.id)
+        : this.workspace.sites().flatMap((item) => this.workspace.siteCohorts(item.id));
+    return [...new Set(cohorts.map((row) => this.text(row?.apiId)).filter(Boolean))];
+  }
+
+  private async loadBroadContext(
+    cohortIds: string[],
+    role: string,
+    generation: number,
+    notify = true,
+  ): Promise<boolean> {
+    const request = ++this.request;
+    this.loading.set(true);
+    this.periodTypesSignal.set([]);
+    const tasks = await Promise.allSettled(
+      role === "stagiaire"
+        ? [ (async () => {
+            const self = await firstValueFrom(this.learnerApi.self());
+            const enrollmentId = this.text(self?.enrollmentId);
+            return {
+              periods: enrollmentId ? await this.api.getMyPeriods(enrollmentId) : [],
+              learners: enrollmentId ? [{
+                enrollmentId,
+                firstName: this.text(self?.firstName),
+                lastName: this.text(self?.lastName),
+                displayName: `${this.text(self?.firstName)} ${this.text(self?.lastName)}`.trim(),
+                externalKey: null,
+              }] : [],
+            };
+          })() ]
+        : cohortIds.map(async (id) => ({
+            periods: await this.api.getPeriods(id),
+            learners: await this.api.getLearners(id),
+          })),
+    );
+    if (generation !== this.generation || request !== this.request) return false;
+    const successful = tasks.flatMap((item) =>
+      item.status === "fulfilled" ? [item.value] : [],
+    );
+    const failed = tasks.some((item) => item.status === "rejected");
+    this.rowsSignal.set(Array.from(new Map(successful
+      .flatMap((item) => Array.isArray(item.periods) ? item.periods : [])
+      .map((row) => { const mapped = this.normalize(row); return [mapped.id, mapped] as const; })
+      .filter(([id]) => Boolean(id))).values()));
+    this.learnersSignal.set(Array.from(new Map(successful
+      .flatMap((item) => Array.isArray(item.learners) ? item.learners : [])
+      .map((row) => { const mapped = this.normalizeLearner(row); return [mapped.enrollmentId, mapped] as const; })
+      .filter(([id]) => Boolean(id))).values()));
+    this.loadError.set(failed);
+    this.loading.set(false);
+    if (failed && notify) this.notifications.error("internships.real.loadError", "/stages");
+    return !failed;
   }
 
   private async loadContext(

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   HostListener,
   inject,
   input,
@@ -104,8 +105,17 @@ export class AddPlanningDrawerComponent {
   });
 
   constructor() {
-    const selected = this.workspace.cohort()?.id ?? "";
-    if (selected) this.form.controls.promotionId.setValue(selected);
+    effect(() => {
+      const options = this.promotions;
+      const selected = this.workspace.cohort()?.id ?? "";
+      const current = this.form.controls.promotionId.value;
+      if (!options.some((item) => item.id === current)) {
+        this.form.controls.promotionId.setValue(
+          options.some((item) => item.id === selected) ? selected : "",
+          { emitEvent: false },
+        );
+      }
+    });
   }
 
   @HostListener("document:keydown.escape")
@@ -120,7 +130,8 @@ export class AddPlanningDrawerComponent {
 
   submit(): void {
     this.submitted.set(true);
-    if (this.form.invalid || this.invalidPeriod() || !this.dayFromDate()) {
+    if (this.form.invalid || this.invalidPeriod() || !this.dayFromDate() ||
+        !this.promotions.some((item) => item.id === this.form.controls.promotionId.value)) {
       this.form.markAllAsTouched();
       return;
     }
