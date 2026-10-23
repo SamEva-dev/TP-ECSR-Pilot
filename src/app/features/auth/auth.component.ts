@@ -77,6 +77,7 @@ export class AuthComponent {
   readonly showPassword = signal(false);
   readonly showConfirmPassword = signal(false);
   readonly submitted = signal(false);
+  readonly showExistingAccountHint = signal(false);
   private pendingMfaToken = "";
   private pendingCurrentPassword = "";
 
@@ -412,6 +413,7 @@ export class AuthComponent {
   }
 
   async submitRegister(): Promise<void> {
+    this.showExistingAccountHint.set(false);
     this.submitted.set(true);
     this.error.set("");
     this.message.set("");
@@ -443,6 +445,17 @@ export class AuthComponent {
 
       await this.handleRegistrationResult(result);
     } catch (e) {
+      const error = e as { status?: number; error?: unknown };
+      const body = error?.error;
+      const reason = typeof body === "string"
+        ? body
+        : body && typeof body === "object"
+          ? String((body as { error?: unknown; message?: unknown }).error ??
+              (body as { message?: unknown }).message ?? "")
+          : "";
+      const invalidExistingCredentials = error?.status === 400 &&
+        reason.trim().toLowerCase() === "invalid email or password";
+      this.showExistingAccountHint.set(invalidExistingCredentials);
       this.error.set(this.backendMessage(e));
     } finally {
       this.loading.set(false);
@@ -450,6 +463,7 @@ export class AuthComponent {
   }
 
   openRegister(): void {
+    this.showExistingAccountHint.set(false);
     this.submitted.set(false);
     this.error.set("");
 
@@ -467,6 +481,7 @@ export class AuthComponent {
   }
 
   openLogin(): void {
+    this.showExistingAccountHint.set(false);
     this.submitted.set(false);
     this.error.set("");
     this.loginStep.set("email");

@@ -464,9 +464,11 @@
             </button>
           </form>
 
-          <p class="mt-4 text-sm leading-relaxed text-red-600" role="note">
-            {{ "auth.existingAccountRegistrationHint" | t }}
-          </p>
+          @if (showExistingAccountHint()) {
+            <p class="mt-4 text-sm leading-relaxed text-red-600" role="alert">
+              {{ "auth.existingAccountRegistrationHint" | t }}
+            </p>
+          }
 
           <p class="mt-7 text-center text-sm text-[var(--ecsr-muted)]">
             {{ "auth.alreadyAccount" | t }}
