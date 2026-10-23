@@ -79,6 +79,20 @@ export class AuthGateService {
   private readonly tokens = inject(AuthTokenStore);
   private readonly baseUrl = `${environment.authGateBaseUrl}/api/Auth`;
 
+  requestPasswordReset(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.authGateBaseUrl}/api/PasswordReset/request`,
+      { email: email.trim().toLowerCase(), clientId: environment.authGateClientId },
+    );
+  }
+
+  resetPassword(email: string, token: string, newPassword: string, confirmPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.authGateBaseUrl}/api/PasswordReset/reset`,
+      { email: email.trim().toLowerCase(), token, newPassword, confirmPassword },
+    );
+  }
+
   prelogin(email: string): Observable<AuthGatePreLoginResponse> {
     return this.http.post<AuthGatePreLoginResponse>(
       `${this.baseUrl}/prelogin`,

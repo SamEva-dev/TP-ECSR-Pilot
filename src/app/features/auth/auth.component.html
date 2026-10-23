@@ -289,6 +289,12 @@
               </div>
 
               @if (loginStep() === "password") {
+                <div class="flex justify-end">
+                  <a
+                    href="/mot-de-passe-oublie"
+                    class="text-sm font-semibold text-[#245d9b] hover:underline"
+                  >{{ "auth.forgotPassword" | t }}</a>
+                </div>
                 <label class="flex items-center gap-2 text-sm text-[#58687a]">
                   <input type="checkbox" formControlName="rememberMe" />
                   {{ "auth.rememberMe" | t }}

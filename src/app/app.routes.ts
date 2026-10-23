@@ -10,6 +10,16 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
+    path: "mot-de-passe-oublie",
+    loadComponent: () =>
+      import("./features/auth/password-reset.component").then((m) => m.PasswordResetComponent),
+  },
+  {
+    path: "reinitialiser-mot-de-passe",
+    loadComponent: () =>
+      import("./features/auth/password-reset.component").then((m) => m.PasswordResetComponent),
+  },
+  {
     path: "inscription",
     loadComponent: () =>
       import("./features/auth/auth.component").then((m) => m.AuthComponent),

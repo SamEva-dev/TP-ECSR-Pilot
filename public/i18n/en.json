@@ -94,7 +94,23 @@
     "newPassword": "New password",
     "changePassword": "Update password",
     "passwordChangePrompt": "You must change your password before continuing.",
-    "existingAccountRegistrationHint": "If you already have an AuthGate account (MobiOne, LocaGuest or another application), use the same password to link PedagoraPilot to your existing account. Otherwise, check your credentials or use “Forgot password?” on the sign-in page."
+    "existingAccountRegistrationHint": "If you already have an AuthGate account (MobiOne, LocaGuest or another application), use the same password to link PedagoraPilot to your existing account. Otherwise, check your credentials or use “Forgot password?” on the sign-in page.",
+    "passwordRecovery": {
+      "title": "Reset your password",
+      "emailHint": "Enter your email address to receive a reset link.",
+      "send": "Send reset link",
+      "sent": "If an account exists for this address, a reset email will be sent.",
+      "invalidEmail": "Enter a valid email address.",
+      "failed": "The service is temporarily unavailable. Try again later.",
+      "newPassword": "New password",
+      "confirm": "Confirm password",
+      "save": "Save new password",
+      "mismatch": "Passwords do not match.",
+      "short": "Password must have at least 8 characters.",
+      "success": "Password changed. You can now sign in.",
+      "invalidLink": "Reset link is incomplete. Request a new link.",
+      "back": "Back to sign in"
+    }
   },
   "home": {
     "greeting": "Hello {{name}}",
