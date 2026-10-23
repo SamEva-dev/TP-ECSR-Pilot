@@ -46,7 +46,8 @@
       "mfaNotYetSupported": "This account requires MFA validation. The Pedagora Pilot MFA screen will be connected in the next step.",
       "invalidMfaCode": "Enter a 6-digit verification code.",
       "passwordTooShort": "The new password must contain at least 8 characters.",
-      "logoutFailed": "The remote session could not be revoked. The local session was closed."
+      "logoutFailed": "The remote session could not be revoked. The local session was closed.",
+      "completeRequiredFields": "Please complete the required fields and correct the highlighted errors."
     },
     "demo": {
       "title": "Sign in",
@@ -92,7 +93,8 @@
     "mfaPrompt": "Enter the 6-digit code from your authenticator app.",
     "newPassword": "New password",
     "changePassword": "Update password",
-    "passwordChangePrompt": "You must change your password before continuing."
+    "passwordChangePrompt": "You must change your password before continuing.",
+    "existingAccountRegistrationHint": "If you already have an AuthGate account (MobiOne, LocaGuest or another application), use the same password to link PedagoraPilot to your existing account. Otherwise, check your credentials or use “Forgot password?” on the sign-in page."
   },
   "home": {
     "greeting": "Hello {{name}}",

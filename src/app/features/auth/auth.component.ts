@@ -422,6 +422,7 @@ export class AuthComponent {
         this.registerForm.controls.confirmPassword.value
     ) {
       this.registerForm.markAllAsTouched();
+      this.error.set(this.translate.instant("auth.errors.completeRequiredFields"));
       return;
     }
 

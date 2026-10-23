@@ -353,9 +353,13 @@
               }}</label>
               <input
                 formControlName="organisation"
+                [attr.aria-invalid]="registerForm.controls.organisation.touched && registerForm.controls.organisation.invalid"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
                 [placeholder]="'auth.organisationPlaceholder' | t"
               />
+              @if (registerForm.controls.organisation.touched && registerForm.controls.organisation.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
             </div>
             <div>
               <label class="mb-2 block text-sm font-semibold">{{
@@ -363,8 +367,12 @@
               }}</label>
               <input
                 formControlName="firstName"
+                [attr.aria-invalid]="registerForm.controls.firstName.touched && registerForm.controls.firstName.invalid"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
               />
+              @if (registerForm.controls.firstName.touched && registerForm.controls.firstName.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
             </div>
             <div>
               <label class="mb-2 block text-sm font-semibold">{{
@@ -372,8 +380,12 @@
               }}</label>
               <input
                 formControlName="lastName"
+                [attr.aria-invalid]="registerForm.controls.lastName.touched && registerForm.controls.lastName.invalid"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
               />
+              @if (registerForm.controls.lastName.touched && registerForm.controls.lastName.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
             </div>
             <div class="sm:col-span-2">
               <label class="mb-2 block text-sm font-semibold">{{
@@ -391,9 +403,16 @@
               }}</label>
               <input
                 formControlName="email"
+                [attr.aria-invalid]="registerForm.controls.email.touched && registerForm.controls.email.invalid"
                 type="email"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
               />
+              @if (registerForm.controls.email.touched && registerForm.controls.email.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
+              @if (registerForm.controls.email.touched && registerForm.controls.email.hasError("email")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.emailRequired" | t }}</p>
+              }
             </div>
             <div>
               <label class="mb-2 block text-sm font-semibold">{{
@@ -401,9 +420,16 @@
               }}</label>
               <input
                 formControlName="password"
+                [attr.aria-invalid]="registerForm.controls.password.touched && registerForm.controls.password.invalid"
                 [type]="showPassword() ? 'text' : 'password'"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
               />
+              @if (registerForm.controls.password.touched && registerForm.controls.password.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
+              @if (registerForm.controls.password.touched && registerForm.controls.password.hasError("minlength")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.passwordMin" | t }}</p>
+              }
             </div>
             <div>
               <label class="mb-2 block text-sm font-semibold">{{
@@ -411,9 +437,13 @@
               }}</label>
               <input
                 formControlName="confirmPassword"
+                [attr.aria-invalid]="registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid"
                 [type]="showConfirmPassword() ? 'text' : 'password'"
                 class="h-[50px] w-full rounded-lg border border-[#d7dde6] px-4"
               />
+              @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.hasError("required")) {
+                <p class="mt-1 text-xs text-red-600" role="alert">{{ "auth.errors.required" | t }}</p>
+              }
             </div>
 
             @if (passwordMismatch()) {
@@ -433,6 +463,10 @@
               {{ "auth.createAccount" | t }}
             </button>
           </form>
+
+          <p class="mt-4 text-sm leading-relaxed text-red-600" role="note">
+            {{ "auth.existingAccountRegistrationHint" | t }}
+          </p>
 
           <p class="mt-7 text-center text-sm text-[var(--ecsr-muted)]">
             {{ "auth.alreadyAccount" | t }}
