@@ -109,7 +109,19 @@
       "short": "Password must have at least 8 characters.",
       "success": "Password changed. You can now sign in.",
       "invalidLink": "Reset link is incomplete. Request a new link.",
-      "back": "Back to sign in"
+      "back": "Back to sign in",
+      "requirements": "Your password must meet all requirements:",
+      "ruleLength": "At least 8 characters",
+      "ruleUpper": "One uppercase letter",
+      "ruleLower": "One lowercase letter",
+      "ruleDigit": "One number",
+      "ruleSpecial": "One special character",
+      "show": "Show",
+      "hide": "Hide",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "matches": "Passwords match.",
+      "requirementsNotMet": "Your password does not meet all requirements yet."
     }
   },
   "home": {

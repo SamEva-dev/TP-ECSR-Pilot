@@ -27,9 +27,16 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
         } @else {
           <form [formGroup]="resetForm" (ngSubmit)="submitReset()" class="mt-6 space-y-4">
             <label class="block text-sm font-semibold text-[#263b55]" for="new-password">{{ "auth.passwordRecovery.newPassword" | t }}</label>
-            <input id="new-password" type="password" autocomplete="new-password" formControlName="password" class="h-[52px] w-full rounded-lg border border-[#d7dde6] px-4" />
+            <div class="relative"><input id="new-password" [type]="showPassword() ? 'text' : 'password'" autocomplete="new-password" formControlName="password" class="h-[52px] w-full rounded-lg border border-[#d7dde6] px-4 pr-14" />
+            <button type="button" (click)="showPassword.set(!showPassword())" [attr.aria-label]="showPassword() ? ('auth.passwordRecovery.hidePassword' | t) : ('auth.passwordRecovery.showPassword' | t)" [attr.aria-pressed]="showPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#245d9b]">{{ (showPassword() ? "auth.passwordRecovery.hide" : "auth.passwordRecovery.show") | t }}</button></div>
+            <p class="text-xs text-[#6a788b]">{{ "auth.passwordRecovery.requirements" | t }}</p>
+            <ul class="space-y-1 text-xs" aria-live="polite">
+              @for (rule of rules; track rule.key) { <li [class]="rule.ok(resetForm.controls.password.value) ? 'text-green-700' : 'text-[#6a788b]'">{{ rule.ok(resetForm.controls.password.value) ? "✓" : "○" }} {{ rule.key | t }}</li> }
+            </ul>
             <label class="block text-sm font-semibold text-[#263b55]" for="confirm-password">{{ "auth.passwordRecovery.confirm" | t }}</label>
-            <input id="confirm-password" type="password" autocomplete="new-password" formControlName="confirmPassword" class="h-[52px] w-full rounded-lg border border-[#d7dde6] px-4" />
+            <div class="relative"><input id="confirm-password" [type]="showConfirmation() ? 'text' : 'password'" autocomplete="new-password" formControlName="confirmPassword" class="h-[52px] w-full rounded-lg border border-[#d7dde6] px-4 pr-14" />
+            <button type="button" (click)="showConfirmation.set(!showConfirmation())" [attr.aria-label]="showConfirmation() ? ('auth.passwordRecovery.hidePassword' | t) : ('auth.passwordRecovery.showPassword' | t)" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#245d9b]">{{ (showConfirmation() ? "auth.passwordRecovery.hide" : "auth.passwordRecovery.show") | t }}</button></div>
+            @if (resetForm.controls.confirmPassword.value) { <p class="text-xs" [class.text-green-700]="passwordsMatch" [class.text-red-600]="!passwordsMatch">{{ (passwordsMatch ? "auth.passwordRecovery.matches" : "auth.passwordRecovery.mismatch") | t }}</p> }
             <button type="submit" [disabled]="loading()" class="w-full rounded-lg bg-[var(--ecsr-orange-strong)] p-4 font-semibold text-white disabled:opacity-50">{{ "auth.passwordRecovery.save" | t }}</button>
           </form>
         }
@@ -46,6 +53,17 @@ export class PasswordResetComponent {
   readonly token = this.route.snapshot.queryParamMap.get("token") ?? "";
   readonly hasToken = signal(this.token.length > 0);
   readonly loading = signal(false);
+  readonly showPassword = signal(false);
+  readonly showConfirmation = signal(false);
+  readonly rules = [
+    { key: "auth.passwordRecovery.ruleLength", ok: (v: string) => v.length >= 8 },
+    { key: "auth.passwordRecovery.ruleUpper", ok: (v: string) => /[A-Z]/.test(v) },
+    { key: "auth.passwordRecovery.ruleLower", ok: (v: string) => /[a-z]/.test(v) },
+    { key: "auth.passwordRecovery.ruleDigit", ok: (v: string) => /[0-9]/.test(v) },
+    { key: "auth.passwordRecovery.ruleSpecial", ok: (v: string) => /[\W_]/.test(v) },
+  ];
+  get passwordValid(): boolean { return this.rules.every(r => r.ok(this.resetForm.controls.password.value)); }
+  get passwordsMatch(): boolean { return !!this.resetForm.controls.confirmPassword.value && this.resetForm.controls.password.value === this.resetForm.controls.confirmPassword.value; }
   readonly errorKey = signal("");
   readonly successKey = signal("");
   readonly requestForm = new FormGroup({
@@ -72,7 +90,7 @@ export class PasswordResetComponent {
     this.errorKey.set(""); this.successKey.set("");
     const email = this.route.snapshot.queryParamMap.get("email") ?? "";
     if (!email || !this.token) { this.errorKey.set("auth.passwordRecovery.invalidLink"); return; }
-    if (this.resetForm.controls.password.value.length < 8) { this.errorKey.set("auth.passwordRecovery.short"); return; }
+    if (!this.passwordValid) { this.errorKey.set("auth.passwordRecovery.requirementsNotMet"); return; }
     if (this.resetForm.invalid || this.resetForm.controls.password.value !== this.resetForm.controls.confirmPassword.value) {
       this.errorKey.set("auth.passwordRecovery.mismatch"); return;
     }

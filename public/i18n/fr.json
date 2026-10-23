@@ -109,7 +109,19 @@
       "short": "Le mot de passe doit contenir au moins 8 caractères.",
       "success": "Mot de passe modifié. Vous pouvez vous connecter.",
       "invalidLink": "Lien de réinitialisation incomplet. Demandez un nouveau lien.",
-      "back": "Retour à la connexion"
+      "back": "Retour à la connexion",
+      "requirements": "Le mot de passe doit respecter tous les critères :",
+      "ruleLength": "Au moins 8 caractères",
+      "ruleUpper": "Une lettre majuscule",
+      "ruleLower": "Une lettre minuscule",
+      "ruleDigit": "Un chiffre",
+      "ruleSpecial": "Un caractère spécial",
+      "show": "Afficher",
+      "hide": "Masquer",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
+      "matches": "Les mots de passe correspondent.",
+      "requirementsNotMet": "Le mot de passe ne respecte pas encore tous les critères."
     }
   },
   "home": {
