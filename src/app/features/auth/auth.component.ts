@@ -77,7 +77,6 @@ export class AuthComponent {
   readonly showPassword = signal(false);
   readonly showConfirmPassword = signal(false);
   readonly submitted = signal(false);
-  readonly showExistingAccountHint = signal(false);
   private pendingMfaToken = "";
   private pendingCurrentPassword = "";
 
@@ -277,7 +276,7 @@ export class AuthComponent {
           result.nextStep === "Register" ||
           result.nextStep === "RegisterApplication"
         ) {
-          await this.router.navigate(["/register"], {
+          await this.router.navigate(["/inscription"], {
             queryParams: { email },
           });
           return;
@@ -413,7 +412,6 @@ export class AuthComponent {
   }
 
   async submitRegister(): Promise<void> {
-    this.showExistingAccountHint.set(false);
     this.submitted.set(true);
     this.error.set("");
     this.message.set("");
@@ -424,7 +422,6 @@ export class AuthComponent {
         this.registerForm.controls.confirmPassword.value
     ) {
       this.registerForm.markAllAsTouched();
-      this.error.set(this.translate.instant("auth.errors.completeRequiredFields"));
       return;
     }
 
@@ -445,17 +442,6 @@ export class AuthComponent {
 
       await this.handleRegistrationResult(result);
     } catch (e) {
-      const error = e as { status?: number; error?: unknown };
-      const body = error?.error;
-      const reason = typeof body === "string"
-        ? body
-        : body && typeof body === "object"
-          ? String((body as { error?: unknown; message?: unknown }).error ??
-              (body as { message?: unknown }).message ?? "")
-          : "";
-      const invalidExistingCredentials = error?.status === 400 &&
-        reason.trim().toLowerCase() === "invalid email or password";
-      this.showExistingAccountHint.set(invalidExistingCredentials);
       this.error.set(this.backendMessage(e));
     } finally {
       this.loading.set(false);
@@ -463,7 +449,6 @@ export class AuthComponent {
   }
 
   openRegister(): void {
-    this.showExistingAccountHint.set(false);
     this.submitted.set(false);
     this.error.set("");
 
@@ -473,7 +458,7 @@ export class AuthComponent {
     }
 
     this.mode.set("register");
-    void this.router.navigate(["/register"], {
+    void this.router.navigate(["/inscription"], {
       queryParams: {
         email: this.loginForm.controls.email.value || undefined,
       },
@@ -481,7 +466,6 @@ export class AuthComponent {
   }
 
   openLogin(): void {
-    this.showExistingAccountHint.set(false);
     this.submitted.set(false);
     this.error.set("");
     this.loginStep.set("email");
@@ -545,7 +529,15 @@ export class AuthComponent {
       return;
     }
 
-    // Email-confirmation / async provisioning mode.
+    if (status === "pending_email_confirmation") {
+      // AuthGate has sent a confirmation email; do not send the user to prelogin.
+      await this.router.navigate(["/confirmation-email"], {
+        queryParams: { email: result.email },
+      });
+      return;
+    }
+
+    // Other asynchronous provisioning states do not imply email confirmation.
     this.message.set(
       result.message || this.translate.instant("auth.registrationPending"),
     );

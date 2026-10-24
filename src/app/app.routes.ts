@@ -10,9 +10,11 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
-    path: "forgot-password",
+    path: "confirmation-email",
     loadComponent: () =>
-      import("./features/auth/password-reset.component").then((m) => m.PasswordResetComponent),
+      import("./features/auth/email-confirmation-pending.component").then(
+        (m) => m.EmailConfirmationPendingComponent,
+      ),
   },
   {
     path: "reset-password",
