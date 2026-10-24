@@ -496,6 +496,14 @@ export class AuthComponent {
     this.showConfirmPassword.update((v) => !v);
   }
 
+  // Referenced by the existing registration template. Keep this guard in
+  // sync with the error returned by AuthGate for an existing account.
+  showExistingAccountHint(): boolean {
+    if (!this.isRegister()) return false;
+    const message = this.error().trim().toLowerCase();
+    return /invalid email or password|already exists|already registered|compte existant|d[eé]j[aà] (?:un compte|inscrit)/i.test(message);
+  }
+
   passwordMismatch(): boolean {
     return (
       this.registerForm.controls.confirmPassword.touched &&
