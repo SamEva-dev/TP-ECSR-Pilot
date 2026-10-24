@@ -10,7 +10,7 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
-    path: "inscription",
+    path: "register",
     loadComponent: () =>
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
     data: { mode: "register" },

@@ -277,7 +277,7 @@ export class AuthComponent {
           result.nextStep === "Register" ||
           result.nextStep === "RegisterApplication"
         ) {
-          await this.router.navigate(["/inscription"], {
+          await this.router.navigate(["/register"], {
             queryParams: { email },
           });
           return;
@@ -473,7 +473,7 @@ export class AuthComponent {
     }
 
     this.mode.set("register");
-    void this.router.navigate(["/inscription"], {
+    void this.router.navigate(["/register"], {
       queryParams: {
         email: this.loginForm.controls.email.value || undefined,
       },
