@@ -10,17 +10,17 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
-    path: "mot-de-passe-oublie",
+    path: "forgot-password",
     loadComponent: () =>
       import("./features/auth/password-reset.component").then((m) => m.PasswordResetComponent),
   },
   {
-    path: "reinitialiser-mot-de-passe",
+    path: "reset-password",
     loadComponent: () =>
       import("./features/auth/password-reset.component").then((m) => m.PasswordResetComponent),
   },
   {
-    path: "inscription",
+    path: "register",
     loadComponent: () =>
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
     data: { mode: "register" },
