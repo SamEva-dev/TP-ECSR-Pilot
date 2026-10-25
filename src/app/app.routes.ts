@@ -10,6 +10,11 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
+    path: "confirm-email",
+    loadComponent: () =>
+      import("./features/auth/confirm-email.component").then((m) => m.ConfirmEmailComponent),
+  },
+  {
     path: "confirmation-email",
     loadComponent: () =>
       import("./features/auth/email-confirmation-pending.component").then(

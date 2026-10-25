@@ -266,6 +266,16 @@ export class AuthComponent {
       try {
         const result = await firstValueFrom(this.authGate.prelogin(email));
 
+        if (result.nextStep === "EmailConfirmationRequired") {
+          await this.router.navigate(["/confirmation-email"], { queryParams: { email } });
+          return;
+        }
+
+        if (result.nextStep === "ProvisioningPending") {
+          await this.router.navigate(["/confirmation-email"], { queryParams: { email, provisioning: "1" } });
+          return;
+        }
+
         if (result.nextStep === "Password") {
           this.loginStep.set("password");
           this.submitted.set(false);
@@ -276,7 +286,7 @@ export class AuthComponent {
           result.nextStep === "Register" ||
           result.nextStep === "RegisterApplication"
         ) {
-          await this.router.navigate(["/inscription"], {
+          await this.router.navigate(["/register"], {
             queryParams: { email },
           });
           return;
@@ -458,7 +468,7 @@ export class AuthComponent {
     }
 
     this.mode.set("register");
-    void this.router.navigate(["/inscription"], {
+    void this.router.navigate(["/register"], {
       queryParams: {
         email: this.loginForm.controls.email.value || undefined,
       },
@@ -515,7 +525,7 @@ export class AuthComponent {
   private async handleRegistrationResult(
     result: AuthGateRegistrationResponse,
   ): Promise<void> {
-    const status = (result.status ?? "").toLowerCase();
+    const status = (result.status ?? "").trim().toLowerCase();
 
     if (result.accessToken) {
       this.tokens.setTokens(result.accessToken, result.refreshToken, true);

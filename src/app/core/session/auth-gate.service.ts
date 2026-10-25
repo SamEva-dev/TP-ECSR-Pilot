@@ -5,7 +5,7 @@ import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "./auth-token.store";
 
 export type AuthGatePreLoginStep =
-  "Password" | "Register" | "RegisterApplication" | "Error";
+  "Password" | "Register" | "RegisterApplication" | "EmailConfirmationRequired" | "ProvisioningPending" | "Error";
 
 export interface AuthGatePreLoginResponse {
   nextStep: AuthGatePreLoginStep | string;
@@ -91,6 +91,12 @@ export class AuthGateService {
       `${environment.authGateBaseUrl}/api/PasswordReset/reset`,
       { email: email.trim().toLowerCase(), token, newPassword, confirmPassword },
     );
+  }
+
+  validateEmail(email: string, token: string): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.baseUrl}/validate-email`, {
+      email: email.trim().toLowerCase(), token,
+    });
   }
 
   prelogin(email: string): Observable<AuthGatePreLoginResponse> {
