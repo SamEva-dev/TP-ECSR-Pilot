@@ -2857,7 +2857,7 @@
       "address": "Adresse",
       "phone": "Téléphone",
       "email": "Email",
-      "manager": "Responsable",
+      "manager": "Responsable d’établissement",
       "status": "Statut"
     },
     "drawer": {
@@ -2953,6 +2953,9 @@
     "delete": {
       "action": "Supprimer l’établissement",
       "confirm": "Supprimer définitivement « {{name}} » ? Cette action n’est autorisée que si l’établissement ne contient plus de données opérationnelles. Cette suppression est irréversible."
+    },
+    "manager": {
+      "choose": "Sélectionner un responsable d’établissement"
     }
   },
   "programs": {
@@ -4772,9 +4775,11 @@
       "sites": "Créez le premier établissement de votre organisation.",
       "programs": "Créez une formation et rattachez-la à un établissement.",
       "referentials": "Créez la première version du référentiel de votre formation.",
-      "cohorts": "Créez une promotion sur la formation et la version souhaitées.",
+      "cohorts": "Sélectionnez d’abord la formation dans le Contexte de travail, puis créez la promotion en choisissant sa version de référentiel. Sans formation sélectionnée, le champ « Version du référentiel » reste indisponible.",
       "students": "Créez les profils puis affectez-les à une promotion.",
-      "planning": "Planifiez des séances avec des formateurs et des promotions valides."
+      "planning": "Planifiez des séances avec des formateurs et des promotions valides.",
+      "cohortsBeforeContext": "Sélectionnez d’abord la formation dans le ",
+      "cohortsAfterContext": " puis créez la promotion en choisissant sa version de référentiel. Sans formation sélectionnée, le champ « Version du référentiel » reste indisponible."
     },
     "compactTitle": "Organisation configurée",
     "completedHint": "{{done}} sur {{total}} prérequis techniques présents. Vous pouvez ajouter des éléments à tout moment.",
@@ -4785,7 +4790,9 @@
     "scopeHint": "Cet assistant accompagne la première configuration. Pour créer une autre organisation, utilisez le changement d'organisation ou le parcours de création autorisé ; les données sont isolées par organisation.",
     "readingOrder": "Ordre de lecture : de gauche à droite, puis de haut en bas.",
     "stepNumber": "Étape {{number}}",
-    "nextStep": "Prochaine étape"
+    "nextStep": "Prochaine étape",
+    "contextLink": "Contexte de travail",
+    "openContext": "Ouvrir le Contexte de travail"
   },
   "s03": {
     "siteDraftHint": "Aucun responsable habilité. Vous pouvez enregistrer cet établissement comme inactif, puis désigner un responsable avant son activation.",

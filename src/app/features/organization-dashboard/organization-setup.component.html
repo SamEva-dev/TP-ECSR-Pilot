@@ -59,7 +59,19 @@
                   {{ (step.verifiable ? (step.complete ? "organizationSetup.done" : "organizationSetup.todo") : "organizationSetup.toVerify") | t }}
                 </span>
               </div>
-              <p class="mt-1 min-h-9 text-[12px] text-[#637083]">{{ ("organizationSetup.help." + step.key) | t }}</p>
+              @if (step.key === "cohorts") {
+                <p class="mt-1 min-h-9 text-[12px] text-[#637083]">
+                  {{ "organizationSetup.help.cohortsBeforeContext" | t }}
+                  <button type="button" (click)="openWorkspaceContext()"
+                    class="inline font-semibold text-[#245c97] underline underline-offset-2 hover:text-[#194977] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#245c97]"
+                    [attr.aria-label]="'organizationSetup.openContext' | t">
+                    {{ "organizationSetup.contextLink" | t }}
+                  </button>
+                  {{ "organizationSetup.help.cohortsAfterContext" | t }}
+                </p>
+              } @else {
+                <p class="mt-1 min-h-9 text-[12px] text-[#637083]">{{ ("organizationSetup.help." + step.key) | t }}</p>
+              }
               <button type="button" (click)="go(step.key, step.href)"
                 class="mt-2 rounded-lg border border-[#a8c5e5] bg-white px-3 py-2 text-[12px] font-semibold text-[#245c97] hover:bg-[#e6f1fc]">
                 {{ "organizationSetup.open" | t }}

@@ -34,7 +34,15 @@ export class PromotionsComponent {
   readonly statusFilter = signal<PromotionStatusFilter>("all");
 
   readonly siteProgramPromotions = computed(() =>
-    [...this.store.promotions()].sort((a, b) => b.start.localeCompare(a.start)),
+    [...this.store.promotions()]
+      .filter(item => {
+        const selection = this.workspace.selection();
+        return item.organizationId === selection.organizationId &&
+          (!selection.siteId || item.siteId === selection.siteId) &&
+          (!selection.programId || item.programId === selection.programId) &&
+          (!selection.cohortId || item.id === selection.cohortId);
+      })
+      .sort((a, b) => b.start.localeCompare(a.start)),
   );
 
   readonly filteredPromotions = computed(() => {

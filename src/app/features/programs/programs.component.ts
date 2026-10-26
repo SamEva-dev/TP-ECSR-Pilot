@@ -28,11 +28,23 @@ export class ProgramsComponent {
   readonly drawerOpen = signal(false);
   readonly editingProgram = signal<ProgramCatalogItem | null>(null);
 
+  // A catalog item is visible only when it belongs to the selected scope.
+  // The site selection must never silently fall back to every site in the org.
   readonly organizationSiteIds = computed(() => this.workspace.sites().map((site) => site.id ?? ""));
-
-  readonly programs = computed(() => this.store.programs().filter((program) =>
-    program.siteIds.some((siteId) => this.organizationSiteIds().includes(siteId)) || program.siteIds.length === 0,
-  ));
+  readonly scopeSiteIds = computed(() => {
+    if (this.workspace.activeLevel() === "organization") return this.organizationSiteIds();
+    const siteId = this.workspace.site()?.id;
+    return siteId ? [siteId] : [];
+  });
+  readonly programs = computed(() => {
+    const allowed = new Set(this.scopeSiteIds());
+    const selectedProgramId = this.workspace.program()?.id;
+    const level = this.workspace.activeLevel();
+    return this.store.programs().filter((program) =>
+      program.siteIds.some((siteId) => allowed.has(siteId)) &&
+      (level === "organization" || level === "site" || program.id === selectedProgramId),
+    );
+  });
 
   readonly filteredPrograms = computed(() => {
     const q = this.query().trim().toLocaleLowerCase("fr-FR");
@@ -46,11 +58,17 @@ export class ProgramsComponent {
     });
   });
 
-  readonly totals = computed(() => this.programs().reduce((acc, program) => ({
-    students: acc.students + (program.students ?? 0),
-    trainers: acc.trainers + (program.trainers ?? 0),
-    cohorts: acc.cohorts + (program.activeCohorts ?? 0),
-  }), { students: 0, trainers: 0, cohorts: 0 }));
+  readonly totals = computed(() => {
+    // Program DTO counters are global to the program, not scoped per offering.
+    // Show zero instead of presenting another site's figures as local totals.
+    if (this.workspace.activeLevel() !== "organization")
+      return { students: 0, trainers: 0, cohorts: 0 };
+    return this.programs().reduce((acc, program) => ({
+      students: acc.students + (program.students ?? 0),
+      trainers: acc.trainers + (program.trainers ?? 0),
+      cohorts: acc.cohorts + (program.activeCohorts ?? 0),
+    }), { students: 0, trainers: 0, cohorts: 0 });
+  });
 
   constructor() {
     effect(() => {
@@ -101,7 +119,7 @@ export class ProgramsComponent {
   }
 
   organizationSiteCount(program: ProgramCatalogItem): number {
-    return program.siteIds.filter((siteId) => this.organizationSiteIds().includes(siteId)).length;
+    return program.siteIds.filter((siteId) => this.scopeSiteIds().includes(siteId)).length;
   }
 
   statusClass(status: ProgramCatalogStatus): string {

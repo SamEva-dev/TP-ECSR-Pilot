@@ -110,7 +110,7 @@ export class PlanningComponent {
     return this.sessions.planningEvents().filter((event) => {
       if (!eligible.has(event.promotionId ?? "")) return false;
       const promotionMatch =
-        promotionId === "all" || (event.promotionId ?? "") === promotionId;
+        promotionId === "all" || !eligible.has(promotionId) || (event.promotionId ?? "") === promotionId;
       const typeMatch = type === "all" || event.type === type;
       return promotionMatch && typeMatch;
     });
@@ -170,6 +170,10 @@ export class PlanningComponent {
   }
   private dayKey(date: Date): PlanningEvent["day"] {
     return (["sunday","monday","tuesday","wednesday","thursday","friday","saturday"] as const)[date.getUTCDay()];
+  }
+
+  eventsForDay(day: PlanningEvent["day"]): PlanningEvent[] {
+    return this.filteredEvents().filter(event => event.day === day);
   }
 
   eventsForDate(iso: string): PlanningEvent[] {

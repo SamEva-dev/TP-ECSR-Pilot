@@ -2857,7 +2857,7 @@
       "address": "Address",
       "phone": "Phone",
       "email": "Email",
-      "manager": "Manager",
+      "manager": "Site manager",
       "status": "Status"
     },
     "drawer": {
@@ -2953,6 +2953,9 @@
     "delete": {
       "action": "Delete site",
       "confirm": "Permanently delete “{{name}}”? This is allowed only when the site no longer contains operational data. This action cannot be undone."
+    },
+    "manager": {
+      "choose": "Select a site manager"
     }
   },
   "programs": {
@@ -4772,9 +4775,11 @@
       "sites": "Create your organization’s first location.",
       "programs": "Create a training program and link it to a location.",
       "referentials": "Create the first curriculum version for your program.",
-      "cohorts": "Create a cohort for the appropriate program and version.",
+      "cohorts": "First select the program in the Workspace Context, then create the cohort and choose its referential version. Without a selected program, the “Referential version” field remains unavailable.",
       "students": "Create learner profiles and enroll them in a cohort.",
-      "planning": "Schedule sessions with eligible trainers and cohorts."
+      "planning": "Schedule sessions with eligible trainers and cohorts.",
+      "cohortsBeforeContext": "First select the program in the ",
+      "cohortsAfterContext": ", then create the cohort and choose its referential version. Without a selected program, the “Referential version” field remains unavailable."
     },
     "compactTitle": "Organization configured",
     "completedHint": "{{done}} of {{total}} technical prerequisites present. You can add more items at any time.",
@@ -4785,7 +4790,9 @@
     "scopeHint": "This assistant supports initial setup. To create another organization, use the organization switcher or the authorized creation flow; data remains scoped to each organization.",
     "readingOrder": "Follow the steps from left to right, then top to bottom.",
     "stepNumber": "Step {{number}}",
-    "nextStep": "Next step"
+    "nextStep": "Next step",
+    "contextLink": "Workspace Context",
+    "openContext": "Open Workspace Context"
   },
   "s03": {
     "siteDraftHint": "No eligible manager is available. You can save this site as inactive, then assign a manager before activation.",

@@ -8,6 +8,7 @@ import {
 import { RouterLink } from "@angular/router";
 import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type {
   ReferentialStatus,
@@ -24,20 +25,29 @@ import { ReferentialVersionDrawerComponent } from "./referential-version-drawer/
 export class ReferentialsComponent {
   readonly store = inject(ReferentialApiStoreService);
   private readonly programStore = inject(ProgramApiStoreService);
+  readonly workspace = inject(WorkspaceContextService);
+  readonly scopeProgramIds = computed(() => {
+    const level = this.workspace.activeLevel();
+    const sites = level === "organization" ? this.workspace.sites() : this.workspace.site() ? [this.workspace.site()!] : [];
+    const ids = new Set(sites.flatMap(site => this.workspace.sitePrograms(site.id).map(program => program.id)));
+    const selected = this.workspace.program()?.id;
+    if (level === "program" || level === "cohort") return new Set(selected && ids.has(selected) ? [selected] : []);
+    return ids;
+  });
+  readonly scopedItems = computed(() => this.store.items().filter(item => this.scopeProgramIds().has(item.programId)));
   readonly drawerOpen = signal(false);
   readonly query = signal("");
   readonly programId = signal("all");
   readonly status = signal<ReferentialStatus | "all">("all");
 
   get programs() {
-    return this.programStore.programs();
+    return this.programStore.programs().filter(program => this.scopeProgramIds().has(program.id));
   }
 
   readonly rows = computed(() => {
     const query = this.query().trim().toLowerCase();
-    const programs = this.programStore.programs();
-    return this.store
-      .items()
+    const programs = this.programs;
+    return this.scopedItems()
       .map((referential) => ({
         ...referential,
         program: programs.find(
@@ -59,14 +69,14 @@ export class ReferentialsComponent {
   });
 
   readonly activeCount = computed(
-    () => this.store.items().filter((item) => item.status === "active").length,
+    () => this.scopedItems().filter((item) => item.status === "active").length,
   );
   readonly draftCount = computed(
-    () => this.store.items().filter((item) => item.status === "draft").length,
+    () => this.scopedItems().filter((item) => item.status === "draft").length,
   );
   readonly archivedCount = computed(
     () =>
-      this.store.items().filter((item) => item.status === "archived").length,
+      this.scopedItems().filter((item) => item.status === "archived").length,
   );
 
   async saveVersion(value: ReferentialVersionFormValue): Promise<void> {

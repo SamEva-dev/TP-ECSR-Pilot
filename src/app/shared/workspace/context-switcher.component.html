@@ -71,7 +71,7 @@
             <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{ workspace.organization()?.shortName }}</span>
             @if (workspace.site()) {
               <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
-              <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{ workspace.site()?.city }}</span>
+              <span class="rounded-full bg-[#eef4fb] px-2.5 py-1">{{ workspace.site()?.code }} — {{ workspace.site()?.city }}</span>
             }
             @if (workspace.program()) {
               <i class="ph ph-caret-right text-[11px] text-[#a0a9b6]"></i>
@@ -146,7 +146,7 @@
                 [class.hover:bg-[#f3f6f9]]="site.id !== workspace.site()?.id"
               >
                 <i class="ph ph-map-pin text-[16px]"></i
-                ><span class="truncate">{{ site.city }}</span>
+                ><span class="truncate">{{ site.code }} — {{ site.city }}</span>
               </button>
             }
           </div>

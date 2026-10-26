@@ -3,10 +3,12 @@ import {
   Component,
   HostListener,
   inject,
+  effect,
   signal,
 } from "@angular/core";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { WorkspaceContextOverlayService } from "../../core/workspace/workspace-context-overlay.service";
 
 @Component({
   selector: "app-context-switcher",
@@ -16,7 +18,15 @@ import { WorkspaceContextService } from "../../core/workspace/workspace-context.
 })
 export class ContextSwitcherComponent {
   readonly workspace = inject(WorkspaceContextService);
+  private readonly overlay = inject(WorkspaceContextOverlayService);
   readonly open = signal(false);
+
+  constructor() {
+    effect(() => {
+      const requested = this.overlay.openRequest();
+      if (requested > 0 && !this.workspace.isLocked()) this.open.set(true);
+    });
+  }
 
   toggle(): void {
     if (this.workspace.isLocked()) return;

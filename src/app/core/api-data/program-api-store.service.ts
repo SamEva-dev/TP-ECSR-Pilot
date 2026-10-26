@@ -8,6 +8,7 @@ import type {
   ProgramCatalogStatus,
   ProgramFormValue,
 } from "../models/programs.models";
+import { ReferentialApiStoreService } from "./referential-api-store.service";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
@@ -20,6 +21,7 @@ export class ProgramApiStoreService {
   private readonly realtime = inject(RealtimeService);
   private readonly session = inject(SessionService);
   private readonly notifications = inject(ApplicationNotificationService);
+  private readonly referentials = inject(ReferentialApiStoreService);
   private readonly programsSignal = signal<ProgramCatalogItem[]>([]);
 
   readonly programs = this.programsSignal.asReadonly();
@@ -132,6 +134,10 @@ export class ProgramApiStoreService {
     try {
       await this.workspace.reload();
       await this.reload();
+      // The backend provisions the initial referential with the program.
+      // Refresh its API-backed store before the creation workflow completes.
+      const referentialsLoaded = await this.referentials.reload();
+      if (!referentialsLoaded) followUpFailed = true;
       if (this.workspace.remoteWorkspaceError()) followUpFailed = true;
     } catch { followUpFailed = true; }
     if (followUpFailed) this.notifications.error("s03.partialProgramCreated", "/formations");

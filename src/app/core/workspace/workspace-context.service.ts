@@ -248,7 +248,7 @@ export class WorkspaceContextService {
     const site = this.site();
     const program = this.program();
     const cohort = this.cohort();
-    return [site?.city, program?.name, cohort?.shortName]
+    return [site ? `${site.code} — ${site.city}` : null, program?.name, cohort?.shortName]
       .filter(Boolean)
       .join(" · ");
   });
@@ -256,7 +256,7 @@ export class WorkspaceContextService {
   readonly breadcrumb = computed(() =>
     [
       this.organization()?.shortName,
-      this.site()?.city,
+      this.site() ? `${this.site()!.code} — ${this.site()!.city}` : null,
       this.program()?.name,
       this.cohort()?.shortName,
     ]

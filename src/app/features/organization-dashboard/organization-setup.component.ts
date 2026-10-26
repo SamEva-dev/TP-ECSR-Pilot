@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
+import { WorkspaceContextOverlayService } from "../../core/workspace/workspace-context-overlay.service";
 import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 
@@ -15,6 +16,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 export class OrganizationSetupComponent {
   private readonly router = inject(Router);
   readonly workspace = inject(WorkspaceContextService);
+  private readonly contextOverlay = inject(WorkspaceContextOverlayService);
   readonly referentials = inject(ReferentialApiStoreService);
 
   readonly ready = computed(() => this.workspace.remoteWorkspaceLoaded() && this.referentials.remoteLoaded());
@@ -57,6 +59,10 @@ export class OrganizationSetupComponent {
     const saved = this.readPreference(id);
     return saved ?? !this.completed();
   });
+
+  openWorkspaceContext(): void {
+    this.contextOverlay.requestOpen();
+  }
 
   toggleExpanded(): void {
     const organizationId = this.currentOrganizationId();

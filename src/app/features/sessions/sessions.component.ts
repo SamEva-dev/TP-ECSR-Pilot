@@ -47,7 +47,7 @@ export class SessionsComponent {
   get trainers() { return this.store.trainers(); }
 
   get promotions(): Array<{ id: string; name: string }> {
-    return this.workspace.cohorts().map((cohort) => ({
+    return this.workspace.contextCohorts().map((cohort) => ({
       id: cohort.id ?? "", name: cohort.name ?? "",
     }));
   }
