@@ -67,6 +67,14 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   readonly nextObjective = signal("");
   readonly decision = signal<FinalEvaluationDecision>("validated");
   readonly saved = signal(false);
+  readonly saving = signal(false);
+  readonly prerequisite = computed(() => {
+    if (!this.students.some(item => item.id === this.studentId())) return "s07.sheets.studentRequired";
+    if (!this.sheets().some(item => item.number === this.sheetNumber() && !!item.topicId)) return "s07.sheets.sheetRequired";
+    if (!this.store.currentEvaluator()) return "s07.sheets.evaluatorRequired";
+    if (!this.presentationDate() || !Number.isFinite(this.durationMinutes()) || this.durationMinutes() < 1 || this.durationMinutes() > 180) return "s07.sheets.dateDurationRequired";
+    return "";
+  });
 
   readonly evaluation = signal<Record<string, EvaluationLevel>>(
     this.defaultEvaluation(),
@@ -218,6 +226,10 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   }
 
   async save(): Promise<void> {
+    if (this.saving()) return;
+    if (this.prerequisite()) return;
+    this.saving.set(true);
+    try {
     const updated = await this.store.saveEvaluation({
       studentId: this.studentId(),
       sheetNumber: this.sheetNumber(),
@@ -251,6 +263,9 @@ export class EvaluateSheetDrawerComponent implements OnInit {
       nextObjective: updated.nextObjective,
       decision: updated.status === "rework" ? "rework" : "validated",
     });
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   close(): void {

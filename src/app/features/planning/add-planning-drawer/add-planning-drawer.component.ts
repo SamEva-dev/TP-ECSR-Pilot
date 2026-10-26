@@ -19,6 +19,7 @@ import type {
   PlanningEvent,
   PlanningType,
 } from "../../../core/models/planning.models";
+import { TrainingSessionApiStoreService } from "../../../core/api-data/training-session-api-store.service";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 
 export interface AddPlanningPayload {
@@ -28,6 +29,7 @@ export interface AddPlanningPayload {
   promotionId: string;
   type: PlanningType;
   title: string;
+  trainerAuthGateUserId: string;
   responsible: string;
   location: string;
   competence: string;
@@ -41,6 +43,8 @@ export interface AddPlanningPayload {
 })
 export class AddPlanningDrawerComponent {
   private readonly workspace = inject(WorkspaceContextService);
+  readonly sessions = inject(TrainingSessionApiStoreService);
+  readonly trainers = this.sessions.trainers;
   readonly open = input(false);
   readonly closed = output<void>();
   readonly eventCreated = output<AddPlanningPayload>();
@@ -92,8 +96,9 @@ export class AddPlanningDrawerComponent {
     }),
     responsible: new FormControl("", {
       nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
+      validators: [Validators.maxLength(100)],
     }),
+    trainerAuthGateUserId: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     location: new FormControl("", {
       nonNullable: true,
       validators: [Validators.maxLength(100)],
@@ -136,6 +141,9 @@ export class AddPlanningDrawerComponent {
       return;
     }
 
+    const trainer = this.trainers().find(item => item.id === this.form.controls.trainerAuthGateUserId.value);
+    if (!trainer) { this.form.controls.trainerAuthGateUserId.setErrors({ required: true }); return; }
+    this.form.controls.responsible.setValue(trainer.name, { emitEvent: false });
     this.eventCreated.emit(this.form.getRawValue());
   }
 
@@ -157,6 +165,8 @@ export class AddPlanningDrawerComponent {
           3: "wednesday",
           4: "thursday",
           5: "friday",
+          6: "saturday",
+          0: "sunday",
         } as Record<number, PlanningEvent["day"]>
       )[day] ?? null
     );
@@ -170,7 +180,8 @@ export class AddPlanningDrawerComponent {
       | "promotionId"
       | "type"
       | "title"
-      | "responsible",
+      | "responsible"
+      | "trainerAuthGateUserId",
   ): boolean {
     const control = this.form.controls[name];
     return (
@@ -191,6 +202,7 @@ export class AddPlanningDrawerComponent {
       type: "classroom",
       title: "",
       responsible: "",
+      trainerAuthGateUserId: "",
       location: "",
       competence: "",
     });

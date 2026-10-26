@@ -136,7 +136,17 @@ export class DrivingComponent {
 
   readonly selectedStudentId = signal("");
   readonly selectedTrainerId = signal("");
+  // Aucun endpoint de parc automobile n’est disponible dans le contrat API actuel.
+  // Ne pas présenter cette sélection comme une donnée persistée.
   readonly selectedVehicleId = signal("");
+  readonly saving = signal(false);
+  readonly savePrerequisite = computed(() => {
+    if (!this.store.students().some(item => item.id === this.selectedStudentId())) return "s07.driving.studentRequired";
+    if (!this.store.competencies().some(item => item.id === this.selectedCompetence())) return "s07.driving.competenceRequired";
+    if (!this.store.criteria(this.selectedCompetence(), this.selectedSubSkill()).length) return "s07.driving.criteriaRequired";
+    if (this.canAssignTrainer() && !this.store.trainers().some(item => item.id === this.selectedTrainerId())) return "s07.driving.trainerRequired";
+    return "";
+  });
   readonly selectedCompetence = signal("");
   readonly selectedSubSkill = signal("");
   readonly date = signal("");
@@ -312,7 +322,13 @@ export class DrivingComponent {
   }
 
   async save() {
-    if (!this.canEdit()) return;
+    if (!this.canEdit() || this.saving()) return;
+    if (this.savePrerequisite()) {
+      this.notifications.error(this.savePrerequisite(), "/conduite");
+      return;
+    }
+    this.saving.set(true);
+    try {
     const ok = await this.store.record({
       enrollmentId: this.selectedStudentId(),
       competenceCode: this.selectedCompetence(),
@@ -331,6 +347,9 @@ export class DrivingComponent {
     });
     this.saved.set(ok);
     if (ok) setTimeout(() => this.saved.set(false), 1800);
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   scrollToHistory() {

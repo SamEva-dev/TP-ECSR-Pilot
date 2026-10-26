@@ -28,7 +28,8 @@ export class ReferentialVersionDrawerComponent {
   readonly effectiveFrom = signal("");
   readonly status = signal<ReferentialVersionFormValue["status"]>("draft");
 
-  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || this.programStore.programs()[0]?.id || "");
+  readonly effectiveProgramId = computed(() => this.programId() || this.referentials().find((item) => item.id === this.defaultSourceId())?.programId || "");
+  readonly canCreate = computed(() => !!this.effectiveProgramId() && !!this.sources().find(item => item.id === this.sourceId()) && !!this.version().trim() && !!this.effectiveFrom());
   readonly sources = computed(() => {
     const selectedId = this.effectiveProgramId();
     const selectedProgram = this.programStore.programs().find(
@@ -53,9 +54,8 @@ export class ReferentialVersionDrawerComponent {
   setProgram(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.programId.set(value);
-    const source = this.sources()[0];
-    this.sourceId.set(source?.id ?? "");
-    this.code.set(source?.certificationCode ?? source?.code ?? "");
+    this.sourceId.set("");
+    this.code.set("");
   }
   setSource(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
@@ -69,11 +69,11 @@ export class ReferentialVersionDrawerComponent {
   setStatus(event: Event): void { this.status.set((event.target as HTMLSelectElement).value as ReferentialVersionFormValue["status"]); }
 
   initialise(): void {
-    const source = this.referentials().find((item) => item.id === this.defaultSourceId()) ?? this.referentials()[0];
+    const source = this.referentials().find((item) => item.id === this.defaultSourceId());
     if (!source) {
       // A program may exist without a version in the loaded catalogue. The
       // selection must still be initialized; the API cannot clone a missing source.
-      this.programId.set(this.programStore.programs()[0]?.id ?? "");
+      this.programId.set(this.programStore.programs().length === 1 ? this.programStore.programs()[0].id : "");
       this.sourceId.set("");
       this.version.set("");
       this.code.set("");
@@ -93,7 +93,7 @@ export class ReferentialVersionDrawerComponent {
   }
 
   submit(): void {
-    const sourceId = this.sourceId() || this.sources()[0]?.id || "";
+    const sourceId = this.sourceId();
     const source = this.sources().find((item) => item.id === sourceId);
     // Creating a version is a clone of an existing referential. Never send a
     // version from another training program or a fabricated source identifier.

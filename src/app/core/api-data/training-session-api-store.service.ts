@@ -299,7 +299,7 @@ export class TrainingSessionApiStoreService {
     const dateFormatter = new Intl.DateTimeFormat("fr-FR", { timeZone: PARIS_ZONE, day: "2-digit", month: "2-digit", year: "numeric" });
     const timeFormatter = new Intl.DateTimeFormat("fr-FR", { timeZone: PARIS_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
     const weekday = new Intl.DateTimeFormat("en-US", { timeZone: PARIS_ZONE, weekday: "long" }).format(start).toLowerCase();
-    const day = (["monday", "tuesday", "wednesday", "thursday", "friday"] as const).includes(weekday as any)
+    const day = (["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).includes(weekday as any)
       ? weekday as PlanningEvent["day"]
       : null;
     return { displayDate: dateFormatter.format(start), start: timeFormatter.format(start), end: timeFormatter.format(end), day };

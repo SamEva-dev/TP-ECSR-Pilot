@@ -14,7 +14,7 @@ export type PlanningType =
 
 export interface PlanningEvent {
   id: string;
-  day: "monday" | "tuesday" | "wednesday" | "thursday" | "friday";
+  day: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
   promotionId: string;
   type: PlanningType;
   titleKey: string;

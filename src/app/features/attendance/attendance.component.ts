@@ -131,6 +131,11 @@ export class AttendanceComponent {
   readonly unsavedChanges = computed(() =>
     JSON.stringify(this.students()) !== JSON.stringify(this.attendance.students()));
 
+  readonly canSave = computed(() =>
+    this.canEdit() && !!this.session.id && !this.saving() &&
+    !this.sendingSignatures() && !this.attendance.loading() &&
+    !this.attendance.loadError() && this.students().some(s => s.status !== "pending"));
+
   readonly readyForSignature = computed(() =>
     this.canRequestSignature() && !this.saving() && !this.sendingSignatures() &&
     !this.attendance.loading() && !this.attendance.loadError() &&
@@ -298,7 +303,11 @@ export class AttendanceComponent {
           updated.departure,
           this.attendance.expectedHours(),
         );
-        if (duration === null) return updated;
+        if (duration === null) {
+          // An incomplete or reversed clock interval cannot retain stale duration.
+          return { ...updated, duration: 0,
+            missedHours: this.attendance.expectedHours(), addToCatchup: false };
+        }
         const missedHours = Math.max(
           0,
           this.attendance.expectedHours() - duration,
@@ -315,7 +324,7 @@ export class AttendanceComponent {
   }
 
   async save() {
-    if (!this.canEdit() || this.saving() || this.sendingSignatures()) return;
+    if (!this.canSave()) return;
     this.saving.set(true);
     this.saved.set(false);
     try {

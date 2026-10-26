@@ -87,11 +87,16 @@ export class SitesComponent {
 
   async saveSite(value: SiteFormValue): Promise<void> {
     const current = this.editingSite();
+    const previousSiteIds = new Set(this.workspace.sites().map(site => site.id));
     const saved = current
       ? await this.store.update(current.id, value)
       : await this.store.create(this.workspace.organization()?.id ?? "", value);
     if (!saved) return;
     await this.referentialStore.reload();
+    if (!current) {
+      const newSites = this.workspace.sites().filter(site => !previousSiteIds.has(site.id));
+      if (newSites.length === 1) this.workspace.selectSite(newSites[0].id);
+    }
     this.drawerOpen.set(false);
     this.editingSite.set(null);
   }

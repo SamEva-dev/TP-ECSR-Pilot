@@ -13,6 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
+import { Router } from "@angular/router";
 import { PedagoraAccessApiService } from "../../../core/access/pedagora-access-api.service";
 import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
@@ -31,11 +32,16 @@ import type {
 export class SiteDrawerComponent {
   private readonly accessApi = inject(PedagoraAccessApiService);
   private readonly workspace = inject(WorkspaceContextService);
+  private readonly router = inject(Router);
+  readonly managersLoading = signal(false);
+  readonly managersLoadError = signal(false);
   readonly eligibleManagers = signal<{ id: string; name: string }[]>([]);
   private managerRequest = 0;
   private async loadManagers(): Promise<void> {
     const request = ++this.managerRequest;
     const context = this.workspace.organization()?.apiId;
+    this.managersLoading.set(true);
+    this.managersLoadError.set(false);
     try {
       const accounts = await this.accessApi.membersWithRole("site_direction");
       if (request !== this.managerRequest || context !== this.workspace.organization()?.apiId || !this.open()) return;
@@ -44,7 +50,9 @@ export class SiteDrawerComponent {
         name: `${account.firstName ?? ""} ${account.lastName ?? ""}`.trim() || account.email,
       })));
     } catch {
-      if (request === this.managerRequest) this.eligibleManagers.set([]);
+      if (request === this.managerRequest) { this.eligibleManagers.set([]); this.managersLoadError.set(true); }
+    } finally {
+      if (request === this.managerRequest) this.managersLoading.set(false);
     }
   }
 
@@ -108,13 +116,19 @@ export class SiteDrawerComponent {
     });
   }
 
+  async manageResponsible(): Promise<void> {
+    this.closed.emit();
+    await this.router.navigate(["/acces"], { queryParams: { inviteRole: "site_direction" } });
+  }
+
   submit(): void {
     const selectedId = this.form.controls.managerAuthGateUserId.value;
     const selectedManager = this.eligibleManagers().find(x => x.id === selectedId);
     const existing = this.site();
     const preservingLegacyManager = !!existing && !existing.managerAuthGateUserId && !selectedId;
     const preservingAssignedManager = !!existing?.managerAuthGateUserId && selectedId === existing.managerAuthGateUserId;
-    if (!selectedManager && !preservingLegacyManager && !preservingAssignedManager) {
+    if (this.form.controls.status.value !== "inactive" &&
+        !selectedManager && !preservingLegacyManager && !preservingAssignedManager) {
       this.form.controls.managerAuthGateUserId.setErrors({ required: true });
     } else {
       this.form.controls.managerAuthGateUserId.setErrors(null);

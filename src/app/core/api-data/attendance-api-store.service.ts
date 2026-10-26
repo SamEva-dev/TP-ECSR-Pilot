@@ -127,6 +127,16 @@ export class AttendanceApiStoreService {
     this.saving = true;
     const generation = this.generation;
     try {
+      // Reject inconsistent local drafts before issuing any HTTP request.
+      // The domain remains authoritative and validates session bounds/eligibility.
+      const expectedMinutes = Math.round(this.number(this.sheetSignal()?.expectedMinutes));
+      if (expectedMinutes <= 0 || !Array.isArray(students))
+        throw new Error("ATTENDANCE_SESSION_INVALID");
+      const eligible = new Set((this.sheetSignal()?.entries ?? []).map(entry => this.text(entry.enrollmentId)));
+      const selected = students.filter(student => student.status !== "pending");
+      if (selected.some(student => !student.id || !eligible.has(student.id)) ||
+          new Set(selected.map(student => student.id)).size !== selected.length)
+        throw new Error("ATTENDANCE_ENROLLMENT_INVALID");
       const entries = students
         .filter((student) => student.status !== "pending")
         .map((student) => {
@@ -148,16 +158,27 @@ export class AttendanceApiStoreService {
           if (student.status === "late" && !arrivalAtUtc)
             throw new Error("ATTENDANCE_LATE_TIMES_REQUIRED");
           const absent = student.status === "absent" || student.status === "excused";
+          if (student.comment.length > 1000 ||
+              (absent && (arrivalAtUtc || departureAtUtc)) ||
+              (student.status === "late" && (!arrivalAtUtc || !departureAtUtc)))
+            throw new Error("ATTENDANCE_ENTRY_INVALID");
           const minutesFromClock = arrivalAtUtc && departureAtUtc
             ? Math.round((new Date(departureAtUtc).getTime() - new Date(arrivalAtUtc).getTime()) / 60000)
             : null;
+          const resolvedMinutes = absent ? 0 : minutesFromClock ?? Math.round(this.number(student.duration) * 60);
+          if (!Number.isFinite(resolvedMinutes) || resolvedMinutes < 0 ||
+              resolvedMinutes > expectedMinutes || (!absent && resolvedMinutes === 0))
+            throw new Error("ATTENDANCE_DURATION_INVALID");
+          if (minutesFromClock !== null && (minutesFromClock <= 0 || minutesFromClock > expectedMinutes))
+            throw new Error("ATTENDANCE_TIME_RANGE_INVALID");
           return {
             enrollmentId: this.text(student.id),
             status: student.status as "present" | "late" | "absent" | "excused",
             arrivalAtUtc: absent ? null : arrivalAtUtc,
             departureAtUtc: absent ? null : departureAtUtc,
-            presentMinutes: absent ? 0 : minutesFromClock ?? Math.round(this.number(student.duration) * 60),
-            addToCatchup: Boolean(student.addToCatchup),
+            presentMinutes: resolvedMinutes,
+            addToCatchup: student.status !== "excused" &&
+              Boolean(student.addToCatchup) && resolvedMinutes < expectedMinutes,
             comment: this.nullableText(student.comment),
           };
         });
@@ -172,7 +193,9 @@ export class AttendanceApiStoreService {
         return false;
       this.sheetSignal.set(this.normalizeSheet(saved));
       this.loadError.set(false);
-      return true;
+      // Always re-read canonical server state so dependent metrics and realtime views
+      // never depend on client-side approximations or partial response fields.
+      return await this.load(row.id, generation, false);
     } catch {
       this.notifications.error("attendance.real.saveFailed", "/presences");
       return false;

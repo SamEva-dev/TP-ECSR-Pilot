@@ -42,6 +42,7 @@
           (change)="setProgram($event)"
           class="h-11 w-full rounded-[11px] border border-[#d8e0e9] bg-white px-3 text-[12.5px] outline-none"
         >
+          <option value="">{{ "referentials.versionDrawer.chooseProgram" | t }}</option>
           @for (program of programs; track program.id) {
             <option [value]="program.id">{{ program.name }}</option>
           }
@@ -56,6 +57,7 @@
           (change)="setSource($event)"
           class="h-11 w-full rounded-[11px] border border-[#d8e0e9] bg-white px-3 text-[12.5px] outline-none"
         >
+          <option value="">{{ "referentials.versionDrawer.chooseSource" | t }}</option>
           @for (item of sources(); track item.id) {
             <option [value]="item.id">
               {{ item.version }} · {{ item.code }}
@@ -63,7 +65,11 @@
           }</select
         ><span class="mt-1.5 block text-[10.5px] text-[#8490a3]">{{
           "referentials.versionDrawer.sourceHint" | t
-        }}</span></label
+        }}</span>
+        @if (effectiveProgramId() && sources().length === 0) {
+          <p class="mt-2 text-[11px] text-amber-700">{{ "referentials.versionDrawer.noSource" | t }}</p>
+        }
+      </label
       >
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="block"
@@ -131,6 +137,7 @@
       ><button
         type="button"
         (click)="submit()"
+        [disabled]="!canCreate()"
         class="h-10 rounded-[11px] bg-[#2b66a4] px-5 text-[12px] font-semibold text-white"
       >
         {{ "referentials.versionDrawer.create" | t }}

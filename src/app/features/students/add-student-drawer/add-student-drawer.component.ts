@@ -17,6 +17,7 @@ import {
 } from "@angular/forms";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
 import { ContextualTrainingDataService } from "../../../core/workspace/contextual-training-data.service";
+import { WorkspaceContextService } from "../../../core/workspace/workspace-context.service";
 
 export interface CreateStudentPayload {
   firstName: string;
@@ -37,15 +38,16 @@ export interface CreateStudentPayload {
 })
 export class AddStudentDrawerComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  readonly workspace = inject(WorkspaceContextService);
   readonly open = input(false);
   readonly busy = input(false);
   readonly closed = output<void>();
   readonly studentCreated = output<CreateStudentPayload>();
   readonly submitted = signal(false);
-  readonly promotions = computed(() => {
-    const cohort = this.contextData.cohort();
-    return cohort ? [{ id: cohort.id, name: cohort.name }] : [];
-  });
+  readonly promotions = computed(() => this.workspace.contextCohorts()
+    .filter(item => !!item.apiId)
+    .map(item => ({ id: item.id as string, name: item.name as string })));
+  readonly promotionUnavailable = computed(() => !this.workspace.remoteWorkspaceLoaded() || this.promotions().length === 0);
 
   readonly form = new FormGroup({
     firstName: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
@@ -73,6 +75,9 @@ export class AddStudentDrawerComponent {
     effect(() => {
       const cohort = this.contextData.cohort();
       if (!cohort) return;
+      // Do not replace an explicitly selected, still-authorized promotion.
+      const currentId = this.form.controls.promotionId.value;
+      if (currentId && this.promotions().some(item => item.id === currentId)) return;
       this.form.controls.promotionId.setValue(cohort.id, { emitEvent: false });
       this.form.controls.startDate.setValue(cohort.start, { emitEvent: false });
     });
@@ -93,6 +98,10 @@ export class AddStudentDrawerComponent {
     this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+    if (!this.promotions().some(item => item.id === this.form.controls.promotionId.value)) {
+      this.form.controls.promotionId.setErrors({ invalidContext: true });
       return;
     }
     this.studentCreated.emit(this.form.getRawValue());

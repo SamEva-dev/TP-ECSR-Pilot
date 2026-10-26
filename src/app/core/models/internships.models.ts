@@ -23,6 +23,8 @@ export interface InternshipPeriod {
   company: string;
   city: string;
   tutor: string;
+  tutorEmail: string;
+  tutorPhone: string;
   startDate: string;
   endDate: string;
   plannedHours: number;

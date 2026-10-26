@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { OrganizationDashboardApiStoreService } from "../../core/api-data/organization-dashboard-api-store.service";
+import { OrganizationSetupComponent } from "./organization-setup.component";
+import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
 @Component({
   selector: "app-organization-dashboard",
-  imports: [TranslatePipe, RouterLink],
+  imports: [TranslatePipe, RouterLink, OrganizationSetupComponent],
   templateUrl: "./organization-dashboard.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -14,6 +16,8 @@ export class OrganizationDashboardComponent {
   private readonly router = inject(Router);
   readonly workspace = inject(WorkspaceContextService);
   private readonly dashboard = inject(OrganizationDashboardApiStoreService);
+  private readonly referentials = inject(ReferentialApiStoreService);
+  readonly setupVisible = computed(() => this.workspace.remoteWorkspaceLoaded() && !!this.workspace.organization()?.apiId);
 
   readonly kpis = this.dashboard.kpis;
   readonly sites = this.dashboard.sites;

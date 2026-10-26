@@ -168,6 +168,10 @@ export class SheetsApiStoreService {
     value: SaveSheetEvaluationValue,
   ): Promise<PedagogicalSheet | null> {
     const enrollmentId = this.text(value.studentId);
+    if (!this.students().some(item => item.id === enrollmentId) || !this.currentEvaluator()) {
+      this.notifications.error("s07.sheets.invalidContext", "/fiches");
+      return null;
+    }
     const current = this.topicByNumber(value.sheetNumber);
     if (
       !enrollmentId ||
@@ -178,6 +182,10 @@ export class SheetsApiStoreService {
       return null;
     }
 
+    if (!value.presentationDate || !Number.isFinite(value.durationMinutes) || value.durationMinutes < 1 || value.durationMinutes > 180) {
+      this.notifications.error("s07.sheets.dateDurationRequired", "/fiches");
+      return null;
+    }
     const evaluationCriteria = Object.entries(value.levels ?? {})
       .filter(([code]) => Boolean(this.text(code)))
       .map(([code, level]) => ({

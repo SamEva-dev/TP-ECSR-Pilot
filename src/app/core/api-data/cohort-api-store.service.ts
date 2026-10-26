@@ -163,7 +163,10 @@ export class CohortApiStoreService {
     const referential = this.referentials.items().find(
       (item) => item.id === payload.referentialVersionId || item.apiId === payload.referentialVersionId,
     );
-    if (!offering?.apiId || !referential?.apiId) {
+    const selectedProgram = this.workspace.program();
+    if (!offering?.apiId || !referential?.apiId || referential.status !== "active" ||
+        !selectedProgram || (referential.programId !== selectedProgram.id && referential.programApiId !== selectedProgram.apiId) ||
+        !this.text(payload.managerUserId).trim()) {
       this.notifications.error("promotions.api.invalidContext", "/promotions");
       return null;
     }

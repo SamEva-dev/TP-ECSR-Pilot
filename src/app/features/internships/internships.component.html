@@ -82,6 +82,15 @@
                       }
               }}
             </p>
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#536277]">
+              @if (period.tutorEmail) {
+                <span><i class="ph ph-envelope-simple mr-1" aria-hidden="true"></i>{{ period.tutorEmail }}</span>
+              }
+              @if (period.tutorPhone) {
+                <span><i class="ph ph-phone mr-1" aria-hidden="true"></i>{{ period.tutorPhone }}</span>
+              }
+              <span class="text-[#8b5e00]">{{ "internships.s09.externalAccessNotInvited" | t }}</span>
+            </div>
           </div>
           <span
             [class]="

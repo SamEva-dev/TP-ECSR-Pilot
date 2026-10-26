@@ -201,6 +201,7 @@
                   formControlName="promotionId"
                   class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
                 >
+                  <option value="" disabled>{{ "students.drawer.training.choosePromotion" | t }}</option>
                   @for (promotion of promotions(); track promotion.id) {
                     <option [value]="promotion.id">{{ promotion.name }}</option>
                   }
@@ -209,6 +210,12 @@
                   class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
                 ></i>
               </div>
+              @if (promotionUnavailable()) {
+                <p role="status" class="mt-2 text-[12px] text-[#a16a00]">{{ "students.drawer.training.noPromotions" | t }}</p>
+              }
+              @if (form.controls.promotionId.hasError("invalidContext")) {
+                <p role="alert" class="mt-2 text-[12px] text-red-600">{{ "students.drawer.training.invalidPromotion" | t }}</p>
+              }
             </div>
 
             <div class="mt-4">

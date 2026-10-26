@@ -71,6 +71,7 @@
                 formControlName="studentId"
                 class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
               >
+                <option value="">{{ "internships.s09.chooseEnrollment" | t }}</option>
                 @for (student of students; track student.id) {
                   <option [value]="student.id">
                     {{ student.firstName }} {{ student.lastName }}
@@ -81,6 +82,9 @@
                 class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
               ></i>
             </div>
+            @if (!students.length) {
+              <p role="status" class="mt-2 text-[12px] text-[#8b5e00]">{{ "internships.s09.noEnrollments" | t }}</p>
+            }
           </section>
 
           <section
@@ -181,6 +185,7 @@
                     {{ "internships.drawer.errors.email" | t }}
                   </p>
                 }
+                <p class="mt-2 text-[11px] text-[#64748b]">{{ "internships.s09.emailNotInvitation" | t }}</p>
               </div>
               <div>
                 <label

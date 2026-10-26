@@ -1,0 +1,39 @@
+{
+  "organizationSetup": {
+    "title": "Configurer votre organisation",
+    "subtitle": "Suivez les étapes dans l’ordre. Les données proviennent de vos services API.",
+    "progress": "{{done}} sur {{total}} prérequis vérifiés",
+    "loadError": "Impossible de charger certaines données. Vérifiez la connexion API avant de continuer.",
+    "loading": "Chargement de votre organisation…",
+    "done": "Présent",
+    "todo": "À configurer",
+    "toVerify": "À vérifier",
+    "open": "Ouvrir",
+    "contextHint": "Le Contexte de travail est conservé. Une sélection est automatique uniquement lorsqu’il n’existe qu’un choix compatible.",
+    "steps": {
+      "access": "Responsables et accès",
+      "sites": "Établissements",
+      "programs": "Formations",
+      "referentials": "Référentiels",
+      "cohorts": "Promotions",
+      "students": "Stagiaires",
+      "planning": "Planning"
+    },
+    "help": {
+      "access": "Invitez ou affectez les responsables avant de les sélectionner dans les formulaires.",
+      "sites": "Créez le premier établissement de votre organisation.",
+      "programs": "Créez une formation et rattachez-la à un établissement.",
+      "referentials": "Créez la première version du référentiel de votre formation.",
+      "cohorts": "Créez une promotion sur la formation et la version souhaitées.",
+      "students": "Créez les profils puis affectez-les à une promotion.",
+      "planning": "Planifiez des séances avec des formateurs et des promotions valides."
+    },
+    "compactTitle": "Organisation configurée",
+    "completedHint": "{{done}} sur {{total}} prérequis techniques présents. Vous pouvez ajouter des éléments à tout moment.",
+    "addSite": "Nouvel établissement",
+    "addProgram": "Nouvelle formation",
+    "expand": "Afficher la configuration",
+    "collapse": "Réduire",
+    "scopeHint": "Cet assistant accompagne la première configuration. Pour créer une autre organisation, utilisez le changement d'organisation ou le parcours de création autorisé ; les données sont isolées par organisation."
+  }
+}

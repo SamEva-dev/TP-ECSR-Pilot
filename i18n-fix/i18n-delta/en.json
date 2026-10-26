@@ -1,0 +1,39 @@
+{
+  "organizationSetup": {
+    "title": "Set up your organization",
+    "subtitle": "Follow the steps in order. Statuses are based on live API data.",
+    "progress": "{{done}} of {{total}} verified prerequisites",
+    "loadError": "Some data could not be loaded. Check API connectivity before continuing.",
+    "loading": "Loading organization…",
+    "done": "Present",
+    "todo": "To set up",
+    "toVerify": "Verify",
+    "open": "Open",
+    "contextHint": "Your working context is preserved. Automatic selection occurs only when there is one compatible choice.",
+    "steps": {
+      "access": "Managers and access",
+      "sites": "Locations",
+      "programs": "Training programs",
+      "referentials": "Curriculum versions",
+      "cohorts": "Cohorts",
+      "students": "Learners",
+      "planning": "Schedule"
+    },
+    "help": {
+      "access": "Invite or assign managers before selecting them in forms.",
+      "sites": "Create your organization’s first location.",
+      "programs": "Create a training program and link it to a location.",
+      "referentials": "Create the first curriculum version for your program.",
+      "cohorts": "Create a cohort for the appropriate program and version.",
+      "students": "Create learner profiles and enroll them in a cohort.",
+      "planning": "Schedule sessions with eligible trainers and cohorts."
+    },
+    "compactTitle": "Organization configured",
+    "completedHint": "{{done}} of {{total}} technical prerequisites present. You can add more items at any time.",
+    "addSite": "New site",
+    "addProgram": "New training program",
+    "expand": "Show setup",
+    "collapse": "Collapse",
+    "scopeHint": "This assistant supports initial setup. To create another organization, use the organization switcher or the authorized creation flow; data remains scoped to each organization."
+  }
+}

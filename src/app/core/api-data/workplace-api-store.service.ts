@@ -155,7 +155,8 @@ export class WorkplaceApiStoreService {
       !enrollmentId ||
       !this.text(value.startDate) ||
       !this.text(value.endDate) ||
-      this.number(value.plannedHours) <= 0
+      this.number(value.plannedHours) <= 0 ||
+      this.text(value.endDate) < this.text(value.startDate)
     ) {
       this.notifications.error("internships.real.createError", "/stages");
       return null;
@@ -377,6 +378,8 @@ export class WorkplaceApiStoreService {
       company: normalized.company,
       city: normalized.city,
       tutor: normalized.tutorName,
+      tutorEmail: normalized.tutorEmail ?? "",
+      tutorPhone: normalized.tutorPhone ?? "",
       startDate: this.displayDate(normalized.startDate),
       endDate: this.displayDate(normalized.endDate),
       plannedHours: normalized.plannedHours,

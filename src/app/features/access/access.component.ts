@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { ActivatedRoute } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
 import { StudentApiStoreService } from "../../core/api-data/student-api-store.service";
@@ -21,6 +22,7 @@ import { AccessAssignmentDrawerComponent } from "./access-assignment-drawer/acce
 })
 export class AccessComponent {
   private readonly api = inject(PedagoraAccessApiService);
+  private readonly route = inject(ActivatedRoute);
   private readonly studentStore = inject(StudentApiStoreService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly accessPolicy = inject(AccessPolicyService);
@@ -29,6 +31,7 @@ export class AccessComponent {
   readonly workspace = inject(WorkspaceContextService);
 
   readonly accounts = signal<AccessAccount[]>([]);
+  readonly invitationPending = signal(false);
   readonly search = signal("");
   readonly roleFilter = signal<"all" | MembershipRole>("all");
   readonly selectedId = signal("");
@@ -68,6 +71,14 @@ export class AccessComponent {
   );
 
   constructor() {
+    // The initial setup wizard and responsibility selectors can deep-link directly to
+    // the required product role. Reject arbitrary query-string values.
+    this.route.queryParamMap.subscribe(params => {
+      const role = params.get("inviteRole");
+      if (role === "site_direction" || role === "pedagogical_manager" || role === "trainer") {
+        this.inviteRole = role;
+      }
+    });
     void this.realtime.start().catch(() => undefined);
 
     effect(() => {
@@ -295,7 +306,7 @@ export class AccessComponent {
     const firstName = this.inviteFirstName.trim();
     const lastName = this.inviteLastName.trim();
     const email = this.inviteEmail.trim();
-    if (!firstName || !lastName || !email) return;
+    if (this.invitationPending() || !firstName || !lastName || !email) return;
     if (this.inviteRole === "student") {
       // Use exactly the same invitation/receipt flow as the Stagiaires screen.
       // The access form has no cohort selector: never pick an arbitrary promotion.
@@ -314,12 +325,14 @@ export class AccessComponent {
       this.selectedId.set(this.accounts().find((account) => account.email.toLowerCase() === receipt.email.toLowerCase())?.id ?? "");
       return;
     }
+    this.invitationPending.set(true);
     try {
       const created = await firstValueFrom(this.api.invite({ firstName, lastName, email, role: this.inviteRole }));
       this.inviteFirstName = ""; this.inviteLastName = ""; this.inviteEmail = ""; this.inviteRole = "trainer";
       await this.reload(false);
       this.selectedId.set(created?.id ?? this.accounts().find((x) => x.email.toLowerCase() === email.toLowerCase())?.id ?? "");
     } catch { this.notifications.error("access.api.inviteError", "/acces"); }
+    finally { this.invitationPending.set(false); }
   }
 
   private async reload(notify = true): Promise<void> {

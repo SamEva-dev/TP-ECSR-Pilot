@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from "@angular/core";
+import { Router } from "@angular/router";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PedagoraAccessApiService, type ProductAccount } from "../../../core/access/pedagora-access-api.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
@@ -16,6 +17,10 @@ import type { ProgramModule } from "../../../core/models/workspace.models";
 export class ProgramDrawerComponent {
   private readonly translate = inject(TranslateService);
   private readonly accessApi = inject(PedagoraAccessApiService);
+  private readonly router = inject(Router);
+  readonly trainersLoading = signal(false);
+  readonly trainersLoadError = signal(false);
+  private trainersRequest = 0;
   readonly trainers = signal<ProductAccount[]>([]);
   readonly open = input(false);
   readonly program = input<ProgramCatalogItem | null>(null);
@@ -31,13 +36,13 @@ export class ProgramDrawerComponent {
     description: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     referenceVersion: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     durationHours: new FormControl(0, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
-    status: new FormControl<ProgramCatalogStatus>("active", { nonNullable: true }),
+    status: new FormControl<ProgramCatalogStatus>("draft", { nonNullable: true }),
     responsibleTrainerAuthGateUserId: new FormControl("", { nonNullable: true }),
   });
 
   constructor() {
     effect(() => {
-      if (!this.open()) return;
+      if (!this.open()) { ++this.trainersRequest; return; }
       const program = this.program();
       this.form.reset({
         code: program?.code ?? "",
@@ -46,7 +51,7 @@ export class ProgramDrawerComponent {
         description: program ? this.translate.instant(program.description) : "",
         referenceVersion: program?.referenceVersion ?? "",
         durationHours: program?.durationHours ?? 0,
-        status: program?.status ?? "active",
+        status: program?.status ?? "draft",
         responsibleTrainerAuthGateUserId: program?.responsibleTrainerAuthGateUserId ?? "",
       });
       this.selectedModules.set(program?.enabledModules ?? ["planning", "attendance", "sessions", "documents", "certification"]);
@@ -63,15 +68,33 @@ export class ProgramDrawerComponent {
   }
 
   private async loadTrainers(): Promise<void> {
+    const request = ++this.trainersRequest;
+    this.trainersLoading.set(true);
+    this.trainersLoadError.set(false);
     try {
       const rows = await this.accessApi.membersWithRole("pedagogical_manager");
-      this.trainers.set((Array.isArray(rows) ? rows : []).filter(x => x.status === "Active"));
-    } catch { this.trainers.set([]); }
+      if (request === this.trainersRequest && this.open())
+        this.trainers.set((Array.isArray(rows) ? rows : []).filter(x => x.status === "Active"));
+    } catch {
+      if (request === this.trainersRequest) { this.trainers.set([]); this.trainersLoadError.set(true); }
+    } finally {
+      if (request === this.trainersRequest) this.trainersLoading.set(false);
+    }
+  }
+
+  async manageResponsible(): Promise<void> {
+    this.closed.emit();
+    await this.router.navigate(["/acces"], { queryParams: { inviteRole: "pedagogical_manager" } });
   }
 
   trainerName(trainer: ProductAccount): string { return `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim(); }
 
   submit(): void {
+    if (this.form.controls.status.value === "active" && !this.form.controls.responsibleTrainerAuthGateUserId.value) {
+      this.form.controls.responsibleTrainerAuthGateUserId.setErrors({ required: true });
+    } else {
+      this.form.controls.responsibleTrainerAuthGateUserId.setErrors(null);
+    }
     if (this.form.invalid || this.selectedModules().length === 0) {
       this.form.markAllAsTouched();
       return;

@@ -142,6 +142,9 @@
                     class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
                   ></i>
                 </div>
+                @if (!referentials().length) {
+                  <p class="mt-1 text-[11px] text-amber-700">{{ "promotions.s04.noPublishedVersion" | t }}</p>
+                }
                 @if (showRequired("referentialVersionId")) {
                   <p class="mt-1 text-[11px] text-red-600">
                     {{ "promotions.drawer.errors.required" | t }}
@@ -186,6 +189,7 @@
                   formControlName="managerUserId"
                   class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
                 >
+                  <option value="">{{ "promotions.s04.chooseManager" | t }}</option>
                   @for (member of team(); track member.id) {
                     <option [value]="member.id">{{ fullName(member) }}</option>
                   }

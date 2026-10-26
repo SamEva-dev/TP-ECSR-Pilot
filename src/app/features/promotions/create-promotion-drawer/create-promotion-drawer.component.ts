@@ -128,9 +128,6 @@ export class CreatePromotionDrawerComponent {
 
   submit(): void {
     this.submitted.set(true);
-    if (!this.form.controls.referentialVersionId.value && this.referentials().length) {
-      this.form.controls.referentialVersionId.setValue(this.referentials()[0].id);
-    }
     if (this.form.invalid || this.hasInvalidDates() ||
         !this.referentials().some((version) => version.id === this.form.controls.referentialVersionId.value) ||
         !this.team().some((member) => member.id === this.form.controls.managerUserId.value)) {
@@ -180,7 +177,7 @@ export class CreatePromotionDrawerComponent {
     const firstReferential = this.referentials()[0];
     const currentReferential = this.form.controls.referentialVersionId.value;
     if (!currentReferential || !this.referentials().some((item) => item.id === currentReferential))
-      this.form.controls.referentialVersionId.setValue(firstReferential?.id ?? "", { emitEvent: false });
+      this.form.controls.referentialVersionId.setValue(firstReferential && this.referentials().length === 1 ? firstReferential.id : "", { emitEvent: false });
     await this.loadTeam();
   }
 
@@ -216,7 +213,7 @@ export class CreatePromotionDrawerComponent {
       endDate: "",
       studentCount: 0,
       managerUserId: "",
-      referentialVersionId: this.referentials()[0]?.id ?? "",
+      referentialVersionId: this.referentials().length === 1 ? this.referentials()[0].id : "",
       status: "planned",
     });
     this.submitted.set(false);

@@ -39,7 +39,7 @@ export class PlanningCreateRouteComponent {
               ? "remote-live"
               : "onsite",
         title: payload.title ?? "",
-        trainerAuthGateUserId: "",
+        trainerAuthGateUserId: payload.trainerAuthGateUserId,
         trainerDisplayName: payload.responsible ?? "",
         location: payload.location ?? "",
         objective: payload.competence ?? "",

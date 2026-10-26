@@ -90,6 +90,7 @@ export class ProgramApiStoreService {
   }
 
   async create(value: ProgramFormValue): Promise<boolean> {
+    let createdId = "";
     try {
       const created = await this.api.create({
         familyCode: this.familyFor(value.category),
@@ -105,24 +106,36 @@ export class ProgramApiStoreService {
         responsibleTrainerAuthGateUserId: this.nullableText(value.responsibleTrainerAuthGateUserId),
         responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
-      const requestedResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
-      if (requestedResponsible && created?.id) {
-        await this.api.assignResponsible(this.text(created.id), requestedResponsible);
-      }
-      this.programsSignal.update((items) => [...items, this.map(created)]);
-      const currentSite = this.workspace.site();
-      if (currentSite?.apiId && created?.id) {
-        await this.api.setOffering(this.text(created.id), currentSite.apiId, true);
-      }
-      await this.reload();
-      await this.workspace.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("programs.real.workspaceError", "/formations");
-      return true;
+      createdId = this.text(created?.id);
+      if (!createdId) throw new Error("Missing persisted program identifier");
+      this.programsSignal.update(items => [...items, this.map(created)]);
     } catch {
       this.notifications.error("programs.real.saveError", "/formations");
       return false;
     }
+
+    // Separate API commands. Once CREATE succeeded, never report that the
+    // program was not created: recover by reloading, not by resubmitting POST.
+    let followUpFailed = false;
+    const requestedResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
+    if (requestedResponsible) {
+      try {
+        await this.api.assignResponsible(createdId, requestedResponsible);
+      } catch { followUpFailed = true; }
+    }
+    const currentSite = this.workspace.site();
+    if (currentSite?.apiId) {
+      try {
+        await this.api.setOffering(createdId, currentSite.apiId, true);
+      } catch { followUpFailed = true; }
+    }
+    try {
+      await this.workspace.reload();
+      await this.reload();
+      if (this.workspace.remoteWorkspaceError()) followUpFailed = true;
+    } catch { followUpFailed = true; }
+    if (followUpFailed) this.notifications.error("s03.partialProgramCreated", "/formations");
+    return true;
   }
 
   async update(id: string, value: ProgramFormValue): Promise<boolean> {

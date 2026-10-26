@@ -41,7 +41,7 @@ export class StudentsComponent {
   readonly status = signal<"all" | StudentStatus>("all");
 
   readonly promotions = computed(() => {
-    return this.workspace.contextCohorts().map((cohort) => ({ id: cohort.apiId ?? "", name: cohort.name ?? "" }));
+    return this.workspace.contextCohorts().filter(cohort => !!cohort.apiId).map((cohort) => ({ id: cohort.apiId ?? "", name: cohort.name ?? "" }));
   });
 
   readonly students = computed(() => this.store.students());

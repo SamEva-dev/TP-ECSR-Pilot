@@ -69,7 +69,7 @@ export class CreateInternshipDrawerComponent {
     }),
     tutorEmail: new FormControl("", {
       nonNullable: true,
-      validators: [Validators.email],
+      validators: [Validators.email, Validators.maxLength(254)],
     }),
     tutorPhone: new FormControl("", { nonNullable: true }),
     startDate: new FormControl("", {
@@ -102,14 +102,14 @@ export class CreateInternshipDrawerComponent {
       const defaultHours = this.store.defaultPlannedHours();
 
       if (open && !this.wasOpen) {
-        this.resetForm(defaultHours, students[0]?.id ?? "");
+        this.resetForm(defaultHours, "");
       } else if (
         open &&
         !students.some(
           (student) => student.id === this.form.controls.studentId.value,
         )
       ) {
-        this.form.controls.studentId.setValue(students[0]?.id ?? "", {
+        this.form.controls.studentId.setValue("", {
           emitEvent: false,
         });
       }
@@ -128,7 +128,7 @@ export class CreateInternshipDrawerComponent {
   }
 
   submit(): void {
-    if (this.store.creating()) return;
+    if (this.store.creating() || this.store.loading() || !this.students.length) return;
     this.submitted.set(true);
     if (this.form.invalid || this.dateRangeInvalid()) {
       this.form.markAllAsTouched();

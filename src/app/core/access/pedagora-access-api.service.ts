@@ -18,6 +18,8 @@ export interface ProductAccount {
   permissions: ProductPermission[];
   assignments: WorkspaceMembership[];
   isInvitation: boolean;
+  /** Server-verified owner of the current organization. */
+  isOrganizationOwner?: boolean;
 }
 export interface ProductAccountPage {
   items: ProductAccount[];
@@ -74,7 +76,7 @@ export class PedagoraAccessApiService {
           .filter((value): value is string => typeof value === "string")
           .map(value => value.toLowerCase().replace(/[^a-z]/g, ""));
         const expected = role === "pedagogical_manager" ? "pedagogicalmanager" : "sitedirection";
-        if (account.status === "Active" && !account.isInvitation && roles.some(value => value === expected || value === `pedagorapilot${expected}`))
+        if (account.status === "Active" && !account.isInvitation && (roles.some(value => value === expected || value === `pedagorapilot${expected}`) || (role === "site_direction" && account.isOrganizationOwner === true)))
           matches.push(account);
       }
       if (!items.length || page * pageSize >= (response?.totalCount ?? 0)) break;

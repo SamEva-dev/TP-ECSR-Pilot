@@ -55,8 +55,8 @@
                   "with": "src/app/environments/environment.staging.ts"
                 }
               ],
-              "outputHashing": "all",
               "optimization": true,
+              "outputHashing": "all",
               "sourceMap": false
             }
           },
@@ -73,6 +73,9 @@
             },
             "development": {
               "buildTarget": "tp-ecsr-pilot:build:development"
+            },
+            "staging": {
+              "buildTarget": "tp-ecsr-pilot:build:staging"
             }
           },
           "defaultConfiguration": "development"

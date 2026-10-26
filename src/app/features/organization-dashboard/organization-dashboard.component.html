@@ -31,6 +31,10 @@
     </div>
   </div>
 
+  @if (setupVisible()) {
+    <app-organization-setup />
+  }
+
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
     <article
       class="relative min-h-[105px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
