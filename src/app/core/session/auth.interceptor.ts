@@ -45,6 +45,11 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     ? request.url.slice(authGateBase.length)
     : "";
   const isProtectedAuthGateCall = isAuthGate && isProtectedAuthGatePath(authGatePath);
+  // The invitation token is the credential for this publicly accessible endpoint.
+  // Never force an AuthGate login or token refresh on this anonymous operation.
+  if (isPedagoraApi && /\/api\/v1\/access\/invitations\/accept(?:\?|$)/.test(request.url)) {
+    return next(request);
+  }
   const shouldAuthorize = isPedagoraApi || isProtectedAuthGateCall;
 
   if (!shouldAuthorize || request.headers.has("Authorization")) {

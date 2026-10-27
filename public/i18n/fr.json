@@ -4815,5 +4815,19 @@
       "dateDurationRequired": "Indiquez une date et une durée comprise entre 1 et 180 minutes.",
       "invalidContext": "Le stagiaire ou l’évaluateur n’est pas valide pour le contexte courant."
     }
+  },
+  "invitationAcceptance": {
+    "title": "Accepter votre invitation à Pedagora Pilot",
+    "description": "Choisissez votre mot de passe pour activer votre accès à l’organisation qui vous a invité.",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordHint": "Le mot de passe doit contenir au moins 8 caractères.",
+    "mismatch": "Les mots de passe sont différents.",
+    "submit": "Accepter et activer mon accès",
+    "processing": "Activation en cours…",
+    "success": "Invitation acceptée. Votre accès a été créé avec le rôle attribué. Connectez-vous à Pedagora Pilot.",
+    "login": "Se connecter",
+    "invalidLink": "Cette invitation est invalide, expirée ou déjà utilisée. Contactez votre administrateur.",
+    "failed": "Impossible d’activer cet accès. Réessayez ou contactez votre administrateur."
   }
 }

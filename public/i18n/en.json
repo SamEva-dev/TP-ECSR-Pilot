@@ -4815,5 +4815,19 @@
       "dateDurationRequired": "Enter a date and a duration between 1 and 180 minutes.",
       "invalidContext": "The learner or evaluator is invalid for the current context."
     }
+  },
+  "invitationAcceptance": {
+    "title": "Accept your invitation to Pedagora Pilot",
+    "description": "Choose a password to activate access to the organization that invited you.",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordHint": "Password must contain at least 8 characters.",
+    "mismatch": "Passwords do not match.",
+    "submit": "Accept and activate my access",
+    "processing": "Activating…",
+    "success": "Invitation accepted. Your access was created with the assigned role. Sign in to Pedagora Pilot.",
+    "login": "Sign in",
+    "invalidLink": "This invitation is invalid, expired or already used. Contact your administrator.",
+    "failed": "Unable to activate access. Try again or contact your administrator."
   }
 }

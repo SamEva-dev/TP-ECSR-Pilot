@@ -10,6 +10,11 @@ export const routes: Routes = [
       import("./features/auth/auth.component").then((m) => m.AuthComponent),
   },
   {
+    path: "accept-invitation/:token",
+    loadComponent: () =>
+      import("./features/auth/accept-invitation.component").then((m) => m.AcceptInvitationComponent),
+  },
+  {
     path: "confirm-email",
     loadComponent: () =>
       import("./features/auth/confirm-email.component").then((m) => m.ConfirmEmailComponent),
