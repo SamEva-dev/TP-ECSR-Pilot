@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
@@ -10,7 +10,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 @Component({
   selector: "app-accept-invitation",
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="flex min-h-screen items-center justify-center bg-[var(--ecsr-page)] px-5 py-10">
@@ -18,7 +18,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
         <h1 class="text-2xl font-extrabold text-[#102847]">{{ "invitationAcceptance.title" | t }}</h1>
         @if (accepted()) {
           <p class="mt-4 text-green-700" role="status">{{ "invitationAcceptance.success" | t }}</p>
-          <a routerLink="/connexion" class="mt-6 inline-flex rounded-lg bg-[#2a64a2] px-6 py-3 font-semibold text-white">{{ "invitationAcceptance.login" | t }}</a>
+          <p class="mt-2 text-sm text-[#64748b]">{{ "invitationAcceptance.redirecting" | t }}</p>
         } @else if (!token) {
           <p class="mt-4 text-red-700" role="alert">{{ "invitationAcceptance.invalidLink" | t }}</p>
         } @else {
@@ -45,6 +45,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
 export class AcceptInvitationComponent {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly token = this.route.snapshot.paramMap.get("token") ?? "";
   readonly loading = signal(false);
   readonly accepted = signal(false);
@@ -65,12 +66,14 @@ export class AcceptInvitationComponent {
     }
     this.loading.set(true);
     try {
-      await firstValueFrom(this.http.post<{ userId: string; status: string }>(
+      const response = await firstValueFrom(this.http.post<{ userId: string; email: string; status: string }>(
         `${environment.apiBaseUrl}/api/v1/access/invitations/accept`,
         { token: this.token, password },
       ));
+      // Do not persist invitation tokens or the new password in browser storage or login URLs.
       this.form.reset();
       this.accepted.set(true);
+      await this.router.navigate(["/connexion"], { replaceUrl: true, queryParams: { email: response.email } });
     } catch (error: unknown) {
       const normalized = error as { code?: string; status?: number; original?: HttpErrorResponse };
       const serverCode = normalized.original?.error?.error ?? normalized.original?.error?.code ?? normalized.code;

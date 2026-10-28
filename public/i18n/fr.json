@@ -767,27 +767,6 @@
       "chooseManager": "Sélectionner un responsable pédagogique",
       "noManagers": "Aucun responsable pédagogique actif. Invitez puis activez un responsable dans Gestion des accès.",
       "noPublishedVersion": "Aucune version de référentiel active pour cette formation. Publiez une version avant de créer la promotion."
-    },
-    "copy": {
-      "action": "Dupliquer",
-      "title": "Dupliquer une promotion",
-      "hint": "Crée une nouvelle promotion dans un autre établissement. Aucun stagiaire, historique ou présence ne sera copié.",
-      "destination": "Établissement de destination",
-      "choose": "Sélectionner",
-      "noOffering": "Rattachez d’abord cette formation à un autre établissement depuis le catalogue Formations.",
-      "name": "Nom de la nouvelle promotion",
-      "code": "Nouveau code unique",
-      "start": "Début",
-      "end": "Fin",
-      "capacity": "Capacité",
-      "manager": "Responsable pédagogique",
-      "draftOnly": "La copie est créée en brouillon. Vérifiez-la avant activation.",
-      "invalid": "Vérifiez le site, le référentiel actif, le responsable, le code (2 à 40 caractères alphanumériques, _ ou -), les dates et la capacité.",
-      "managersUnavailable": "Impossible de charger les responsables pédagogiques.",
-      "unexpectedResponse": "La réponse API ne confirme pas la destination. Vérifiez la liste avant toute nouvelle tentative.",
-      "failed": "La création n’a pas pu être confirmée. Vérifiez les promotions du site cible avant de réessayer.",
-      "cancel": "Annuler",
-      "confirm": "Créer la copie"
     }
   },
   "sessions": {
@@ -3130,16 +3109,6 @@
     "delete": {
       "action": "Supprimer la formation",
       "confirm": "Supprimer définitivement « {{name}} » ? La suppression est refusée si la formation, son référentiel ou ses versions sont déjà utilisés. Cette action est irréversible."
-    },
-    "attach": {
-      "action": "Rattacher une formation existante",
-      "title": "Rattacher une formation à cet établissement",
-      "help": "Réutilise le catalogue, le référentiel et les modules de cette organisation, sans copier les stagiaires ni les promotions.",
-      "source": "Formation existante",
-      "choose": "Choisir une formation",
-      "empty": "Aucune formation disponible à rattacher.",
-      "cancel": "Annuler",
-      "confirm": "Rattacher"
     }
   },
   "referentials": {
@@ -4859,6 +4828,7 @@
     "success": "Invitation acceptée. Votre accès a été créé avec le rôle attribué. Connectez-vous à Pedagora Pilot.",
     "login": "Se connecter",
     "invalidLink": "Cette invitation est invalide, expirée ou déjà utilisée. Contactez votre administrateur.",
-    "failed": "Impossible d’activer cet accès. Réessayez ou contactez votre administrateur."
+    "failed": "Impossible d’activer cet accès. Réessayez ou contactez votre administrateur.",
+    "redirecting": "Redirection vers la connexion avec votre adresse email préremplie…"
   }
 }
