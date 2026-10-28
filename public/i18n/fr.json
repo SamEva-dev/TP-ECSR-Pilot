@@ -4829,6 +4829,8 @@
     "login": "Se connecter",
     "invalidLink": "Cette invitation est invalide, expirée ou déjà utilisée. Contactez votre administrateur.",
     "failed": "Impossible d’activer cet accès. Réessayez ou contactez votre administrateur.",
-    "redirecting": "Redirection vers la connexion avec votre adresse email préremplie…"
+    "redirecting": "Redirection vers la connexion avec votre adresse email préremplie…",
+    "passwordTitle": "Créer votre mot de passe",
+    "passwordDescription": "Définissez le mot de passe de votre nouveau compte pour accepter cette invitation."
   }
 }

@@ -4829,6 +4829,8 @@
     "login": "Sign in",
     "invalidLink": "This invitation is invalid, expired or already used. Contact your administrator.",
     "failed": "Unable to activate access. Try again or contact your administrator.",
-    "redirecting": "Redirecting to sign in with your email address prefilled…"
+    "redirecting": "Redirecting to sign in with your email address prefilled…",
+    "passwordTitle": "Create your password",
+    "passwordDescription": "Set your new account password to accept this invitation."
   }
 }

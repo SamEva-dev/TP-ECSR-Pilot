@@ -15,6 +15,11 @@ export const routes: Routes = [
       import("./features/auth/accept-invitation.component").then((m) => m.AcceptInvitationComponent),
   },
   {
+    path: "change-password",
+    loadComponent: () =>
+      import("./features/auth/invitation-password.component").then((m) => m.InvitationPasswordComponent),
+  },
+  {
     path: "confirm-email",
     loadComponent: () =>
       import("./features/auth/confirm-email.component").then((m) => m.ConfirmEmailComponent),
