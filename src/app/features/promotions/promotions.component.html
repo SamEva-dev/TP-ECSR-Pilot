@@ -65,6 +65,9 @@
               } @else {
                 <span class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] bg-[#e8f6ec] px-3 text-[10.5px] font-semibold text-[#178344]"><i class="ph ph-check-circle text-[14px]"></i>{{ "promotions.contextual.currentContext" | t }}</span>
               }
+              @if (access.can("promotions.create")) {
+                <button type="button" (click)="openCopy(promotion)" class="inline-flex h-[34px] items-center gap-1.5 rounded-[10px] border border-[#dce3eb] bg-white px-3 text-[10.5px] font-semibold text-[#445269]" [attr.aria-label]="'promotions.copy.action' | t"><i class="ph ph-copy"></i>{{ "promotions.copy.action" | t }}</button>
+              }
               @if (access.can("promotions.delete")) {
                 <button type="button" (click)="deletePromotion(promotion)" class="grid size-[34px] place-items-center rounded-[10px] border border-[#f1c9c9] bg-white text-[#d43b3b] shadow-sm transition hover:bg-[#fff1f1]" [attr.aria-label]="'promotions.delete.action' | t"><i class="ph ph-trash text-[15px]"></i></button>
               }
@@ -142,4 +145,43 @@
     (closed)="closeCreateDrawer()"
     (promotionCreated)="createPromotion($event)"
   />
+
+  @if (copySource(); as source) {
+    <div class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/50 p-4" role="presentation" (click)="closeCopy()">
+      <section role="dialog" aria-modal="true" [attr.aria-label]="'promotions.copy.title' | t" class="w-full max-w-[620px] max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+        <div class="mb-4 flex items-center justify-between gap-2">
+          <h2 class="text-xl font-bold">{{ "promotions.copy.title" | t }}</h2>
+          <button type="button" (click)="closeCopy()" [disabled]="copying()" [attr.aria-label]="'promotions.copy.cancel' | t"><i class="ph ph-x text-xl"></i></button>
+        </div>
+        <p class="mb-4 text-sm text-slate-600">{{ "promotions.copy.hint" | t }}</p>
+        <p class="mb-4 rounded-lg bg-slate-100 p-3 text-sm">{{ source.name }} — {{ source.siteName }}</p>
+        <form (ngSubmit)="submitCopy()" class="grid gap-4 sm:grid-cols-2">
+          <label class="grid gap-1 text-sm sm:col-span-2">{{ "promotions.copy.destination" | t }}
+            <select class="rounded-lg border p-3" name="destinationSite" [(ngModel)]="copySiteId" required>
+              <option value="">{{ "promotions.copy.choose" | t }}</option>
+              @for (site of copyDestinations(); track site.id) { <option [value]="site.id">{{ site.code }} — {{ site.city }}</option> }
+            </select>
+          </label>
+          @if (!copyDestinations().length) { <p class="text-sm text-amber-700 sm:col-span-2">{{ "promotions.copy.noOffering" | t }}</p> }
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.name" | t }}<input class="rounded-lg border p-3" name="copyName" [(ngModel)]="copyName" required maxlength="80" /></label>
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.code" | t }}<input class="rounded-lg border p-3" name="copyCode" [(ngModel)]="copyCode" required maxlength="40" /></label>
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.start" | t }}<input type="date" class="rounded-lg border p-3" name="copyStart" [(ngModel)]="copyStart" required /></label>
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.end" | t }}<input type="date" class="rounded-lg border p-3" name="copyEnd" [(ngModel)]="copyEnd" required /></label>
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.capacity" | t }}<input type="number" min="1" step="1" class="rounded-lg border p-3" name="copyCapacity" [(ngModel)]="copyCapacity" required /></label>
+          <label class="grid gap-1 text-sm">{{ "promotions.copy.manager" | t }}
+            <select class="rounded-lg border p-3" name="copyManager" [(ngModel)]="copyManagerId" required>
+              <option value="">{{ "promotions.copy.choose" | t }}</option>
+              @for (manager of copyManagers(); track manager.id) { <option [value]="manager.id">{{ manager.name }}</option> }
+            </select>
+          </label>
+          <p class="text-xs text-slate-600 sm:col-span-2">{{ "promotions.copy.draftOnly" | t }}</p>
+          @if (copyError()) { <p class="text-sm text-red-700 sm:col-span-2" role="alert">{{ copyError() }}</p> }
+          <div class="flex justify-end gap-3 sm:col-span-2">
+            <button type="button" class="rounded-lg border px-4 py-2" [disabled]="copying()" (click)="closeCopy()">{{ "promotions.copy.cancel" | t }}</button>
+            <button type="submit" class="rounded-lg bg-[#2b66a4] px-4 py-2 text-white disabled:opacity-50" [disabled]="copying() || !copyDestinations().length">{{ "promotions.copy.confirm" | t }}</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
 </section>

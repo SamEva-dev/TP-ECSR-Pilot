@@ -767,6 +767,27 @@
       "chooseManager": "Select a pedagogical manager",
       "noManagers": "No active pedagogical manager. Invite and activate one in Access Management.",
       "noPublishedVersion": "No active referential version for this training program. Publish a version before creating the cohort."
+    },
+    "copy": {
+      "action": "Duplicate",
+      "title": "Duplicate a cohort",
+      "hint": "Create a new cohort at another site. Learners, attendance and history are not copied.",
+      "destination": "Destination site",
+      "choose": "Select",
+      "noOffering": "First attach this program to another site from the Programs catalog.",
+      "name": "New cohort name",
+      "code": "New unique code",
+      "start": "Start",
+      "end": "End",
+      "capacity": "Capacity",
+      "manager": "Pedagogical manager",
+      "draftOnly": "The copy is created as a draft. Review it before activation.",
+      "invalid": "Check the site, active referential, manager, code (2–40 alphanumeric characters, _ or -), dates and capacity.",
+      "managersUnavailable": "Unable to load pedagogical managers.",
+      "unexpectedResponse": "The API response does not confirm the destination. Check the list before retrying.",
+      "failed": "Creation could not be confirmed. Check destination cohorts before retrying.",
+      "cancel": "Cancel",
+      "confirm": "Create copy"
     }
   },
   "sessions": {
@@ -3109,6 +3130,16 @@
     "delete": {
       "action": "Delete program",
       "confirm": "Permanently delete “{{name}}”? Deletion is blocked if the program, its referential or its versions are already in use. This action cannot be undone."
+    },
+    "attach": {
+      "action": "Add existing program",
+      "title": "Offer an existing program at this site",
+      "help": "Reuse the organization catalog, referential and modules without copying learners or cohorts.",
+      "source": "Existing program",
+      "choose": "Choose a program",
+      "empty": "No eligible program available to attach.",
+      "cancel": "Cancel",
+      "confirm": "Attach"
     }
   },
   "referentials": {

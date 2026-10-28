@@ -27,6 +27,19 @@ export class ProgramsComponent {
   readonly status = signal<"all" | ProgramCatalogStatus>("all");
   readonly drawerOpen = signal(false);
   readonly editingProgram = signal<ProgramCatalogItem | null>(null);
+  // A training program is shared at organization level; a new site gets an
+  // offering rather than a second program identity or referential copy.
+  readonly attachOpen = signal(false);
+  readonly selectedSourceProgram = signal("");
+  readonly attaching = signal(false);
+  readonly attachCandidates = computed(() => {
+    const siteId = this.workspace.site()?.id;
+    if (!siteId) return [];
+    return this.store.programs().filter(program =>
+      !program.siteIds.includes(siteId) && program.status !== "inactive"
+    );
+  });
+
 
   // A catalog item is visible only when it belongs to the selected scope.
   // The site selection must never silently fall back to every site in the org.
@@ -75,6 +88,30 @@ export class ProgramsComponent {
       if (this.workspace.remoteWorkspaceError())
         this.notifications.error("programs.real.workspaceError", "/formations");
     });
+  }
+
+  openAttach(): void {
+    if (!this.workspace.site()?.apiId || !this.access.can("programs.manage")) return;
+    this.selectedSourceProgram.set("");
+    this.attachOpen.set(true);
+  }
+
+  async attachExistingProgram(): Promise<void> {
+    const programId = this.selectedSourceProgram();
+    const siteId = this.workspace.site()?.id;
+    if (!siteId || !programId || this.attaching() || !this.access.can("programs.manage")) return;
+    const candidate = this.attachCandidates().find(item => item.id === programId);
+    if (!candidate) return;
+    this.attaching.set(true);
+    try {
+      const success = await this.store.toggleSite(programId, siteId);
+      if (success) {
+        this.attachOpen.set(false);
+        this.selectedSourceProgram.set("");
+      }
+    } finally {
+      this.attaching.set(false);
+    }
   }
 
   addProgram(): void {

@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { PedagoraAccessApiService } from "../../core/access/pedagora-access-api.service";
+import { TrainingCatalogApiService } from "../../core/training/training-catalog-api.service";
 import { RouterLink } from "@angular/router";
 import { CohortApiStoreService } from "../../core/api-data/cohort-api-store.service";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
@@ -18,12 +21,31 @@ type PromotionStatusFilter = "all" | WorkspaceCohort["status"];
 
 @Component({
   selector: "app-promotions",
-  imports: [RouterLink, TranslatePipe, ProgressBarComponent, CreatePromotionDrawerComponent],
+  imports: [RouterLink, FormsModule, TranslatePipe, ProgressBarComponent, CreatePromotionDrawerComponent],
   templateUrl: "./promotions.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromotionsComponent {
   readonly workspace = inject(WorkspaceContextService);
+  private readonly cohortsApi = inject(TrainingCatalogApiService);
+  private readonly accessApi = inject(PedagoraAccessApiService);
+  readonly copying = signal(false);
+  readonly copySource = signal<ContextualPromotionSummary | null>(null);
+  readonly copyError = signal("");
+  readonly copyManagers = signal<{ id: string; name: string }[]>([]);
+  copySiteId = "";
+  copyName = "";
+  copyCode = "";
+  copyStart = "";
+  copyEnd = "";
+  copyCapacity = 1;
+  copyManagerId = "";
+  readonly copyDestinations = computed(() => {
+    const source = this.copySource();
+    if (!source) return [];
+    return this.workspace.sites().filter(site => site.id !== source.siteId &&
+      !!this.workspace.offeringForSiteProgram(site.id, source.programId));
+  });
   readonly access = inject(AccessPolicyService);
   private readonly translate = inject(TranslateService);
   readonly store = inject(CohortApiStoreService);
@@ -70,6 +92,89 @@ export class PromotionsComponent {
       (item) => item.apiId === cohort.referentialVersionId || item.id === cohort.referentialVersionId,
     )?.version ?? "";
   });
+
+  async openCopy(item: ContextualPromotionSummary): Promise<void> {
+    if (!this.access.can("promotions.create")) return;
+    this.copySource.set(item);
+    this.copyError.set("");
+    this.copySiteId = "";
+    this.copyName = item.name;
+    // A different code must always be supplied explicitly for the destination.
+    this.copyCode = "";
+    this.copyStart = item.start;
+    this.copyEnd = item.end;
+    this.copyCapacity = Math.max(1, item.capacity);
+    this.copyManagerId = "";
+    this.copyManagers.set([]);
+    try {
+      const members = await this.accessApi.membersWithRole("pedagogical_manager");
+      if (this.copySource()?.id !== item.id) return;
+      this.copyManagers.set((members ?? [])
+        .filter(m => m.status === "Active" && !m.isInvitation)
+        .map(m => ({ id: m.id, name: `${m.firstName ?? ""} ${m.lastName ?? ""}`.trim() || m.email }))
+        .filter(m => !!m.id));
+    } catch {
+      this.copyError.set(this.translate.instant("promotions.copy.managersUnavailable"));
+    }
+  }
+
+  closeCopy(): void {
+    if (this.copying()) return;
+    this.copySource.set(null);
+    this.copyError.set("");
+  }
+
+  async submitCopy(): Promise<void> {
+    const source = this.copySource();
+    if (!source || this.copying() || !this.access.can("promotions.create")) return;
+    const offering = this.workspace.offeringForSiteProgram(this.copySiteId, source.programId);
+    const version = this.referentials.items().find(r =>
+      r.id === source.referentialVersionId || r.apiId === source.referentialVersionId);
+    const manager = this.copyManagers().find(m => m.id === this.copyManagerId);
+    const code = this.copyCode.trim();
+    const name = this.copyName.trim();
+    if (!offering?.apiId || !version?.apiId || version.status !== "active" ||
+        !manager || !name || name.length > 80 || !/^[A-Za-z0-9][A-Za-z0-9_-]{1,39}$/.test(code) ||
+        !this.copyStart || !this.copyEnd || this.copyEnd < this.copyStart ||
+        !Number.isInteger(this.copyCapacity) || this.copyCapacity < 1) {
+      this.copyError.set(this.translate.instant("promotions.copy.invalid"));
+      return;
+    }
+    this.copying.set(true);
+    this.copyError.set("");
+    try {
+      const destination = this.workspace.sites().find(site => site.id === this.copySiteId);
+      const created = await this.cohortsApi.createCohort({
+        programOfferingId: offering.apiId,
+        referentialVersionId: version.apiId,
+        code,
+        name,
+        startDate: this.copyStart,
+        endDate: this.copyEnd,
+        capacity: this.copyCapacity,
+        pedagogicalManagerAuthGateUserId: manager.id,
+        pedagogicalManagerDisplayName: manager.name,
+        externalKey: null,
+        initialStatus: "draft",
+      });
+      // Only a committed server resource counts as success.
+      if (!created?.id || created.siteId !== destination?.apiId ||
+          created.programOfferingId !== offering.apiId) {
+        this.copyError.set(this.translate.instant("promotions.copy.unexpectedResponse"));
+        return;
+      }
+      this.copySource.set(null);
+      this.createdPromotionName.set(created.name);
+      // Keep the current source context unchanged. Reload the global workspace so
+      // the new destination cohort appears when that site is selected.
+      await this.workspace.reload();
+      await this.store.reload();
+    } catch {
+      this.copyError.set(this.translate.instant("promotions.copy.failed"));
+    } finally {
+      this.copying.set(false);
+    }
+  }
 
   openCreateDrawer(): void {
     void this.referentials.reload();

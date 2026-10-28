@@ -178,6 +178,15 @@ export class WorkspaceContextService {
     return [...new Map(filtered.filter((item) => item.apiId).map((item) => [item.apiId, item])).values()];
   }
 
+  /** Authorized active offer at a specific site, without changing the user's current workspace. */
+  offeringForSiteProgram(siteId: string, programId: string): ProgramOffering | null {
+    if (!this.sites().some(site => site.id === siteId)) return null;
+    return this.offeringsSignal().find(item =>
+      item.siteId === siteId && item.programId === programId &&
+      item.active && this.canAccessOffering(item)
+    ) ?? null;
+  }
+
   activeOfferingForContext(): ProgramOffering | null {
     const site = this.site();
     const program = this.program();
