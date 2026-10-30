@@ -528,12 +528,16 @@ export class AuthComponent {
     const status = (result.status ?? "").trim().toLowerCase();
 
     if (result.accessToken) {
-      this.tokens.setTokens(result.accessToken, result.refreshToken, true);
-      this.session.connectAuthenticatedToken(result.accessToken);
-      this.message.set(
-        result.message || this.translate.instant("auth.registrationReady"),
-      );
-      await this.router.navigateByUrl("/organisation");
+      // Registration establishes the account, not the browser session.
+      // Always require an explicit login, even when email confirmation is disabled.
+      this.tokens.clear();
+      this.session.disconnect();
+      this.loginStep.set("email");
+      this.pendingCurrentPassword = "";
+      this.pendingMfaToken = "";
+      await this.router.navigate(["/connexion"], {
+        queryParams: { email: result.email, registered: "1" },
+      });
       return;
     }
 

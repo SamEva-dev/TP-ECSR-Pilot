@@ -178,26 +178,15 @@ export class AuthGateService {
   registerOrganization(
     request: AuthGateRegistrationRequest,
   ): Observable<AuthGateRegistrationResponse> {
-    return this.http
-      .post<AuthGateRegistrationResponse>(
-        `${this.baseUrl}/register-with-tenant`,
-        {
-          clientId: environment.authGateClientId,
-          ...request,
-          email: request.email.trim().toLowerCase(),
-        },
-      )
-      .pipe(
-        tap((response) => {
-          if (response.accessToken) {
-            this.tokens.setTokens(
-              response.accessToken,
-              response.refreshToken,
-              true,
-            );
-          }
-        }),
-      );
+    // Registration does not authenticate the browser. The caller redirects to login.
+    return this.http.post<AuthGateRegistrationResponse>(
+      `${this.baseUrl}/register-with-tenant`,
+      {
+        clientId: environment.authGateClientId,
+        ...request,
+        email: request.email.trim().toLowerCase(),
+      },
+    );
   }
 
   provisioningStatus(
