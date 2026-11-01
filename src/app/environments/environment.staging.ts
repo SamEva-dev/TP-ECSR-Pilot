@@ -4,7 +4,7 @@ export const environment = {
   authGateBaseUrl: "https://auth.staging.locaguest.com",
   authGateClientId: "pedagora-pilot-web",
   //authMode: "oidc" as "legacy" | "oidc",
-  authMode:  "legacy",
+  authMode: "legacy" as "legacy" | "oidc",
   oidc: {
     authority: "https://auth.staging.locaguest.com/",
     clientId: "pedagora-pilot-web",
