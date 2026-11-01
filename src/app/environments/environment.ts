@@ -4,8 +4,8 @@ export const environment = {
   authGateBaseUrl: "https://localhost:8081",
   authGateClientId: "pedagora-pilot-web",
   // La bascule exige un service Angular OIDC et une API qui valide cette audience.
-  //authMode: "legacy" as "legacy" | "oidc",
-  authMode: 'oidc' as 'legacy' | 'oidc',
+  authMode: "legacy" as "legacy" | "oidc",
+ // authMode: 'oidc' as 'legacy' | 'oidc',
   oidc: {
     authority: "https://localhost:8081/",
     clientId: "pedagora-pilot-web",
