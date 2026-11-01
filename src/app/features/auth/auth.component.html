@@ -178,6 +178,12 @@
             </div>
           </div>
 
+          @if (demoMfaRequired()) {
+            <label class="block mb-2 text-sm font-semibold">{{ "auth.mfaPrompt" | t }}</label>
+            <input [formControl]="demoMfaCode" type="text" inputmode="numeric" autocomplete="one-time-code"
+              maxlength="6" class="h-[52px] w-full rounded-lg border border-[#d7dde6] bg-white px-4" />
+          }
+
           <button
             type="submit"
             [disabled]="loading()"
@@ -321,6 +327,18 @@
               }}
             </button>
           </form>
+
+          <!-- T07: explicit OIDC entry while legacy login remains the default. -->
+          <button
+            type="button"
+            (click)="openOidcTest()"
+            class="mt-5 flex min-h-12 w-full items-center justify-center rounded-lg border border-[#245d9b] bg-white px-4 font-semibold text-[#245d9b] hover:bg-blue-50"
+          >
+            Tester la connexion SSO AuthGate (OIDC)
+          </button>
+          <p class="mt-2 text-center text-xs text-[#6a788b]">
+            Parcours de validation OIDC uniquement : aucun accès métier ouvert à cette étape.
+          </p>
 
           <div class="my-8 flex items-center gap-4 text-sm text-[#929aab]">
             <span class="h-px flex-1 bg-[#d8dce4]"></span>

@@ -10,7 +10,7 @@
       <p class="text-[12px] font-semibold">{{ 'signatures.status.' + record.envelope.status | t }}</p>
       @if (observation(); as item) {
         @if (item.Observations?.length) {
-          <p class="text-[13px] font-semibold">{{ 'signatures.center.dailyTitle' | t }} — {{ item.Date || '' }} ({{ item.Observations?.length }})</p>
+          <p class="text-[13px] font-semibold">{{ 'signatures.center.dailyTitle' | t }} — {{ item.Date || '' }} ({{ item.Observations.length }})</p>
         }
         @for (entry of item.Observations ?? [item]; track entry.EvaluationId ?? $index) {
         <div class="space-y-3 rounded-xl border border-[#e4e9ef] p-3">

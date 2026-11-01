@@ -1,13 +1,19 @@
 import { Routes } from "@angular/router";
+import { environment } from "./environments/environment";
 import { authGuard } from "./core/session/auth.guard";
 import { roleGuard } from "./core/session/role.guard";
 
 export const routes: Routes = [
+  { path: 'auth/logout', loadComponent: () => import('./core/oidc/oidc-signout.component').then(m => m.OidcSignoutComponent) },
+  { path: 'auth/logout-callback', loadComponent: () => import('./core/oidc/oidc-signout.component').then(m => m.OidcSignoutComponent), data: { callback: true } },
+  { path: 'auth/oidc-test', loadComponent: () => import('./core/oidc/oidc-smoke.component').then(m => m.OidcSmokeComponent) },
+  { path: 'auth/callback', loadComponent: () => (environment.authMode === 'oidc'
+    ? import('./core/oidc/oidc-application-gate.component').then(m => m.OidcApplicationGateComponent)
+    : import('./core/oidc/oidc-smoke.component').then(m => m.OidcSmokeComponent)) },
   { path: "", pathMatch: "full", redirectTo: "connexion" },
   {
     path: "connexion",
-    loadComponent: () =>
-      import("./features/auth/auth.component").then((m) => m.AuthComponent),
+    loadComponent: () => import('./features/auth/auth.component').then(m => m.AuthComponent),
   },
   {
     path: "accept-invitation/:token",

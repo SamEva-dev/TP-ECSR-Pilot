@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
+import { AuthTokenStore } from "../../core/session/auth-token.store";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 
 @Component({
@@ -24,6 +25,7 @@ export class AcceptInvitationComponent {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly tokens = inject(AuthTokenStore);
   readonly loading = signal(true);
   readonly errorKey = signal("");
 
@@ -41,7 +43,14 @@ export class AcceptInvitationComponent {
         await this.router.navigate(["/change-password"], { replaceUrl: true, queryParams: { token } });
         return;
       }
-      // An existing identity must never receive a second password.
+      // Existing identities must authenticate before accepting an invitation.
+      // The invitation token is not itself an AuthGate login credential.
+      if (!this.tokens.accessToken()) {
+        await this.router.navigate(["/connexion"], { replaceUrl: true, queryParams: {
+          email: status.email, returnUrl: `/accept-invitation/${encodeURIComponent(token)}`,
+        } });
+        return;
+      }
       await firstValueFrom(this.http.post(
         `${environment.apiBaseUrl}/api/v1/access/invitations/accept`, { token, password: null },
       ));

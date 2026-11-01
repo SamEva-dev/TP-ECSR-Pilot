@@ -1,4 +1,5 @@
 import { Injectable, computed, inject } from "@angular/core";
+import { environment } from "../../environments/environment";
 import type { AppPermission } from "./access.models";
 import type {
   MembershipRole,
@@ -232,7 +233,9 @@ export class AccessPolicyService {
     const platform = (session.roles ?? []).some((role) =>
       /superadmin|platformadministrator/i.test(role),
     );
-    if (platform) return true;
+    // Only legacy sessions retain their historical role shortcut. In OIDC mode
+    // every UI permission must be present in the API-resolved grant set.
+    if (platform && environment.authMode !== 'oidc') return true;
     // Transitional mapping: UI permissions map to server permission suffixes until front permission codes are renamed.
     const aliases: Record<string, string[]> = {
       "home.view": [],
@@ -278,7 +281,8 @@ export class AccessPolicyService {
       "access.privileged.manage": ["pedagora.access.privileged.manage", "access.privileged.manage"],
       "administration.manage": ["pedagora.organization.manage", "organization.manage"],
     };
-    if (permission === "home.view" && session.authMode === "authgate") return permissions.size > 0;
+    if (permission === "home.view" && session.authMode === "authgate" &&
+        environment.authMode !== 'oidc') return permissions.size > 0;
     const candidates = [permission, ...(aliases[permission] ?? [])];
     if (candidates.some((candidate) => permissions.has(candidate))) return true;
     // AuthGate permissions are authoritative. Keep role defaults only for the legacy non-AuthGate demo path.

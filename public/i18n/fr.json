@@ -1952,7 +1952,10 @@
       "assignmentError": "Impossible d’enregistrer cette affectation.",
       "inviteError": "Impossible d’envoyer cette invitation.",
       "pendingActionError": "Cette action sera disponible après acceptation de l’invitation.",
-      "roleError": "Impossible de modifier le rôle de ce compte."
+      "roleError": "Impossible de modifier le rôle de ce compte.",
+      "selfInviteError": "Vous ne pouvez pas vous inviter vous-même dans votre organisation.",
+      "memberExistsError": "Cet utilisateur est déjà membre de cette organisation. Modifiez ses rôles depuis Gestion des accès.",
+      "invitationExistsError": "Une invitation est déjà en attente pour cette adresse."
     }
   },
   "administration": {

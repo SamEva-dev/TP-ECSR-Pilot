@@ -7,6 +7,7 @@ import {
 } from "@microsoft/signalr";
 import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "../session/auth-token.store";
+import { OidcApplicationSessionService } from "../oidc/oidc-application-session.service";
 
 export interface PedagoraRealtimeEvent {
   eventId: string;
@@ -18,9 +19,10 @@ export interface PedagoraRealtimeEvent {
 @Injectable({ providedIn: "root" })
 export class RealtimeService {
   private readonly tokens = inject(AuthTokenStore);
+  private readonly oidc = inject(OidcApplicationSessionService);
   private connection?: HubConnection;
   private queued: Promise<void> = Promise.resolve();
-  private token: string | null = this.tokens.accessToken();
+  private token: string | null = this.identityKey();
   private wanted = false;
   private retryTimer?: ReturnType<typeof setTimeout>;
   private retryAttempt = 0;
@@ -29,7 +31,7 @@ export class RealtimeService {
 
   constructor() {
     effect(() => {
-      const token = this.tokens.accessToken();
+      const token = this.identityKey();
       if (token === this.token) return;
       this.token = token;
       this.clearRetry();
@@ -41,9 +43,16 @@ export class RealtimeService {
     });
   }
 
+  private identityKey(): string | null {
+    if (environment.authMode !== 'oidc') return this.tokens.accessToken();
+    const context = this.oidc.bootstrapResult();
+    return this.oidc.ready() && context?.selectedWorkspaceId
+      ? `${context.subject}:${context.selectedWorkspaceId}` : null;
+  }
+
   start(): Promise<void> {
     this.wanted = true;
-    return this.enqueue(() => this.openFor(this.tokens.accessToken()));
+    return this.enqueue(() => this.openFor(this.identityKey()));
   }
 
   stop(): Promise<void> {
@@ -78,24 +87,30 @@ export class RealtimeService {
   }
 
   private scheduleRetry(token: string): void {
-    if (!this.wanted || this.tokens.accessToken() !== token || this.retryTimer)
+    if (!this.wanted || this.identityKey() !== token || this.retryTimer)
       return;
     const delay = Math.min(30000, 2000 * 2 ** Math.min(this.retryAttempt++, 4));
     this.retryTimer = setTimeout(() => {
       this.retryTimer = undefined;
-      if (this.wanted && this.tokens.accessToken() === token)
+      if (this.wanted && this.identityKey() === token)
         void this.enqueue(() => this.openFor(token)).catch(() => undefined);
     }, delay);
   }
 
   private async openFor(token: string | null): Promise<void> {
-    if (!this.wanted || this.tokens.accessToken() !== token) return;
+    if (!this.wanted || this.identityKey() !== token) return;
     if (this.connection && this.connected() && this.token === token) return;
     await this.closeConnection();
-    if (!token || !this.wanted || this.tokens.accessToken() !== token) return;
+    if (!token || !this.wanted || this.identityKey() !== token) return;
+    const hubBase = `${environment.apiBaseUrl}/hubs/notifications`;
+    const hubUrl = environment.authMode === 'oidc'
+      ? this.oidc.authorizedHubEndpoint(hubBase) : hubBase;
+    if (!hubUrl) return;
     const connection = new HubConnectionBuilder()
-      .withUrl(`${environment.apiBaseUrl}/hubs/notifications`, {
-        accessTokenFactory: () => this.tokens.accessToken() ?? "",
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => environment.authMode === 'oidc'
+          ? this.oidc.accessTokenForHub(hubBase)
+          : this.tokens.accessToken() ?? "",
         transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
@@ -105,11 +120,11 @@ export class RealtimeService {
       .build();
     this.connection = connection;
     connection.on("domainEvent", (event: PedagoraRealtimeEvent) => {
-      if (this.connection === connection && this.tokens.accessToken() === token)
+      if (this.connection === connection && this.identityKey() === token)
         this.lastEvent.set(event);
     });
     connection.onreconnected(() => {
-      if (this.connection === connection && this.tokens.accessToken() === token)
+      if (this.connection === connection && this.identityKey() === token)
         this.connected.set(true);
     });
     connection.onreconnecting(() => {
@@ -125,7 +140,7 @@ export class RealtimeService {
       await connection.start();
       if (
         this.connection === connection &&
-        this.tokens.accessToken() === token
+        this.identityKey() === token
       ) {
         this.connected.set(true);
         this.clearRetry();

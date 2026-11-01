@@ -1952,7 +1952,10 @@
       "assignmentError": "Unable to save this assignment.",
       "inviteError": "Unable to send this invitation.",
       "pendingActionError": "This action will be available after the invitation is accepted.",
-      "roleError": "Unable to update this account role."
+      "roleError": "Unable to update this account role.",
+      "selfInviteError": "You cannot invite yourself to your own organization.",
+      "memberExistsError": "This user already belongs to this organization. Manage their roles instead.",
+      "invitationExistsError": "An invitation is already pending for this email."
     }
   },
   "administration": {

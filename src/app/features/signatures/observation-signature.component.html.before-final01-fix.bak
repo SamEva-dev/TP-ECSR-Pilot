@@ -1,0 +1,46 @@
+<section class="mx-auto max-w-[950px] space-y-4">
+  <a routerLink="/accueil" class="text-[13px] font-semibold text-[#245c97]">{{ 'signatures.observations.back' | t }}</a>
+  <h1 class="text-[23px] font-bold">{{ 'signatures.observations.title' | t }}</h1>
+  @if (loading()) { <p>{{ 'signatures.observations.loading' | t }}</p> }
+  @else if (error() || !document()) { <p class="rounded-xl border p-5 text-[13px]" role="alert">{{ 'signatures.errors.load' | t }}</p> }
+  @else if (document(); as record) {
+    <article class="space-y-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <p class="text-[12px] text-[#748094]">{{ 'signatures.observations.reference' | t }} : {{ record.envelope.id }}</p>
+      <p class="text-[12px]">{{ 'signatures.observations.hash' | t }} : <span class="break-all font-mono">{{ record.envelope.contentSha256 }}</span></p>
+      <p class="text-[12px] font-semibold">{{ 'signatures.status.' + record.envelope.status | t }}</p>
+      @if (observation(); as item) {
+        @if (item.Observations?.length) {
+          <p class="text-[13px] font-semibold">{{ 'signatures.center.dailyTitle' | t }} — {{ item.Date || '' }} ({{ item.Observations?.length }})</p>
+        }
+        @for (entry of item.Observations ?? [item]; track entry.EvaluationId ?? $index) {
+        <div class="space-y-3 rounded-xl border border-[#e4e9ef] p-3">
+        <h2 class="text-[18px] font-semibold">{{ entry.Subject || '' }}</h2>
+        <p class="text-[12px] text-[#748094]">{{ entry.TrainerDisplayName || '' }} · {{ entry.EvaluatedAtUtc || '' }}</p>
+        <dl class="space-y-3 text-[13px]">
+          <div><dt class="font-semibold">{{ 'signatures.observations.positive' | t }}</dt><dd>{{ entry.Positive || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.observations.improvements' | t }}</dt><dd>{{ entry.Difficulty || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.observations.nextGoal' | t }}</dt><dd>{{ entry.NextGoal || '' }}</dd></div>
+          <div><dt class="font-semibold">{{ 'signatures.observations.other' | t }}</dt><dd>{{ entry.FreeObservation || '' }}</dd></div>
+        </dl>
+        @for (criterion of entry.Criteria ?? []; track criterion.Code) {
+          <p class="text-[12px]">{{ criterion.Label || criterion.Code }} — {{ criterion.Level || '' }}</p>
+        }
+        </div>
+        }
+      }
+      <p class="rounded-[12px] bg-[#f1f4f8] p-4 text-[13px]">{{ 'signatures.observations.disclaimer' | t }}</p>
+      @if (record.responseComment) { <p class="rounded-xl border p-3 text-[13px]">{{ record.responseComment }}</p> }
+      @if (record.canRespond) {
+        <textarea class="min-h-[80px] w-full rounded-lg border border-[#dfe5ec] p-3 text-[13px]"
+          maxlength="2000" [value]="comment()" (input)="updateComment($event)"
+          [placeholder]="'signatures.observations.comment' | t"></textarea>
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="rounded-lg bg-[#2a64a2] px-4 py-2 text-white disabled:opacity-50"
+            [disabled]="saving()" (click)="respond(true)">{{ 'signatures.observations.acknowledge' | t }}</button>
+          <button type="button" class="rounded-lg border border-[#dfe5ec] px-4 py-2 disabled:opacity-50"
+            [disabled]="saving()" (click)="respond(false)">{{ 'signatures.observations.decline' | t }}</button>
+        </div>
+      }
+    </article>
+  }
+</section>

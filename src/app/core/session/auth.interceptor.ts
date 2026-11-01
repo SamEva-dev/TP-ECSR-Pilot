@@ -1,4 +1,5 @@
 import { HttpInterceptorFn } from "@angular/common/http";
+import { oidcApiInterceptor } from '../oidc/oidc-api.interceptor';
 import { inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, switchMap, throwError } from "rxjs";
@@ -32,6 +33,7 @@ function isProtectedAuthGatePath(path: string): boolean {
 }
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
+  if (environment.authMode === 'oidc') return oidcApiInterceptor(request, next);
   const tokens = inject(AuthTokenStore);
   const refresh = inject(AuthRefreshService);
   const router = inject(Router);

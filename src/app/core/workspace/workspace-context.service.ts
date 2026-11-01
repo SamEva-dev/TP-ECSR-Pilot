@@ -9,6 +9,8 @@ import {
 import { RealtimeService } from "../realtime/realtime.service";
 import { WorkspaceApiService } from "./workspace-api.service";
 import { SessionService } from "../session/session.service";
+import { OidcApplicationSessionService } from "../oidc/oidc-application-session.service";
+import { environment } from "../../environments/environment";
 import { RuntimeDataLoaderService } from "../api-data/runtime-data-loader.service";
 import { clearRuntimeData } from "../api-data/runtime-data.store";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
@@ -24,6 +26,7 @@ const STORAGE_PREFIX = "tp-ecsr-pilot.workspace-context";
 @Injectable({ providedIn: "root" })
 export class WorkspaceContextService {
   private readonly sessionService = inject(SessionService);
+  private readonly oidc = inject(OidcApplicationSessionService);
   private readonly workspaceApi = inject(WorkspaceApiService);
   private readonly realtime = inject(RealtimeService);
   private readonly runtimeData = inject(RuntimeDataLoaderService);
@@ -54,11 +57,19 @@ export class WorkspaceContextService {
     if (selection.siteId) return "site";
     return "organization";
   });
-  readonly access = computed<WorkspaceAccessRule>(() => ({
-    scope: "platform" as const,
-    locked: false,
-  }));
-  readonly isLocked = computed(() => false);
+  readonly access = computed<WorkspaceAccessRule>(() => {
+    const selected = environment.authMode === 'oidc'
+      ? (this.oidc.ready() ? this.oidc.bootstrapResult()?.selectedWorkspaceId : null)
+      : this.sessionService.session()?.organizationId;
+    // Platform access cannot be inferred from authentication. Broad access must
+    // come from a separate explicit server-side platform authorization contract.
+    return {
+      scope: 'organization',
+      organizationIds: selected ? [selected] : [],
+      locked: !selected,
+    };
+  });
+  readonly isLocked = computed(() => this.access().locked !== false);
 
   readonly organizations = computed(() =>
     this.organizationsSignal().filter((organization) =>

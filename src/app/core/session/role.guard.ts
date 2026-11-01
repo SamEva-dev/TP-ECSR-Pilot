@@ -1,4 +1,6 @@
 import { inject } from "@angular/core";
+import { environment } from "../../environments/environment";
+import { OidcApplicationSessionService } from "../oidc/oidc-application-session.service";
 import { CanActivateFn, Router } from "@angular/router";
 import { AccessPolicyService } from "../access/access-policy.service";
 import type { AppPermission } from "../access/access.models";
@@ -7,6 +9,24 @@ import type { MembershipRole } from "../models/workspace.models";
 import { SessionService } from "./session.service";
 
 export const roleGuard: CanActivateFn = (route) => {
+  const oidc = inject(OidcApplicationSessionService);
+  if (environment.authMode === 'oidc') {
+    if (!oidc.ready()) return false;
+    const permission = route.data?.['permission'] as string | undefined;
+    const membershipRoles = (route.data?.['membershipRoles'] ?? []) as string[];
+    const roles = (route.data?.['roles'] ?? []) as string[];
+    // The API returns canonical permission codes. Existing route permissions may
+    // have product-specific aliases; AccessPolicyService checks only resolved
+    // grants in OIDC mode (never role templates or implicit platform grants).
+    const access = inject(AccessPolicyService);
+    const userRole = inject(SessionService).role();
+    if (permission && !access.can(permission as AppPermission)) return false;
+    if (membershipRoles.length && !membershipRoles.some(role =>
+      oidc.hasRole(role) || (role === 'jury' && userRole === 'jury'))) return false;
+    if (roles.length && !roles.includes(userRole)) return false;
+    return true;
+  }
+
   const session = inject(SessionService);
   const access = inject(AccessPolicyService);
   const router = inject(Router);

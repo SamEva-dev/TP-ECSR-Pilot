@@ -1,6 +1,8 @@
 import { Injectable, computed, inject, signal } from "@angular/core";
 import type { DemoSession, UserRole } from "../models/app.models";
 import { AuthTokenStore } from "./auth-token.store";
+import { OidcApplicationSessionService } from "../oidc/oidc-application-session.service";
+import { environment } from "../../environments/environment";
 
 const STORAGE_KEY = "tp-ecsr-pilot.session";
 const LEGACY_KEY = "tp-ecsr-pilot.demo-session";
@@ -22,19 +24,34 @@ type JwtPayload = Record<string, unknown> & {
 @Injectable({ providedIn: "root" })
 export class SessionService {
   private readonly tokens = inject(AuthTokenStore);
+  private readonly oidc = inject(OidcApplicationSessionService);
   private readonly sessionSignal = signal<DemoSession | null>(this.restore());
   private readonly promotionSignal = signal(
     this.sessionSignal()?.promotionId ?? "",
   );
 
-  readonly session = this.sessionSignal.asReadonly();
+  // UI-only projection from the API-validated OIDC context. It is never used
+  // as proof of authorization: every API endpoint validates the bearer token,
+  // membership and effective permissions on each request.
+  readonly session = computed<DemoSession | null>(() => {
+    if (environment.authMode !== 'oidc') return this.sessionSignal();
+    const context = this.oidc.bootstrapResult();
+    if (!this.oidc.ready() || !context?.subject || !context.selectedWorkspaceId) return null;
+    const roles = context.roles ?? [];
+    return {
+      authMode: 'authgate', userId: context.subject,
+      organizationId: context.selectedWorkspaceId,
+      email: '', firstName: '', lastName: '', promotionId: '',
+      role: this.mapRole(roles), roles,
+      permissions: context.permissions ?? [],
+    };
+  });
   readonly promotionId = this.promotionSignal.asReadonly();
-  readonly isConnected = computed(() => this.sessionSignal() !== null);
-  readonly role = computed<UserRole>(
-    () => this.sessionSignal()?.role ?? "direction",
-  );
+  readonly isConnected = computed(() => this.session() !== null);
+  readonly role = computed<UserRole>(() => this.session()?.role ?? 'stagiaire');
 
   hasValidToken(): boolean {
+    if (environment.authMode === 'oidc') return this.oidc.ready();
     const token = this.tokens.accessToken();
     const payload = token ? this.decodeJwt(token) : {};
     const session = this.sessionSignal();
@@ -124,7 +141,7 @@ export class SessionService {
   }
 
   initials(): string {
-    const s = this.sessionSignal();
+    const s = this.session();
     if (!s) return "";
 
     const first = s.firstName?.[0] ?? "";

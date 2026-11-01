@@ -73,11 +73,38 @@ export interface AuthGateProvisioningStatusResponse {
   canRetry?: boolean;
 }
 
+export interface AuthGateMembership {
+  organizationId: string;
+  applicationCode: string;
+  initialRole: string | null;
+}
+
+export interface AuthGateContextTokens {
+  accessToken: string;
+  refreshToken: string;
+  organizationId: string;
+}
+
 @Injectable({ providedIn: "root" })
 export class AuthGateService {
   private readonly http = inject(HttpClient);
   private readonly tokens = inject(AuthTokenStore);
   private readonly baseUrl = `${environment.authGateBaseUrl}/api/Auth`;
+
+  listContexts(): Observable<{ memberships: AuthGateMembership[] }> {
+    return this.http.get<{ memberships: AuthGateMembership[] }>(
+      `${environment.authGateBaseUrl}/api/account/applications/memberships`,
+    );
+  }
+
+  selectContext(organizationId: string): Observable<AuthGateContextTokens> {
+    return this.http.post<AuthGateContextTokens>(
+      `${environment.authGateBaseUrl}/api/account/applications/context:select`,
+      { organizationId },
+    ).pipe(tap(response => {
+      this.tokens.setTokens(response.accessToken, response.refreshToken, this.tokens.rememberMe());
+    }));
+  }
 
   requestPasswordReset(email: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(

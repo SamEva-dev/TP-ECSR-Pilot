@@ -1,3 +1,4 @@
+import { safeReturnUrl } from "../../core/auth-contract/auth-return-url";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,6 +27,7 @@ import { AuthTokenStore } from "../../core/session/auth-token.store";
 import { SessionService } from "../../core/session/session.service";
 import { PublishedBrandingService } from "../../core/branding/published-branding.service";
 import { environment } from "../../environments/environment";
+import { OidcApplicationSessionService } from "../../core/oidc/oidc-application-session.service";
 
 type DemoProfile = {
   role: UserRole;
@@ -42,9 +44,17 @@ type DemoProfile = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthComponent {
+  /** Legacy OIDC diagnostic action referenced by the sign-in template.
+   * Normal sign-in remains prelogin -> AuthGate authorization.
+   */
+  openOidcTest(): void {
+    void this.router.navigate(['/auth/oidc-test']);
+  }
+
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly authGate = inject(AuthGateService);
+  private readonly oidc = inject(OidcApplicationSessionService);
   private readonly tokens = inject(AuthTokenStore);
   private readonly session = inject(SessionService);
   private readonly translate = inject(TranslateService);
@@ -119,6 +129,8 @@ export class AuthComponent {
   ];
 
   readonly selectedDemoRole = signal<UserRole>("direction");
+  readonly demoMfaRequired = signal(false);
+  readonly demoMfaCode = new FormControl("", { nonNullable: true });
 
   readonly demoLoginForm = new FormGroup({
     email: new FormControl(this.demoProfiles[0].email, {
@@ -178,6 +190,8 @@ export class AuthComponent {
   });
 
   selectDemoProfile(profile: DemoProfile): void {
+    this.demoMfaRequired.set(false);
+    this.demoMfaCode.reset();
     this.selectedDemoRole.set(profile.role);
     this.demoLoginForm.setValue({
       email: profile.email,
@@ -187,10 +201,23 @@ export class AuthComponent {
   }
 
   private signInRedirect(): string {
-    const destination = this.route.snapshot.queryParamMap.get('returnUrl') ?? '';
-    // Whitelist internal signing routes: never use untrusted external redirects.
-    return /^\/signatures\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(destination)
-      ? destination : (this.session.role() === 'jury' ? '/jury' : '/accueil');
+    const fallback = this.session.role() === 'jury' ? '/jury' : '/accueil';
+    return safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'), fallback, [
+      '/connexion', '/register', '/change-password', '/choisir-espace',
+    ]);
+  }
+
+  private async postLoginDestination(): Promise<string> {
+    const destination = this.signInRedirect();
+    try {
+      const response = await firstValueFrom(this.authGate.listContexts());
+      if ((response.memberships?.length ?? 0) > 1) {
+        return `/choisir-espace?returnUrl=${encodeURIComponent(destination)}`;
+      }
+    } catch {
+      // The current token still defines the server-verified authorization context.
+    }
+    return destination;
   }
 
   async submitDemoLogin(): Promise<void> {
@@ -198,7 +225,12 @@ export class AuthComponent {
     this.error.set("");
     this.message.set("");
 
-    if (this.demoLoginForm.invalid) {
+    if (this.demoMfaRequired()) {
+      if (!/^\d{6}$/.test(this.demoMfaCode.value.trim())) {
+        this.error.set(this.translate.instant("auth.errors.loginFailed"));
+        return;
+      }
+    } else if (this.demoLoginForm.invalid) {
       this.demoLoginForm.markAllAsTouched();
       return;
     }
@@ -207,33 +239,49 @@ export class AuthComponent {
     this.loading.set(true);
 
     try {
-      const result = await firstValueFrom(
-        this.authGate.login({
-          email: credentials.email,
-          password: credentials.password,
-          rememberMe: true,
-          deviceFingerprint: this.deviceFingerprint(),
-        }),
-      );
+      const result = this.demoMfaRequired()
+        ? await firstValueFrom(this.authGate.verifyMfa({
+            mfaToken: this.pendingMfaToken,
+            code: this.demoMfaCode.value.trim(),
+            deviceFingerprint: this.deviceFingerprint(),
+          }, true))
+        : await firstValueFrom(this.authGate.login({
+            email: credentials.email,
+            password: credentials.password,
+            rememberMe: true,
+            deviceFingerprint: this.deviceFingerprint(),
+          }));
 
       if (result.requiresMfa) {
-        this.error.set(
-          this.translate.instant("auth.errors.mfaNotYetSupported"),
-        );
+        if (!result.mfaToken) throw new Error("AUTH_MFA_CHALLENGE_MISSING");
+        this.pendingMfaToken = result.mfaToken;
+        this.demoMfaRequired.set(true);
+        this.demoMfaCode.reset();
+        this.demoLoginForm.controls.password.reset();
         return;
       }
 
-      if (!result.accessToken) {
+      if (!result.accessToken || result.passwordChangeRequired) {
+        // No privileged session is established for an incomplete authentication step.
         this.error.set(this.translate.instant("auth.errors.loginFailed"));
         return;
       }
 
       // Demo mode uses a REAL AuthGate token and the REAL Pedagora APIs.
       // Role cards are illustrative only: credentials must be entered for a real AuthGate account.
+      this.pendingMfaToken = "";
+      this.demoMfaRequired.set(false);
+      this.demoMfaCode.reset();
       this.session.connectAuthenticatedToken(result.accessToken);
+      if (!this.session.hasValidToken()) {
+        this.tokens.clear();
+        this.session.disconnect();
+        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
+        return;
+      }
 
       await this.router.navigateByUrl(
-        this.signInRedirect(),
+        await this.postLoginDestination(),
       );
     } catch (e) {
       this.error.set(this.backendMessage(e));
@@ -277,8 +325,25 @@ export class AuthComponent {
         }
 
         if (result.nextStep === "Password") {
+          // Le prélogin est l’unique décision d’entrée : login OIDC pour un compte existant.
+          // Les étapes Register/RegisterApplication restent traitées plus bas par la page UI.
+          if (environment.authMode === "oidc") {
+            await this.oidc.begin(this.route.snapshot.queryParamMap.get("returnUrl") || "/accueil", email);
+            return;
+          }
           this.loginStep.set("password");
           this.submitted.set(false);
+          return;
+        }
+
+        if (result.nextStep === "PartielRegisterApplication") {
+          if (environment.authMode === "oidc") {
+            // Must authenticate the existing AuthGate identity before any app enrollment.
+            await this.oidc.begin("/register?mode=partial", email);
+          } else {
+            // No password-less registration for an identity not authenticated by OIDC.
+            this.error.set("Un compte AuthGate existe. Connectez-vous à cette identité avant de rejoindre PedagoraPilot.");
+          }
           return;
         }
 
@@ -356,8 +421,14 @@ export class AuthComponent {
         this.pendingCurrentPassword = "";
         this.pendingMfaToken = "";
         this.session.connectAuthenticatedToken(result.accessToken);
+      if (!this.session.hasValidToken()) {
+        this.tokens.clear();
+        this.session.disconnect();
+        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
+        return;
+      }
         await this.router.navigateByUrl(
-          this.signInRedirect(),
+          await this.postLoginDestination(),
         );
         return;
       }
@@ -416,8 +487,14 @@ export class AuthComponent {
     this.pendingCurrentPassword = "";
     this.pendingMfaToken = "";
     this.session.connectAuthenticatedToken(result.accessToken);
+      if (!this.session.hasValidToken()) {
+        this.tokens.clear();
+        this.session.disconnect();
+        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
+        return;
+      }
     await this.router.navigateByUrl(
-      this.signInRedirect(),
+      await this.postLoginDestination(),
     );
   }
 

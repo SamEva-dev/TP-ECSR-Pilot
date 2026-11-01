@@ -331,7 +331,15 @@ export class AccessComponent {
       this.inviteFirstName = ""; this.inviteLastName = ""; this.inviteEmail = ""; this.inviteRole = "trainer";
       await this.reload(false);
       this.selectedId.set(created?.id ?? this.accounts().find((x) => x.email.toLowerCase() === email.toLowerCase())?.id ?? "");
-    } catch { this.notifications.error("access.api.inviteError", "/acces"); }
+    } catch (error: unknown) {
+      const response = error as { error?: { code?: string; error?: string } };
+      const code = response.error?.code ?? response.error?.error;
+      const key = code === "ACCESS_CANNOT_INVITE_SELF" ? "access.api.selfInviteError"
+        : code === "ACCESS_MEMBER_ALREADY_EXISTS" ? "access.api.memberExistsError"
+        : code === "ACCESS_INVITATION_ALREADY_EXISTS" ? "access.api.invitationExistsError"
+        : "access.api.inviteError";
+      this.notifications.error(key, "/acces");
+    }
     finally { this.invitationPending.set(false); }
   }
 
