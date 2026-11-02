@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
 import { AuthTokenStore } from "../../core/session/auth-token.store";
+import { SessionService } from "../../core/session/session.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 
 @Component({
@@ -26,6 +27,7 @@ export class AcceptInvitationComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly tokens = inject(AuthTokenStore);
+  private readonly session = inject(SessionService);
   readonly loading = signal(true);
   readonly errorKey = signal("");
 
@@ -45,15 +47,29 @@ export class AcceptInvitationComponent {
       }
       // Existing identities must authenticate before accepting an invitation.
       // The invitation token is not itself an AuthGate login credential.
-      if (!this.tokens.accessToken()) {
+      const invitationRoute = `/accept-invitation/${encodeURIComponent(token)}`;
+      // A stored token can be expired or belong to someone else. Never attempt
+      // acceptance until the session is valid and its email matches the invite.
+      const connectedEmail = this.session.session()?.email?.trim().toLowerCase();
+      if (!this.session.hasValidToken() || connectedEmail !== status.email.trim().toLowerCase()) {
+        // If another identity is signed in, clear its session before switching.
+        // Otherwise the HTTP interceptor would send the wrong user's bearer token.
+        if (this.tokens.accessToken() && connectedEmail !== status.email.trim().toLowerCase()) {
+          this.tokens.clear();
+          this.session.disconnect();
+        }
         await this.router.navigate(["/connexion"], { replaceUrl: true, queryParams: {
-          email: status.email, returnUrl: `/accept-invitation/${encodeURIComponent(token)}`,
+          email: status.email, returnUrl: invitationRoute,
         } });
         return;
       }
       await firstValueFrom(this.http.post(
         `${environment.apiBaseUrl}/api/v1/access/invitations/accept`, { token, password: null },
       ));
+      // Access membership has changed. Reauthentication/context selection
+      // obtains fresh claims, without retaining the old organization's rights.
+      this.tokens.clear();
+      this.session.disconnect();
       await this.router.navigate(["/connexion"], { replaceUrl: true, queryParams: { email: status.email } });
     } catch (error: unknown) {
       const e = error as { code?: string; original?: HttpErrorResponse };
