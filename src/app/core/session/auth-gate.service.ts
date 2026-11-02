@@ -102,6 +102,28 @@ export class AuthGateService {
       `${environment.authGateBaseUrl}/api/account/applications/context:select`,
       { organizationId },
     ).pipe(tap(response => {
+      // Never replace a valid session before validating the selected tenant.
+      // Server-side authorization remains authoritative; this prevents a
+      // mismatched or stale token response from poisoning the local session.
+      const payload = readJwtPayload(response?.accessToken);
+      const currentPayload = readJwtPayload(this.tokens.accessToken());
+      const currentSubject = currentPayload?.["sub"];
+      // Switching tenant must never silently switch the globally authenticated identity.
+      if (typeof currentSubject !== "string" || !currentSubject ||
+          currentSubject !== payload?.["sub"]) {
+        throw new Error("AUTHGATE_CONTEXT_IDENTITY_MISMATCH");
+      }
+      const tokenOrganization = payload?.["org_id"] ?? payload?.["organization_id"];
+      const exp = payload?.["exp"];
+      if (
+        !response?.accessToken ||
+        response.organizationId !== organizationId ||
+        tokenOrganization !== organizationId ||
+        typeof exp !== "number" || exp * 1000 <= Date.now() ||
+        typeof payload?.["sub"] !== "string" || !payload["sub"]
+      ) {
+        throw new Error("AUTHGATE_CONTEXT_TOKEN_MISMATCH");
+      }
       this.tokens.setTokens(response.accessToken, response.refreshToken, this.tokens.rememberMe());
     }));
   }
@@ -231,5 +253,23 @@ export class AuthGateService {
 
   logout(): void {
     this.tokens.clear();
+  }
+}
+
+/** Decode claims only to fail closed before storing a context token.
+ * This is not JWT signature verification; AuthGate and the API validate it.
+ */
+function readJwtPayload(token: string | null | undefined): Record<string, unknown> | null {
+  if (!token || typeof atob !== "function") return null;
+  try {
+    const segment = token.split(".")[1];
+    if (!segment) return null;
+    const base64 = segment.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+    const parsed: unknown = JSON.parse(atob(padded));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown> : null;
+  } catch {
+    return null;
   }
 }

@@ -2581,6 +2581,17 @@
       "saveConflict": "Another user changed this assessment grid. Reload the candidate before retrying.",
       "partialNotFinal": "A “partial” assessment is provisional and cannot be validated as a final result.",
       "refreshFailed": "The grid was saved, but synchronization failed. Reload the page."
+    },
+    "juryAccess": {
+      "title": "Jury assignments and access periods",
+      "refresh": "Refresh",
+      "loading": "Loading jury assignments…",
+      "error": "Unable to load jury assignments.",
+      "empty": "No jury assigned to this session.",
+      "name": "Jury member",
+      "role": "Role",
+      "from": "Access from",
+      "until": "Access until"
     }
   },
   "jury": {

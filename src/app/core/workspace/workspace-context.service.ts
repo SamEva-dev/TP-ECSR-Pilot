@@ -315,8 +315,11 @@ export class WorkspaceContextService {
     });
     effect(() => {
       const session = this.sessionService.session();
-      const key = session
-        ? `${session.role}:${session.email.toLowerCase()}`
+      // The active AuthGate organization is part of the security boundary.
+      // Users can hold the same role in multiple organizations; neither the
+      // email nor the role alone may key a workspace cache or selection.
+      const key = session?.userId && session.organizationId
+        ? `${session.userId}:${session.organizationId}`
         : "anonymous";
       if (key === this.sessionKey) return;
       this.sessionKey = key;

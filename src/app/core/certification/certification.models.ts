@@ -59,3 +59,14 @@ export interface CertificationCandidate {
   lastName?: string | null;
   candidateNumber?: string | null;
 }
+
+export interface CertificationJuryAssignment {
+  id: string;
+  examSessionId: string;
+  authGateUserId: string;
+  displayName: string;
+  role: string;
+  assignedAtUtc: string;
+  accessValidFromUtc?: string | null;
+  accessValidUntilUtc?: string | null;
+}

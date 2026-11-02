@@ -47,9 +47,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     ? request.url.slice(authGateBase.length)
     : "";
   const isProtectedAuthGateCall = isAuthGate && isProtectedAuthGatePath(authGatePath);
-  // Preparation validates the invitation token and is always anonymous.
-  // Acceptance of an invitation for an existing AuthGate identity REQUIRES the
-  // authenticated user's bearer token. Do not strip it from that request.
+  // Preparation is public: a stale browser token must never block it.
+  // Acceptance is different: existing identities MUST submit a valid bearer token.
   if (isPedagoraApi && /\/api\/v1\/access\/invitations\/prepare(?:\?|$)/.test(request.url)) {
     return next(request);
   }

@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import {
   CertificationCandidate,
   CertificationExamSession,
+  CertificationJuryAssignment,
   CertificationScheme,
 } from "./certification.models";
 import { environment } from "../../environments/environment";
@@ -44,6 +45,11 @@ export class CertificationApiService {
     return this.http.post<number>(
       `${this.base}/sessions/${id}/candidates/from-cohort`,
       {},
+    );
+  }
+  getJuryAssignments(id: string) {
+    return this.http.get<CertificationJuryAssignment[]>(
+      `${this.base}/sessions/${encodeURIComponent(id)}/jury`,
     );
   }
   getCandidates(id: string) {

@@ -17,6 +17,9 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
       <section class="w-full max-w-lg rounded-2xl border border-[#d7dde6] bg-white p-8 shadow-sm">
         <h1 class="text-2xl font-extrabold text-[#102847]">{{ "invitationAcceptance.passwordTitle" | t }}</h1>
         <p class="mt-3 text-sm text-[#64748b]">{{ "invitationAcceptance.passwordDescription" | t }}</p>
+        <label for="invited-email" class="mt-5 block text-sm font-semibold">{{ "invitationAcceptance.email" | t }}</label>
+        <input id="invited-email" type="email" autocomplete="username" [value]="invitedEmail()" readonly
+          class="mt-2 w-full rounded-lg border bg-slate-100 px-4 py-3 text-slate-700" />
         @if (errorKey()) { <p role="alert" class="mt-3 text-red-700">{{ errorKey() | t }}</p> }
         <form [formGroup]="form" (ngSubmit)="save()" class="mt-5 space-y-4">
           <label for="new-password" class="block text-sm font-semibold">{{ "invitationAcceptance.password" | t }}</label>
@@ -24,7 +27,7 @@ import { TranslatePipe } from "../../core/i18n/translate.pipe";
           <label for="confirm-password" class="block text-sm font-semibold">{{ "invitationAcceptance.confirmPassword" | t }}</label>
           <input id="confirm-password" type="password" autocomplete="new-password" formControlName="confirmPassword" class="w-full rounded-lg border px-4 py-3" />
           <p class="text-xs text-[#64748b]">{{ "invitationAcceptance.passwordHint" | t }}</p>
-          <button type="submit" [disabled]="loading()" class="w-full rounded-lg bg-[#2a64a2] px-5 py-3 font-semibold text-white disabled:opacity-50">
+          <button type="submit" [disabled]="loading() || !verified()" class="w-full rounded-lg bg-[#2a64a2] px-5 py-3 font-semibold text-white disabled:opacity-50">
             {{ (loading() ? "invitationAcceptance.processing" : "invitationAcceptance.submit") | t }}
           </button>
         </form>
@@ -38,13 +41,37 @@ export class InvitationPasswordComponent {
   private readonly router = inject(Router);
   readonly loading = signal(false);
   readonly errorKey = signal("");
+  readonly invitedEmail = signal("");
+  readonly verified = signal(false);
+
+  constructor() { void this.loadInvitation(); }
+
+  private async loadInvitation(): Promise<void> {
+    const token = this.route.snapshot.queryParamMap.get("token") ?? "";
+    if (!token) { this.errorKey.set("invitationAcceptance.invalidLink"); return; }
+    try {
+      const result = await firstValueFrom(this.http.post<{email:string;existingActiveIdentity:boolean}>(
+        `${environment.apiBaseUrl}/api/v1/access/invitations/prepare`, { token },
+      ));
+      if (result.existingActiveIdentity) {
+        await this.router.navigate(["/connexion"], { replaceUrl: true, queryParams: {
+          email: result.email, returnUrl: `/accept-invitation/${encodeURIComponent(token)}`,
+        } });
+        return;
+      }
+      this.invitedEmail.set(result.email);
+      this.verified.set(true);
+    } catch {
+      this.errorKey.set("invitationAcceptance.invalidLink");
+    }
+  }
   readonly form = new FormGroup({
     password: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.minLength(8)] }),
     confirmPassword: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
   });
 
   async save(): Promise<void> {
-    if (this.loading()) return;
+    if (this.loading() || !this.verified()) return;
     this.errorKey.set("");
     const token = this.route.snapshot.queryParamMap.get("token") ?? "";
     if (!token) { this.errorKey.set("invitationAcceptance.invalidLink"); return; }
