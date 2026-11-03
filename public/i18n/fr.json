@@ -2581,17 +2581,6 @@
       "saveConflict": "La grille a été modifiée par un autre utilisateur. Rechargez le candidat avant de réessayer.",
       "partialNotFinal": "Une appréciation « partielle » reste provisoire et ne peut pas être validée comme épreuve finale.",
       "refreshFailed": "La grille est enregistrée, mais sa synchronisation a échoué. Rechargez la page."
-    },
-    "juryAccess": {
-      "title": "Affectations des jurys et périodes d’accès",
-      "refresh": "Actualiser",
-      "loading": "Chargement des jurys…",
-      "error": "Impossible de récupérer les affectations des jurys.",
-      "empty": "Aucun jury affecté à cette session.",
-      "name": "Jury",
-      "role": "Rôle",
-      "from": "Accès à partir du",
-      "until": "Accès jusqu’au"
     }
   },
   "jury": {
@@ -2970,6 +2959,11 @@
     },
     "manager": {
       "choose": "Sélectionner un responsable d’établissement"
+    },
+    "validation": {
+      "managerRequired": "Sélectionnez un responsable d’établissement actif appartenant à la liste autorisée pour cette organisation.",
+      "managersLoading": "Chargement des responsables en cours. Réessayez dans un instant.",
+      "fieldsRequired": "Le formulaire contient des champs obligatoires manquants ou invalides. Vérifiez les informations saisies."
     }
   },
   "programs": {

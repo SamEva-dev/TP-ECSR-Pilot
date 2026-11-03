@@ -130,6 +130,7 @@
               >{{ "sites.fields.manager" | t }}</span
             ><select
               formControlName="managerAuthGateUserId"
+              (change)="submissionError.set(null)"
               class="h-11 w-full rounded-[11px] border border-[#d9e1ea] bg-white px-3 text-[13px] outline-none focus:border-[#8eafd2] focus:ring-2 focus:ring-blue-100"
             >
               <option value="">{{ "sites.manager.choose" | t }}</option>
@@ -140,6 +141,9 @@
                 <option [value]="manager.id">{{ manager.name }}</option>
               }
             </select></label>
+          @if (form.controls.managerAuthGateUserId.invalid && (form.controls.managerAuthGateUserId.touched || submissionError() === "manager")) {
+            <p role="alert" class="mt-2 text-xs font-semibold text-red-700">{{ "sites.validation.managerRequired" | t }}</p>
+          }
           @if (managersLoading()) {
             <p class="mt-2 text-xs text-[#64748b]">{{ "setupResponsibles.loading" | t }}</p>
           } @else if (managersLoadError()) {
@@ -168,6 +172,11 @@
         </div>
       </div>
 
+      @if (submissionError()) {
+        <p role="alert" aria-live="assertive" class="mx-6 mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+          {{ (submissionError() === "manager" ? "sites.validation.managerRequired" : submissionError() === "loading" ? "sites.validation.managersLoading" : "sites.validation.fieldsRequired") | t }}
+        </p>
+      }
       <footer
         class="flex items-center justify-end gap-2 border-t border-[#dfe5ec] bg-white px-6 py-4"
       >

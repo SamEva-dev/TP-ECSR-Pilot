@@ -34,6 +34,7 @@ export class SiteDrawerComponent {
   private readonly workspace = inject(WorkspaceContextService);
   private readonly router = inject(Router);
   readonly managersLoading = signal(false);
+  readonly submissionError = signal<"manager" | "fields" | "loading" | null>(null);
   readonly managersLoadError = signal(false);
   readonly eligibleManagers = signal<{ id: string; name: string }[]>([]);
   private managerRequest = 0;
@@ -41,6 +42,7 @@ export class SiteDrawerComponent {
     const request = ++this.managerRequest;
     const context = this.workspace.organization()?.apiId;
     this.managersLoading.set(true);
+    this.submissionError.set(null);
     this.managersLoadError.set(false);
     try {
       const accounts = await this.accessApi.membersWithRole("site_direction");
@@ -101,6 +103,7 @@ export class SiteDrawerComponent {
       void organization;
       void this.loadManagers();
       const site = this.site();
+      this.submissionError.set(null);
       this.form.reset({
         code: site?.code ?? "",
         name: site?.name ?? "",
@@ -122,20 +125,33 @@ export class SiteDrawerComponent {
   }
 
   submit(): void {
+    this.submissionError.set(null);
     const selectedId = this.form.controls.managerAuthGateUserId.value;
     const selectedManager = this.eligibleManagers().find(x => x.id === selectedId);
     const existing = this.site();
     const preservingLegacyManager = !!existing && !existing.managerAuthGateUserId && !selectedId;
     const preservingAssignedManager = !!existing?.managerAuthGateUserId && selectedId === existing.managerAuthGateUserId;
-    if (this.form.controls.status.value !== "inactive" &&
-        !selectedManager && !preservingLegacyManager && !preservingAssignedManager) {
-      this.form.controls.managerAuthGateUserId.setErrors({ required: true });
-    } else {
-      this.form.controls.managerAuthGateUserId.setErrors(null);
+
+    // Do not submit while the authoritative list of eligible managers is being refreshed.
+    if (this.managersLoading()) {
+      this.submissionError.set("loading");
+      return;
     }
+
+    const managerRequired = this.form.controls.status.value !== "inactive";
+    const managerInvalid = managerRequired && !selectedManager && !preservingLegacyManager && !preservingAssignedManager;
+    const managerControl = this.form.controls.managerAuthGateUserId;
+    if (managerInvalid) {
+      managerControl.setErrors({ ...(managerControl.errors ?? {}), required: true });
+    } else if (managerControl.hasError("required")) {
+      const { required: _required, ...remaining } = managerControl.errors ?? {};
+      managerControl.setErrors(Object.keys(remaining).length ? remaining : null);
+    }
+
     if (selectedManager) this.form.controls.manager.setValue(selectedManager.name);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.submissionError.set(managerInvalid ? "manager" : "fields");
       return;
     }
     this.saved.emit(this.form.getRawValue());
