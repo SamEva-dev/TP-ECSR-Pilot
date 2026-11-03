@@ -177,6 +177,11 @@
           {{ (submissionError() === "manager" ? "sites.validation.managerRequired" : submissionError() === "loading" ? "sites.validation.managersLoading" : "sites.validation.fieldsRequired") | t }}
         </p>
       }
+      @if (saveError()) {
+        <p role="alert" aria-live="assertive" class="mx-6 mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+          {{ saveError()! | t }}
+        </p>
+      }
       <footer
         class="flex items-center justify-end gap-2 border-t border-[#dfe5ec] bg-white px-6 py-4"
       >

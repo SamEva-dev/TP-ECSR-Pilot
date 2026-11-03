@@ -53,5 +53,5 @@
     }
   </div>
 
-  <app-site-drawer [open]="drawerOpen()" [site]="editingSite()" (closed)="drawerOpen.set(false)" (saved)="saveSite($event)" />
+  <app-site-drawer [open]="drawerOpen()" [site]="editingSite()" [saveError]="store.saveError()" (closed)="drawerOpen.set(false)" (saved)="saveSite($event)" />
 </section>

@@ -27,6 +27,7 @@ export class SiteApiStoreService {
 
   readonly loading = signal(false);
   readonly error = signal(false);
+  readonly saveError = signal<string | null>(null);
   private generation = 0;
   private request = 0;
 
@@ -137,11 +138,16 @@ export class SiteApiStoreService {
   }
 
   async create(organizationId: string, value: SiteFormValue): Promise<boolean> {
+    this.saveError.set(null);
     try {
-      const org = this.workspace
-        .organizations()
-        .find((item) => item.id === organizationId);
-      if (!org?.apiId) throw new Error("No accessible organization");
+      // The active context is authoritative for a creation. Filtering the
+      // organizations list here can incorrectly reject a valid selected org
+      // before the POST is issued (notably after switching AuthGate context).
+      const org = this.workspace.organization();
+      if (!org?.apiId || org.id !== organizationId) {
+        this.saveError.set("sites.validation.save.context");
+        return false;
+      }
 
       await firstValueFrom(
         this.http.post(
@@ -166,7 +172,19 @@ export class SiteApiStoreService {
       if (this.workspace.remoteWorkspaceError())
         this.notifications.error("sites.real.workspaceError", "/etablissements");
       return true;
-    } catch {
+    } catch (error: unknown) {
+      const failure = error as { status?: number; error?: { code?: string } };
+      const status = failure?.status;
+      const errorKey = status === 400 || status === 422
+        ? "sites.validation.save.invalid"
+        : status === 401 || status === 403
+          ? "sites.validation.save.forbidden"
+          : status === 409
+            ? "sites.validation.save.conflict"
+            : "sites.validation.save.unavailable";
+      this.saveError.set(errorKey);
+      // Do not log request payloads, credentials, or personal data.
+      console.error("Site creation failed", { httpStatus: status ?? null, code: failure?.error?.code ?? null });
       this.notifications.error("sites.real.saveError", "/etablissements");
       return false;
     }

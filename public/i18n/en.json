@@ -2963,7 +2963,14 @@
     "validation": {
       "managerRequired": "Select an active site director from the eligible members of this organization.",
       "managersLoading": "Site directors are still loading. Please try again shortly.",
-      "fieldsRequired": "Some required fields are missing or invalid. Please review the form."
+      "fieldsRequired": "Some required fields are missing or invalid. Please review the form.",
+      "save": {
+        "context": "The active organization is unavailable. Select your organization again and retry.",
+        "invalid": "The API rejected the site details. Check the fields and manager.",
+        "forbidden": "You cannot create a site in the selected organization.",
+        "conflict": "Creation conflict: a site or manager assignment is already in use.",
+        "unavailable": "Creation failed due to a connection or server error. Check the API request and logs."
+      }
     }
   },
   "programs": {

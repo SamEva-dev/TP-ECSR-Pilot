@@ -59,6 +59,7 @@ export class SiteDrawerComponent {
   }
 
   readonly open = input(false);
+  readonly saveError = input<string | null>(null);
   readonly site = input<SiteProfile | null>(null);
   readonly closed = output<void>();
   readonly saved = output<SiteFormValue>();

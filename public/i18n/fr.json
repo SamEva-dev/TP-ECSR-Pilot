@@ -2963,7 +2963,14 @@
     "validation": {
       "managerRequired": "Sélectionnez un responsable d’établissement actif appartenant à la liste autorisée pour cette organisation.",
       "managersLoading": "Chargement des responsables en cours. Réessayez dans un instant.",
-      "fieldsRequired": "Le formulaire contient des champs obligatoires manquants ou invalides. Vérifiez les informations saisies."
+      "fieldsRequired": "Le formulaire contient des champs obligatoires manquants ou invalides. Vérifiez les informations saisies.",
+      "save": {
+        "context": "L’organisation active n’est pas disponible. Sélectionnez de nouveau votre organisation puis réessayez.",
+        "invalid": "Les informations de l’établissement sont refusées par l’API. Vérifiez les champs et le responsable.",
+        "forbidden": "Vous n’avez pas l’autorisation de créer cet établissement dans l’organisation sélectionnée.",
+        "conflict": "Création refusée : un établissement ou une attribution de responsable est déjà en conflit.",
+        "unavailable": "Création impossible : erreur de connexion ou du serveur. Consultez la requête et les journaux de l’API."
+      }
     }
   },
   "programs": {
