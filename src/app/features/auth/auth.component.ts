@@ -207,6 +207,46 @@ export class AuthComponent {
     ]);
   }
 
+  // A valid AuthGate identity token may precede organization selection.
+  // This check is ONLY for navigation, never for granting business permissions.
+  private needsOrganizationSelection(accessToken: string): boolean {
+    try {
+      const encoded = accessToken.split(".")[1];
+      if (!encoded) return false;
+      const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="))) as {
+        sub?: unknown; exp?: unknown; org_id?: unknown; organization_id?: unknown;
+      };
+      return typeof payload.sub === "string" &&
+        typeof payload.exp === "number" && payload.exp * 1000 > Date.now() &&
+        !(typeof payload.org_id === "string" && payload.org_id.trim()) &&
+        !(typeof payload.organization_id === "string" && payload.organization_id.trim());
+    } catch {
+      return false;
+    }
+  }
+
+  private async completeLogin(accessToken: string): Promise<void> {
+    if (this.needsOrganizationSelection(accessToken)) {
+      // AuthGateService.login() already stores the identity JWT. It is only
+      // usable for AuthGate context discovery/selection, not Pedagora APIs.
+      this.session.disconnect();
+      const destination = this.signInRedirect();
+      await this.router.navigate(["/choisir-espace"], {
+        queryParams: { returnUrl: destination }, replaceUrl: true,
+      });
+      return;
+    }
+    this.session.connectAuthenticatedToken(accessToken);
+    if (!this.session.hasValidToken()) {
+      this.tokens.clear();
+      this.session.disconnect();
+      this.error.set('Connexion AuthGate acceptée, mais le jeton de contexte est invalide.');
+      return;
+    }
+    await this.router.navigateByUrl(await this.postLoginDestination());
+  }
+
   private async postLoginDestination(): Promise<string> {
     const destination = this.signInRedirect();
     try {
@@ -272,17 +312,7 @@ export class AuthComponent {
       this.pendingMfaToken = "";
       this.demoMfaRequired.set(false);
       this.demoMfaCode.reset();
-      this.session.connectAuthenticatedToken(result.accessToken);
-      if (!this.session.hasValidToken()) {
-        this.tokens.clear();
-        this.session.disconnect();
-        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
-        return;
-      }
-
-      await this.router.navigateByUrl(
-        await this.postLoginDestination(),
-      );
+      await this.completeLogin(result.accessToken);
     } catch (e) {
       this.error.set(this.backendMessage(e));
     } finally {
@@ -420,16 +450,7 @@ export class AuthComponent {
         );
         this.pendingCurrentPassword = "";
         this.pendingMfaToken = "";
-        this.session.connectAuthenticatedToken(result.accessToken);
-      if (!this.session.hasValidToken()) {
-        this.tokens.clear();
-        this.session.disconnect();
-        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
-        return;
-      }
-        await this.router.navigateByUrl(
-          await this.postLoginDestination(),
-        );
+      await this.completeLogin(result.accessToken);
         return;
       }
 
@@ -486,16 +507,7 @@ export class AuthComponent {
 
     this.pendingCurrentPassword = "";
     this.pendingMfaToken = "";
-    this.session.connectAuthenticatedToken(result.accessToken);
-      if (!this.session.hasValidToken()) {
-        this.tokens.clear();
-        this.session.disconnect();
-        this.error.set('Connexion AuthGate acceptée, mais aucun contexte PedagoraPilot valide n’a été établi. Vérifier org_id et les rattachements de ce compte dans PedagoraPilot.');
-        return;
-      }
-    await this.router.navigateByUrl(
-      await this.postLoginDestination(),
-    );
+      await this.completeLogin(result.accessToken);
   }
 
   async submitRegister(): Promise<void> {

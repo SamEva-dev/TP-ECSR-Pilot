@@ -16,6 +16,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/auth.component').then(m => m.AuthComponent),
   },
   {
+    path: "choisir-espace",
+    loadComponent: () =>
+      import("./features/auth/context-selector.component").then((m) => m.ContextSelectorComponent),
+  },
+  {
     path: "accept-invitation/:token",
     loadComponent: () =>
       import("./features/auth/accept-invitation.component").then((m) => m.AcceptInvitationComponent),
