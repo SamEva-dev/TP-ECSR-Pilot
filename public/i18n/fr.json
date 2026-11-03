@@ -2959,18 +2959,6 @@
     },
     "manager": {
       "choose": "Sélectionner un responsable d’établissement"
-    },
-    "validation": {
-      "managerRequired": "Sélectionnez un responsable d’établissement actif appartenant à la liste autorisée pour cette organisation.",
-      "managersLoading": "Chargement des responsables en cours. Réessayez dans un instant.",
-      "fieldsRequired": "Le formulaire contient des champs obligatoires manquants ou invalides. Vérifiez les informations saisies.",
-      "save": {
-        "context": "L’organisation active n’est pas disponible. Sélectionnez de nouveau votre organisation puis réessayez.",
-        "invalid": "Les informations de l’établissement sont refusées par l’API. Vérifiez les champs et le responsable.",
-        "forbidden": "Vous n’avez pas l’autorisation de créer cet établissement dans l’organisation sélectionnée.",
-        "conflict": "Création refusée : un établissement ou une attribution de responsable est déjà en conflit.",
-        "unavailable": "Création impossible : erreur de connexion ou du serveur. Consultez la requête et les journaux de l’API."
-      }
     }
   },
   "programs": {
@@ -3124,6 +3112,16 @@
     "delete": {
       "action": "Supprimer la formation",
       "confirm": "Supprimer définitivement « {{name}} » ? La suppression est refusée si la formation, son référentiel ou ses versions sont déjà utilisés. Cette action est irréversible."
+    },
+    "attach": {
+      "action": "Rattacher une formation",
+      "title": "Rattacher une formation existante",
+      "help": "Sélectionnez une formation de cette organisation qui n’est pas encore proposée par cet établissement.",
+      "source": "Formation à rattacher",
+      "choose": "Choisir une formation",
+      "empty": "Aucune formation disponible à rattacher à cet établissement.",
+      "cancel": "Annuler",
+      "confirm": "Rattacher la formation"
     }
   },
   "referentials": {

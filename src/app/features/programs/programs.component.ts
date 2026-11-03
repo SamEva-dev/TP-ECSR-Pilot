@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
+import { firstValueFrom } from "rxjs";
+import { PedagoraAccessApiService, type ProductAccount } from "../../core/access/pedagora-access-api.service";
+import { RealtimeService } from "../../core/realtime/realtime.service";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
@@ -17,6 +20,10 @@ import { ProgramDrawerComponent } from "./program-drawer/program-drawer.componen
 })
 export class ProgramsComponent {
   private readonly router = inject(Router);
+  private readonly accessApi = inject(PedagoraAccessApiService);
+  private readonly realtime = inject(RealtimeService);
+  private readonly trainerAccounts = signal<ProductAccount[] | null>(null);
+  private trainerRequest = 0;
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly translate = inject(TranslateService);
   readonly access = inject(AccessPolicyService);
@@ -53,10 +60,29 @@ export class ProgramsComponent {
     const allowed = new Set(this.scopeSiteIds());
     const selectedProgramId = this.workspace.program()?.id;
     const level = this.workspace.activeLevel();
-    return this.store.programs().filter((program) =>
-      program.siteIds.some((siteId) => allowed.has(siteId)) &&
-      (level === "organization" || level === "site" || program.id === selectedProgramId),
-    );
+    return this.store.programs()
+      .filter((program) =>
+        program.siteIds.some((siteId) => allowed.has(siteId)) &&
+        (level === "organization" || level === "site" || program.id === selectedProgramId),
+      )
+      .map((program) => {
+        // Read the current API-backed workspace signal, rather than counters
+        // snapshotted when the program catalog was last fetched.
+        const seen = new Set<string>();
+        const cohorts = program.siteIds
+          .filter((siteId) => allowed.has(siteId))
+          .flatMap((siteId) => this.workspace.siteCohorts(siteId))
+          .filter((cohort) => {
+            if (cohort.programId !== program.id || seen.has(cohort.id)) return false;
+            seen.add(cohort.id);
+            return true;
+          });
+        return {
+          ...program,
+          students: cohorts.reduce((sum, cohort) => sum + Number(cohort.studentCount ?? 0), 0),
+          activeCohorts: cohorts.filter((cohort) => cohort.status === "active").length,
+        };
+      });
   });
 
   readonly filteredPrograms = computed(() => {
@@ -72,15 +98,14 @@ export class ProgramsComponent {
   });
 
   readonly totals = computed(() => {
-    // Program DTO counters are global to the program, not scoped per offering.
-    // Show zero instead of presenting another site's figures as local totals.
-    if (this.workspace.activeLevel() !== "organization")
-      return { students: 0, trainers: 0, cohorts: 0 };
-    return this.programs().reduce((acc, program) => ({
-      students: acc.students + (program.students ?? 0),
-      trainers: acc.trainers + (program.trainers ?? 0),
-      cohorts: acc.cohorts + (program.activeCohorts ?? 0),
-    }), { students: 0, trainers: 0, cohorts: 0 });
+    const programs = this.programs();
+    const students = programs.reduce((sum, program) => sum + (program.students ?? 0), 0);
+    const cohorts = programs.reduce((sum, program) => sum + (program.activeCohorts ?? 0), 0);
+    // Distinct active trainer members assigned to this selected scope.
+    // Organization scope includes all its trainers; narrower scopes require
+    // an explicit local business assignment.
+    const trainers = this.trainerTotal(programs);
+    return { students, trainers, cohorts };
   });
 
   constructor() {
@@ -88,6 +113,67 @@ export class ProgramsComponent {
       if (this.workspace.remoteWorkspaceError())
         this.notifications.error("programs.real.workspaceError", "/formations");
     });
+    effect(() => {
+      const organizationId = this.workspace.organization()?.apiId;
+      const ready = this.workspace.remoteWorkspaceLoaded();
+      if (ready && organizationId) void this.loadTrainerCount(organizationId);
+      else {
+        ++this.trainerRequest;
+        this.trainerAccounts.set(null);
+      }
+    });
+    effect(() => {
+      const event = this.realtime.lastEvent();
+      if (!event || !(/^(pedagora\.access\.|pedagora\.training\.)/.test(event.typeKey))) return;
+      const organizationId = this.workspace.organization()?.apiId;
+      if (organizationId && this.workspace.remoteWorkspaceLoaded())
+        void this.loadTrainerCount(organizationId);
+    });
+  }
+
+  private async loadTrainerCount(organizationId: string): Promise<void> {
+    const request = ++this.trainerRequest;
+    this.trainerAccounts.set(null);
+    try {
+      const accounts: ProductAccount[] = [];
+      const pageSize = 100;
+      for (let page = 1; page <= 100; page++) {
+        const response = await firstValueFrom(this.accessApi.list(page, "", pageSize));
+        accounts.push(...(response.items ?? []));
+        if (page * pageSize >= response.totalCount || !response.items?.length) break;
+      }
+      if (request !== this.trainerRequest || this.workspace.organization()?.apiId !== organizationId) return;
+      this.trainerAccounts.set(accounts);
+    } catch {
+      if (request === this.trainerRequest) this.trainerAccounts.set(null);
+    }
+  }
+
+  private trainerTotal(programs: ProgramCatalogItem[]): number | null {
+    const accounts = this.trainerAccounts();
+    if (!accounts) return null;
+    const organizationLevel = this.workspace.activeLevel() === "organization";
+    const siteKeys = new Set(this.scopeSiteIds());
+    const sites = this.workspace.sites().filter(site => siteKeys.has(site.id));
+    const siteIds = new Set(sites.flatMap(site => [site.id, site.apiId]));
+    const programIds = new Set(programs.flatMap(program => [program.id, program.apiId]));
+    const cohortIds = new Set(sites.flatMap(site => this.workspace.siteCohorts(site.id))
+      .filter(cohort => programs.some(program => program.id === cohort.programId))
+      .flatMap(cohort => [cohort.id, cohort.apiId]));
+    return new Set(accounts.filter(account => {
+      if (account.status !== "Active" || account.isInvitation) return false;
+      const roles = [account.primaryRole, ...(account.roles ?? [])];
+      const trainerRole = roles.some(role => /(?:trainer|formateur)/i.test(role ?? ""));
+      if (!trainerRole) return false;
+      if (organizationLevel) return true;
+      return (account.assignments ?? []).some(assignment => {
+        if (!assignment.active) return false;
+        if (assignment.cohortId) return cohortIds.has(assignment.cohortId);
+        if (assignment.programId) return programIds.has(assignment.programId);
+        if (assignment.siteId) return siteIds.has(assignment.siteId);
+        return assignment.scope === "organization";
+      });
+    }).map(account => account.id)).size;
   }
 
   openAttach(): void {

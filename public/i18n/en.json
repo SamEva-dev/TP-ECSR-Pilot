@@ -2959,18 +2959,6 @@
     },
     "manager": {
       "choose": "Select a site manager"
-    },
-    "validation": {
-      "managerRequired": "Select an active site director from the eligible members of this organization.",
-      "managersLoading": "Site directors are still loading. Please try again shortly.",
-      "fieldsRequired": "Some required fields are missing or invalid. Please review the form.",
-      "save": {
-        "context": "The active organization is unavailable. Select your organization again and retry.",
-        "invalid": "The API rejected the site details. Check the fields and manager.",
-        "forbidden": "You cannot create a site in the selected organization.",
-        "conflict": "Creation conflict: a site or manager assignment is already in use.",
-        "unavailable": "Creation failed due to a connection or server error. Check the API request and logs."
-      }
     }
   },
   "programs": {
@@ -3124,6 +3112,16 @@
     "delete": {
       "action": "Delete program",
       "confirm": "Permanently delete “{{name}}”? Deletion is blocked if the program, its referential or its versions are already in use. This action cannot be undone."
+    },
+    "attach": {
+      "action": "Attach a program",
+      "title": "Attach an existing program",
+      "help": "Choose a program in this organization that is not yet offered at this site.",
+      "source": "Program to attach",
+      "choose": "Select a program",
+      "empty": "No program is available to attach to this site.",
+      "cancel": "Cancel",
+      "confirm": "Attach program"
     }
   },
   "referentials": {
