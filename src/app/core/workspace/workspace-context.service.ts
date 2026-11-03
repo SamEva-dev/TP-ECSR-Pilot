@@ -600,8 +600,18 @@ export class WorkspaceContextService {
   private canAccessOrganization(organizationId: string): boolean {
     const access = this.access();
     if (access.scope === "platform") return true;
-    if (access.organizationIds)
-      return access.organizationIds.includes(organizationId);
+    if (access.organizationIds) {
+      // AuthGate grants access using the organization UUID (API id), while
+      // workspace selections and sites use the organization's stable key.
+      // Resolve the key to its authorized API id; do not grant access to any
+      // organization that was not explicitly present in the active session.
+      const organization = this.organizationsSignal().find(
+        (item) => item.id === organizationId || item.apiId === organizationId,
+      );
+      return !!organization && access.organizationIds.some(
+        (id) => id === organization.apiId || id === organization.id,
+      );
+    }
     if (access.siteIds) {
       return this.sitesSignal().some(
         (site) =>
