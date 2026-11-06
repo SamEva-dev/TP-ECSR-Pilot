@@ -145,61 +145,87 @@ export class ProgramApiStoreService {
   }
 
   async update(id: string, value: ProgramFormValue): Promise<boolean> {
-    try {
-      const current = this.programsSignal().find((item) => item.id === id);
-      if (!current) throw new Error("Program unavailable");
+    const current = this.programsSignal().find((item) => item.id === id);
+    if (!current) {
+      this.notifications.error("programs.real.saveError", `/formations/${id}`);
+      return false;
+    }
 
-      const saved = await this.api.update(current.apiId, {
-        familyCode:
-          current.category === value.category
-            ? current.familyCode
-            : this.familyFor(value.category),
+    let saved: ProgramApiDto;
+    try {
+      saved = await this.api.update(current.apiId, {
+        familyCode: current.category === value.category
+          ? current.familyCode : this.familyFor(value.category),
         name: this.text(value.name).trim(),
         descriptionKey: this.text(value.description).trim(),
         referenceVersion: this.text(value.referenceVersion).trim(),
-        icon:
-          current.category === value.category
-            ? current.icon
-            : this.iconFor(value.category),
+        icon: current.category === value.category
+          ? current.icon : this.iconFor(value.category),
         durationHours: this.number(value.durationHours),
         status: this.status(value.status),
         enabledModules: Array.isArray(value.enabledModules) ? value.enabledModules : [],
         responsibleTrainerAuthGateUserId: this.nullableText(value.responsibleTrainerAuthGateUserId),
         responsibleTrainerDisplayName: this.nullableText(value.responsibleTrainerDisplayName),
       });
-
-      // Updating program metadata does not update the responsible in the backend.
-      // Reassignment is a distinct command with its own membership checks.
-      const nextResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
-      const previousResponsible = this.text(current.responsibleTrainerAuthGateUserId).trim();
-      if (nextResponsible !== previousResponsible) {
-        if (!nextResponsible) throw new Error("A responsible trainer is required");
-        await this.api.assignResponsible(current.apiId, nextResponsible);
-      }
-      const mapped = this.map(saved);
-      if (nextResponsible !== previousResponsible) {
-        mapped.responsibleTrainerAuthGateUserId = nextResponsible;
-        mapped.responsibleTrainerDisplayName = this.text(value.responsibleTrainerDisplayName);
-        mapped.responsibleTrainerActive = true;
-      }
-      this.programsSignal.update((items) =>
-        items.map((item) =>
-          item.id === id
-            ? {
-                ...mapped,
-                siteIds: mapped.siteIds.length ? mapped.siteIds : item.siteIds,
-                referenceVersion: mapped.referenceVersion || item.referenceVersion,
-              }
-            : item,
-        ),
-      );
-      await this.reload();
-      await this.workspace.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("programs.real.workspaceError", `/formations/${id}`);
-      return true;
     } catch {
       this.notifications.error("programs.real.saveError", `/formations/${id}`);
+      return false;
+    }
+
+    // From here the UPDATE is committed. A secondary command or refresh
+    // must not turn a successful PUT into an apparent failure (and retry).
+    let followUpFailed = false;
+    const nextResponsible = this.text(value.responsibleTrainerAuthGateUserId).trim();
+    const previousResponsible = this.text(current.responsibleTrainerAuthGateUserId).trim();
+    const mapped = this.map(saved);
+    if (nextResponsible !== previousResponsible) {
+      if (!nextResponsible) {
+        followUpFailed = true;
+      } else {
+        try {
+          await this.api.assignResponsible(current.apiId, nextResponsible);
+          mapped.responsibleTrainerAuthGateUserId = nextResponsible;
+          mapped.responsibleTrainerDisplayName = this.text(value.responsibleTrainerDisplayName);
+          mapped.responsibleTrainerActive = true;
+        } catch {
+          followUpFailed = true;
+        }
+      }
+    }
+    this.programsSignal.update((items) => items.map((item) => item.id === id
+      ? {
+          ...mapped,
+          siteIds: mapped.siteIds.length ? mapped.siteIds : item.siteIds,
+          referenceVersion: mapped.referenceVersion || item.referenceVersion,
+        }
+      : item,
+    ));
+    try {
+      await this.reload();
+      await this.workspace.reload();
+      if (this.workspace.remoteWorkspaceError() || this.loadError()) followUpFailed = true;
+    } catch {
+      followUpFailed = true;
+    }
+    if (followUpFailed)
+      this.notifications.error("programs.real.workspaceError", `/formations/${id}`);
+    return true;
+  }
+
+  async changeStatus(id: string, target: ProgramCatalogStatus): Promise<boolean> {
+    const current = this.programsSignal().find(item => item.id === id);
+    if (!current?.apiId || current.status === target) return false;
+    try {
+      const saved = await this.api.changeStatus(current.apiId, target);
+      const mapped = this.map(saved);
+      this.programsSignal.update(items => items.map(item => item.id === id
+        ? { ...item, status: mapped.status } : item));
+      await this.refreshAfterWrite(`/formations/${id}`);
+      return true;
+    } catch (error: any) {
+      const code = typeof error?.error?.code === "string" ? error.error.code :
+        typeof error?.code === "string" ? error.code : "";
+      this.notifications.error(code ? `backendErrors.${code}` : "programs.real.saveError", `/formations/${id}`);
       return false;
     }
   }
@@ -209,52 +235,58 @@ export class ProgramApiStoreService {
     if (!current?.apiId) return false;
     try {
       await this.api.delete(current.apiId);
-      this.programsSignal.update((items) => items.filter((item) => item.id !== id));
-      await this.workspace.reload();
-      await this.reload();
-      return true;
     } catch (error: any) {
       const code = typeof error?.error?.code === "string"
         ? error.error.code
-        : typeof error?.code === "string"
-          ? error.code
-          : "";
+        : typeof error?.code === "string" ? error.code : "";
       this.notifications.error(
-        code ? `backendErrors.${code}` : "programs.real.deleteError",
-        "/formations",
+        code ? `backendErrors.${code}` : "programs.real.deleteError", "/formations",
       );
       return false;
     }
+
+    this.programsSignal.update((items) => items.filter((item) => item.id !== id));
+    await this.refreshAfterWrite("/formations");
+    return true;
   }
 
   async toggleSite(programId: string, siteId: string): Promise<boolean> {
+    const program = this.programsSignal().find((item) => item.id === programId);
+    const site = this.workspace.sites().find((item) => item.id === siteId);
+    if (!program || !site?.apiId) {
+      this.notifications.error("programs.real.offeringError", `/formations/${programId}`);
+      return false;
+    }
+    const enabled = !program.siteIds.includes(siteId);
     try {
-      const program = this.programsSignal().find((item) => item.id === programId);
-      const site = this.workspace.sites().find((item) => item.id === siteId);
-      if (!program || !site?.apiId) throw new Error("Offering unavailable");
-
-      const enabled = !program.siteIds.includes(siteId);
       await this.api.setOffering(program.apiId, site.apiId, enabled);
-      this.programsSignal.update((items) =>
-        items.map((item) =>
-          item.id === programId
-            ? {
-                ...item,
-                siteIds: enabled
-                  ? [...new Set([...item.siteIds, siteId])]
-                  : item.siteIds.filter((id) => id !== siteId),
-              }
-            : item,
-        ),
-      );
-      await this.workspace.reload();
-      await this.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("programs.real.workspaceError", `/formations/${programId}`);
-      return true;
     } catch {
       this.notifications.error("programs.real.offeringError", `/formations/${programId}`);
       return false;
+    }
+
+    this.programsSignal.update((items) => items.map((item) => item.id === programId
+      ? {
+          ...item,
+          siteIds: enabled
+            ? [...new Set([...item.siteIds, siteId])]
+            : item.siteIds.filter((id) => id !== siteId),
+        }
+      : item,
+    ));
+    await this.refreshAfterWrite(`/formations/${programId}`);
+    return true;
+  }
+
+  /** A completed API mutation is not rolled back by a failed workspace refresh. */
+  private async refreshAfterWrite(path: string): Promise<void> {
+    try {
+      await this.workspace.reload();
+      await this.reload();
+      if (this.workspace.remoteWorkspaceError() || this.loadError())
+        this.notifications.error("programs.real.workspaceError", path);
+    } catch {
+      this.notifications.error("programs.real.workspaceError", path);
     }
   }
 

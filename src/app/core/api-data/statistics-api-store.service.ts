@@ -347,7 +347,7 @@ export class StatisticsApiStoreService {
       const event = this.realtime.lastEvent();
       if (
         !event ||
-        !/^pedagora\.(training|learning|workplace|certification)\./.test(
+        !/^pedagora\.(organization|catalog|training|learning|workplace|certification)\./.test(
           event.typeKey,
         )
       )
@@ -359,7 +359,8 @@ export class StatisticsApiStoreService {
   async reload(): Promise<boolean> {
     const generation = ++this.generation;
     const role = this.session.role();
-    this.resetDataOnly();
+    // Preserve the last confirmed values while refreshing the same workspace.
+    // The workspace/role effect performs the required reset on context changes.
     this.loadError.set(false);
     if (role === "stagiaire") {
       const cohortApiId = this.text(this.workspace.cohort()?.apiId);
@@ -403,6 +404,8 @@ export class StatisticsApiStoreService {
               learners.status === "fulfilled" && Array.isArray(learners.value)
                 ? learners.value.map((row) => this.learner(row))
                 : [],
+            dashboardFailed: dashboard.status === "rejected",
+            learnersFailed: learners.status === "rejected",
             failed:
               dashboard.status === "rejected" || learners.status === "rejected",
           };
@@ -411,12 +414,20 @@ export class StatisticsApiStoreService {
       if (generation !== this.generation || request !== this.request)
         return false;
       const failed = bundles.some((bundle) => bundle.failed);
+      const previous = new Map(
+        this.bundlesSignal().map((bundle) => [bundle.cohort.apiId, bundle]),
+      );
       this.bundlesSignal.set(
-        bundles.map(({ cohort, dashboard, learners }) => ({
-          cohort,
-          dashboard,
-          learners,
-        })),
+        bundles.map(({ cohort, dashboard, learners, dashboardFailed, learnersFailed }) => {
+          const last = previous.get(cohort.apiId);
+          // A failed request must not turn previously confirmed KPIs into zero.
+          // Preserve each independently successful resource where possible.
+          return {
+            cohort,
+            dashboard: dashboardFailed ? last?.dashboard ?? null : dashboard,
+            learners: learnersFailed ? last?.learners ?? [] : learners,
+          };
+        }),
       );
       this.loadError.set(failed);
       if (failed)
@@ -427,7 +438,6 @@ export class StatisticsApiStoreService {
       return !failed;
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.resetDataOnly();
         this.loadError.set(true);
         this.notifications.error(
           "statistics.real.partialError",
@@ -458,7 +468,7 @@ export class StatisticsApiStoreService {
       return true;
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.studentSignal.set(null);
+        // Keep the last confirmed student dashboard on a transient GET failure.
         this.loadError.set(true);
         this.notifications.error(
           "statistics.real.partialError",

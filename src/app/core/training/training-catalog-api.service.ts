@@ -14,7 +14,7 @@ export interface CreateCohortRequest {
   pedagogicalManagerAuthGateUserId: string | null;
   pedagogicalManagerDisplayName: string | null;
   externalKey: string | null;
-  initialStatus: "draft" | "planned" | "active";
+  initialStatus: "draft" | "planned" | "active" | "completed";
 }
 
 export interface CohortResponse {

@@ -1,7 +1,7 @@
 import { Routes } from "@angular/router";
 import { environment } from "./environments/environment";
 import { authGuard } from "./core/session/auth.guard";
-import { roleGuard } from "./core/session/role.guard";
+import { roleGuard, tutorWorkspaceGuard } from "./core/session/role.guard";
 
 export const routes: Routes = [
   { path: 'auth/logout', loadComponent: () => import('./core/oidc/oidc-signout.component').then(m => m.OidcSignoutComponent) },
@@ -61,6 +61,13 @@ export const routes: Routes = [
         (m) => m.AppShellComponent,
       ),
     children: [
+      {
+        path: 'mes-stages-tuteur',
+        canActivate: [tutorWorkspaceGuard, roleGuard],
+        data: { permission: 'internships.tutor.viewAssigned' },
+        loadComponent: () => import('./features/internships/tutor/tutor-workspace.component')
+          .then(m => m.TutorWorkspaceComponent),
+      },
       {
         path: 'signatures/centre',
         canActivate: [roleGuard],

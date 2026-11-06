@@ -11,6 +11,24 @@ import { environment } from "../../environments/environment";
 export class WorkplaceApiService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiBaseUrl}/api/v1`;
+  getTutorPeriods() {
+    return firstValueFrom(this.http.get<WorkplacePeriodDto[]>(`${this.base}/workplace/tutor/periods`));
+  }
+  updateTutorHours(id: string, completedHours: number, observation: string) {
+    return firstValueFrom(this.http.put<WorkplacePeriodDto>(
+      `${this.base}/workplace/tutor/periods/${encodeURIComponent(id)}/hours`,
+      { completedHours, observation }));
+  }
+  updateTutorActivity(id: string, activityId: string, status: WorkplacePeriodDto['activities'][number]['status'], comment: string) {
+    return firstValueFrom(this.http.put<WorkplacePeriodDto>(
+      `${this.base}/workplace/tutor/periods/${encodeURIComponent(id)}/activities/${encodeURIComponent(activityId)}`,
+      { status, comment }));
+  }
+  submitTutorEvaluation(id: string, summary: string, strengths: string, improvementAreas: string, validated: boolean | null) {
+    return firstValueFrom(this.http.post<WorkplacePeriodDto>(
+      `${this.base}/workplace/tutor/periods/${encodeURIComponent(id)}/evaluations`,
+      { summary, strengths, improvementAreas, validated }));
+  }
   getPeriods(cohortId: string) {
     return firstValueFrom(
       this.http.get<WorkplacePeriodDto[]>(`${this.base}/workplace/periods`, {
@@ -46,6 +64,14 @@ export class WorkplaceApiService {
         payload,
       ),
     );
+  }
+  changeLifecycle(id: string, action: "cancel" | "archive" | "delete", reason: string | null) {
+    return firstValueFrom(this.http.post<boolean>(`${this.base}/workplace/periods/${encodeURIComponent(id)}/lifecycle`, { action, reason }));
+  }
+  reassignTutor(periodId: string, tutorName: string, tutorEmail: string, tutorPhone: string | null) {
+    return firstValueFrom(this.http.post<boolean>(
+      `${this.base}/workplace/periods/${encodeURIComponent(periodId)}/tutor/reassign`,
+      { tutorName, tutorEmail, tutorPhone }));
   }
   updateHours(
     id: string,

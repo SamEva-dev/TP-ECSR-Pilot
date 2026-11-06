@@ -49,3 +49,13 @@ export const roleGuard: CanActivateFn = (route) => {
 
   return router.createUrlTree([access.defaultPath()]);
 };
+
+/** Route-level separation: internal directors use the supervision workspace. */
+export const tutorWorkspaceGuard: CanActivateFn = () => {
+  const access = inject(AccessPolicyService);
+  const router = inject(Router);
+  if (access.canOpenTutorWorkspace()) return true;
+  // Do not expose tutor-only API calls to administrative profiles.
+  if (access.can("internships.view")) return router.createUrlTree(["/stages"]);
+  return router.createUrlTree([access.defaultPath()]);
+};

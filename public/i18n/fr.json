@@ -1367,7 +1367,9 @@
       "incomplete": "Incomplet",
       "inProgress": "En cours",
       "planned": "Planifié",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "archived": "Archivé",
+      "deleted": "Supprimé"
     },
     "card": {
       "planned": "Heures prévues",
@@ -1441,6 +1443,7 @@
         "required": "Ce champ est obligatoire.",
         "email": "Saisissez une adresse e-mail valide.",
         "dateRange": "La date de fin doit être postérieure ou égale à la date de début.",
+        "cohortDateRange": "Les dates du stage doivent être valides et comprises dans la période de la promotion.",
         "hours": "Le volume horaire doit être supérieur à 0 et inférieur ou égal à 2 000 heures."
       }
     },
@@ -1494,7 +1497,35 @@
       "chooseEnrollment": "Sélectionner un stagiaire inscrit",
       "noEnrollments": "Aucun stagiaire inscrit dans la promotion sélectionnée. Sélectionnez une promotion comportant des inscriptions.",
       "emailNotInvitation": "L’email du tuteur est enregistré dans le dossier ; aucune invitation n’est envoyée automatiquement.",
+      "emailInvitation": "Si un email est renseigné, une invitation sera envoyée automatiquement après création. L’accès sera limité aux stages affectés.",
       "externalAccessNotInvited": "Accès tuteur externe non activé"
+    },
+    "tutorReview": {
+      "title": "Bilans et évaluations du maître de stage",
+      "strengths": "Points forts",
+      "improvements": "Axes d’amélioration",
+      "validated": "Compétence validée",
+      "notValidated": "À retravailler"
+    },
+    "tutorReassign": {
+      "action": "Réattribuer le maître de stage",
+      "name": "Nom du nouveau maître de stage",
+      "email": "Email du nouveau maître de stage",
+      "phone": "Téléphone (facultatif)",
+      "save": "Confirmer la réattribution",
+      "cancel": "Annuler",
+      "success": "Réattribution enregistrée ; invitation envoyée.",
+      "error": "Impossible de réattribuer ce stage."
+    },
+    "lifecycle": {
+      "cancel": "Annuler le stage",
+      "delete": "Supprimer la période inutilisée",
+      "archive": "Archiver",
+      "confirm": "Confirmer le changement de statut ? Les accès du maître de stage seront révoqués.",
+      "reason": "Motif obligatoire",
+      "validate": "Confirmer",
+      "dismiss": "Retour",
+      "error": "Impossible de modifier le statut de la période."
     }
   },
   "documents": {
@@ -1955,7 +1986,8 @@
       "roleError": "Impossible de modifier le rôle de ce compte.",
       "selfInviteError": "Vous ne pouvez pas vous inviter vous-même dans votre organisation.",
       "memberExistsError": "Cet utilisateur est déjà membre de cette organisation. Modifiez ses rôles depuis Gestion des accès.",
-      "invitationExistsError": "Une invitation est déjà en attente pour cette adresse."
+      "invitationExistsError": "Une invitation est déjà en attente pour cette adresse.",
+      "activeTutorAssignments": "Ce membre possède des affectations de stage actives. Réattribuez les stages ou suspendez son accès avant le retrait."
     }
   },
   "administration": {
@@ -3991,7 +4023,12 @@
     "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les épreuves requises doivent avoir un résultat avant la décision du jury.",
     "CERTIFICATION_ASSESSMENTS_REQUIRED": "Au moins une épreuve est obligatoire.",
     "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "Une même épreuve figure plusieurs fois dans la grille.",
-    "CERTIFICATION_COMMENT_TOO_LONG": "Le commentaire dépasse la longueur autorisée."
+    "CERTIFICATION_COMMENT_TOO_LONG": "Le commentaire dépasse la longueur autorisée.",
+    "WORKPLACE_TUTOR_REASSIGNMENT_REQUIRED": "Le remplacement du maître de stage passe par l’action « Réattribuer » du dossier. L’ancien accès est révoqué.",
+    "WORKPLACE_TUTOR_MEMBER_INACTIVE": "Ce membre est suspendu ou inactif et ne peut pas être affecté comme maître de stage.",
+    "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "Le compte existe déjà mais son rôle actuel n’est pas compatible avec une affectation directe de maître de stage.",
+    "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "Ce maître de stage est déjà affecté à cette période.",
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4272,7 +4309,16 @@
     "SIGNATURE_TIMEZONE_INVALID": "Le fuseau horaire de l’organisation est invalide.",
     "SIGNATURE_ARCHIVE_NOT_READY": "Le document de preuve est en cours d'archivage. Réessayez plus tard.",
     "SIGNATURE_ARCHIVE_NOT_FINAL": "Le document ne peut être archivé qu'après réponse du stagiaire.",
-    "SIGNATURE_ARCHIVE_INTEGRITY_FAILED": "L'intégrité du document archivé n'a pas pu être vérifiée."
+    "SIGNATURE_ARCHIVE_INTEGRITY_FAILED": "L'intégrité du document archivé n'a pas pu être vérifiée.",
+    "WORKPLACE_TUTOR_REASSIGNMENT_REQUIRED": "Le remplacement du maître de stage passe par l’action « Réattribuer » du dossier. L’ancien accès est révoqué.",
+    "WORKPLACE_TUTOR_MEMBER_INACTIVE": "Ce membre est suspendu ou inactif et ne peut pas être affecté comme maître de stage.",
+    "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "Le compte existe déjà mais son rôle actuel n’est pas compatible avec une affectation directe de maître de stage.",
+    "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "Ce maître de stage est déjà affecté à cette période.",
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage.",
+    "WORKPLACE_DELETE_HAS_EVIDENCE": "Cette période contient des traces pédagogiques et ne peut pas être supprimée.",
+    "WORKPLACE_LIFECYCLE_INVALID": "Transition de statut non autorisée.",
+    "WORKPLACE_LIFECYCLE_REASON_INVALID": "Un motif de 1 à 500 caractères est obligatoire.",
+    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Historique des notes complet, opération impossible."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -4845,5 +4891,37 @@
     "redirecting": "Redirection vers la connexion avec votre adresse email préremplie…",
     "passwordTitle": "Créer votre mot de passe",
     "passwordDescription": "Définissez le mot de passe de votre nouveau compte pour accepter cette invitation."
+  },
+  "tutorWorkspace": {
+    "nav": "Mes stages (tuteur)",
+    "title": "Espace maître de stage",
+    "subtitle": "Suivi des stagiaires qui vous sont affectés",
+    "refresh": "Actualiser",
+    "loading": "Chargement…",
+    "loadError": "Impossible de charger vos périodes de stage.",
+    "saveError": "Enregistrement impossible. Vérifiez les informations et vos droits.",
+    "saved": "Informations enregistrées.",
+    "empty": "Aucune période de stage ne vous est affectée.",
+    "hours": "Heures et observations",
+    "completed": "Heures réalisées",
+    "observation": "Observations du tuteur",
+    "save": "Enregistrer",
+    "activities": "Activités pédagogiques",
+    "status": "Statut",
+    "pending": "À réaliser",
+    "done": "Réalisée",
+    "notApplicable": "Non applicable",
+    "comment": "Commentaire",
+    "noActivities": "Aucune activité configurée pour cette période.",
+    "evaluation": "Évaluation du maître de stage",
+    "summary": "Bilan",
+    "strengths": "Points forts",
+    "improvements": "Axes d’amélioration",
+    "validated": "Compétences validées ?",
+    "notAssessed": "Non évalué",
+    "yes": "Oui",
+    "no": "Non",
+    "submit": "Enregistrer l’évaluation",
+    "history": "Historique des évaluations"
   }
 }

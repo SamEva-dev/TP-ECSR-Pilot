@@ -129,11 +129,12 @@ export class DrivingApiStoreService {
       this.definitionsSignal.set([]);
       this.historySignal.set([]);
       this.selectedEnrollmentSignal.set("");
+      this.trainersSignal.set([]);
       this.loadError.set(false);
       this.definitionsError.set(false);
       if (ready && cohortApiId) {
         void this.loadContext(cohortApiId, referentialVersionId, role === "stagiaire", generation);
-        if (role !== "stagiaire") void this.loadEligibleTrainers();
+        if (role !== "stagiaire") void this.loadEligibleTrainers(generation);
       }
     });
 
@@ -156,18 +157,22 @@ export class DrivingApiStoreService {
   }
 
 
-  private async loadEligibleTrainers(): Promise<void> {
+  private async loadEligibleTrainers(generation: number): Promise<void> {
     try {
       const rows = await firstValueFrom(this.accessApi.trainers());
-      this.trainersSignal.set((rows ?? []).map((row) => ({
-        id: this.text(row.id),
-        name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
-      })).filter((row) => !!row.id && !!row.name));
+      if (generation !== this.contextGeneration) return;
+      this.trainersSignal.set((rows ?? [])
+        .filter((row) => row.status === "Active" && !row.isInvitation)
+        .map((row) => ({
+          id: this.text(row.id),
+          name: [this.text(row.firstName), this.text(row.lastName)].filter(Boolean).join(" ").trim(),
+        })).filter((row) => !!row.id && !!row.name));
     } catch {
-      const current = this.session.session();
-      const id = this.text(current?.userId);
-      const name = this.currentUserName();
-      this.trainersSignal.set(id && name ? [{ id, name }] : []);
+      if (generation !== this.contextGeneration) return;
+      // A failed directory request is not evidence that the current identity
+      // is an eligible trainer in this organization. Never fabricate one.
+      this.trainersSignal.set([]);
+      this.notifications.error("drivingSession.real.loadError", "/conduite");
     }
   }
 
@@ -314,7 +319,8 @@ export class DrivingApiStoreService {
       this.historyError.set(false);
     } catch {
       if (generation === this.historyGeneration && enrollmentId === this.selectedEnrollmentSignal()) {
-        this.historySignal.set([]);
+        // Retain already confirmed evaluations for the SAME enrollment.
+        // Switching student clears the signal in the selection effect above.
         this.historyError.set(true);
         if (notify) this.notifications.error("drivingSession.real.historyError", "/conduite");
       }

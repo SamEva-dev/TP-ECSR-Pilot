@@ -186,10 +186,24 @@ export class CreateInternshipDrawerComponent {
     );
   }
 
+  // Local calendar dates (YYYY-MM-DD) are compared as civil dates, without
+  // constructing JS Date instances or applying UTC timezone conversions.
+  get cohortStartDate(): string {
+    return String(this.store.cohortStartDate() ?? "").slice(0, 10);
+  }
+
+  get cohortEndDate(): string {
+    return String(this.store.cohortEndDate() ?? "").slice(0, 10);
+  }
+
   dateRangeInvalid(): boolean {
     const start = this.form.controls.startDate.value ?? "";
     const end = this.form.controls.endDate.value ?? "";
-    return Boolean(start && end && end < start);
+    return Boolean(
+      (start && end && end < start) ||
+      (start && this.cohortStartDate && start < this.cohortStartDate) ||
+      (end && this.cohortEndDate && end > this.cohortEndDate)
+    );
   }
 
   private resetForm(plannedHours: number, studentId: string): void {

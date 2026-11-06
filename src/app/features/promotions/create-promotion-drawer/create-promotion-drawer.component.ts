@@ -136,12 +136,25 @@ export class CreatePromotionDrawerComponent {
     }
 
     const raw = this.form.getRawValue();
+    raw.status = this.derivedStatus();
     const manager = this.team().find((member) => member.id === raw.managerUserId);
     this.promotionCreated.emit({
       ...raw,
       manager: manager ? this.fullName(manager) : "",
     });
     // Parent closes only after the server confirms persistence; preserve form on 4xx/5xx.
+  }
+
+  /** Informational calendar status; final decision is recalculated by the API. */
+  derivedStatus(): WorkspaceCohort["status"] {
+    const { startDate, endDate } = this.form.getRawValue();
+    if (!startDate || !endDate || endDate < startDate) return "planned";
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (key: string) => parts.find((item) => item.type === key)?.value ?? "";
+    const parisDate = `${part("year")}-${part("month")}-${part("day")}`;
+    return parisDate < startDate ? "planned" : parisDate > endDate ? "completed" : "active";
   }
 
   hasInvalidDates(): boolean {

@@ -183,7 +183,7 @@ export class CohortApiStoreService {
         pedagogicalManagerAuthGateUserId: this.text(payload.managerUserId) || null,
         pedagogicalManagerDisplayName: this.text(payload.managerDisplayName) || null,
         externalKey: null,
-        initialStatus: payload.status === "draft" || payload.status === "active" ? payload.status : "planned",
+        initialStatus: this.initialStatusFromDates(payload.startDate, payload.endDate),
       });
       if (!response?.id || !response?.organizationId || !response?.siteId ||
           response.organizationId !== this.currentFilters().organizationId ||
@@ -200,10 +200,14 @@ export class CohortApiStoreService {
       this.upsert(saved);
       this.workspace.applySavedCohort(saved);
       const workspaceReloaded = await this.reloadWorkspaceSafely();
+      // Refresh can be invalidated by a concurrent workspace/context update. Regardless
+      // of read availability, the confirmed POST response is the canonical saved cohort.
       const refreshed = await this.reload();
-      if (!workspaceReloaded || !refreshed) {
-        // The POST already committed: preserve its canonical representation on read failures.
-        if (!refreshed) this.upsert(saved);
+      const sameContext = this.currentFilters().organizationId === saved.organizationId
+        && this.currentFilters().siteId === saved.siteId;
+      const missingFromRead = sameContext && !this.rowsSignal().some((row) => row.id === saved.id);
+      if (missingFromRead) this.upsert(saved);
+      if (!workspaceReloaded || !refreshed || missingFromRead) {
         this.notifications.error("promotions.api.refreshFailed", "/promotions");
       }
       // Return the committed server resource, independent of reporting or workspace GET availability.
@@ -220,9 +224,12 @@ export class CohortApiStoreService {
     try {
       await this.api.deleteCohort(row.id);
       this.rowsSignal.update((items) => items.filter((item) => item.id !== row.id));
+      // Deletion has committed: a failed or stale GET must not turn success into failure
+      // or resurrect the deleted cohort in the current store.
       const workspaceReloaded = await this.reloadWorkspaceSafely();
-      await this.reload();
-      if (!workspaceReloaded) this.notifications.error("promotions.api.refreshFailed", "/promotions");
+      const refreshed = await this.reload();
+      this.rowsSignal.update((items) => items.filter((item) => item.id !== row.id));
+      if (!workspaceReloaded || !refreshed) this.notifications.error("promotions.api.refreshFailed", "/promotions");
       return true;
     } catch (error: any) {
       const code = typeof error?.error?.code === "string" ? error.error.code : typeof error?.code === "string" ? error.code : "";
@@ -327,6 +334,16 @@ export class CohortApiStoreService {
       pedagogicalManagerDisplayName: this.text(row?.pedagogicalManagerDisplayName),
       status: this.status(row?.status),
     };
+  }
+
+  /** Initial creation state is a calendar projection, never a lifecycle cancellation. */
+  private initialStatusFromDates(startDate: string, endDate: string): "planned" | "active" | "completed" {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (key: string) => parts.find((item) => item.type === key)?.value ?? "";
+    const today = `${part("year")}-${part("month")}-${part("day")}`;
+    return today < startDate ? "planned" : today > endDate ? "completed" : "active";
   }
 
   private status(value: unknown): CohortResponse["status"] {

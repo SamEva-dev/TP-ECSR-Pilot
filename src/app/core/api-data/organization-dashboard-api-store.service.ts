@@ -280,6 +280,8 @@ export class OrganizationDashboardApiStoreService {
             )
           : 0;
 
+      const previousKpis = this.kpisSignal();
+      const sameOrganization = previousKpis.organizationId === organizationId;
       this.kpisSignal.set({
         organizationId,
         sites: org ? this.number(org.sites) : sites.length,
@@ -287,7 +289,8 @@ export class OrganizationDashboardApiStoreService {
           ? this.number(org.activePrograms)
           : uniquePrograms.filter((row) => row.active !== false).length,
         students: org ? this.number(org.learners) : siteLearners,
-        trainers: trainerNames.size,
+        trainers: sessionResult.status === "rejected" && sameOrganization
+          ? previousKpis.trainers : trainerNames.size,
         activeCohorts: org
           ? this.number(org.activeCohorts)
           : uniqueCohorts.filter((row) => row.status === "active").length,
@@ -297,7 +300,8 @@ export class OrganizationDashboardApiStoreService {
         attendanceRate: org
           ? this.number(org.attendanceRate)
           : fallbackAttendance,
-        completedHours: this.round1(completedMinutes / 60),
+        completedHours: sessionResult.status === "rejected" && sameOrganization
+          ? previousKpis.completedHours : this.round1(completedMinutes / 60),
       });
 
       this.sitesSignal.set(
@@ -392,7 +396,7 @@ export class OrganizationDashboardApiStoreService {
           : [],
       );
 
-      this.activitySignal.set(
+      if (auditSettled.status === "fulfilled") this.activitySignal.set(
         audit.slice(0, 8).map((row) => ({
           id: this.text(row.id),
           organizationId,
@@ -405,11 +409,17 @@ export class OrganizationDashboardApiStoreService {
         })),
       );
 
-      this.loadError.set(orgResult.status === "rejected");
+      this.loadError.set(
+        orgResult.status === "rejected" ||
+          sessionResult.status === "rejected" ||
+          auditSettled.status === "rejected" ||
+          siteRows.some((row) => row.dashboard === null) ||
+          cohortRows.some((row) => row.dashboard === null),
+      );
       return orgResult.status === "fulfilled";
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.resetDataOnly();
+        // A refresh failure must not erase data confirmed for this context.
         this.loadError.set(true);
         this.notifications.error(
           "organizationDashboard.api.loadFailed",

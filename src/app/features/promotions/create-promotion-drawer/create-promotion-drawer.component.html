@@ -155,24 +155,14 @@
                 <label
                   for="promotion-status"
                   class="mb-1.5 block text-[12px] font-semibold text-[#344054]"
-                  >{{ "promotions.contextual.drawer.status" | t }} *</label
+                  >{{ "promotions.contextual.drawer.status" | t }}</label
                 >
-                <div class="relative">
-                  <select
-                    id="promotion-status"
-                    formControlName="status"
-                    class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3.5 pr-9 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
-                  >
-                    <option value="planned">
-                      {{ "promotions.contextual.status.planned" | t }}
-                    </option>
-                    <option value="active">
-                      {{ "promotions.contextual.status.active" | t }}
-                    </option>
-                  </select>
-                  <i
-                    class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] text-[#64748b]"
-                  ></i>
+                <div class="flex h-[42px] items-center rounded-[11px] border border-[#dce3eb] bg-[#f8fafc] px-3.5 text-[13px] text-[#475569]" aria-live="polite">
+                  @if (form.controls.startDate.value && form.controls.endDate.value && !hasInvalidDates()) {
+                    {{ ("promotions.contextual.status." + derivedStatus()) | t }}
+                  } @else {
+                    —
+                  }
                 </div>
               </div>
             </div>

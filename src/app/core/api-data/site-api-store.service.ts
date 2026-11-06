@@ -168,10 +168,6 @@ export class SiteApiStoreService {
         ),
       );
 
-      await this.workspace.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", "/etablissements");
-      return true;
     } catch (error: unknown) {
       const failure = error as { status?: number; error?: { code?: string } };
       const status = failure?.status;
@@ -188,6 +184,8 @@ export class SiteApiStoreService {
       this.notifications.error("sites.real.saveError", "/etablissements");
       return false;
     }
+    await this.refreshAfterWrite("/etablissements");
+    return true;
   }
 
   async update(id: string, value: SiteFormValue): Promise<boolean> {
@@ -216,14 +214,12 @@ export class SiteApiStoreService {
         ),
       );
 
-      await this.workspace.reload();
-      if (this.workspace.remoteWorkspaceError())
-        this.notifications.error("sites.real.workspaceError", `/etablissements/${id}`);
-      return true;
     } catch {
       this.notifications.error("sites.real.saveError", `/etablissements/${id}`);
       return false;
     }
+    await this.refreshAfterWrite(`/etablissements/${id}`);
+    return true;
   }
 
   async delete(id: string): Promise<boolean> {
@@ -232,13 +228,23 @@ export class SiteApiStoreService {
     if (!site?.apiId || !org?.apiId) return false;
     try {
       await firstValueFrom(this.http.delete<void>(`${environment.apiBaseUrl}/api/v1/organizations/${org.apiId}/sites/${site.apiId}`));
-      await this.workspace.reload();
-      await this.refresh();
-      return true;
     } catch (error: any) {
       const code = typeof error?.error?.code === "string" ? error.error.code : typeof error?.code === "string" ? error.code : "";
       this.notifications.error(code ? `backendErrors.${code}` : "sites.real.deleteError", "/etablissements");
       return false;
+    }
+    await this.refreshAfterWrite("/etablissements");
+    return true;
+  }
+
+  /** A completed write is never reported as failed because a subsequent GET fails. */
+  private async refreshAfterWrite(path: string): Promise<void> {
+    try {
+      await this.workspace.reload();
+      if (this.workspace.remoteWorkspaceError())
+        this.notifications.error("sites.real.workspaceError", path);
+    } catch {
+      this.notifications.error("sites.real.workspaceError", path);
     }
   }
 

@@ -29,6 +29,7 @@ export type AppPermission =
   | "attendance.view"
   | "signatures.view"
   | "internships.view"
+  | "internships.tutor.viewAssigned"
   | "documents.view"
   | "certification.view"
   | "certification.manage"

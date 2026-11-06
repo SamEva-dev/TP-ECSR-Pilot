@@ -1,5 +1,5 @@
 export type WorkplacePeriodStatus =
-  "planned" | "inProgress" | "completed" | "incomplete" | "cancelled";
+  "planned" | "inProgress" | "completed" | "incomplete" | "cancelled" | "archived" | "deleted";
 export interface WorkplaceActivityDto {
   id: string;
   definitionId: string;

@@ -185,7 +185,7 @@
                     {{ "internships.drawer.errors.email" | t }}
                   </p>
                 }
-                <p class="mt-2 text-[11px] text-[#64748b]">{{ "internships.s09.emailNotInvitation" | t }}</p>
+                <p class="mt-2 text-[11px] text-[#64748b]">{{ "internships.s10.emailInvitation" | t }}</p>
               </div>
               <div>
                 <label
@@ -231,6 +231,8 @@
                 <input
                   id="internship-start"
                   type="date"
+                  [min]="cohortStartDate"
+                  [max]="cohortEndDate"
                   formControlName="startDate"
                   class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
                 />
@@ -244,6 +246,8 @@
                 <input
                   id="internship-end"
                   type="date"
+                  [min]="cohortStartDate"
+                  [max]="cohortEndDate"
                   formControlName="endDate"
                   class="h-[42px] w-full rounded-[11px] border border-[#dce3eb] bg-white px-3.5 text-[13px] text-[#475569] outline-none transition focus:border-[#8bb0d5] focus:ring-2 focus:ring-[#e2eef9]"
                 />
@@ -254,7 +258,7 @@
               (submitted() || form.controls.endDate.touched)
             ) {
               <p class="mt-2 text-[11px] text-red-600">
-                {{ "internships.drawer.errors.dateRange" | t }}
+                {{ "internships.drawer.errors.cohortDateRange" | t }}
               </p>
             }
 

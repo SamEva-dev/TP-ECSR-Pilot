@@ -68,6 +68,11 @@ export class WorkplaceApiStoreService {
     })),
   );
 
+  // Civil dates of the selected cohort, exposed for stage-period validation.
+  // Do not convert YYYY-MM-DD to a JavaScript Date or UTC timestamp.
+  readonly cohortStartDate = computed(() => this.text(this.workspace.cohort()?.start).slice(0, 10));
+  readonly cohortEndDate = computed(() => this.text(this.workspace.cohort()?.end).slice(0, 10));
+
   readonly periodTypes = this.periodTypesSignal.asReadonly();
   readonly defaultPlannedHours = computed(() => 0);
   readonly periods = computed<InternshipPeriod[]>(() =>
@@ -133,6 +138,27 @@ export class WorkplaceApiStoreService {
       this.generation,
       notify,
     );
+  }
+
+  async changeLifecycle(id: string, action: "cancel" | "archive" | "delete", reason: string | null): Promise<boolean> {
+    try {
+      await this.api.changeLifecycle(id, action, reason);
+      await this.reload(false);
+      return true;
+    } catch {
+      this.notifications.error("internships.lifecycle.error", "/stages");
+      return false;
+    }
+  }
+  async reassignTutor(periodId: string, tutorName: string, tutorEmail: string, tutorPhone: string): Promise<boolean> {
+    try {
+      await this.api.reassignTutor(periodId, tutorName.trim(), tutorEmail.trim(), tutorPhone.trim() || null);
+      await this.reload(false);
+      return true;
+    } catch {
+      this.notifications.error("internships.tutorReassign.error", "/stages");
+      return false;
+    }
   }
 
   async create(
@@ -394,6 +420,16 @@ export class WorkplaceApiStoreService {
         status: activity.status,
       })),
       tutorObservationKey: this.text(normalized.tutorObservation),
+      evaluations: normalized.evaluations.map((evaluation) => ({
+        id: evaluation.id,
+        kind: evaluation.kind,
+        evaluatorDisplayName: evaluation.evaluatorDisplayName,
+        evaluatedAtUtc: evaluation.evaluatedAtUtc,
+        summary: evaluation.summary,
+        strengths: evaluation.strengths ?? "",
+        improvementAreas: evaluation.improvementAreas ?? "",
+        validated: evaluation.validated,
+      })),
       documents: normalized.documents.map((document) => ({
         labelKey:
           this.text(document.labelKey) ||
@@ -409,7 +445,9 @@ export class WorkplaceApiStoreService {
       row?.status === "inProgress" ||
       row?.status === "completed" ||
       row?.status === "incomplete" ||
-      row?.status === "cancelled"
+      row?.status === "cancelled" ||
+      row?.status === "archived" ||
+      row?.status === "deleted"
         ? row.status
         : "planned";
     return {

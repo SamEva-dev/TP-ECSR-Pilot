@@ -123,11 +123,21 @@ export class TrainingSessionApiStoreService {
     try {
       const results = await Promise.allSettled(cohortApiIds.map((id) => this.api.list(id)));
       if (generation !== this.generation || request !== this.request) return false;
+      const failedCohortIds = new Set(results.flatMap((result, index) =>
+        result.status === "rejected" ? [cohortApiIds[index]] : [],
+      ));
       const rows = results.flatMap((result) =>
         result.status === "fulfilled" && Array.isArray(result.value) ? result.value : [],
       );
+      // Preserve only previously confirmed rows for cohorts whose GET failed.
+      // Do not retain rows belonging to other organizations or removed cohorts.
+      const visibleIds = new Set(cohortApiIds);
+      const previous = this.rowsSignal().filter((row) =>
+        visibleIds.has(row.cohortId) && failedCohortIds.has(row.cohortId),
+      );
       this.rowsSignal.set(
-        [...new Map(rows.map((row) => [row.id, this.normalize(row)])).values()],
+        [...new Map([...previous, ...rows.map((row) => this.normalize(row))]
+          .map((row) => [row.id, row])).values()],
       );
       const failed = results.some((result) => result.status === "rejected");
       this.loadError.set(failed);
@@ -135,7 +145,7 @@ export class TrainingSessionApiStoreService {
       return !failed;
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.rowsSignal.set([]);
+        // A network error must not clear sessions already confirmed by the API.
         this.loadError.set(true);
         this.notifications.error("sessions.real.loadError", "/seances");
       }
@@ -206,9 +216,19 @@ export class TrainingSessionApiStoreService {
       request.trainerAuthGateUserId = this.text(eligible.id);
       request.trainerDisplayName = [this.text(eligible.firstName), this.text(eligible.lastName)]
         .filter(Boolean).join(" ").trim();
+      // Capture the organization/cohort scope before the asynchronous POST.
+      // A user can change workspace while this operation is in flight.
+      const createdInGeneration = this.generation;
       const created = this.normalize(await this.api.create(request));
-      this.upsert(created);
-      await this.reload();
+      if (createdInGeneration === this.generation && this.visibleCohortApiIds().includes(created.cohortId)) {
+        this.upsert(created);
+        // A successful but lagging GET must not hide the just-confirmed POST.
+        // Reinsert only while the original organization/cohort remains visible.
+        await this.reload();
+        if (createdInGeneration === this.generation && this.visibleCohortApiIds().includes(created.cohortId)) {
+          this.upsert(created);
+        }
+      }
       return created;
     } catch {
       this.notifications.error("sessions.real.saveError", errorPath);

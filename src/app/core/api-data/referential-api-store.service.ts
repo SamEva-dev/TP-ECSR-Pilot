@@ -101,7 +101,8 @@ export class ReferentialApiStoreService {
       return true;
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.itemsSignal.set([]);
+        // Keep the last confirmed API state when a refresh fails.
+        // A temporary read failure must not erase a successfully created version.
         this.loadError.set(true);
         this.notifications.error("referentials.api.loadError", "/referentiels");
       }
@@ -139,7 +140,8 @@ export class ReferentialApiStoreService {
       });
 
       const mapped = this.map(created);
-      this.itemsSignal.update((items) => [mapped, ...items]);
+      // The POST is committed. Preserve the response even when subsequent GET fails.
+      this.itemsSignal.update((items) => [mapped, ...items.filter((item) => item.apiId !== mapped.apiId)]);
       await this.reload();
       return this.itemsSignal().find((item) => item.apiId === mapped.apiId) ?? mapped;
     } catch {
@@ -157,6 +159,10 @@ export class ReferentialApiStoreService {
 
     try {
       await this.api.publish(versionId);
+      // Reflect the confirmed publication immediately; reload enriches the result.
+      this.itemsSignal.update((items) => items.map((item) =>
+        item.apiId === versionId ? { ...item, status: "active" as const } : item,
+      ));
       await this.reload();
       return true;
     } catch {

@@ -16,6 +16,10 @@ export interface AppNavItem {
 
 export const APP_NAV_ITEMS: readonly AppNavItem[] = [
   {
+    path: "/mes-stages-tuteur", labelKey: "tutorWorkspace.nav", icon: "ph-clipboard-text",
+    permission: "internships.tutor.viewAssigned", audiences: ["direction", "formateur", "stagiaire", "secretariat"],
+  },
+  {
     path: "/accueil",
     labelKey: "nav.home",
     icon: "ph-house",

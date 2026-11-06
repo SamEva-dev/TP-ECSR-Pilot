@@ -209,7 +209,8 @@ export class HomeDashboardApiStoreService {
       return true;
     } catch {
       if (generation === this.generation && request === this.request) {
-        this.resetDataOnly();
+        // Retain confirmed dashboard values on temporary reporting failures.
+        // The context-change effect performs the security reset separately.
         this.loadError.set(true);
         this.notifications.error("home.api.loadFailed", "/accueil");
       }

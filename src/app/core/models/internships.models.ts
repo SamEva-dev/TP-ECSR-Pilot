@@ -2,7 +2,7 @@
 // This file contains TypeScript contracts only and is safe in API-only mode.
 
 export type InternshipStatus =
-  "completed" | "incomplete" | "inProgress" | "planned" | "cancelled";
+  "completed" | "incomplete" | "inProgress" | "planned" | "cancelled" | "archived" | "deleted";
 
 export type InternshipActivityStatus = "done" | "pending" | "notApplicable";
 
@@ -14,6 +14,17 @@ export interface InternshipActivity {
 export interface InternshipDocument {
   labelKey: string;
   status: "available" | "validated" | "missing";
+}
+
+export interface InternshipEvaluation {
+  id: string;
+  kind: string;
+  evaluatorDisplayName: string;
+  evaluatedAtUtc: string;
+  summary: string;
+  strengths: string;
+  improvementAreas: string;
+  validated: boolean | null;
 }
 
 export interface InternshipPeriod {
@@ -34,4 +45,5 @@ export interface InternshipPeriod {
   activities: InternshipActivity[];
   tutorObservationKey: string;
   documents: InternshipDocument[];
+  evaluations: InternshipEvaluation[];
 }

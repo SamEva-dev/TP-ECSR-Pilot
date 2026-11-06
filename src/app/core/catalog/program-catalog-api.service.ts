@@ -78,6 +78,11 @@ export class ProgramCatalogApiService {
       ),
     );
   }
+  changeStatus(id: string, status: "active" | "draft" | "inactive") {
+    return firstValueFrom(this.http.put<ProgramApiDto>(
+      `${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}/status`, { status },
+    ));
+  }
   assignResponsible(id: string, authGateUserId: string) {
     return firstValueFrom(this.http.put<ProgramApiDto>(
       `${environment.apiBaseUrl}/api/v1/programs/${encodeURIComponent(id)}/responsible`,

@@ -1367,7 +1367,9 @@
       "incomplete": "Incomplete",
       "inProgress": "In progress",
       "planned": "Planned",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "archived": "Archived",
+      "deleted": "Deleted"
     },
     "card": {
       "planned": "Planned hours",
@@ -1441,6 +1443,7 @@
         "required": "This field is required.",
         "email": "Enter a valid email address.",
         "dateRange": "The end date must be on or after the start date.",
+        "cohortDateRange": "Internship dates must be valid and fall within the cohort dates.",
         "hours": "Hours must be greater than 0 and no more than 2,000."
       }
     },
@@ -1494,7 +1497,35 @@
       "chooseEnrollment": "Select an enrolled learner",
       "noEnrollments": "No enrolled learners in the selected cohort. Select a cohort with enrollments.",
       "emailNotInvitation": "The tutor email is saved in the record; no invitation is sent automatically.",
+      "emailInvitation": "If an email is provided, an invitation will be sent automatically after creation. Access is limited to assigned placements.",
       "externalAccessNotInvited": "External tutor access not enabled"
+    },
+    "tutorReview": {
+      "title": "Internship tutor reviews and evaluations",
+      "strengths": "Strengths",
+      "improvements": "Areas for improvement",
+      "validated": "Validated",
+      "notValidated": "Further work required"
+    },
+    "tutorReassign": {
+      "action": "Reassign placement tutor",
+      "name": "New tutor name",
+      "email": "New tutor email",
+      "phone": "Phone (optional)",
+      "save": "Confirm reassignment",
+      "cancel": "Cancel",
+      "success": "Reassignment saved; invitation queued.",
+      "error": "Could not reassign this placement."
+    },
+    "lifecycle": {
+      "cancel": "Cancel placement",
+      "delete": "Delete unused placement",
+      "archive": "Archive",
+      "confirm": "Confirm the status change? Tutor access will be revoked.",
+      "reason": "Reason required",
+      "validate": "Confirm",
+      "dismiss": "Back",
+      "error": "Could not change placement status."
     }
   },
   "documents": {
@@ -1955,7 +1986,8 @@
       "roleError": "Unable to update this account role.",
       "selfInviteError": "You cannot invite yourself to your own organization.",
       "memberExistsError": "This user already belongs to this organization. Manage their roles instead.",
-      "invitationExistsError": "An invitation is already pending for this email."
+      "invitationExistsError": "An invitation is already pending for this email.",
+      "activeTutorAssignments": "This member has active placement assignments. Reassign the placements or suspend access before removal."
     }
   },
   "administration": {
@@ -3991,7 +4023,12 @@
     "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "All required assessment steps must have an outcome before the jury decision.",
     "CERTIFICATION_ASSESSMENTS_REQUIRED": "At least one assessment step is required.",
     "CERTIFICATION_ASSESSMENT_DUPLICATE_STEP": "The same assessment step appears more than once in the grid.",
-    "CERTIFICATION_COMMENT_TOO_LONG": "The comment exceeds the allowed length."
+    "CERTIFICATION_COMMENT_TOO_LONG": "The comment exceeds the allowed length.",
+    "WORKPLACE_TUTOR_REASSIGNMENT_REQUIRED": "This tutor already has a pending invitation or active access. Revoke the assignment before changing the email; the secure reassignment workflow is not yet available.",
+    "WORKPLACE_TUTOR_MEMBER_INACTIVE": "This member is suspended or inactive and cannot be assigned as a placement tutor.",
+    "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "The account already exists but its current role is not eligible for direct placement tutor assignment.",
+    "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "This tutor is already assigned to the placement.",
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4272,7 +4309,16 @@
     "SIGNATURE_TIMEZONE_INVALID": "The organization timezone is invalid.",
     "SIGNATURE_ARCHIVE_NOT_READY": "Evidence is being archived. Please try again later.",
     "SIGNATURE_ARCHIVE_NOT_FINAL": "Evidence is only available after the learner responds.",
-    "SIGNATURE_ARCHIVE_INTEGRITY_FAILED": "The integrity of the archived file could not be verified."
+    "SIGNATURE_ARCHIVE_INTEGRITY_FAILED": "The integrity of the archived file could not be verified.",
+    "WORKPLACE_TUTOR_REASSIGNMENT_REQUIRED": "This tutor already has a pending invitation or active access. Revoke the assignment before changing the email; the secure reassignment workflow is not yet available.",
+    "WORKPLACE_TUTOR_MEMBER_INACTIVE": "This member is suspended or inactive and cannot be assigned as a placement tutor.",
+    "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "The account already exists but its current role is not eligible for direct placement tutor assignment.",
+    "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "This tutor is already assigned to the placement.",
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned.",
+    "WORKPLACE_DELETE_HAS_EVIDENCE": "This placement contains learning evidence and cannot be deleted.",
+    "WORKPLACE_LIFECYCLE_INVALID": "Invalid status transition.",
+    "WORKPLACE_LIFECYCLE_REASON_INVALID": "A reason of 1 to 500 characters is required.",
+    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Notes history is full; operation rejected."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -4845,5 +4891,37 @@
     "redirecting": "Redirecting to sign in with your email address prefilled…",
     "passwordTitle": "Create your password",
     "passwordDescription": "Set your new account password to accept this invitation."
+  },
+  "tutorWorkspace": {
+    "nav": "My placements (tutor)",
+    "title": "Internship tutor workspace",
+    "subtitle": "Track only the learners assigned to you",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "loadError": "Unable to load your placements.",
+    "saveError": "Unable to save. Check your data and permissions.",
+    "saved": "Changes saved.",
+    "empty": "No placements are assigned to you.",
+    "hours": "Hours and observations",
+    "completed": "Completed hours",
+    "observation": "Tutor observations",
+    "save": "Save",
+    "activities": "Learning activities",
+    "status": "Status",
+    "pending": "Pending",
+    "done": "Completed",
+    "notApplicable": "Not applicable",
+    "comment": "Comment",
+    "noActivities": "No activities configured for this placement.",
+    "evaluation": "Tutor evaluation",
+    "summary": "Summary",
+    "strengths": "Strengths",
+    "improvements": "Areas for improvement",
+    "validated": "Validated competencies?",
+    "notAssessed": "Not assessed",
+    "yes": "Yes",
+    "no": "No",
+    "submit": "Save evaluation",
+    "history": "Evaluation history"
   }
 }

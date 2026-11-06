@@ -209,8 +209,18 @@ export class AccessComponent {
   async deleteAccount(account: AccessAccount): Promise<void> {
     if (!this.canManageAccount(account)) return;
     try {
-      if (account.isInvitation) await firstValueFrom(this.api.revokeInvitation(account.id));
-      else await firstValueFrom(this.api.revoke(account.id));
+      if (account.isInvitation) {
+        if (!window.confirm('Annuler cette invitation ?')) return;
+        await firstValueFrom(this.api.revokeInvitation(account.id));
+      } else {
+        const impact = await firstValueFrom(this.api.removalImpact(account.id));
+        if (impact.requiresTutorReassignment) {
+          this.notifications.error('access.api.activeTutorAssignments', '/acces');
+          return;
+        }
+        if (!window.confirm('Retirer les accès de ce membre à cette organisation ? Les contributions pédagogiques seront conservées.')) return;
+        await firstValueFrom(this.api.revoke(account.id));
+      }
       await this.reload(false);
     } catch { this.notifications.error("access.api.deleteError", "/acces"); }
   }

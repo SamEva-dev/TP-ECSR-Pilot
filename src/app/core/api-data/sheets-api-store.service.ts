@@ -214,6 +214,9 @@ export class SheetsApiStoreService {
         this.api.updateTopic(enrollmentId, current.topicId, request),
       );
       const mapped = this.mapTopic(updated);
+      // A GET started before this confirmed write must not overwrite the saved evaluation.
+      ++this.topicsGeneration;
+      this.topicsLoading.set(false);
       this.topicsSignal.update((items) =>
         items.map((item) => (item.topicId === mapped.topicId ? mapped : item)),
       );
@@ -312,7 +315,8 @@ export class SheetsApiStoreService {
         generation === this.topicsGeneration &&
         enrollmentId === this.selectedEnrollmentSignal()
       ) {
-        this.topicsSignal.set([]);
+        // Keep the last confirmed topics for this enrollment on transient GET errors.
+        // selectStudent() and the workspace effect already clear data on context changes.
         this.topicsError.set(true);
         if (notify)
           this.notifications.error("sheets.real.topicsFailed", "/fiches");

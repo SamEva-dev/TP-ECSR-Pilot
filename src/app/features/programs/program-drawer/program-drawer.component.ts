@@ -54,7 +54,7 @@ export class ProgramDrawerComponent {
         status: program?.status ?? "draft",
         responsibleTrainerAuthGateUserId: program?.responsibleTrainerAuthGateUserId ?? "",
       });
-      this.selectedModules.set(program?.enabledModules ?? ["planning", "attendance", "sessions", "documents", "certification"]);
+      this.selectedModules.set(program ? [...program.enabledModules] : ["planning", "attendance", "sessions", "documents", "certification"]);
       void this.loadTrainers();
     });
   }
@@ -87,21 +87,19 @@ export class ProgramDrawerComponent {
     await this.router.navigate(["/acces"], { queryParams: { inviteRole: "pedagogical_manager" } });
   }
 
+  hasTrainer(id: string): boolean { return this.trainers().some(trainer => trainer.id === id); }
+
   trainerName(trainer: ProductAccount): string { return `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim(); }
 
   submit(): void {
-    if (this.form.controls.status.value === "active" && !this.form.controls.responsibleTrainerAuthGateUserId.value) {
-      this.form.controls.responsibleTrainerAuthGateUserId.setErrors({ required: true });
-    } else {
-      this.form.controls.responsibleTrainerAuthGateUserId.setErrors(null);
-    }
     if (this.form.invalid || this.selectedModules().length === 0) {
       this.form.markAllAsTouched();
       return;
     }
     const raw = this.form.getRawValue();
-    if (raw.responsibleTrainerAuthGateUserId && !this.trainers().some(x => x.id === raw.responsibleTrainerAuthGateUserId)) return;
+    // Existing assignment remains valid if the API members list is temporarily unavailable.
+    if (raw.responsibleTrainerAuthGateUserId && raw.responsibleTrainerAuthGateUserId !== this.program()?.responsibleTrainerAuthGateUserId && !this.trainers().some(x => x.id === raw.responsibleTrainerAuthGateUserId)) return;
     const trainer = this.trainers().find((x) => x.id === raw.responsibleTrainerAuthGateUserId);
-    this.saved.emit({ ...raw, responsibleTrainerDisplayName: trainer ? `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim() : "", enabledModules: this.selectedModules() });
+    this.saved.emit({ ...raw, status: this.program()?.status ?? "draft", responsibleTrainerDisplayName: trainer ? `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim() : (this.program()?.responsibleTrainerDisplayName ?? ""), enabledModules: this.selectedModules() });
   }
 }

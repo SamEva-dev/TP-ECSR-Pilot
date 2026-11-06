@@ -71,6 +71,7 @@ export class AppShellComponent {
     APP_NAV_ITEMS.filter(
       (item) =>
         this.access.can(item.permission) &&
+        (item.path !== "/mes-stages-tuteur" || this.access.canOpenTutorWorkspace()) &&
         (!item.requiredRoles?.length ||
           this.access.hasAnyRole(...item.requiredRoles)),
     ),

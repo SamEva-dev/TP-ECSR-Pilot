@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { TranslatePipe } from '../../../core/i18n/translate.pipe';
 import { SessionService } from '../../../core/session/session.service';
@@ -49,7 +50,7 @@ interface ExamCandidateView {
 
 @Component({
   selector: 'app-student-detail',
-  imports: [RouterLink, TranslatePipe, ProgressBarComponent],
+  imports: [RouterLink, TranslatePipe, DatePipe, ProgressBarComponent],
   templateUrl: './student-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -306,7 +307,7 @@ export class StudentDetailComponent {
   }
   private mapInternships(detail: LearnerDetailReport | null): InternshipPeriod[] {
     const studentName = `${this.text(detail?.firstName)} ${this.text(detail?.lastName)}`.trim();
-    return (detail?.workplace ?? []).map((row) => ({ id: this.text(row.id), studentId: this.text(detail?.learnerProfileId), studentName, company: this.text(row.company), city: this.text(row.city), tutor: this.text(row.tutorName), tutorEmail: '', tutorPhone: '', startDate: this.date(row.startDate), endDate: this.date(row.endDate), plannedHours: this.number(row.plannedHours), completedHours: this.number(row.completedHours), status: this.internshipStatus(row.status), trainerVisible: true, activities: (row.activities ?? []).map((a) => ({ labelKey: this.text(a.title), status: a.status === 'done' ? 'done' : a.status === 'notApplicable' ? 'notApplicable' : 'pending' })), tutorObservationKey: this.text(row.tutorObservation), documents: [] }));
+    return (detail?.workplace ?? []).map((row) => ({ id: this.text(row.id), studentId: this.text(detail?.learnerProfileId), studentName, company: this.text(row.company), city: this.text(row.city), tutor: this.text(row.tutorName), tutorEmail: '', tutorPhone: '', startDate: this.date(row.startDate), endDate: this.date(row.endDate), plannedHours: this.number(row.plannedHours), completedHours: this.number(row.completedHours), status: this.internshipStatus(row.status), trainerVisible: true, activities: (row.activities ?? []).map((a) => ({ labelKey: this.text(a.title), status: a.status === 'done' ? 'done' : a.status === 'notApplicable' ? 'notApplicable' : 'pending' })), tutorObservationKey: this.text(row.tutorObservation), documents: [], evaluations: (row.evaluations ?? []).map(e => ({ id: `${this.text(e.kind)}-${this.text(e.evaluatedAtUtc)}`, kind: this.text(e.kind), evaluatorDisplayName: this.text(e.evaluatorDisplayName), evaluatedAtUtc: this.text(e.evaluatedAtUtc), summary: this.text(e.summary), strengths: this.text(e.strengths), improvementAreas: this.text(e.improvementAreas), validated: typeof e.validated === "boolean" ? e.validated : null })) }));
   }
   private mapEvaluations(detail: LearnerDetailReport): StudentEvaluationRow[] {
     const rows: StudentEvaluationRow[] = [];

@@ -236,6 +236,12 @@ export class AccessPolicyService {
     // Only legacy sessions retain their historical role shortcut. In OIDC mode
     // every UI permission must be present in the API-resolved grant set.
     if (platform && environment.authMode !== 'oidc') return true;
+    // An existing staff account may act as an explicitly assigned tutor without
+    // changing its AuthGate role. The API still enforces active membership + period
+    // assignment for every request; this only makes the workspace navigable.
+    if (permission === "internships.tutor.viewAssigned" &&
+        this.hasAnyRole("trainer", "pedagogical_manager") &&
+        this.can("internships.view")) return true;
     // Transitional mapping: UI permissions map to server permission suffixes until front permission codes are renamed.
     const aliases: Record<string, string[]> = {
       "home.view": [],
@@ -268,6 +274,7 @@ export class AccessPolicyService {
       "attendance.view": ["pedagora.attendance.view", "attendance.view"],
       "signatures.view": ["pedagora.signatures.view", "signatures.view"],
       "internships.view": ["pedagora.internships.view", "internships.view"],
+      "internships.tutor.viewAssigned": ["pedagora.internships.tutor.viewAssigned", "internships.tutor.viewAssigned"],
       "documents.view": ["pedagora.documents.view", "documents.view"],
       "certification.view": ["pedagora.certification.view", "certification.view"],
       "certification.manage": ["pedagora.certification.manage", "certification.manage"],
@@ -296,7 +303,16 @@ export class AccessPolicyService {
     return roles.some((role) => effective.has(role));
   }
 
+  /** The direction workspace supervises internships via /stages, not tutor-only endpoints. */
+  canOpenTutorWorkspace(): boolean {
+    if (this.hasAnyRole("organization_admin", "organization_direction", "site_direction", "platform_admin")) {
+      return false;
+    }
+    return this.can("internships.tutor.viewAssigned");
+  }
+
   defaultPath(): string {
+    if (this.canOpenTutorWorkspace() && !this.can("home.view")) return "/mes-stages-tuteur";
     if (this.hasAnyRole("jury") && this.can("jury.view") && !this.can("home.view")) return "/jury";
     if (this.can("home.view")) return "/accueil";
     if (this.hasAnyRole("jury") && this.can("jury.view")) return "/jury";

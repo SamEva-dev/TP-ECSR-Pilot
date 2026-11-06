@@ -1,0 +1,82 @@
+<div class="mx-auto max-w-6xl space-y-6 p-6">
+  <header class="flex items-center justify-between gap-4">
+    <div><h1 class="text-2xl font-bold">{{ 'tutorWorkspace.title' | t }}</h1>
+      <p class="text-slate-500">{{ 'tutorWorkspace.subtitle' | t }}</p></div>
+    <button type="button" class="rounded-lg border px-4 py-2" [disabled]="pending()" (click)="load()">{{ 'tutorWorkspace.refresh' | t }}</button>
+  </header>
+  @if (pending()) { <p role="status">{{ 'tutorWorkspace.loading' | t }}</p> }
+  @if (error()) { <p role="alert" class="rounded-lg bg-red-50 p-3 text-red-700">{{ (error() === 'load' ? 'tutorWorkspace.loadError' : 'tutorWorkspace.saveError') | t }}</p> }
+  @if (success()) { <p role="status" class="rounded-lg bg-green-50 p-3 text-green-700">{{ 'tutorWorkspace.saved' | t }}</p> }
+  @if (!pending() && !rows().length) { <p class="rounded-xl border bg-white p-6">{{ 'tutorWorkspace.empty' | t }}</p> }
+  <div class="grid gap-6 lg:grid-cols-3">
+    <aside class="space-y-3" aria-label="Périodes affectées">
+      @for (period of rows(); track period.id) {
+        <button type="button" (click)="choose(period.id)" class="w-full rounded-xl border p-4 text-left" [class.bg-blue-50]="period.id === selectedId()">
+          <strong class="block">{{ period.learnerDisplayName }}</strong>
+          <span class="text-sm text-slate-600">{{ period.company }} · {{ period.startDate }} – {{ period.endDate }}</span>
+        </button>
+      }
+    </aside>
+    @if (selected(); as period) {
+      <section class="space-y-5 lg:col-span-2">
+        <div class="rounded-xl border bg-white p-5">
+          <h2 class="mb-2 text-xl font-semibold">{{ period.learnerDisplayName }}</h2>
+          <p class="text-sm text-slate-600">{{ period.company }} · {{ period.city }} · {{ period.periodTypeCode }}</p>
+          <p class="text-sm">{{ period.startDate }} – {{ period.endDate }} · {{ period.completedHours }} / {{ period.plannedHours }} h</p>
+        </div>
+        <div class="space-y-3 rounded-xl border bg-white p-5">
+          <h3 class="text-lg font-semibold">{{ 'tutorWorkspace.hours' | t }}</h3>
+          <label class="block">{{ 'tutorWorkspace.completed' | t }}
+            <input type="number" step="0.25" min="0" [max]="period.plannedHours" [value]="completedHours()" (input)="setHours($event)" class="mt-1 block w-full rounded-lg border p-2" />
+          </label>
+          <label class="block">{{ 'tutorWorkspace.observation' | t }}
+            <textarea rows="3" [value]="observation()" (input)="setObservation($event)" class="mt-1 block w-full rounded-lg border p-2"></textarea>
+          </label>
+          <button type="button" (click)="saveHours()" [disabled]="saving() || completedHours() < 0 || completedHours() > period.plannedHours" class="rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{{ 'tutorWorkspace.save' | t }}</button>
+        </div>
+        <div class="space-y-3 rounded-xl border bg-white p-5">
+          <h3 class="text-lg font-semibold">{{ 'tutorWorkspace.activities' | t }}</h3>
+          @for (activity of period.activities; track activity.id) {
+            <div class="rounded-lg border p-3">
+              <strong class="block">{{ activity.title }}</strong>
+              <label class="block text-sm">{{ 'tutorWorkspace.status' | t }}
+                <select #activityStatus [value]="activity.status" class="mt-1 w-full rounded-lg border p-2">
+                  <option value="pending">{{ 'tutorWorkspace.pending' | t }}</option>
+                  <option value="done">{{ 'tutorWorkspace.done' | t }}</option>
+                  <option value="notApplicable">{{ 'tutorWorkspace.notApplicable' | t }}</option>
+                </select>
+              </label>
+              <label class="mt-2 block text-sm">{{ 'tutorWorkspace.comment' | t }}
+                <textarea #activityComment rows="2" [value]="activity.comment ?? ''" class="mt-1 w-full rounded-lg border p-2"></textarea>
+              </label>
+              <button type="button" [disabled]="saving()" (click)="saveActivity(activity, activityStatus.value === 'done' ? 'done' : activityStatus.value === 'notApplicable' ? 'notApplicable' : 'pending', activityComment.value)" class="mt-2 rounded-lg border px-3 py-2">{{ 'tutorWorkspace.save' | t }}</button>
+            </div>
+          } @empty { <p class="text-slate-500">{{ 'tutorWorkspace.noActivities' | t }}</p> }
+        </div>
+        <div class="space-y-3 rounded-xl border bg-white p-5">
+          <h3 class="text-lg font-semibold">{{ 'tutorWorkspace.evaluation' | t }}</h3>
+          <label class="block">{{ 'tutorWorkspace.summary' | t }} *
+            <textarea rows="4" maxlength="4000" [value]="summary()" (input)="setSummary($event)" class="mt-1 block w-full rounded-lg border p-2"></textarea>
+          </label>
+          <label class="block">{{ 'tutorWorkspace.strengths' | t }}
+            <textarea rows="2" [value]="strengths()" (input)="setStrengths($event)" class="mt-1 block w-full rounded-lg border p-2"></textarea>
+          </label>
+          <label class="block">{{ 'tutorWorkspace.improvements' | t }}
+            <textarea rows="2" [value]="improvementAreas()" (input)="setImprovements($event)" class="mt-1 block w-full rounded-lg border p-2"></textarea>
+          </label>
+          <label class="block">{{ 'tutorWorkspace.validated' | t }}
+            <select [value]="validated()" (change)="setValidated($event)" class="mt-1 block w-full rounded-lg border p-2">
+              <option value="unset">{{ 'tutorWorkspace.notAssessed' | t }}</option><option value="yes">{{ 'tutorWorkspace.yes' | t }}</option><option value="no">{{ 'tutorWorkspace.no' | t }}</option>
+            </select>
+          </label>
+          <button type="button" [disabled]="saving() || !summary().trim()" (click)="saveEvaluation()" class="rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{{ 'tutorWorkspace.submit' | t }}</button>
+          <h4 class="font-semibold">{{ 'tutorWorkspace.history' | t }}</h4>
+          @for (evaluation of period.evaluations; track evaluation.id) {
+            <div class="rounded border p-3 text-sm"><strong>{{ evaluation.evaluatorDisplayName }}</strong> · {{ evaluation.evaluatedAtUtc }}
+              <p>{{ evaluation.summary }}</p></div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</div>

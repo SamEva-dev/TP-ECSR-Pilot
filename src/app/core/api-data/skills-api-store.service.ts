@@ -285,14 +285,18 @@ export class SkillsApiStoreService {
         ? current
         : (this.rowsSignal()[0]?.enrollmentId ?? "");
       this.selectedEnrollmentSignal.set(selected);
-      this.historySignal.set([]);
+      // A same-cohort competency refresh must not blank the current learner's
+      // confirmed evaluation history while its independent GET is pending.
+      if (selected !== current) {
+        ++this.historyGeneration;
+        this.historySignal.set([]);
+      }
       if (selected)
         void this.loadHistory(selected, ++this.historyGeneration, notify);
     } catch {
       if (generation === this.contextGeneration) {
-        this.rowsSignal.set([]);
-        this.definitionsSignal.set([]);
-        this.historySignal.set([]);
+        // On refresh failure retain previously confirmed data in the SAME context.
+        // The workspace effect clears these signals before a context change.
         this.loadError.set(true);
         if (notify)
           this.notifications.error("skills.real.failed", "/competences");
@@ -343,7 +347,7 @@ export class SkillsApiStoreService {
         generation === this.historyGeneration &&
         enrollmentId === this.selectedEnrollmentSignal()
       ) {
-        this.historySignal.set([]);
+        // Preserve the last confirmed history for the current learner.
         this.historyError.set(true);
         if (notify)
           this.notifications.error("skills.real.drivingFailed", "/competences");

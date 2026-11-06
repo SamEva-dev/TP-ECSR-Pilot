@@ -6,6 +6,22 @@
       <button type="button" (click)="edit()" class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d8e0e9] bg-white px-4 text-[12px] font-semibold text-[#526075] shadow-sm"><i class="ph ph-pencil-simple text-[15px]"></i>{{ 'programs.edit' | t }}</button>
     </div>
 
+    @if (access.can('programs.manage')) {
+      <section class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <h2 class="text-[14px] font-bold">{{ 'programs.lifecycle.title' | t }}</h2>
+        <p class="mt-1 text-[12px] text-[#748095]">{{ 'programs.lifecycle.hint' | t }}</p>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          @if (current.status !== 'active') {
+            <button type="button" [disabled]="statusBusy()" (click)="changeStatus('active')" class="rounded-[10px] bg-[#2b66a4] px-4 py-2.5 text-[12px] font-semibold text-white disabled:opacity-50">{{ 'programs.lifecycle.activate' | t }}</button>
+          }
+          @if (current.status === 'active') {
+            <button type="button" [disabled]="statusBusy()" (click)="changeStatus('inactive')" class="rounded-[10px] border border-[#d8e0e9] px-4 py-2.5 text-[12px] font-semibold text-[#526075] disabled:opacity-50">{{ 'programs.lifecycle.deactivate' | t }}</button>
+          }
+          <span class="text-[12px] text-[#64748b]">{{ ('programs.status.' + current.status) | t }}</span>
+        </div>
+      </section>
+    }
+
     <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
       <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.sites' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ enabledSiteCount() }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f1fb] text-[#2a64a2]"><i class="ph ph-buildings text-[19px]"></i></span></article>
       <article class="relative min-h-[103px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"><p class="text-[10.5px] font-medium uppercase text-[#637083]">{{ 'programs.card.students' | t }}</p><p class="mt-2 text-[25px] font-extrabold">{{ current.students }}</p><span class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-[#e7f6ec] text-[#1f9d55]"><i class="ph ph-student text-[19px]"></i></span></article>

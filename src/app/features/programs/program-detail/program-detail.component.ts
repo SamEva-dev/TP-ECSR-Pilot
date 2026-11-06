@@ -7,6 +7,7 @@ import {
   signal,
 } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { AccessPolicyService } from "../../../core/access/access-policy.service";
 import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
@@ -28,6 +29,8 @@ export class ProgramDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly notifications = inject(ApplicationNotificationService);
   readonly store = inject(ProgramApiStoreService);
+  readonly access = inject(AccessPolicyService);
+  readonly statusBusy = signal(false);
   readonly referentials = inject(ReferentialApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly drawerOpen = signal(false);
@@ -107,6 +110,18 @@ export class ProgramDetailComponent {
   async save(value: ProgramFormValue): Promise<void> {
     if (await this.store.update(this.programId, value))
       this.drawerOpen.set(false);
+  }
+
+  async changeStatus(target: "active" | "inactive"): Promise<void> {
+    const program = this.program();
+    if (!program || !this.access.can("programs.manage") || this.statusBusy() || program.status === target) return;
+    if (target === "active" && !program.responsibleTrainerAuthGateUserId) {
+      this.notifications.error("programs.lifecycle.responsibleRequired", `/formations/${this.programId}`);
+      return;
+    }
+    this.statusBusy.set(true);
+    try { await this.store.changeStatus(this.programId, target); }
+    finally { this.statusBusy.set(false); }
   }
 
   async toggleSite(siteId: string): Promise<void> {

@@ -5,6 +5,7 @@ import {
   inject,
   signal,
 } from "@angular/core";
+import { DatePipe } from "@angular/common";
 import { WorkplaceApiStoreService } from "../../core/api-data/workplace-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import {
@@ -23,6 +24,7 @@ import {
   selector: "app-internships",
   imports: [
     TranslatePipe,
+    DatePipe,
     ProgressBarComponent,
     CreateInternshipDrawerComponent,
   ],
@@ -33,8 +35,41 @@ export class InternshipsComponent {
   readonly sessionService = inject(SessionService);
   readonly store = inject(WorkplaceApiStoreService);
   readonly drawerOpen = signal(false);
+  readonly reassigningId = signal<string | null>(null);
+  readonly lifecycleId = signal<string | null>(null);
+  readonly lifecycleAction = signal<"cancel" | "archive" | "delete" | null>(null);
+  readonly lifecycleReason = signal("");
+  readonly lifecycleSaving = signal(false);
+  openLifecycle(period: InternshipPeriod, action: "cancel" | "archive" | "delete"): void {
+    if (!this.canCreate()) return;
+    this.lifecycleId.set(period.id);
+    this.lifecycleAction.set(action);
+    this.lifecycleReason.set("");
+  }
+  closeLifecycle(): void {
+    this.lifecycleId.set(null);
+    this.lifecycleAction.set(null);
+    this.lifecycleReason.set("");
+  }
+  async confirmLifecycle(): Promise<void> {
+    const id = this.lifecycleId();
+    const action = this.lifecycleAction();
+    const reason = this.lifecycleReason().trim();
+    if (!id || !action || this.lifecycleSaving() || (action !== "archive" && !reason)) return;
+    this.lifecycleSaving.set(true);
+    try {
+      if (await this.store.changeLifecycle(id, action, action === "archive" ? null : reason)) this.closeLifecycle();
+    } finally {
+      this.lifecycleSaving.set(false);
+    }
+  }
+  readonly tutorNameInput = signal("");
+  readonly tutorEmailInput = signal("");
+  readonly tutorPhoneInput = signal("");
+  readonly savingReassignment = signal(false);
+  readonly reassignmentSaved = signal(false);
 
-  readonly periods = computed<InternshipPeriod[]>(() => this.store.periods());
+  readonly periods = computed<InternshipPeriod[]>(() => this.store.periods().filter(p => p.status !== "deleted"));
 
   readonly totals = computed(() => {
     const periods = this.periods();
@@ -89,6 +124,35 @@ export class InternshipsComponent {
     if (created) this.closeDrawer();
   }
 
+  openReassignment(period: InternshipPeriod): void {
+    if (!this.canCreate()) return;
+    this.reassigningId.set(period.id);
+    this.tutorNameInput.set("");
+    this.tutorEmailInput.set("");
+    this.tutorPhoneInput.set("");
+    this.reassignmentSaved.set(false);
+  }
+
+  cancelReassignment(): void {
+    this.reassigningId.set(null);
+  }
+
+  async confirmReassignment(period: InternshipPeriod): Promise<void> {
+    if (!this.canCreate() || this.savingReassignment() ||
+      this.reassigningId() !== period.id ||
+      !this.tutorNameInput().trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.tutorEmailInput().trim())) return;
+    this.savingReassignment.set(true);
+    try {
+      const saved = await this.store.reassignTutor(period.id, this.tutorNameInput(), this.tutorEmailInput(), this.tutorPhoneInput());
+      if (saved) {
+        this.reassignmentSaved.set(true);
+        this.reassigningId.set(null);
+      }
+    } finally {
+      this.savingReassignment.set(false);
+    }
+  }
+
   progress(period: InternshipPeriod): number {
     if (!this.number(period.plannedHours)) return 0;
     return Math.round(
@@ -106,6 +170,8 @@ export class InternshipsComponent {
 
   statusClass(status: InternshipStatus): string {
     switch (status) {
+      case "archived":
+      case "deleted":
       case "completed":
         return "bg-[#d8f8df] text-[#18a547]";
       case "incomplete":

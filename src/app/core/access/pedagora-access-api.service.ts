@@ -92,6 +92,10 @@ export class PedagoraAccessApiService {
     return this.http.post<{ ownerUserId: string; previousOwnerUserId: string }>(`${this.url}/ownership/transfer`, { newOwnerUserId });
   }
   setActive(userId: string, active: boolean) { return this.http.put<void>(`${this.url}/${encodeURIComponent(userId)}/status`, { active }); }
+  removalImpact(userId: string) {
+    return this.http.get<{ activeTutorAssignments: number; revokedTutorAssignments: number; requiresTutorReassignment: boolean }>(
+      `${this.url}/${encodeURIComponent(userId)}/removal-impact`);
+  }
   revoke(userId: string) { return this.http.delete<void>(`${this.url}/${encodeURIComponent(userId)}`); }
   setPermission(userId: string, key: AccessPermissionKey, enabled: boolean) {
     return this.http.put<void>(`${this.url}/${encodeURIComponent(userId)}/permissions/${encodeURIComponent(key)}`, { key, enabled });

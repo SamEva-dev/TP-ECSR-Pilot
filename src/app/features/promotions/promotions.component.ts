@@ -167,8 +167,16 @@ export class PromotionsComponent {
       this.createdPromotionName.set(created.name);
       // Keep the current source context unchanged. Reload the global workspace so
       // the new destination cohort appears when that site is selected.
-      await this.workspace.reload();
-      await this.store.reload();
+      // The POST is committed. Do not report a failed copy (or encourage another POST)
+      // merely because a secondary workspace refresh failed.
+      try {
+        await this.workspace.reload();
+        if (this.workspace.remoteWorkspaceError() || !(await this.store.reload())) {
+          this.copyError.set(this.translate.instant("promotions.api.refreshFailed"));
+        }
+      } catch {
+        this.copyError.set(this.translate.instant("promotions.api.refreshFailed"));
+      }
     } catch {
       this.copyError.set(this.translate.instant("promotions.copy.failed"));
     } finally {
