@@ -47,7 +47,8 @@
       "invalidMfaCode": "Saisissez un code de vérification à 6 chiffres.",
       "passwordTooShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
       "logoutFailed": "La session distante n’a pas pu être révoquée. La connexion locale a été fermée.",
-      "completeRequiredFields": "Veuillez compléter les champs obligatoires et corriger les erreurs indiquées."
+      "completeRequiredFields": "Veuillez compléter les champs obligatoires et corriger les erreurs indiquées.",
+      "accountExists": "Un compte utilise déjà cette adresse e-mail. Connectez-vous ou utilisez la récupération de mot de passe."
     },
     "demo": {
       "title": "Connexion",
@@ -4051,7 +4052,8 @@
     "WORKPLACE_TUTOR_MEMBER_INACTIVE": "Ce membre est suspendu ou inactif et ne peut pas être affecté comme maître de stage.",
     "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "Le compte existe déjà mais son rôle actuel n’est pas compatible avec une affectation directe de maître de stage.",
     "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "Ce maître de stage est déjà affecté à cette période.",
-    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage."
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage.",
+    "AUTHGATE_UPSTREAM_UNAVAILABLE": "Service d’identité temporairement indisponible. Réessayez."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4767,21 +4769,6 @@
       "attendance": "Émargement",
       "pedagogical-observation": "Observation pédagogique",
       "daily-observation-summary": "Récapitulatif journalier"
-    },
-    "hours": {
-      "title": "Confirmation des heures de prestation",
-      "realized": "Heures réalisées",
-      "confirmed": "Heures confirmées",
-      "awaiting": "Heures en attente",
-      "refresh": "Actualiser",
-      "loading": "Chargement des heures…",
-      "loadError": "Impossible de charger le détail des confirmations.",
-      "status": {
-        "confirmed": "Confirmée",
-        "contested": "Contestée — correction nécessaire",
-        "awaiting_confirmation": "En attente de confirmation",
-        "not_applicable": "Sans prestation à confirmer"
-      }
     }
   },
   "branding": {

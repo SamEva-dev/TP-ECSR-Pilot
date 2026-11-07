@@ -72,41 +72,10 @@
           {{ metrics().missedHours }} h
         </p>
         <p class="mt-1 text-[11px] text-[#8b95a5]">
-          {{ "attendance.metrics.excusedHint" | t }}
+          {{ "attendance.metrics.excusedHint" | t: { count: metrics().excused } }}
         </p>
       </article>
     </div>
-
-    @if (canViewSignatures()) {
-      <section class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm" aria-live="polite">
-        <div class="flex items-center justify-between gap-3">
-          <h2 class="text-[15px] font-bold">{{ 'signatures.hours.title' | t }}</h2>
-          <button type="button" (click)="loadHoursSummary(session.id)" [disabled]="hoursLoading()"
-            class="text-[12px] font-semibold text-[#2b66a4] disabled:opacity-50">{{ 'signatures.hours.refresh' | t }}</button>
-        </div>
-        @if (hoursError()) {
-          <p class="mt-2 text-[12px] text-red-600">{{ 'signatures.hours.loadError' | t }}</p>
-        } @else if (hoursLoading()) {
-          <p class="mt-2 text-[12px] text-[#637083]">{{ 'signatures.hours.loading' | t }}</p>
-        } @else if (hoursSummary()) {
-          <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div class="rounded-lg bg-[#f5f7fa] p-3"><p class="text-[12px]">{{ 'signatures.hours.realized' | t }}</p>
-              <strong>{{ hourTotals().realized }} h</strong></div>
-            <div class="rounded-lg bg-[#f5f7fa] p-3"><p class="text-[12px]">{{ 'signatures.hours.confirmed' | t }}</p>
-              <strong>{{ hourTotals().confirmed }} h</strong></div>
-            <div class="rounded-lg bg-[#f5f7fa] p-3"><p class="text-[12px]">{{ 'signatures.hours.awaiting' | t }}</p>
-              <strong>{{ hourTotals().awaiting }} h</strong></div>
-          </div>
-          <div class="mt-3 space-y-1">
-            @for (row of hoursSummary()!.rows; track row.enrollmentId) {
-              <p class="text-[12px] text-[#536174]">{{ learnerNameFor(row.enrollmentId) }} ·
-                {{ 'signatures.hours.status.' + row.confirmationStatus | t }} ·
-                {{ hoursFromMinutes(row.confirmedMinutes) }} / {{ hoursFromMinutes(row.realizedMinutes) }} h</p>
-            }
-          </div>
-        }
-      </section>
-    }
 
     <article
       class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm sm:p-5"
@@ -370,24 +339,6 @@
         </p>
       </article>
     </div>
-
-    <section class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-4" aria-live="polite">
-      <h2 class="text-[15px] font-bold">{{ 'signatures.hours.title' | t }}</h2>
-      @if (hoursError()) {
-        <p class="mt-2 text-[12px] text-red-600">{{ 'signatures.hours.loadError' | t }}</p>
-      } @else if (hoursLoading()) {
-        <p class="mt-2 text-[12px]">{{ 'signatures.hours.loading' | t }}</p>
-      } @else if (hoursSummary()) {
-        <div class="mt-3 grid grid-cols-3 gap-2 text-[12px]">
-          <div><p>{{ 'signatures.hours.realized' | t }}</p><strong>{{ hourTotals().realized }} h</strong></div>
-          <div><p>{{ 'signatures.hours.confirmed' | t }}</p><strong>{{ hourTotals().confirmed }} h</strong></div>
-          <div><p>{{ 'signatures.hours.awaiting' | t }}</p><strong>{{ hourTotals().awaiting }} h</strong></div>
-        </div>
-        @if (hoursSummary()!.rows.length) {
-          <p class="mt-2 text-[12px]">{{ 'signatures.hours.status.' + hoursSummary()!.rows[0].confirmationStatus | t }}</p>
-        }
-      }
-    </section>
 
     <article
       class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"

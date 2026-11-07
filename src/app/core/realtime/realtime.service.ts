@@ -86,8 +86,18 @@ export class RealtimeService {
     this.retryAttempt = 0;
   }
 
+  private legacyTokenExpired(): boolean {
+    if (environment.authMode === 'oidc') return false;
+    const token = this.tokens.accessToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { exp?: number };
+      return typeof payload.exp !== 'number' || payload.exp * 1000 <= Date.now() + 5000;
+    } catch { return true; }
+  }
+
   private scheduleRetry(token: string): void {
-    if (!this.wanted || this.identityKey() !== token || this.retryTimer)
+    if (this.legacyTokenExpired() || !this.wanted || this.identityKey() !== token || this.retryTimer)
       return;
     const delay = Math.min(30000, 2000 * 2 ** Math.min(this.retryAttempt++, 4));
     this.retryTimer = setTimeout(() => {
@@ -101,7 +111,7 @@ export class RealtimeService {
     if (!this.wanted || this.identityKey() !== token) return;
     if (this.connection && this.connected() && this.token === token) return;
     await this.closeConnection();
-    if (!token || !this.wanted || this.identityKey() !== token) return;
+    if (!token || this.legacyTokenExpired() || !this.wanted || this.identityKey() !== token) return;
     const hubBase = `${environment.apiBaseUrl}/hubs/notifications`;
     const hubUrl = environment.authMode === 'oidc'
       ? this.oidc.authorizedHubEndpoint(hubBase) : hubBase;
@@ -110,7 +120,7 @@ export class RealtimeService {
       .withUrl(hubUrl, {
         accessTokenFactory: () => environment.authMode === 'oidc'
           ? this.oidc.accessTokenForHub(hubBase)
-          : this.tokens.accessToken() ?? "",
+          : (this.legacyTokenExpired() ? "" : this.tokens.accessToken() ?? ""),
         transport: HttpTransportType.WebSockets | HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])

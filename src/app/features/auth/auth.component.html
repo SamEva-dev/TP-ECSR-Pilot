@@ -297,7 +297,7 @@
               @if (loginStep() === "password") {
                 <div class="flex justify-end">
                   <a
-                    href="/mot-de-passe-oublie"
+                    [routerLink]="['/reset-password']" [queryParams]="{ email: loginForm.controls.email.value }"
                     class="text-sm font-semibold text-[#245d9b] hover:underline"
                   >{{ "auth.forgotPassword" | t }}</a>
                 </div>

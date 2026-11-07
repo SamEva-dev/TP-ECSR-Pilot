@@ -13,7 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { TranslateService } from "../../core/i18n/translate.service";
@@ -39,7 +39,7 @@ type DemoProfile = {
 
 @Component({
   selector: "app-auth",
-  imports: [ReactiveFormsModule, TranslatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe, RouterLink],
   templateUrl: "./auth.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -687,7 +687,14 @@ export class AuthComponent {
     if (e?.status === 401) {
       return this.translate.instant("auth.errors.invalidCredentials");
     }
-
+    // Only use the existing-account hint for explicit registration conflicts.
+    // Do not infer account existence from an arbitrary 400 response.
+    const responseText = [typeof body === "string" ? body : "",
+      typeof body === "object" && body ? JSON.stringify(body) : ""].join(" ");
+    if (this.isRegister() && (e?.status === 409 || e?.status === 400) &&
+        /already.?exists|already.?registered|email.?taken|user.?exists|account.?exists|compte.?existant|d[eé]j[aà].?inscrit|DUPLICATE_(?:USER|EMAIL)|USER_ALREADY_EXISTS|EMAIL_ALREADY_EXISTS/i.test(responseText)) {
+      return this.translate.instant("auth.errors.accountExists");
+    }
     return this.translate.instant("auth.errors.technical");
   }
 
