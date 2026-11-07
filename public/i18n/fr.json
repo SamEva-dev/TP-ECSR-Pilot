@@ -1679,7 +1679,8 @@
       "loadFailed": "Impossible de charger les données du rapport.",
       "auditFailed": "Impossible de charger le journal d’audit.",
       "exportFailed": "Impossible d’exporter le rapport."
-    }
+    },
+    "noExportContext": "Sélectionnez une promotion existante avant de lancer un export ou une impression."
   },
   "statistics": {
     "title": "Statistiques",
@@ -1985,9 +1986,18 @@
       "pendingActionError": "Cette action sera disponible après acceptation de l’invitation.",
       "roleError": "Impossible de modifier le rôle de ce compte.",
       "selfInviteError": "Vous ne pouvez pas vous inviter vous-même dans votre organisation.",
-      "memberExistsError": "Cet utilisateur est déjà membre de cette organisation. Modifiez ses rôles depuis Gestion des accès.",
+      "memberExistsError": "Cette personne dispose déjà d’un accès à l’organisation sélectionnée. Vous pouvez retrouver son compte dans « Gestion des accès » pour modifier ses rôles ou ses affectations. Aucune nouvelle invitation n’a été créée.",
       "invitationExistsError": "Une invitation est déjà en attente pour cette adresse.",
-      "activeTutorAssignments": "Ce membre possède des affectations de stage actives. Réattribuez les stages ou suspendez son accès avant le retrait."
+      "activeTutorAssignments": "Ce membre possède des affectations de stage actives. Réattribuez les stages ou suspendez son accès avant le retrait.",
+      "activeBusinessDependencies": "Retrait impossible : réattribuez ou clôturez les responsabilités suivantes avant de retirer cet accès.",
+      "impactOwner": "Organisation propriétaire",
+      "impactPrograms": "Formations sous responsabilité",
+      "impactCohorts": "Promotions sous responsabilité",
+      "impactTrainer": "Affectations de formateur",
+      "impactSessions": "Séances planifiées ou en cours",
+      "impactJury": "Jurys sur examens ouverts",
+      "impactEnrollment": "Inscriptions apprenant ouvertes",
+      "impactTutor": "Affectations de maître de stage"
     }
   },
   "administration": {
@@ -2613,6 +2623,12 @@
       "saveConflict": "La grille a été modifiée par un autre utilisateur. Rechargez le candidat avant de réessayer.",
       "partialNotFinal": "Une appréciation « partielle » reste provisoire et ne peut pas être validée comme épreuve finale.",
       "refreshFailed": "La grille est enregistrée, mais sa synchronisation a échoué. Rechargez la page."
+    },
+    "emptySession": "Aucune session de certification n’est enregistrée pour cette promotion.",
+    "juryAccess": {
+      "title": "Espace jury",
+      "refresh": "Actualiser",
+      "empty": "Aucune session de certification disponible."
     }
   },
   "jury": {
@@ -2991,6 +3007,13 @@
     },
     "manager": {
       "choose": "Sélectionner un responsable d’établissement"
+    },
+    "validation": {
+      "managerRequired": "Sélectionnez un responsable d’établissement actif.",
+      "fieldsRequired": "Renseignez tous les champs obligatoires.",
+      "save": {
+        "unavailable": "Impossible d’enregistrer l’établissement. Vérifiez les informations et réessayez."
+      }
     }
   },
   "programs": {
@@ -4923,5 +4946,16 @@
     "no": "Non",
     "submit": "Enregistrer l’évaluation",
     "history": "Historique des évaluations"
+  },
+  "qaFix": {
+    "inviteRequired": "Renseignez le prénom, le nom et l’adresse email avant d’envoyer l’invitation.",
+    "inviteEmail": "Saisissez une adresse email valide.",
+    "assignmentAfterAcceptance": "Après acceptation de l’invitation et activation du compte, vous pourrez définir les affectations depuis « Gestion des accès ».",
+    "responsibleInvalid": "Le responsable sélectionné n’est plus disponible. Actualisez la liste et choisissez un membre actif.",
+    "programRequired": "Complétez les champs obligatoires et sélectionnez au moins un module.",
+    "sessionTrainer": "Aucun formateur actif sélectionné. Affectez un formateur avant de créer la séance.",
+    "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
+    "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
+    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel."
   }
 }

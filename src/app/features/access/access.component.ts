@@ -5,6 +5,7 @@ import { firstValueFrom } from "rxjs";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
 import { StudentApiStoreService } from "../../core/api-data/student-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import { TranslateService } from "../../core/i18n/translate.service";
 import type { AccessAccount, AccessPermissionKey } from "../../core/access/access.models";
 import { PedagoraAccessApiService, type ProductAccount } from "../../core/access/pedagora-access-api.service";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
@@ -22,6 +23,7 @@ import { AccessAssignmentDrawerComponent } from "./access-assignment-drawer/acce
 })
 export class AccessComponent {
   private readonly api = inject(PedagoraAccessApiService);
+  private readonly translate = inject(TranslateService);
   private readonly route = inject(ActivatedRoute);
   private readonly studentStore = inject(StudentApiStoreService);
   private readonly notifications = inject(ApplicationNotificationService);
@@ -32,6 +34,7 @@ export class AccessComponent {
 
   readonly accounts = signal<AccessAccount[]>([]);
   readonly invitationPending = signal(false);
+  readonly inviteValidationError = signal<"" | "required" | "email">("");
   readonly search = signal("");
   readonly roleFilter = signal<"all" | MembershipRole>("all");
   readonly selectedId = signal("");
@@ -214,8 +217,20 @@ export class AccessComponent {
         await firstValueFrom(this.api.revokeInvitation(account.id));
       } else {
         const impact = await firstValueFrom(this.api.removalImpact(account.id));
-        if (impact.requiresTutorReassignment) {
-          this.notifications.error('access.api.activeTutorAssignments', '/acces');
+        if (impact.hasBlockingDependencies) {
+          const detail = [
+            ['access.api.impactOwner', impact.ownedOrganizations],
+            ['access.api.impactPrograms', impact.responsiblePrograms],
+            ['access.api.impactCohorts', impact.managedCohorts],
+            ['access.api.impactTrainer', impact.activeTrainerAssignments],
+            ['access.api.impactSessions', impact.upcomingTrainingSessions],
+            ['access.api.impactJury', impact.openJuryAssignments],
+            ['access.api.impactEnrollment', impact.openLearnerEnrollments],
+            ['access.api.impactTutor', impact.activeTutorAssignments],
+          ] as const;
+          const summary = detail.filter(([, count]) => count > 0)
+            .map(([key, count]) => `${this.translate.instant(key)}: ${count}`).join('\n');
+          window.alert(`${this.translate.instant('access.api.activeBusinessDependencies')}\n\n${summary}`);
           return;
         }
         if (!window.confirm('Retirer les accès de ce membre à cette organisation ? Les contributions pédagogiques seront conservées.')) return;
@@ -316,7 +331,10 @@ export class AccessComponent {
     const firstName = this.inviteFirstName.trim();
     const lastName = this.inviteLastName.trim();
     const email = this.inviteEmail.trim();
-    if (this.invitationPending() || !firstName || !lastName || !email) return;
+    if (this.invitationPending()) return;
+    if (!firstName || !lastName || !email) { this.inviteValidationError.set("required"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { this.inviteValidationError.set("email"); return; }
+    this.inviteValidationError.set("");
     if (this.inviteRole === "student") {
       // Use exactly the same invitation/receipt flow as the Stagiaires screen.
       // The access form has no cohort selector: never pick an arbitrary promotion.
@@ -340,7 +358,14 @@ export class AccessComponent {
       const created = await firstValueFrom(this.api.invite({ firstName, lastName, email, role: this.inviteRole }));
       this.inviteFirstName = ""; this.inviteLastName = ""; this.inviteEmail = ""; this.inviteRole = "trainer";
       await this.reload(false);
-      this.selectedId.set(created?.id ?? this.accounts().find((x) => x.email.toLowerCase() === email.toLowerCase())?.id ?? "");
+      const account = this.accounts().find((x) => x.id === created?.id)
+        ?? this.accounts().find((x) => x.email.toLowerCase() === email.toLowerCase());
+      this.selectedId.set(account?.id ?? "");
+      // Invited identities cannot receive scoped memberships until acceptance.
+      // Offer the assignment drawer only when the account is already an active member.
+      if (account && !account.isInvitation && account.access === "active" && this.canManageAccount(account)) {
+        this.openAssignments(account);
+      }
     } catch (error: unknown) {
       const response = error as { error?: { code?: string; error?: string } };
       const code = response.error?.code ?? response.error?.error;

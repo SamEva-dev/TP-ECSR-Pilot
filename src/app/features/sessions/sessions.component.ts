@@ -43,6 +43,7 @@ export class SessionsComponent {
   objectives = "";
   supports = "";
   comments = "";
+  readonly validationError = signal<"" | "required" | "trainer" | "time">("");
 
   get trainers() { return this.store.trainers(); }
 
@@ -118,8 +119,14 @@ export class SessionsComponent {
   }
 
   async createSession(): Promise<void> {
-    if (!this.theme.trim() || !this.promotions.some((item) => item.id === this.promotionId) ||
-        (this.trainer && !this.trainers.some((item) => item.id === this.trainer))) return;
+    if (!this.theme.trim() || !this.promotions.some((item) => item.id === this.promotionId) || !this.date || !this.start || !this.end) {
+      this.validationError.set("required"); return;
+    }
+    if (!this.trainer || !this.trainers.some((item) => item.id === this.trainer)) {
+      this.validationError.set("trainer"); return;
+    }
+    if (this.start >= this.end) { this.validationError.set("time"); return; }
+    this.validationError.set("");
     const created = await this.store.create({
       cohortId: this.promotionId,
       date: this.date ?? "",

@@ -12,7 +12,7 @@ export interface StatisticsPromotionRow {
 }
 
 export interface StatisticsCompetencyRow {
-  code: "C1" | "C2" | "C3" | "C4";
+  code: string;
   labelKey: string;
   value: number;
 }

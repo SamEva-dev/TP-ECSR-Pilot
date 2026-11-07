@@ -63,6 +63,9 @@ export class StudentApiStoreService {
     try {
       const rows = await firstValueFrom(this.profiles.directory());
       const allowedIds = new Set(cohortApiId.split("|").filter(Boolean));
+      // The server directory is already scoped to the authenticated organization.
+      // Organization-level viewing must not require choosing a cohort first.
+      const organizationScope = this.workspace.activeLevel() === "organization";
       let summaries: CohortLearnerDashboard[] = [];
       if (allowedIds.size) {
         const outcomes = await Promise.allSettled([...allowedIds].map((id) =>
@@ -75,7 +78,7 @@ export class StudentApiStoreService {
       if (generation !== this.generation || request !== this.request) return false;
       const summaryByEnrollment = new Map(summaries.map((item) => [item.enrollmentId, item]));
       this.itemsSignal.set((Array.isArray(rows) ? rows : [])
-        .filter((row) => allowedIds.has(this.text(row?.cohortId)))
+        .filter((row) => organizationScope || allowedIds.has(this.text(row?.cohortId)))
         .map((row) => this.mapDirectory(row, summaryByEnrollment.get(this.text(row?.enrollmentId)))));
       this.loadError.set(false);
       return true;

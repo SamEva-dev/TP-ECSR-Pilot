@@ -13,6 +13,7 @@
       <button
         type="button"
         (click)="exportPdf()"
+        [disabled]="!hasExportContext()"
         class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"
       >
         <i class="ph ph-file-pdf text-[16px]"></i>{{ "reports.exportPdf" | t }}
@@ -20,6 +21,7 @@
       <button
         type="button"
         (click)="exportExcel()"
+        [disabled]="!hasExportContext()"
         class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#dbe3eb] bg-white px-4 text-[13px] font-semibold text-[#26364a] shadow-sm"
       >
         <i class="ph ph-table text-[16px]"></i>{{ "reports.exportExcel" | t }}
@@ -27,12 +29,17 @@
       <button
         type="button"
         (click)="print()"
+        [disabled]="!hasExportContext()"
         class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#dbe3eb] bg-white px-4 text-[13px] font-semibold text-[#26364a] shadow-sm"
       >
         <i class="ph ph-printer text-[16px]"></i>{{ "reports.print" | t }}
       </button>
     </div>
   </div>
+
+  @if (!hasExportContext()) {
+    <p class="mt-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-[13px] text-[#64748b]">{{ "reports.noExportContext" | t }}</p>
+  }
 
   <article
     class="mt-6 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"

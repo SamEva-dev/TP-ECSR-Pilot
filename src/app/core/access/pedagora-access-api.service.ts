@@ -93,7 +93,7 @@ export class PedagoraAccessApiService {
   }
   setActive(userId: string, active: boolean) { return this.http.put<void>(`${this.url}/${encodeURIComponent(userId)}/status`, { active }); }
   removalImpact(userId: string) {
-    return this.http.get<{ activeTutorAssignments: number; revokedTutorAssignments: number; requiresTutorReassignment: boolean }>(
+    return this.http.get<{ activeTutorAssignments: number; revokedTutorAssignments: number; requiresTutorReassignment: boolean; hasBlockingDependencies: boolean; ownedOrganizations: number; responsiblePrograms: number; managedCohorts: number; activeTrainerAssignments: number; upcomingTrainingSessions: number; openJuryAssignments: number; openLearnerEnrollments: number }>(
       `${this.url}/${encodeURIComponent(userId)}/removal-impact`);
   }
   revoke(userId: string) { return this.http.delete<void>(`${this.url}/${encodeURIComponent(userId)}`); }

@@ -490,12 +490,15 @@ export class StatisticsApiStoreService {
   private competencies(
     rows: CohortLearnerDashboard[],
   ): StatisticsCompetencyRow[] {
-    return (["C1", "C2", "C3", "C4"] as const).map((code) => ({
+    // Competencies are supplied by the selected cohort's reporting API.
+    // Never manufacture C1-C4 when a referential contains other codes.
+    const codes = [...new Set(rows.flatMap((row) => Object.keys(row.competencies ?? {})))];
+    return codes.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map((code) => ({
       code,
-      labelKey: `statistics.competencies.${code.toLowerCase()}`,
-      value: this.average(
-        rows.map((row) => this.number(row.competencies?.[code])),
-      ),
+      labelKey: code,
+      value: this.average(rows.filter((row) =>
+        Object.prototype.hasOwnProperty.call(row.competencies ?? {}, code),
+      ).map((row) => this.number(row.competencies?.[code]))),
     }));
   }
 

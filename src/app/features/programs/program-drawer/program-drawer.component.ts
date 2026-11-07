@@ -28,6 +28,7 @@ export class ProgramDrawerComponent {
   readonly saved = output<ProgramFormValue>();
   readonly modules = PROGRAM_MODULES;
   readonly selectedModules = signal<ProgramModule[]>([]);
+  readonly submissionError = signal<"" | "required" | "responsible">("");
 
   readonly form = new FormGroup({
     code: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
@@ -54,6 +55,7 @@ export class ProgramDrawerComponent {
         status: program?.status ?? "draft",
         responsibleTrainerAuthGateUserId: program?.responsibleTrainerAuthGateUserId ?? "",
       });
+      this.submissionError.set("");
       this.selectedModules.set(program ? [...program.enabledModules] : ["planning", "attendance", "sessions", "documents", "certification"]);
       void this.loadTrainers();
     });
@@ -94,11 +96,15 @@ export class ProgramDrawerComponent {
   submit(): void {
     if (this.form.invalid || this.selectedModules().length === 0) {
       this.form.markAllAsTouched();
+      this.submissionError.set("required");
       return;
     }
     const raw = this.form.getRawValue();
     // Existing assignment remains valid if the API members list is temporarily unavailable.
-    if (raw.responsibleTrainerAuthGateUserId && raw.responsibleTrainerAuthGateUserId !== this.program()?.responsibleTrainerAuthGateUserId && !this.trainers().some(x => x.id === raw.responsibleTrainerAuthGateUserId)) return;
+    if (raw.responsibleTrainerAuthGateUserId && raw.responsibleTrainerAuthGateUserId !== this.program()?.responsibleTrainerAuthGateUserId && !this.trainers().some(x => x.id === raw.responsibleTrainerAuthGateUserId)) {
+      this.submissionError.set("responsible"); return;
+    }
+    this.submissionError.set("");
     const trainer = this.trainers().find((x) => x.id === raw.responsibleTrainerAuthGateUserId);
     this.saved.emit({ ...raw, status: this.program()?.status ?? "draft", responsibleTrainerDisplayName: trainer ? `${trainer.firstName ?? ""} ${trainer.lastName ?? ""}`.trim() : (this.program()?.responsibleTrainerDisplayName ?? ""), enabledModules: this.selectedModules() });
   }

@@ -29,12 +29,14 @@
           ><i class="ph ph-check-square-offset text-[16px]"></i
           >{{ "certification.actions.results" | t }}</a
         >
+        @if (hasExamSession()) {
         <a
           [routerLink]="['/certification/sessions', examSession.id]"
           class="inline-flex h-[39px] items-center gap-2 rounded-[11px] bg-[#2b66a4] px-4 text-[13px] font-semibold text-white shadow-sm"
           ><i class="ph ph-calendar-check text-[16px]"></i
           >{{ "certification.actions.manageSession" | t }}</a
         >
+        }
       </div>
     }
   </div>
@@ -140,6 +142,7 @@
     </div>
 
     <div class="mt-4 grid gap-4 xl:grid-cols-[1.35fr_.85fr]">
+      @if (hasExamSession()) {
       <article
         class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
       >
@@ -207,6 +210,11 @@
           >{{ "common.open" | t }}</a
         >
       </article>
+      } @else {
+        <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+          <p class="text-[14px] font-semibold text-[#334155]">{{ "certification.emptySession" | t }}</p>
+        </article>
+      }
 
       <article
         class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
@@ -355,11 +363,15 @@
           class="grid size-[44px] place-items-center rounded-full bg-[#e5f2ff] text-[#2a64a2]"
           ><i class="ph ph-certificate text-[22px]"></i
         ></span>
+        @if (hasExamSession()) {
         <h2 class="mt-4 text-[17px] font-extrabold">{{ examSession.name }}</h2>
         <p class="mt-1 text-[12px] text-[#718096]">
           {{ scheme().nameKey | t }} · {{ examSession.startDate }} →
           {{ examSession.endDate }}
         </p>
+        } @else {
+          <p class="mt-4 text-[13px] text-[#64748b]">{{ "certification.emptySession" | t }}</p>
+        }
         <div class="mt-5">
           <div class="flex justify-between text-[12px]">
             <span>{{ "certification.trainer.readyStudents" | t }}</span

@@ -42,6 +42,9 @@ export class ReportsApiStoreService {
   private request = 0;
 
   readonly promotionId = this.promotionIdSignal.asReadonly();
+  readonly hasSelectedPromotion = computed(() =>
+    this.promotions().some((row) => row.id === this.promotionIdSignal() && !!row.apiId),
+  );
   readonly students = this.studentsSignal.asReadonly();
   readonly auditLog = this.auditSignal.asReadonly();
 

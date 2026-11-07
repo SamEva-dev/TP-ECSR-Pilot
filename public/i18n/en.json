@@ -1679,7 +1679,8 @@
       "loadFailed": "Could not load report data.",
       "auditFailed": "Could not load the audit log.",
       "exportFailed": "Could not export the report."
-    }
+    },
+    "noExportContext": "Select an existing cohort before exporting or printing."
   },
   "statistics": {
     "title": "Statistics",
@@ -1985,9 +1986,18 @@
       "pendingActionError": "This action will be available after the invitation is accepted.",
       "roleError": "Unable to update this account role.",
       "selfInviteError": "You cannot invite yourself to your own organization.",
-      "memberExistsError": "This user already belongs to this organization. Manage their roles instead.",
+      "memberExistsError": "This person already has access to the selected organization. Open Access Management to change their roles or assignments. No new invitation was created.",
       "invitationExistsError": "An invitation is already pending for this email.",
-      "activeTutorAssignments": "This member has active placement assignments. Reassign the placements or suspend access before removal."
+      "activeTutorAssignments": "This member has active placement assignments. Reassign the placements or suspend access before removal.",
+      "activeBusinessDependencies": "Removal blocked: reassign or close the following responsibilities before revoking access.",
+      "impactOwner": "Organization ownership",
+      "impactPrograms": "Responsible training programs",
+      "impactCohorts": "Managed cohorts",
+      "impactTrainer": "Trainer assignments",
+      "impactSessions": "Scheduled or ongoing sessions",
+      "impactJury": "Jury assignments for open exams",
+      "impactEnrollment": "Open learner enrollments",
+      "impactTutor": "Internship tutor assignments"
     }
   },
   "administration": {
@@ -2613,6 +2623,12 @@
       "saveConflict": "Another user changed this assessment grid. Reload the candidate before retrying.",
       "partialNotFinal": "A “partial” assessment is provisional and cannot be validated as a final result.",
       "refreshFailed": "The grid was saved, but synchronization failed. Reload the page."
+    },
+    "emptySession": "No certification session is recorded for this cohort.",
+    "juryAccess": {
+      "title": "Jury workspace",
+      "refresh": "Refresh",
+      "empty": "No certification session available."
     }
   },
   "jury": {
@@ -2991,6 +3007,13 @@
     },
     "manager": {
       "choose": "Select a site manager"
+    },
+    "validation": {
+      "managerRequired": "Select an active site manager.",
+      "fieldsRequired": "Complete all required fields.",
+      "save": {
+        "unavailable": "Unable to save the site. Check the details and try again."
+      }
     }
   },
   "programs": {
@@ -4923,5 +4946,16 @@
     "no": "No",
     "submit": "Save evaluation",
     "history": "Evaluation history"
+  },
+  "qaFix": {
+    "inviteRequired": "Enter a first name, last name and email address before sending the invitation.",
+    "inviteEmail": "Enter a valid email address.",
+    "assignmentAfterAcceptance": "Once the invitation is accepted and the account is active, you can define assignments in Access Management.",
+    "responsibleInvalid": "The selected manager is no longer available. Refresh the list and select an active member.",
+    "programRequired": "Complete the required fields and select at least one module.",
+    "sessionTrainer": "No active trainer selected. Assign a trainer before creating the session.",
+    "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
+    "sessionTime": "End time must be later than start time.",
+    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version."
   }
 }

@@ -58,6 +58,9 @@ export class CertificationComponent {
   get examSession() {
     return this.store.examSession();
   }
+  // A synthetic empty session model must never be displayed as persisted data.
+  readonly hasExamSession = computed(() => this.store.hasSession(this.store.examSession().id));
+
 
   get candidates() {
     return this.store.candidates();

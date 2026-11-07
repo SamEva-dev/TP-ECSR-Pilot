@@ -9,6 +9,7 @@ import { RouterLink } from "@angular/router";
 import { TEAM_WORK_MODE_WEEK } from "../../core/api-data/runtime-data.store";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
+import { TranslateService } from "../../core/i18n/translate.service";
 import type {
   PlanningEvent,
   PlanningType,
@@ -39,6 +40,7 @@ export class PlanningComponent {
   private readonly workspace = inject(WorkspaceContextService);
   readonly sessions = inject(TrainingSessionApiStoreService);
   readonly session = inject(SessionService);
+  private readonly translate = inject(TranslateService);
   readonly teamWorkModes = computed(() =>
     TEAM_WORK_MODE_WEEK.filter(
       (item) => (item.siteId ?? "") === (this.contextData.site()?.id ?? ""),
@@ -54,8 +56,8 @@ export class PlanningComponent {
   readonly selectedDate = signal(this.localToday());
   readonly currentLabel = computed(() => {
     const date = this.parseIsoDate(this.selectedDate());
-    if (this.view() === "day") return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
-    if (this.view() === "month") return new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+    if (this.view() === "day") return new Intl.DateTimeFormat(this.translate.locale() === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+    if (this.view() === "month") return new Intl.DateTimeFormat(this.translate.locale() === "en" ? "en-GB" : "fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
     const monday = this.weekStart(date);
     const thursday = new Date(monday);
     thursday.setUTCDate(thursday.getUTCDate() + 3);
@@ -161,7 +163,7 @@ export class PlanningComponent {
   private parseIsoDate(value: string): Date { return new Date(`${value}T12:00:00Z`); }
   private isoDate(date: Date): string { return date.toISOString().slice(0, 10); }
   private dateLabel(date: Date): string {
-    return new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(date);
+    return new Intl.DateTimeFormat(this.translate.locale() === "en" ? "en-GB" : "fr-FR", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(date);
   }
   private weekStart(value: Date): Date {
     const date = new Date(value);

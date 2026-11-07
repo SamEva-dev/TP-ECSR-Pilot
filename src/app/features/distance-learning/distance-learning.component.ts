@@ -156,10 +156,13 @@ export class DistanceLearningComponent {
       ? Math.round((metric.remote / metric.total) * 100)
       : 0;
   });
-  readonly onsiteShare = computed(() => Math.max(100 - this.remoteShare(), 0));
+  readonly hasModalityHours = computed(() => this.modalityMinutes().total > 0);
+  readonly onsiteShare = computed(() => this.hasModalityHours() ? Math.max(100 - this.remoteShare(), 0) : 0);
   readonly modalityGradient = computed(
     () =>
-      `conic-gradient(#2b66a4 0 ${this.onsiteShare()}%, #f5a623 ${this.onsiteShare()}% 100%)`,
+      this.hasModalityHours()
+        ? `conic-gradient(#2b66a4 0 ${this.onsiteShare()}%, #f5a623 ${this.onsiteShare()}% 100%)`
+        : 'conic-gradient(#e2e8f0 0 100%)',
   );
   readonly trainerToCorrect = computed(() => 0);
   readonly trainerQuizzes = computed(() => 0);

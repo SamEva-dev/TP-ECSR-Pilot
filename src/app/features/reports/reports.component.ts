@@ -22,6 +22,7 @@ export class ReportsComponent {
   private readonly store = inject(ReportsApiStoreService);
   readonly selectedReport = signal<ReportType>("individual");
   readonly promotionId = this.store.promotionId;
+  readonly hasExportContext = this.store.hasSelectedPromotion;
   readonly students = this.store.students;
   readonly totalCompletedHours = this.store.totalCompletedHours;
   readonly totalCatchupHours = this.store.totalCatchupHours;
@@ -60,12 +61,15 @@ export class ReportsComponent {
     return `reports.sections.${this.selectedReport()}.title`;
   }
   print() {
+    if (!this.hasExportContext()) return;
     window.print();
   }
   exportPdf() {
+    if (!this.hasExportContext()) return;
     window.print();
   }
   exportExcel() {
+    if (!this.hasExportContext()) return;
     void this.store.exportExcel();
   }
 }
