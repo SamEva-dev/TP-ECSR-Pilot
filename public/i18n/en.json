@@ -4767,6 +4767,21 @@
       "attendance": "Attendance",
       "pedagogical-observation": "Pedagogical observation",
       "daily-observation-summary": "Daily summary"
+    },
+    "hours": {
+      "title": "Training hours confirmation",
+      "realized": "Hours recorded",
+      "confirmed": "Hours confirmed",
+      "awaiting": "Hours awaiting confirmation",
+      "refresh": "Refresh",
+      "loading": "Loading hours…",
+      "loadError": "Unable to load attendance confirmation details.",
+      "status": {
+        "confirmed": "Confirmed",
+        "contested": "Disputed — correction needed",
+        "awaiting_confirmation": "Awaiting confirmation",
+        "not_applicable": "No attendance to confirm"
+      }
     }
   },
   "branding": {

@@ -4767,6 +4767,21 @@
       "attendance": "Émargement",
       "pedagogical-observation": "Observation pédagogique",
       "daily-observation-summary": "Récapitulatif journalier"
+    },
+    "hours": {
+      "title": "Confirmation des heures de prestation",
+      "realized": "Heures réalisées",
+      "confirmed": "Heures confirmées",
+      "awaiting": "Heures en attente",
+      "refresh": "Actualiser",
+      "loading": "Chargement des heures…",
+      "loadError": "Impossible de charger le détail des confirmations.",
+      "status": {
+        "confirmed": "Confirmée",
+        "contested": "Contestée — correction nécessaire",
+        "awaiting_confirmation": "En attente de confirmation",
+        "not_applicable": "Sans prestation à confirmer"
+      }
     }
   },
   "branding": {

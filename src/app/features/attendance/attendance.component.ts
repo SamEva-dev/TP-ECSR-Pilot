@@ -9,11 +9,12 @@ import {
 } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
 import { RouterLink } from '@angular/router';
-import { SignatureApiService, type SignatureEnvelope } from '../../core/signatures/signature-api.service';
+import { SignatureApiService, type SignatureEnvelope, type AttendanceHoursSummary } from '../../core/signatures/signature-api.service';
 import { ApplicationNotificationService } from '../../core/notifications/application-notification.service';
 import { AttendanceApiStoreService } from "../../core/api-data/attendance-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { SessionService } from "../../core/session/session.service";
+import { RealtimeService } from "../../core/realtime/realtime.service";
 import {
   type AttendanceStatus,
   type AttendanceStudent,
@@ -42,10 +43,34 @@ const EMPTY_STUDENT: AttendanceStudent = {
 })
 export class AttendanceComponent {
   readonly sessionService = inject(SessionService);
+  private readonly realtime = inject(RealtimeService);
   readonly attendance = inject(AttendanceApiStoreService);
   private readonly signaturesApi = inject(SignatureApiService);
   private readonly notifications = inject(ApplicationNotificationService);
   readonly signatureHistory = signal<SignatureEnvelope[]>([]);
+  readonly hoursSummary = signal<AttendanceHoursSummary | null>(null);
+  readonly hoursLoading = signal(false);
+  readonly hoursError = signal(false);
+  readonly hourTotals = computed(() => {
+    const data = this.hoursSummary();
+    return {
+      realized: this.roundHours((data?.realizedMinutes ?? 0) / 60),
+      confirmed: this.roundHours((data?.confirmedMinutes ?? 0) / 60),
+      awaiting: this.roundHours((data?.awaitingMinutes ?? 0) / 60),
+    };
+  });
+  hoursFromMinutes(minutes: number): number {
+    return this.roundHours(minutes / 60);
+  }
+  learnerNameFor(enrollmentId: string): string {
+    const student = this.students().find(row => row.id === enrollmentId);
+    return student ? this.fullName(student) : enrollmentId;
+  }
+  confirmationFor(enrollmentId: string): string {
+    return this.hoursSummary()?.rows.find(row => row.enrollmentId === enrollmentId)?.confirmationStatus
+      ?? 'awaiting_confirmation';
+  }
+
   readonly mySignatures = signal<SignatureEnvelope[]>([]);
   readonly selectedForSignature = signal<ReadonlySet<string>>(new Set<string>());
   readonly sendingSignatures = signal(false);
@@ -60,17 +85,38 @@ export class AttendanceComponent {
   }
 
   constructor() {
+    void this.realtime.start().catch(() => undefined);
+    effect(() => {
+      const event = this.realtime.lastEvent();
+      if (!event || !/^pedagora\.signature\.(requested|completed|declined)\./.test(event.typeKey)) return;
+      const sessionId = this.session.id;
+      const generation = this.signatureLoadGeneration;
+      if (!sessionId) return;
+      untracked(() => {
+        if (this.canViewSignatures()) {
+          void this.loadSignatureHistory(sessionId, generation);
+          void this.loadHoursSummary(sessionId, generation);
+        } else if (this.isStudent()) {
+          void this.loadMySignatures(generation);
+          void this.loadMyHoursSummary(sessionId, generation);
+        }
+      });
+    });
     effect(() => {
       const sessionId = this.attendance.session().id;
       // Invalidate the previous session's data synchronously to avoid cross-session leakage.
       this.signatureHistory.set([]);
+      this.hoursSummary.set(null);
+      this.hoursError.set(false);
       this.selectedForSignature.set(new Set<string>());
       this.signatureBatchResult.set(null);
       const generation = ++this.signatureLoadGeneration;
       if (sessionId && this.canViewSignatures()) {
         untracked(() => void this.loadSignatureHistory(sessionId, generation));
+        untracked(() => void this.loadHoursSummary(sessionId, generation));
       }
       if (this.isStudent()) {
+        if (sessionId) untracked(() => void this.loadMyHoursSummary(sessionId, generation));
         untracked(() => void this.loadMySignatures(generation));
       } else {
         this.mySignatures.set([]);
@@ -166,6 +212,44 @@ export class AttendanceComponent {
     return this.signatureHistory().find((row) => row.enrollmentId === enrollmentId)?.status ?? '';
   }
 
+  async loadMyHoursSummary(sessionId: string, generation = this.signatureLoadGeneration): Promise<void> {
+    if (!this.isStudent()) return;
+    this.hoursLoading.set(true);
+    try {
+      const summary = await firstValueFrom(this.signaturesApi.myAttendanceHours(sessionId));
+      if (generation === this.signatureLoadGeneration && sessionId === this.session.id && this.isStudent()) {
+        this.hoursSummary.set(summary);
+        this.hoursError.set(false);
+      }
+    } catch {
+      if (generation === this.signatureLoadGeneration) {
+        this.hoursSummary.set(null);
+        this.hoursError.set(true);
+      }
+    } finally {
+      if (generation === this.signatureLoadGeneration) this.hoursLoading.set(false);
+    }
+  }
+
+  async loadHoursSummary(sessionId: string, generation = this.signatureLoadGeneration): Promise<void> {
+    if (!this.canViewSignatures()) return;
+    this.hoursLoading.set(true);
+    try {
+      const summary = await firstValueFrom(this.signaturesApi.attendanceHours(sessionId));
+      if (generation === this.signatureLoadGeneration && sessionId === this.session.id) {
+        this.hoursSummary.set(summary);
+        this.hoursError.set(false);
+      }
+    } catch {
+      if (generation === this.signatureLoadGeneration) {
+        this.hoursSummary.set(null);
+        this.hoursError.set(true);
+      }
+    } finally {
+      if (generation === this.signatureLoadGeneration) this.hoursLoading.set(false);
+    }
+  }
+
   async loadSignatureHistory(sessionId: string, generation = this.signatureLoadGeneration): Promise<void> {
     if (!this.canViewSignatures()) {
       if (generation === this.signatureLoadGeneration) this.signatureHistory.set([]);
@@ -235,6 +319,7 @@ export class AttendanceComponent {
         this.signatureBatchResult.set({ sent, failed });
         this.selectedForSignature.set(new Set<string>());
         await this.loadSignatureHistory(sessionId, generation);
+        await this.loadHoursSummary(sessionId, generation);
         if (failed) this.notifications.error('signatures.errors.request', '/presences');
       }
     } finally { this.sendingSignatures.set(false); }
@@ -332,7 +417,10 @@ export class AttendanceComponent {
       this.saved.set(success);
       if (success) {
         this.selectedForSignature.set(new Set<string>());
-        if (this.session.id) await this.loadSignatureHistory(this.session.id);
+        if (this.session.id) {
+          await this.loadSignatureHistory(this.session.id);
+          await this.loadHoursSummary(this.session.id);
+        }
       }
     } finally {
       this.saving.set(false);

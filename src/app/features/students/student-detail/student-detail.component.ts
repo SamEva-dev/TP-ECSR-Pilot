@@ -22,7 +22,7 @@ import { WorkspaceContextService } from '../../../core/workspace/workspace-conte
 import { ApplicationNotificationService } from '../../../core/notifications/application-notification.service';
 import { RealtimeService } from '../../../core/realtime/realtime.service';
 import { DocumentApiService } from '../../../core/documents/document-api.service';
-import { SignatureApiService, type SignatureEnvelope } from '../../../core/signatures/signature-api.service';
+import { SignatureApiService, type SignatureEnvelope, type LearnerAttendanceHours } from '../../../core/signatures/signature-api.service';
 
 interface AuditViewItem {
   id: string;
@@ -64,6 +64,11 @@ export class StudentDetailComponent {
   private readonly documentsApi = inject(DocumentApiService);
   private readonly signatureApi = inject(SignatureApiService);
   readonly observationSignatures = signal<SignatureEnvelope[]>([]);
+  readonly confirmedAttendance = signal<LearnerAttendanceHours | null>(null);
+  hoursFromMinutes(minutes: number): number {
+    return Math.round(minutes / 60 * 100) / 100;
+  }
+
   readonly checkedObservations = signal<ReadonlySet<string>>(new Set<string>());
   readonly sendingObservations = signal(false);
   readonly lastSignatureBatch = signal<{sent: number; failed: number} | null>(null);
@@ -118,7 +123,7 @@ export class StudentDetailComponent {
     });
     effect(() => {
       const event = this.realtime.lastEvent();
-      if (!event || !/^pedagora\.(training\.(attendance|enrollment)|learning\.|workplace\.|document\.|certification\.)/.test(event.typeKey)) return;
+      if (!event || !/^pedagora\.(training\.(attendance|enrollment)|learning\.|workplace\.|document\.|certification\.|signature\.(requested|completed|declined))/.test(event.typeKey)) return;
       untracked(() => void this.load(this.isSelfView(), this.isSelfView() ? this.workspace.cohort()?.apiId ?? '' : ''));
     });
   }
@@ -131,10 +136,19 @@ export class StudentDetailComponent {
           ? await firstValueFrom(this.reporting.learnerDetail(this.requestedId))
           : null;
       this.detail.set(result ?? null);
+      this.confirmedAttendance.set(null);
+      if (self && result) {
+        try {
+          this.confirmedAttendance.set(await firstValueFrom(this.signatureApi.myLearnerHours()));
+        } catch {
+          this.notifications.error('signatures.hours.loadError', '/stagiaires');
+        }
+      }
       const enrollmentId = result?.enrollmentId ?? '';
       await this.loadObservationSignatures(enrollmentId);
     } catch {
       this.detail.set(null);
+      this.confirmedAttendance.set(null);
       this.observationSignatures.set([]);
       this.notifications.error('studentDetail.api.loadFailed', self ? '/accueil' : `/stagiaires/${this.requestedId}`);
     }

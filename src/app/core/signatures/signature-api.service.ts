@@ -30,6 +30,28 @@ export interface CreateSignatureDraftRequest {
   enrollmentId: string;
 }
 
+export interface LearnerAttendanceHours {
+  realizedMinutes: number;
+  confirmedMinutes: number;
+  awaitingMinutes: number;
+}
+
+export interface AttendanceHoursRow {
+  enrollmentId: string;
+  realizedMinutes: number;
+  confirmedMinutes: number;
+  awaitingMinutes: number;
+  confirmationStatus: 'confirmed' | 'contested' | 'awaiting_confirmation' | 'not_applicable';
+}
+export interface AttendanceHoursSummary {
+  sessionId: string;
+  sheetVersion: number;
+  realizedMinutes: number;
+  confirmedMinutes: number;
+  awaitingMinutes: number;
+  rows: AttendanceHoursRow[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class SignatureApiService {
   private readonly http = inject(HttpClient);
@@ -114,6 +136,18 @@ export class SignatureApiService {
 
   myAttendance() {
     return this.http.get<SignatureEnvelope[]>(`${this.base}/attendance/my`);
+  }
+
+  myLearnerHours() {
+    return this.http.get<LearnerAttendanceHours>(`${this.base}/attendance/my-hours`);
+  }
+
+  myAttendanceHours(sessionId: string) {
+    return this.http.get<AttendanceHoursSummary>(`${this.base}/attendance/session/${encodeURIComponent(sessionId)}/my-hours`);
+  }
+
+  attendanceHours(sessionId: string) {
+    return this.http.get<AttendanceHoursSummary>(`${this.base}/attendance/session/${encodeURIComponent(sessionId)}/hours`);
   }
 
   attendanceBySession(sessionId: string) {
