@@ -62,6 +62,23 @@ export class TrainingSessionApiStoreService {
   );
   readonly trainers = this.trainersSignal.asReadonly();
 
+  async complete(id: string): Promise<boolean> {
+    try {
+      const before = this.rowsSignal().find(row => row.id === id);
+      if (!before || before.status === "completed" || before.status === "cancelled") return false;
+      const generation = this.generation;
+      const completed = this.normalize(await this.api.complete(id));
+      if (generation === this.generation && this.visibleCohortApiIds().includes(completed.cohortId)) {
+        this.upsert(completed);
+        await this.reload();
+      }
+      return true;
+    } catch {
+      this.notifications.error("sessions.real.saveError", "/seances");
+      return false;
+    }
+  }
+
   constructor() {
     void this.realtime.start().catch(() => undefined);
 
@@ -273,6 +290,7 @@ export class TrainingSessionApiStoreService {
     const local = this.localParts(row.startsAtUtc, row.endsAtUtc);
     return {
       id: this.text(row.id),
+      status: row.status,
       titleKey: this.text(row.title),
       date: local.displayDate,
       start: local.start,

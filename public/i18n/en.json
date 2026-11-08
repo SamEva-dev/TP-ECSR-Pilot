@@ -47,8 +47,7 @@
       "invalidMfaCode": "Enter a 6-digit verification code.",
       "passwordTooShort": "The new password must contain at least 8 characters.",
       "logoutFailed": "The remote session could not be revoked. The local session was closed.",
-      "completeRequiredFields": "Please complete the required fields and correct the highlighted errors.",
-      "accountExists": "An account already uses this email address. Sign in or reset your password."
+      "completeRequiredFields": "Please complete the required fields and correct the highlighted errors."
     },
     "demo": {
       "title": "Sign in",
@@ -4052,8 +4051,7 @@
     "WORKPLACE_TUTOR_MEMBER_INACTIVE": "This member is suspended or inactive and cannot be assigned as a placement tutor.",
     "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "The account already exists but its current role is not eligible for direct placement tutor assignment.",
     "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "This tutor is already assigned to the placement.",
-    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned.",
-    "AUTHGATE_UPSTREAM_UNAVAILABLE": "Identity service temporarily unavailable. Please retry."
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4958,6 +4956,7 @@
     "sessionTrainer": "No active trainer selected. Assign a trainer before creating the session.",
     "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
     "sessionTime": "End time must be later than start time.",
-    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version."
+    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
+    "completeSession": "Complete session"
   }
 }

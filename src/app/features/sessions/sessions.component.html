@@ -9,6 +9,7 @@
   </div>
 
   <div class="mt-6 grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
+    @if (canManageSessions()) {
     <article
       class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm xl:min-h-[790px]"
     >
@@ -193,6 +194,7 @@
         >
       </div>
     </article>
+    }
 
     <article
       class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"
@@ -277,6 +279,9 @@
                       : { present: session.present, expected: session.expected }
                 }}</span
               >
+              @if (canManageSessions() && session.status !== "completed" && session.status !== "cancelled") {
+              <button type="button" (click)="completeSession(session)" class="ecsr-secondary-action">{{ "qaFix.completeSession" | t }}</button>
+              }
               <a
                 routerLink="/presences"
                 class="inline-flex h-[31px] shrink-0 items-center rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[10.5px] font-semibold text-[#475569] shadow-sm"

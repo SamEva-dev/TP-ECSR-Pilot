@@ -17,6 +17,7 @@ export type SessionModality =
 
 export interface ProgrammedSession {
   id: string;
+  status: "planned" | "inprogress" | "completed" | "cancelled";
   titleKey: string;
   date: string;
   start: string;

@@ -47,8 +47,7 @@
       "invalidMfaCode": "Saisissez un code de vérification à 6 chiffres.",
       "passwordTooShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
       "logoutFailed": "La session distante n’a pas pu être révoquée. La connexion locale a été fermée.",
-      "completeRequiredFields": "Veuillez compléter les champs obligatoires et corriger les erreurs indiquées.",
-      "accountExists": "Un compte utilise déjà cette adresse e-mail. Connectez-vous ou utilisez la récupération de mot de passe."
+      "completeRequiredFields": "Veuillez compléter les champs obligatoires et corriger les erreurs indiquées."
     },
     "demo": {
       "title": "Connexion",
@@ -4052,8 +4051,7 @@
     "WORKPLACE_TUTOR_MEMBER_INACTIVE": "Ce membre est suspendu ou inactif et ne peut pas être affecté comme maître de stage.",
     "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "Le compte existe déjà mais son rôle actuel n’est pas compatible avec une affectation directe de maître de stage.",
     "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "Ce maître de stage est déjà affecté à cette période.",
-    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage.",
-    "AUTHGATE_UPSTREAM_UNAVAILABLE": "Service d’identité temporairement indisponible. Réessayez."
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4958,6 +4956,7 @@
     "sessionTrainer": "Aucun formateur actif sélectionné. Affectez un formateur avant de créer la séance.",
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
-    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel."
+    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
+    "completeSession": "Terminer la séance"
   }
 }

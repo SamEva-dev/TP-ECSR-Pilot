@@ -8,6 +8,7 @@ import type {
   ProgrammedSession,
   SessionModality,
 } from "../../core/models/sessions.models";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
@@ -19,6 +20,8 @@ import { WorkspaceContextService } from "../../core/workspace/workspace-context.
 })
 export class SessionsComponent {
   readonly contextData = inject(ContextualTrainingDataService);
+  readonly access = inject(AccessPolicyService);
+  readonly canManageSessions = () => this.access.can("sessions.manage");
   private readonly workspace = inject(WorkspaceContextService);
   readonly store = inject(TrainingSessionApiStoreService);
   readonly types: PedagogicalSessionType[] = [
@@ -119,6 +122,7 @@ export class SessionsComponent {
   }
 
   async createSession(): Promise<void> {
+    if (!this.canManageSessions()) return;
     if (!this.theme.trim() || !this.promotions.some((item) => item.id === this.promotionId) || !this.date || !this.start || !this.end) {
       this.validationError.set("required"); return;
     }
@@ -147,6 +151,11 @@ export class SessionsComponent {
     this.objectives = "";
     this.supports = "";
     this.comments = "";
+  }
+
+  async completeSession(session: ProgrammedSession): Promise<void> {
+    if (!this.canManageSessions() || session.status === "completed" || session.status === "cancelled") return;
+    await this.store.complete(session.id);
   }
 
   sessionTitle(session: ProgrammedSession): string | null {

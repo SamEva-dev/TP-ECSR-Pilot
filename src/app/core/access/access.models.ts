@@ -18,6 +18,7 @@ export type AppPermission =
   | "promotions.view"
   | "promotions.create"
   | "promotions.delete"
+  | "sessions.manage"
   | "sessions.view"
   | "sessions.viewOthers"
   | "sessions.assignTrainer"
