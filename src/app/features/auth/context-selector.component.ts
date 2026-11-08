@@ -5,8 +5,8 @@ import { firstValueFrom } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { AuthGateMembership, AuthGateService } from "../../core/session/auth-gate.service";
+import { authorizedPedagoraContexts } from "./authorized-contexts";
 import { SessionService } from "../../core/session/session.service";
-import { WorkspaceApiService } from "../../core/workspace/workspace-api.service";
 
 /** UI is deliberately application-owned; AuthGate only exposes opaque context IDs. */
 @Component({
@@ -48,7 +48,6 @@ export class ContextSelectorComponent {
   private readonly auth = inject(AuthGateService);
   private readonly http = inject(HttpClient);
   private readonly session = inject(SessionService);
-  private readonly workspaceApi = inject(WorkspaceApiService);
   readonly organizationNames = signal<Record<string, string>>({});
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -77,83 +76,73 @@ export class ContextSelectorComponent {
     return roles[role ?? ''] ?? 'Membre';
   }
 
-  private organizationNameKey(userId: string, organizationId: string): string {
-    return `pedagora.context-name:${userId}:${organizationId}`;
-  }
 
   constructor() { void this.load(); }
 
+  /** Only a tenant approved by BOTH AuthGate and PedagoraPilot is selectable. */
   private async load(): Promise<void> {
+    this.loading.set(true);
+    this.error.set("");
+    this.contexts.set([]);
+    this.organizationNames.set({});
     try {
-      const response = await firstValueFrom(this.auth.listContexts());
-      // Membership discovery is shared by AuthGate across independent products.
-      // Only PedagoraPilot memberships may be offered as workspace choices.
-      const memberships = (response.memberships ?? []).filter(space =>
-        !!space.organizationId &&
-        space.applicationCode?.trim().toLowerCase() === "pedagora-pilot"
-      );
-      this.contexts.set(memberships);
-      // Names are display-only metadata from PedagoraPilot, NEVER a source of
-      // membership authorization. Intersect with AuthGate memberships above.
-      try {
-        const labels = await firstValueFrom(this.http.get<{
+      const [response, labels] = await Promise.all([
+        firstValueFrom(this.auth.listContexts()),
+        // Product-owned, authenticated projection: active local memberships
+        // and organizations explicitly owned by this identity (Register flow).
+        // If the request fails, fail CLOSED; cached labels are never authority.
+        firstValueFrom(this.http.get<{
           organizations: { organizationId: string; name: string }[];
-        }>(`${environment.apiBaseUrl}/api/v1/me/organization-labels`));
-        const allowed = new Set(memberships.map(m => m.organizationId.toLowerCase()));
-        const names: Record<string, string> = {};
-        for (const org of labels.organizations ?? []) {
-          if (allowed.has(org.organizationId.toLowerCase()) && org.name?.trim()) {
-            names[org.organizationId] = org.name.trim();
-          }
-        }
-        this.organizationNames.set(names);
-      } catch {
-        // A transient labels failure must not block selecting an authorized tenant.
-      }
-      const userId = this.session.session()?.userId;
-      if (userId && typeof sessionStorage !== "undefined") {
-        const labels = { ...this.organizationNames() };
-        for (const membership of memberships) {
-          // Server names take precedence over potentially stale browser labels.
-          if (labels[membership.organizationId]) continue;
-          const label = sessionStorage.getItem(this.organizationNameKey(userId, membership.organizationId));
-          if (label) labels[membership.organizationId] = label;
-        }
-        this.organizationNames.set(labels);
-      }
+        }>(`${environment.apiBaseUrl}/api/v1/me/organization-labels`)),
+      ]);
+
+      const { contexts, names } = authorizedPedagoraContexts(
+        response.memberships ?? [], labels.organizations ?? []);
+      this.organizationNames.set(names);
+      this.contexts.set(contexts);
     } catch {
-      this.error.set("Impossible de récupérer les espaces autorisés.");
+      // Never present an unverified AuthGate organization when PedagoraPilot
+      // is unreachable or reports no active local access.
+      this.contexts.set([]);
+      this.organizationNames.set({});
+      this.error.set("Impossible de vérifier vos espaces actifs. Réessayez ultérieurement.");
     } finally {
       this.loading.set(false);
     }
   }
 
   async open(space: AuthGateMembership): Promise<void> {
-    if (this.loading()) return;
+    if (this.loading() || !this.contexts().some(x =>
+      x.organizationId.toLowerCase() === space.organizationId.toLowerCase())) return;
     this.error.set("");
     this.loading.set(true);
+    let contextSelected = false;
     try {
       const tokens = await firstValueFrom(this.auth.selectContext(space.organizationId));
+      contextSelected = true;
       this.session.connectAuthenticatedToken(tokens.accessToken);
       const current = this.session.session();
       if (!this.session.hasValidToken() || current?.organizationId !== space.organizationId) {
         this.error.set("AuthGate n’a pas délivré une session valide pour l’organisation sélectionnée.");
         return;
       }
-      // Tenant names are resolved from the API only AFTER AuthGate has selected
-      // the tenant. Never query arbitrary organization IDs as public metadata.
-      try {
-        const workspace = await this.workspaceApi.load();
-        const organization = workspace.organizations.find(org => org.id === space.organizationId);
-        if (organization?.name) {
-          this.organizationNames.update(names => ({ ...names, [space.organizationId]: organization.name }));
-          if (current.userId && typeof sessionStorage !== "undefined") {
-            sessionStorage.setItem(this.organizationNameKey(current.userId, space.organizationId), organization.name);
-          }
-        }
-      } catch {
-        // A failed label lookup must not grant or deny a valid AuthGate context.
-        // The secured workspace guard will report actual API access failures.
+      // Membership may have been suspended between listing and selecting.
+      // Verify the local business authorization again AFTER context selection.
+      // AuthGate alone cannot reinstate a revoked PedagoraPilot membership.
+      const verified = await firstValueFrom(this.http.get<{
+        organizations: { organizationId: string; name: string }[];
+      }>(`${environment.apiBaseUrl}/api/v1/me/organization-labels`));
+      const authorized = (verified.organizations ?? []).find(org =>
+        org.organizationId?.toLowerCase() === space.organizationId.toLowerCase());
+      if (!authorized) {
+        // A context token was issued; do not retain a token for a revoked tenant.
+        this.auth.logout();
+        this.session.disconnect();
+        this.error.set("Cet espace n’est plus autorisé. Reconnectez-vous.");
+        return;
+      }
+      if (authorized.name?.trim()) {
+        this.organizationNames.update(names => ({ ...names, [space.organizationId]: authorized.name.trim() }));
       }
       if (this.session.hasValidToken()) {
         const returnUrl = safeReturnUrl(this.route.snapshot.queryParamMap.get("returnUrl"), "/accueil",
@@ -162,7 +151,13 @@ export class ContextSelectorComponent {
       }
       else this.error.set("La session du nouvel espace est invalide.");
     } catch {
-      this.error.set("Accès refusé ou espace indisponible.");
+      // A context token may have been stored before a local authorization
+      // lookup failed. Never retain it when its active membership is unverified.
+      if (contextSelected) {
+        this.auth.logout();
+        this.session.disconnect();
+      }
+      this.error.set("Accès refusé ou espace indisponible. Reconnectez-vous si nécessaire.");
     } finally {
       this.loading.set(false);
     }
