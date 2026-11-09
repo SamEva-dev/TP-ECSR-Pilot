@@ -226,17 +226,27 @@ export class HomeDashboardApiStoreService {
     generation: number,
     request: number,
   ): Promise<void> {
+    // Avoid preloading routes forbidden to the current role. Permissions are
+    // provided by the authenticated workspace; the API remains authoritative.
+    const granted = this.session.session()?.permissions ?? [];
+    const canViewLearners = granted.some(permission =>
+      /^(pedagora\.)?learners\.view$/i.test(permission));
+    const canViewSessions = granted.some(permission =>
+      /^(pedagora\.)?sessions\.view$/i.test(permission));
+    const canViewStats = granted.some(permission =>
+      /^(pedagora\.)?statistics\.view$/i.test(permission));
     const [learnerResult, sessionsResult, dashboardResult, observationsResult] =
       await Promise.allSettled([
-        firstValueFrom(this.reporting.cohortLearners(cohortApiId)),
-        this.delivery.list(cohortApiId),
-        this.session.session()?.permissions?.some(permission =>
-          /^(pedagora\.)?statistics\.view$/i.test(permission))
+        canViewLearners
+          ? firstValueFrom(this.reporting.cohortLearners(cohortApiId))
+          : Promise.resolve([]),
+        canViewSessions ? this.delivery.list(cohortApiId) : Promise.resolve([]),
+        canViewStats
           ? firstValueFrom(this.reporting.cohortDashboard(cohortApiId))
           : Promise.resolve(null),
-        firstValueFrom(
-          this.reporting.cohortDrivingObservations(cohortApiId, 12),
-        ),
+        canViewLearners
+          ? firstValueFrom(this.reporting.cohortDrivingObservations(cohortApiId, 12))
+          : Promise.resolve([]),
       ]);
     if (generation !== this.generation || request !== this.request) return;
 

@@ -6,7 +6,7 @@
               [value]="session.id" (change)="selectSession($event)">
         <option value="">{{ "qaFixAttendance.chooseSession" | t }}</option>
         @for (row of availableSessions; track row.id) {
-          <option [value]="row.id">{{ row.title }} · {{ row.startsAtUtc }}</option>
+          <option [value]="row.id" [selected]="row.id === session.id">{{ row.title }} · {{ row.startsAtUtc }}</option>
         }
       </select>
     </label>
@@ -89,7 +89,7 @@
           {{ metrics().missedHours }} h
         </p>
         <p class="mt-1 text-[11px] text-[#8b95a5]">
-          {{ "attendance.metrics.excusedHint" | t }}
+          {{ "attendance.metrics.excusedHint" | t: { count: metrics().excused } }}
         </p>
       </article>
     </div>
