@@ -35,6 +35,7 @@ export class SignatureCenterComponent {
     return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
   }
   private readonly permissions = computed(() => this.session.session()?.permissions ?? []);
+  readonly signerMode = computed(() => this.session.role() === 'stagiaire');
   readonly canRequest = computed(() => this.permissions().some(p => /^(pedagora\.)?signatures\.request$/i.test(p)));
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.data().total / this.data().pageSize)));
   readonly selectedCount = computed(() => this.selected().size);
@@ -65,10 +66,12 @@ export class SignatureCenterComponent {
     if (!organization) return;
     this.pending.set(true);
     try {
-      const response = await firstValueFrom(this.api.center({
-        page: this.page(), pageSize: 25, status: this.status() || undefined,
-        team: this.team(),
-      }));
+      const response = this.signerMode()
+        ? await this.loadSignersOwnPage()
+        : await firstValueFrom(this.api.center({
+            page: this.page(), pageSize: 25, status: this.status() || undefined,
+            team: this.team(),
+          }));
       if (generation !== this.generation || organization !== this.session.session()?.organizationId) return;
       this.data.set({items: Array.isArray(response?.items) ? response.items : [],
         statusCounts: response?.statusCounts && typeof response.statusCounts === 'object' ? response.statusCounts : {},
@@ -81,6 +84,24 @@ export class SignatureCenterComponent {
         this.notifications.error('signatures.center.loadError', '/signatures/centre');
       }
     } finally { if (generation === this.generation) this.pending.set(false); }
+  }
+
+  private async loadSignersOwnPage(): Promise<SignatureCenterPage> {
+    // This endpoint binds signer identity and organization to the server-authenticated user.
+    // Never call the staff-wide /center endpoint for a Stagiaire.
+    const entries = await firstValueFrom(this.api.myAttendance());
+    const counts: Record<string, number> = {};
+    for (const row of entries) counts[row.status] = (counts[row.status] ?? 0) + 1;
+    const filtered = this.status() ? entries.filter(row => row.status === this.status()) : entries;
+    const pageSize = 25;
+    const page = this.page();
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize).map(envelope => ({
+        envelope, expiresAtUtc: null, lastReminderAtUtc: null,
+        reminderCount: 0, responseComment: null, learnerName: '',
+      })),
+      total: filtered.length, page, pageSize, statusCounts: counts,
+    };
   }
 
   chooseStatus(event: Event): void {

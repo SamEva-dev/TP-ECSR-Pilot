@@ -230,7 +230,10 @@ export class HomeDashboardApiStoreService {
       await Promise.allSettled([
         firstValueFrom(this.reporting.cohortLearners(cohortApiId)),
         this.delivery.list(cohortApiId),
-        firstValueFrom(this.reporting.cohortDashboard(cohortApiId)),
+        this.session.session()?.permissions?.some(permission =>
+          /^(pedagora\.)?statistics\.view$/i.test(permission))
+          ? firstValueFrom(this.reporting.cohortDashboard(cohortApiId))
+          : Promise.resolve(null),
         firstValueFrom(
           this.reporting.cohortDrivingObservations(cohortApiId, 12),
         ),
@@ -257,7 +260,7 @@ export class HomeDashboardApiStoreService {
         ? sessionsResult.value.map((row) => this.sessionRow(row))
         : [];
     const dashboard =
-      dashboardResult.status === "fulfilled"
+      dashboardResult.status === "fulfilled" && dashboardResult.value
         ? this.dashboard(dashboardResult.value)
         : null;
     const observations =

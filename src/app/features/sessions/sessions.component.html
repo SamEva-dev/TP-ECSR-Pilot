@@ -284,6 +284,7 @@
               }
               <a
                 routerLink="/presences"
+                [queryParams]="{ sessionId: session.id }"
                 class="inline-flex h-[31px] shrink-0 items-center rounded-[10px] border border-[#d9e0e9] bg-white px-3 text-[10.5px] font-semibold text-[#475569] shadow-sm"
                 >{{ "sessions.programmed.attendanceButton" | t }}</a
               >

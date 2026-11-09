@@ -70,8 +70,9 @@ export const routes: Routes = [
       },
       {
         path: 'signatures/centre',
-        canActivate: [roleGuard],
-        data: { permission: 'signatures.view' },
+        // Authenticated app-shell route: staff access is checked by /center,
+        // and students are restricted to /attendance/my by the component/API.
+
         loadComponent: () => import('./features/signatures/signature-center.component')
           .then(m => m.SignatureCenterComponent),
       },

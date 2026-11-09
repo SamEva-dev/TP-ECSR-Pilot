@@ -352,7 +352,8 @@
       "formateur": "Trainer",
       "stagiaire": "Trainee",
       "secretariat": "Administration",
-      "jury": "Jury member"
+      "jury": "Jury member",
+      "pedagogicalManager": "Pedagogical manager"
     },
     "studentStatus": {
       "good": "On track",
@@ -4957,6 +4958,7 @@
     "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
     "sessionTime": "End time must be later than start time.",
     "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
-    "completeSession": "Complete session"
+    "completeSession": "Complete session",
+    "juryNoAssignment": "No examination session is currently assigned to you. Check your workspace context or contact the pedagogical manager."
   }
 }

@@ -19,7 +19,9 @@
           }
         </select>
       </label>
+      @if (!signerMode()) {
       <label class="flex items-center gap-2 text-[12px]"><input type="checkbox" [checked]="team()" (change)="setTeam($event)" />{{ 'signatures.center.team' | t }}</label>
+      }
       <span class="ml-auto text-[12px] text-[#748094]">{{ data().total }} {{ 'signatures.center.results' | t }}</span>
     </div>
     @if (pending()) { <p class="text-[13px]">{{ 'signatures.center.loading' | t }}</p> }

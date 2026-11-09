@@ -47,6 +47,7 @@ export class AttendanceApiStoreService {
   private readonly realtime = inject(RealtimeService);
   private readonly translate = inject(TranslateService);
 
+  private readonly requestedSessionId = signal<string | null>(null);
   private readonly sheetSignal = signal<AttendanceSheetApi | null>(null);
   readonly loading = signal(false);
   readonly loadError = signal(false);
@@ -99,6 +100,10 @@ export class AttendanceApiStoreService {
         if (sessionId) void this.load(sessionId, this.generation, false);
       });
     });
+  }
+
+  setRequestedSessionId(id: string | null): void {
+    this.requestedSessionId.set(id?.trim() || null);
   }
 
   async reload(): Promise<boolean> {
@@ -237,6 +242,13 @@ export class AttendanceApiStoreService {
   }
 
   private pickSession(rows: TrainingSessionApi[]): TrainingSessionApi | null {
+    const requested = this.requestedSessionId();
+    if (requested) {
+      // A missing or unauthorized session must never fall back to another session.
+      return (Array.isArray(rows) ? rows : []).find(
+        row => row.id === requested && row.status !== "cancelled",
+      ) ?? null;
+    }
     const candidates = (Array.isArray(rows) ? rows : [])
       .filter(
         (row) => row?.status !== "cancelled" && Boolean(this.text(row?.id)),

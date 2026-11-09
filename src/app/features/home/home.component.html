@@ -401,6 +401,7 @@
                         ? '/fiches'
                         : '/presences'
                   "
+                  [queryParams]="item.type !== 'driving' && item.type !== 'presentation' ? { sessionId: item.id } : null"
                   class="hidden rounded-[11px] border border-[#d9e0e9] px-3 py-2 text-[11px] font-semibold shadow-sm sm:inline-flex"
                   >{{ "common.open" | t }}</a
                 >

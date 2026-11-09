@@ -352,7 +352,8 @@
       "formateur": "Formateur",
       "stagiaire": "Stagiaire",
       "secretariat": "Secrétariat",
-      "jury": "Jury"
+      "jury": "Jury",
+      "pedagogicalManager": "Responsable pédagogique"
     },
     "studentStatus": {
       "good": "En bonne voie",
@@ -4957,6 +4958,7 @@
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
     "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
-    "completeSession": "Terminer la séance"
+    "completeSession": "Terminer la séance",
+    "juryNoAssignment": "Aucune session d’examen ne vous est actuellement affectée. Vérifiez votre contexte de travail ou contactez le responsable pédagogique."
   }
 }
