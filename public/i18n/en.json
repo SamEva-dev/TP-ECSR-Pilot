@@ -4960,5 +4960,10 @@
     "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
     "completeSession": "Complete session",
     "juryNoAssignment": "No examination session is currently assigned to you. Check your workspace context or contact the pedagogical manager."
+  },
+  "qaFixAttendance": {
+    "selectSession": "Attendance session",
+    "chooseSession": "Select a session",
+    "noSession": "Select a session explicitly before editing attendance. No session will be chosen automatically."
   }
 }

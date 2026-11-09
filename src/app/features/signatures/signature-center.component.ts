@@ -35,7 +35,14 @@ export class SignatureCenterComponent {
     return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
   }
   private readonly permissions = computed(() => this.session.session()?.permissions ?? []);
-  readonly signerMode = computed(() => this.session.role() === 'stagiaire');
+  readonly signerMode = computed(() => {
+    const current = this.session.session();
+    if (!current) return false;
+    const roles = (current.roles ?? []).map(role => role.toLowerCase());
+    // The active Student profile is authoritative for the personal queue,
+    // including multi-role accounts whose display role is not 'stagiaire'.
+    return roles.some(role => /(^|[.])student$/.test(role)) || this.session.role() === 'stagiaire';
+  });
   readonly canRequest = computed(() => this.permissions().some(p => /^(pedagora\.)?signatures\.request$/i.test(p)));
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.data().total / this.data().pageSize)));
   readonly selectedCount = computed(() => this.selected().size);
@@ -89,7 +96,18 @@ export class SignatureCenterComponent {
   private async loadSignersOwnPage(): Promise<SignatureCenterPage> {
     // This endpoint binds signer identity and organization to the server-authenticated user.
     // Never call the staff-wide /center endpoint for a Stagiaire.
-    const entries = await firstValueFrom(this.api.myAttendance());
+    const [attendance, observations] = await Promise.allSettled([
+      firstValueFrom(this.api.myAttendance()),
+      firstValueFrom(this.api.myPendingObservations()),
+    ]);
+    // A failed observation feed must not hide valid attendance requests.
+    // Report a failure only when neither personal source can be loaded.
+    if (attendance.status === 'rejected' && observations.status === 'rejected')
+      throw new Error('SIGNATURE_PERSONAL_FEEDS_UNAVAILABLE');
+    const entries = [
+      ...(attendance.status === 'fulfilled' && Array.isArray(attendance.value) ? attendance.value : []),
+      ...(observations.status === 'fulfilled' && Array.isArray(observations.value) ? observations.value : []),
+    ];
     const counts: Record<string, number> = {};
     for (const row of entries) counts[row.status] = (counts[row.status] ?? 0) + 1;
     const filtered = this.status() ? entries.filter(row => row.status === this.status()) : entries;

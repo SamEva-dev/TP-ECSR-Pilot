@@ -8,7 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SignatureApiService, type SignatureEnvelope } from '../../core/signatures/signature-api.service';
 import { ApplicationNotificationService } from '../../core/notifications/application-notification.service';
@@ -45,6 +45,7 @@ export class AttendanceComponent {
   readonly sessionService = inject(SessionService);
   readonly attendance = inject(AttendanceApiStoreService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly signaturesApi = inject(SignatureApiService);
   private readonly notifications = inject(ApplicationNotificationService);
   readonly signatureHistory = signal<SignatureEnvelope[]>([]);
@@ -59,6 +60,19 @@ export class AttendanceComponent {
 
   get session() {
     return this.attendance.session();
+  }
+
+  get availableSessions() {
+    return this.attendance.availableSessions();
+  }
+
+  selectSession(event: Event): void {
+    const sessionId = (event.target as HTMLSelectElement).value;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: sessionId ? { sessionId } : { sessionId: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   constructor() {

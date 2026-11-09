@@ -187,11 +187,11 @@
         >
           <i class="ph ph-plus text-[16px]"></i>{{ "sessions.form.create" | t }}
         </button>
-        <a
-          routerLink="/presences"
-          class="ecsr-secondary-action"
-          >{{ "sessions.form.createAndAttendance" | t }}</a
-        >
+        @if (lastCreatedSessionId()) {
+          <a routerLink="/presences"
+             [queryParams]="{ sessionId: lastCreatedSessionId() }"
+             class="ecsr-secondary-action">{{ "sessions.form.createAndAttendance" | t }}</a>
+        }
       </div>
     </article>
     }

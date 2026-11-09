@@ -54,6 +54,9 @@ export class AttendanceApiStoreService {
   private generation = 0;
   private saving = false;
 
+  readonly availableSessions = computed<TrainingSessionApi[]>(() =>
+    this.sessions.apiSessions().filter(row => row?.status !== "cancelled" && Boolean(row?.id)));
+
   readonly selectedSession = computed<TrainingSessionApi | null>(() =>
     this.pickSession(this.sessions.apiSessions()),
   );
@@ -249,24 +252,10 @@ export class AttendanceApiStoreService {
         row => row.id === requested && row.status !== "cancelled",
       ) ?? null;
     }
-    const candidates = (Array.isArray(rows) ? rows : [])
-      .filter(
-        (row) => row?.status !== "cancelled" && Boolean(this.text(row?.id)),
-      )
-      .slice();
-    if (!candidates.length) return null;
+    // No implicit selection: a missing sessionId must NEVER route an edit to
+    // whichever past session happens to sort first.
+    return null;
 
-    const now = Date.now();
-    const started = candidates
-      .filter((row) => this.time(row.startsAtUtc) <= now)
-      .sort((a, b) => this.time(b.startsAtUtc) - this.time(a.startsAtUtc));
-    if (started.length) return started[0] ?? null;
-
-    return (
-      candidates.sort(
-        (a, b) => this.time(a.startsAtUtc) - this.time(b.startsAtUtc),
-      )[0] ?? null
-    );
   }
 
   private normalizeSheet(

@@ -46,6 +46,7 @@ export class SessionsComponent {
   objectives = "";
   supports = "";
   comments = "";
+  readonly lastCreatedSessionId = signal("");
   readonly validationError = signal<"" | "required" | "trainer" | "time">("");
 
   get trainers() { return this.store.trainers(); }
@@ -147,6 +148,7 @@ export class SessionsComponent {
       comments: this.comments.trim(),
     });
     if (!created) return;
+    this.lastCreatedSessionId.set(created.id);
     this.theme = "";
     this.objectives = "";
     this.supports = "";

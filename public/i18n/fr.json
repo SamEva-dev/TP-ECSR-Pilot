@@ -4960,5 +4960,10 @@
     "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
     "completeSession": "Terminer la séance",
     "juryNoAssignment": "Aucune session d’examen ne vous est actuellement affectée. Vérifiez votre contexte de travail ou contactez le responsable pédagogique."
+  },
+  "qaFixAttendance": {
+    "selectSession": "Séance concernée",
+    "chooseSession": "Choisir une séance",
+    "noSession": "Sélectionne explicitement une séance avant toute saisie : aucune séance ne sera choisie automatiquement."
   }
 }
