@@ -157,6 +157,30 @@
           </tbody>
         </table>
       </div>
+    } @else if (selectedReport() === "internship") {
+      @if (internshipLoading()) {
+        <p class="mt-5 text-[13px] text-[#64748b]">{{ "reports.internshipLoading" | t }}</p>
+      } @else if (internshipLoadError()) {
+        <p class="mt-5 text-[13px] text-[#b91c1c]">{{ "reports.internshipUnavailable" | t }}</p>
+      } @else {
+        <div class="mt-5 grid gap-4 md:grid-cols-3">
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[11px] uppercase text-[#6c788b]">{{ "reports.internshipPlanned" | t }}</p>
+            <p class="mt-2 text-[25px] font-extrabold text-[#172033]">{{ internshipPlannedHours() }} h</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[11px] uppercase text-[#6c788b]">{{ "reports.internshipCompleted" | t }}</p>
+            <p class="mt-2 text-[25px] font-extrabold text-[#172033]">{{ internshipCompletedHours() }} h</p>
+          </div>
+          <div class="rounded-[15px] bg-[#f1f4f8] p-4">
+            <p class="text-[11px] uppercase text-[#6c788b]">{{ "reports.internshipRemaining" | t }}</p>
+            <p class="mt-2 text-[25px] font-extrabold text-[#172033]">{{ internshipRemainingHours() }} h</p>
+          </div>
+        </div>
+        @if (internshipPeriods().length === 0) {
+          <p class="mt-4 text-[13px] text-[#64748b]">{{ "reports.internshipEmpty" | t }}</p>
+        }
+      }
     } @else {
       <div class="mt-5 grid gap-4 md:grid-cols-3">
         <div class="rounded-[15px] bg-[#f1f4f8] p-4">

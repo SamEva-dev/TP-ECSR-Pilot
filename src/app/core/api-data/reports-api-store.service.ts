@@ -20,6 +20,8 @@ import type {
   CohortLearnerDashboard,
 } from "../reporting/reporting.models";
 import { ReportingApiService } from "../reporting/reporting-api.service";
+import { WorkplaceApiService } from "../workplace/workplace-api.service";
+import type { WorkplacePeriodDto } from "../workplace/workplace.models";
 import { SessionService } from "../session/session.service";
 import { TranslateService } from "../i18n/translate.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
@@ -27,6 +29,7 @@ import { WorkspaceContextService } from "../workspace/workspace-context.service"
 @Injectable({ providedIn: "root" })
 export class ReportsApiStoreService {
   private readonly reporting = inject(ReportingApiService);
+  private readonly workplace = inject(WorkplaceApiService);
   private readonly workspace = inject(WorkspaceContextService);
   private readonly session = inject(SessionService);
   private readonly realtime = inject(RealtimeService);
@@ -36,17 +39,45 @@ export class ReportsApiStoreService {
   private readonly promotionIdSignal = signal("");
   private readonly studentsSignal = signal<ReportStudentRow[]>([]);
   private readonly auditSignal = signal<AuditLogItem[]>([]);
+  private readonly internshipPeriodsSignal = signal<WorkplacePeriodDto[]>([]);
+  private readonly internshipEnabledSignal = signal(false);
+  readonly internshipLoading = signal(false);
+  readonly internshipLoadError = signal(false);
+  private internshipRequest = 0;
   readonly loading = signal(false);
   readonly loadError = signal(false);
   private generation = 0;
   private request = 0;
 
-  readonly promotionId = this.promotionIdSignal.asReadonly();
+  // Always expose a value that exists in the rendered <select> options.
+  // Otherwise the native select displays the first option while the report still
+  // uses a stale cohort ID (task-45).
+  readonly promotionId = computed(() => {
+    const options = this.promotions();
+    const requested = this.promotionIdSignal();
+    if (options.some((row) => row.id === requested)) return requested;
+    const globalId = this.text(this.session.promotionId());
+    if (options.some((row) => row.id === globalId)) return globalId;
+    return options[0]?.id ?? "";
+  });
   readonly hasSelectedPromotion = computed(() =>
-    this.promotions().some((row) => row.id === this.promotionIdSignal() && !!row.apiId),
+    this.promotions().some((row) => row.id === this.promotionId() && !!row.apiId),
   );
   readonly students = this.studentsSignal.asReadonly();
   readonly auditLog = this.auditSignal.asReadonly();
+  readonly internshipPeriods = this.internshipPeriodsSignal.asReadonly();
+  readonly internshipPlannedHours = computed(() =>
+    this.round1(this.internshipPeriodsSignal().reduce((sum, p) =>
+      sum + this.number(p.plannedHours), 0)),
+  );
+  readonly internshipCompletedHours = computed(() =>
+    this.round1(this.internshipPeriodsSignal().reduce((sum, p) =>
+      sum + this.number(p.completedHours), 0)),
+  );
+  readonly internshipRemainingHours = computed(() =>
+    this.round1(this.internshipPeriodsSignal().reduce((sum, p) =>
+      sum + Math.max(0, this.number(p.plannedHours) - this.number(p.completedHours)), 0)),
+  );
 
   readonly promotions = computed<ReportPromotionOption[]>(() =>
     this.workspace
@@ -62,7 +93,7 @@ export class ReportsApiStoreService {
   readonly promotionName = computed(
     () =>
       this.promotions().find(
-        (promotion) => promotion.id === this.promotionIdSignal(),
+        (promotion) => promotion.id === this.promotionId(),
       )?.name ?? "",
   );
   readonly totalCompletedHours = computed(() =>
@@ -102,19 +133,29 @@ export class ReportsApiStoreService {
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
       const options = this.promotions();
-      const globalPromotionId = this.text(this.session.promotionId());
-      const current = this.promotionIdSignal();
-      const resolved = options.some((row) => row.id === current)
-        ? current
-        : options.some((row) => row.id === globalPromotionId)
-          ? globalPromotionId
-          : (options[0]?.id ?? "");
-      if (resolved !== current) this.promotionIdSignal.set(resolved);
+      const resolved = this.promotionId();
       const generation = ++this.generation;
       this.studentsSignal.set([]);
       this.auditSignal.set([]);
+      this.internshipPeriodsSignal.set([]);
+      this.internshipLoadError.set(false);
       this.loadError.set(false);
       if (ready) void this.load(generation, resolved);
+    });
+
+    effect(() => {
+      const enabled = this.internshipEnabledSignal();
+      const ready = this.workspace.remoteWorkspaceLoaded();
+      const cohortId = this.promotionId();
+      const generation = this.generation;
+      const request = ++this.internshipRequest;
+      this.internshipPeriodsSignal.set([]);
+      this.internshipLoadError.set(false);
+      if (enabled && ready && cohortId) {
+        void this.loadInternshipPeriods(generation, request, cohortId);
+      } else {
+        this.internshipLoading.set(false);
+      }
     });
 
     effect(() => {
@@ -136,12 +177,45 @@ export class ReportsApiStoreService {
 
   async reload(): Promise<boolean> {
     const generation = ++this.generation;
-    return this.load(generation, this.promotionIdSignal());
+    return this.load(generation, this.promotionId());
+  }
+
+  setInternshipReportEnabled(enabled: boolean): void {
+    this.internshipEnabledSignal.set(enabled);
+  }
+
+  private async loadInternshipPeriods(
+    generation: number,
+    request: number,
+    cohortId: string,
+  ): Promise<void> {
+    const option = this.promotions().find((row) => row.id === cohortId);
+    if (!option?.apiId) return;
+    this.internshipLoading.set(true);
+    try {
+      const periods = await this.workplace.getPeriods(option.apiId);
+      if (generation !== this.generation || request !== this.internshipRequest ||
+          !this.internshipEnabledSignal() || this.promotionId() !== cohortId) return;
+      // The backend scopes the query to the cohort and checks permissions.
+      // Ignore cancelled/deleted periods for the active internship report.
+      this.internshipPeriodsSignal.set((Array.isArray(periods) ? periods : [])
+        .filter((period) => period.cohortId === option.apiId &&
+          period.status !== "cancelled" && period.status !== "deleted"));
+    } catch {
+      if (generation === this.generation && request === this.internshipRequest) {
+        this.internshipPeriodsSignal.set([]);
+        this.internshipLoadError.set(true);
+        this.notifications.error("reports.api.loadFailed", "/rapports");
+      }
+    } finally {
+      if (generation === this.generation && request === this.internshipRequest)
+        this.internshipLoading.set(false);
+    }
   }
 
   async exportExcel(): Promise<boolean> {
     const option = this.promotions().find(
-      (row) => row.id === this.promotionIdSignal(),
+      (row) => row.id === this.promotionId(),
     );
     if (!option?.apiId) {
       this.notifications.error("reports.api.exportFailed", "/rapports");

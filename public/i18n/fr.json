@@ -352,8 +352,7 @@
       "formateur": "Formateur",
       "stagiaire": "Stagiaire",
       "secretariat": "Secrétariat",
-      "jury": "Jury",
-      "pedagogical_manager": "Responsable pédagogique"
+      "jury": "Jury"
     },
     "studentStatus": {
       "good": "En bonne voie",
@@ -1681,7 +1680,13 @@
       "auditFailed": "Impossible de charger le journal d’audit.",
       "exportFailed": "Impossible d’exporter le rapport."
     },
-    "noExportContext": "Sélectionnez une promotion existante avant de lancer un export ou une impression."
+    "noExportContext": "Sélectionnez une promotion existante avant de lancer un export ou une impression.",
+    "internshipLoading": "Chargement des périodes de stage…",
+    "internshipUnavailable": "Impossible de charger les périodes de stage. Les totaux ne sont pas disponibles.",
+    "internshipPlanned": "Heures de stage prévues",
+    "internshipCompleted": "Heures de stage réalisées",
+    "internshipRemaining": "Heures de stage restantes",
+    "internshipEmpty": "Aucune période de stage enregistrée pour cette promotion."
   },
   "statistics": {
     "title": "Statistiques",

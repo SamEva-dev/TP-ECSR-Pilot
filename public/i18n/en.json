@@ -352,8 +352,7 @@
       "formateur": "Trainer",
       "stagiaire": "Trainee",
       "secretariat": "Administration",
-      "jury": "Jury member",
-      "pedagogical_manager": "Educational manager"
+      "jury": "Jury member"
     },
     "studentStatus": {
       "good": "On track",
@@ -1681,7 +1680,13 @@
       "auditFailed": "Could not load the audit log.",
       "exportFailed": "Could not export the report."
     },
-    "noExportContext": "Select an existing cohort before exporting or printing."
+    "noExportContext": "Select an existing cohort before exporting or printing.",
+    "internshipLoading": "Loading internship periods…",
+    "internshipUnavailable": "Unable to load internship periods. Totals are unavailable.",
+    "internshipPlanned": "Planned internship hours",
+    "internshipCompleted": "Completed internship hours",
+    "internshipRemaining": "Remaining internship hours",
+    "internshipEmpty": "No internship periods recorded for this cohort."
   },
   "statistics": {
     "title": "Statistics",

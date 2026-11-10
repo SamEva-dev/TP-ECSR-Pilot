@@ -28,6 +28,12 @@ export class ReportsComponent {
   readonly totalCatchupHours = this.store.totalCatchupHours;
   readonly averageProgress = this.store.averageProgress;
   readonly canSeeAudit = this.store.canSeeAudit;
+  readonly internshipPeriods = this.store.internshipPeriods;
+  readonly internshipPlannedHours = this.store.internshipPlannedHours;
+  readonly internshipCompletedHours = this.store.internshipCompletedHours;
+  readonly internshipRemainingHours = this.store.internshipRemainingHours;
+  readonly internshipLoading = this.store.internshipLoading;
+  readonly internshipLoadError = this.store.internshipLoadError;
 
   get promotions() {
     return this.store.promotions();
@@ -47,6 +53,7 @@ export class ReportsComponent {
 
   selectReport(type: ReportType) {
     this.selectedReport.set(type);
+    this.store.setInternshipReportEnabled(type === "internship");
   }
 
   updatePromotion(event: Event) {
