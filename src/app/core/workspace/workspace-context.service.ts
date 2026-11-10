@@ -444,16 +444,25 @@ export class WorkspaceContextService {
           : defaultSelection && this.isSelectionAccessible(defaultSelection)
             ? defaultSelection
             : this.resolveInitialSelection(key);
-      await this.runtimeData.hydrateWorkspace(
-        dto,
-        selection,
-        () => sequence === this.loadSequence && key === this.sessionKey,
-      );
+      // The workspace bootstrap is the authority for the user's accessible
+      // organization/site/program/cohort. Optional page data must NOT prevent
+      // an authorized trainer from entering the workspace when a secondary
+      // reporting or catalog request fails.
       if (sequence !== this.loadSequence || key !== this.sessionKey) return;
       this.selectionSignal.set(selection);
       this.persist(selection);
       this.remoteWorkspaceLoaded.set(true);
       this.remoteWorkspaceError.set(false);
+      void this.runtimeData.hydrateWorkspace(
+        dto,
+        selection,
+        () => sequence === this.loadSequence && key === this.sessionKey,
+      ).catch(() => {
+        // Keep the validated workspace usable; secondary data may be retried
+        // on navigation/reload. Do not erase the tenant boundary or selection.
+        if (sequence !== this.loadSequence || key !== this.sessionKey) return;
+        this.remoteWorkspaceError.set(true);
+      });
     } catch {
       if (sequence !== this.loadSequence || key !== this.sessionKey) return;
       this.notifications.error("workspace.api.loadFailed", "/accueil");
