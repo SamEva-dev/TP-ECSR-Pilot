@@ -194,8 +194,10 @@ export class DrivingComponent {
     effect(() => {
       const trainers = this.store.trainers();
       const current = this.selectedTrainerId();
-      if (!trainers.some((trainer) => trainer.id === current)) {
-        this.selectedTrainerId.set(trainers[0]?.id ?? "");
+      const self = this.sessionService.session()?.userId ?? "";
+      const preferred = !this.canAssignTrainer() ? self : (trainers.some(t => t.id === self) ? self : trainers[0]?.id ?? "");
+      if (!trainers.some((trainer) => trainer.id === current) || !this.canAssignTrainer()) {
+        if (current !== preferred) this.selectedTrainerId.set(preferred);
       }
     });
 
@@ -239,9 +241,19 @@ export class DrivingComponent {
   readonly selectedStudent = computed(() =>
     this.students.find((student) => student.id === this.selectedStudentId()) ?? { id: "", name: "" },
   );
-  readonly selectedTrainer = computed(() =>
-    this.trainers.find((trainer) => trainer.id === this.selectedTrainerId()) ?? { id: "", name: "" },
-  );
+  readonly selectedTrainer = computed(() => {
+    // A trainer without AssignTrainer must always submit their own authenticated identity.
+    // The server independently enforces this rule (VerifiedTrainerAsync).
+    if (!this.canAssignTrainer()) {
+      const session = this.sessionService.session();
+      return {
+        id: session?.userId ?? "",
+        name: `${session?.firstName ?? ""} ${session?.lastName ?? ""}`.trim()
+          || session?.email || this.trainers.find(t => t.id === session?.userId)?.name || "",
+      };
+    }
+    return this.trainers.find((trainer) => trainer.id === this.selectedTrainerId()) ?? { id: "", name: "" };
+  });
   readonly selectedVehicle = computed(() =>
     this.vehicles.find((vehicle) => vehicle.id === this.selectedVehicleId()) ?? { id: "", label: "" },
   );

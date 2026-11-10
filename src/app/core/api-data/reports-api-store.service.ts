@@ -56,6 +56,8 @@ export class ReportsApiStoreService {
     const options = this.promotions();
     const requested = this.promotionIdSignal();
     if (options.some((row) => row.id === requested)) return requested;
+    const restored = this.restoredPromotion();
+    if (options.some((row) => row.id === restored)) return restored;
     const globalId = this.text(this.session.promotionId());
     if (options.some((row) => row.id === globalId)) return globalId;
     return options[0]?.id ?? "";
@@ -172,7 +174,22 @@ export class ReportsApiStoreService {
   }
 
   selectPromotion(id: string): void {
-    this.promotionIdSignal.set(this.text(id));
+    const selected = this.text(id);
+    if (!this.promotions().some(row => row.id === selected)) return;
+    this.promotionIdSignal.set(selected);
+    const key = this.promotionStorageKey();
+    if (key && typeof sessionStorage !== "undefined") sessionStorage.setItem(key, selected);
+  }
+
+  private promotionStorageKey(): string {
+    const organization = this.text(this.session.session()?.organizationId);
+    return organization ? `pedagora.reports.selectedPromotion.${organization}` : "";
+  }
+
+  private restoredPromotion(): string {
+    const key = this.promotionStorageKey();
+    if (!key || typeof sessionStorage === "undefined") return "";
+    try { return this.text(sessionStorage.getItem(key)); } catch { return ""; }
   }
 
   async reload(): Promise<boolean> {

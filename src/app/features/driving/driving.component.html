@@ -77,7 +77,11 @@
         <div>
           <label class="mb-1.5 block text-[12px] font-semibold text-[#334155]">{{ 'drivingSession.information.trainer' | t }}</label>
           <select [value]="selectedTrainerId()" (change)="updateTrainer($event)" [disabled]="!canAssignTrainer() || isStudent()" class="h-[39px] w-full rounded-[11px] border border-[#dfe5ec] bg-white px-3 text-[12px] outline-none disabled:cursor-not-allowed disabled:bg-[#f5f7fa] disabled:text-[#687589]">
-            @for (trainer of trainers; track trainer.id) {<option [value]="trainer.id">{{ trainer.name }}</option>}
+            @if (!canAssignTrainer() && selectedTrainer().id) {
+              <option [value]="selectedTrainer().id">{{ selectedTrainer().name || selectedTrainer().id }}</option>
+            } @else {
+              @for (trainer of trainers; track trainer.id) {<option [value]="trainer.id">{{ trainer.name }}</option>}
+            }
           </select>
         </div>
         <div>

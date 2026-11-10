@@ -3283,7 +3283,8 @@
       "notFound": {
         "title": "Framework not found",
         "subtitle": "This version does not exist in the demo data."
-      }
+      },
+      "publish": "Publish referential"
     },
     "compare": {
       "button": "Compare",

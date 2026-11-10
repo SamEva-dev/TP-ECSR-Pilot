@@ -6,6 +6,7 @@ import {
   signal,
 } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { AccessPolicyService } from "../../../core/access/access-policy.service";
 import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
@@ -32,6 +33,9 @@ type DetailTab = "overview" | "skills" | "hours" | "stages" | "certification";
 })
 export class ReferentialDetailComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly accessPolicy = inject(AccessPolicyService);
+  readonly canManage = computed(() => this.accessPolicy.can("administration.manage"));
+  readonly publishing = signal(false);
   private readonly programStore = inject(ProgramApiStoreService);
   readonly store = inject(ReferentialApiStoreService);
   readonly referentialId = this.route.snapshot.paramMap.get("id") ?? "";
@@ -89,6 +93,17 @@ export class ReferentialDetailComponent {
         0,
       ) ?? 0,
   );
+
+  async publishDraft(): Promise<void> {
+    const item = this.referential();
+    if (!item || item.status !== "draft" || !this.canManage() || this.publishing()) return;
+    this.publishing.set(true);
+    try {
+      await this.store.publish(item.apiId);
+    } finally {
+      this.publishing.set(false);
+    }
+  }
 
   selectTab(tab: DetailTab): void {
     this.activeTab.set(tab);

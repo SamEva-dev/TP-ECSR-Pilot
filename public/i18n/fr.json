@@ -3283,7 +3283,8 @@
       "notFound": {
         "title": "Référentiel introuvable",
         "subtitle": "Cette version n’existe pas dans les données de démonstration."
-      }
+      },
+      "publish": "Publier le référentiel"
     },
     "compare": {
       "button": "Comparer",
