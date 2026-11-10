@@ -353,7 +353,7 @@
       "stagiaire": "Trainee",
       "secretariat": "Administration",
       "jury": "Jury member",
-      "pedagogicalManager": "Pedagogical manager"
+      "pedagogical_manager": "Educational manager"
     },
     "studentStatus": {
       "good": "On track",
@@ -4957,13 +4957,6 @@
     "sessionTrainer": "No active trainer selected. Assign a trainer before creating the session.",
     "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
     "sessionTime": "End time must be later than start time.",
-    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
-    "completeSession": "Complete session",
-    "juryNoAssignment": "No examination session is currently assigned to you. Check your workspace context or contact the pedagogical manager."
-  },
-  "qaFixAttendance": {
-    "selectSession": "Attendance session",
-    "chooseSession": "Select a session",
-    "noSession": "Select a session explicitly before editing attendance. No session will be chosen automatically."
+    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version."
   }
 }

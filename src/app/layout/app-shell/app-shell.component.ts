@@ -112,6 +112,9 @@ export class AppShellComponent {
   }
 
   roleLabelKey(): string {
+    if (this.access.hasAnyRole("pedagogical_manager")) {
+      return "common.roles.pedagogical_manager";
+    }
     return `common.roles.${this.sessionService.role()}`;
   }
 

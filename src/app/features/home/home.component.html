@@ -42,7 +42,7 @@
           <p class="text-[11px] font-medium uppercase text-[#637083]">
             {{ "home.direction.kpi.students" | t }}
           </p>
-          <p class="mt-2 text-[25px] font-extrabold">{{ students().length }}</p>
+          <p class="mt-2 text-[25px] font-extrabold">{{ metricsAvailable() ? metrics().learners : '—' }}</p>
           <span
             class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#2a64a2] text-white"
             ><i class="ph ph-users-three text-[20px]"></i
@@ -83,7 +83,7 @@
             {{ "home.direction.kpi.completedHours" | t }}
           </p>
           <p class="mt-2 text-[25px] font-extrabold">
-            {{ metrics().completedHours }} h
+            {{ metricsAvailable() ? metrics().completedHours + ' h' : '—' }}
           </p>
           <span
             class="absolute right-4 top-4 grid size-[41px] place-items-center rounded-full bg-[#e4f2ff] text-[#2a64a2]"
@@ -188,7 +188,7 @@
                 {{ "home.direction.hours.completed" | t }}
               </dt>
               <dd class="font-bold text-[#2a64a2]">
-                {{ metrics().completedHours }} h
+                {{ metricsAvailable() ? metrics().completedHours + ' h' : '—' }}
               </dd>
             </div>
             <div class="flex justify-between border-b border-[#e2e7ed] py-2.5">
@@ -401,7 +401,6 @@
                         ? '/fiches'
                         : '/presences'
                   "
-                  [queryParams]="item.type !== 'driving' && item.type !== 'presentation' ? { sessionId: item.id } : null"
                   class="hidden rounded-[11px] border border-[#d9e0e9] px-3 py-2 text-[11px] font-semibold shadow-sm sm:inline-flex"
                   >{{ "common.open" | t }}</a
                 >

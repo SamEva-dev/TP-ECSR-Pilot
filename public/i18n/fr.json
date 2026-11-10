@@ -353,7 +353,7 @@
       "stagiaire": "Stagiaire",
       "secretariat": "Secrétariat",
       "jury": "Jury",
-      "pedagogicalManager": "Responsable pédagogique"
+      "pedagogical_manager": "Responsable pédagogique"
     },
     "studentStatus": {
       "good": "En bonne voie",
@@ -4957,13 +4957,6 @@
     "sessionTrainer": "Aucun formateur actif sélectionné. Affectez un formateur avant de créer la séance.",
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
-    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
-    "completeSession": "Terminer la séance",
-    "juryNoAssignment": "Aucune session d’examen ne vous est actuellement affectée. Vérifiez votre contexte de travail ou contactez le responsable pédagogique."
-  },
-  "qaFixAttendance": {
-    "selectSession": "Séance concernée",
-    "chooseSession": "Choisir une séance",
-    "noSession": "Sélectionne explicitement une séance avant toute saisie : aucune séance ne sera choisie automatiquement."
+    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel."
   }
 }

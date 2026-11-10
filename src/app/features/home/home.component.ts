@@ -49,6 +49,7 @@ export class HomeComponent {
   }));
   readonly students = computed(() => this.dashboard.students());
   readonly metrics = computed(() => this.dashboard.metrics());
+  readonly metricsAvailable = this.dashboard.metricsAvailable;
   readonly studentsToWatch = computed(() =>
     [...this.students()]
       .sort((a, b) => b.catchupHours - a.catchupHours)

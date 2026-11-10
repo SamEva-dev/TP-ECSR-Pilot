@@ -3,6 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { firstValueFrom, forkJoin, of } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { environment } from "../../environments/environment";
+import { SessionService } from "../session/session.service";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import type { WorkspaceBootstrapApi } from "../workspace/workspace-api.service";
 import {
@@ -66,6 +67,7 @@ import { apiCollection } from "./api-response-normalizers";
 export class RuntimeDataLoaderService {
   private contextGeneration = 0;
   private readonly http = inject(HttpClient);
+  private readonly session = inject(SessionService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly api = environment.apiBaseUrl;
 
@@ -199,61 +201,73 @@ export class RuntimeDataLoaderService {
         return of(fallback);
       });
 
-    const requests: Record<string, any> = {
-      referentials: this.http
-        .get<any[]>(`${this.api}/api/v1/referentials`)
-        .pipe(safe([])),
-      programs: this.http
-        .get<any[]>(`${this.api}/api/v1/programs`)
-        .pipe(safe([])),
-      audit: this.http
+    // Workspace hydration is shared by all roles. Never probe endpoints merely
+    // to discover that a trainee or trainer receives 403. The bearer token and
+    // the backend remain authoritative for every permitted request.
+    const permissions = new Set((this.session.session()?.permissions ?? [])
+      .map(permission => permission.toLowerCase()));
+    const can = (...codes: string[]) => codes.some(code =>
+      permissions.has(code.toLowerCase()) ||
+      permissions.has(`pedagora.${code.toLowerCase()}`));
+    const directionRole = (this.session.session()?.roles ?? []).some(role =>
+      /platformadministrator|organizationadministrator|organizationdirection|sitedirection/i.test(role));
+    const requests: Record<string, any> = {};
+    if (can("referentials.view")) {
+      requests["referentials"] = this.http
+        .get<any[]>(`${this.api}/api/v1/referentials`).pipe(safe([]));
+    }
+    if (can("programs.view")) {
+      requests["programs"] = this.http
+        .get<any[]>(`${this.api}/api/v1/programs`).pipe(safe([]));
+    }
+    if (can("audit.view")) {
+      requests["audit"] = this.http
         .get<any>(`${this.api}/api/v1/reporting/audit`, {
           params: new HttpParams().set("pageSize", "100"),
-        })
-        .pipe(safe({ items: [] })),
-    };
+        }).pipe(safe({ items: [] }));
+    }
     if (cohortApiId) {
-      requests["learners"] = this.http
+      if (can("learners.view")) requests["learners"] = this.http
         .get<any[]>(`${this.api}/api/v1/cohorts/${cohortApiId}/learners`)
         .pipe(safe([]));
-      requests["sessions"] = this.http
+      if (can("sessions.view")) requests["sessions"] = this.http
         .get<any[]>(`${this.api}/api/v1/training-sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
         .pipe(safe([]));
-      requests["workplace"] = this.http
+      if (can("workplace.view", "internships.view")) requests["workplace"] = this.http
         .get<any[]>(`${this.api}/api/v1/workplace/periods`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
         .pipe(safe([]));
-      requests["certSessions"] = this.http
+      if (can("certification.view")) requests["certSessions"] = this.http
         .get<any[]>(`${this.api}/api/v1/certification/sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
         .pipe(safe([]));
-      requests["distanceLive"] = this.http
+      if (can("distance-learning.view")) requests["distanceLive"] = this.http
         .get<any[]>(`${this.api}/api/v1/distance-learning/live-sessions`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
         .pipe(safe([]));
-      requests["distanceAsync"] = this.http
+      if (can("distance-learning.view")) requests["distanceAsync"] = this.http
         .get<any[]>(`${this.api}/api/v1/distance-learning/async-modules`, {
           params: new HttpParams().set("cohortId", cohortApiId),
         })
         .pipe(safe([]));
     }
     if (referentialVersionId) {
-      requests["topics"] = this.http
+      if (can("sheets.view")) requests["topics"] = this.http
         .get<any[]>(
           `${this.api}/api/v1/learning/referentials/${referentialVersionId}/topics`,
         )
         .pipe(safe([]));
-      requests["competencies"] = this.http
+      if (can("skills.view")) requests["competencies"] = this.http
         .get<any[]>(
           `${this.api}/api/v1/learning/referentials/${referentialVersionId}/competencies`,
         )
         .pipe(safe([]));
-      requests["certSchemes"] = this.http
+      if (can("certification.view")) requests["certSchemes"] = this.http
         .get<any[]>(`${this.api}/api/v1/certification/schemes`, {
           params: new HttpParams().set(
             "referentialVersionId",
@@ -262,23 +276,23 @@ export class RuntimeDataLoaderService {
         })
         .pipe(safe([]));
     }
-    if (organizationApiId)
+    if (organizationApiId && directionRole && can("statistics.view"))
       requests["orgDashboard"] = this.http
         .get<any>(
           `${this.api}/api/v1/reporting/organizations/${organizationApiId}/dashboard`,
         )
         .pipe(safe(null));
-    if (siteApiId)
+    if (siteApiId && directionRole && can("statistics.view"))
       requests["siteDashboard"] = this.http
         .get<any>(`${this.api}/api/v1/reporting/sites/${siteApiId}/dashboard`)
         .pipe(safe(null));
-    if (cohortApiId)
+    if (cohortApiId && can("statistics.view"))
       requests["cohortDashboard"] = this.http
         .get<any>(
           `${this.api}/api/v1/reporting/cohorts/${cohortApiId}/dashboard`,
         )
         .pipe(safe(null));
-    if (siteApiId)
+    if (siteApiId && can("remote-work.view"))
       requests["remoteWork"] = this.http
         .get<any[]>(`${this.api}/api/v1/workforce/remote-work`, {
           params: new HttpParams().set("siteId", siteApiId),

@@ -43,6 +43,7 @@ export interface HomeStudent {
 }
 
 export interface HomeMetrics {
+  learners: number;
   trainers: number;
   attendanceRate: number;
   completedHours: number;
@@ -89,6 +90,7 @@ export interface HomeNextSession {
 }
 
 const EMPTY_METRICS: HomeMetrics = {
+  learners: 0,
   trainers: 0,
   attendanceRate: 0,
   completedHours: 0,
@@ -149,6 +151,7 @@ export class HomeDashboardApiStoreService {
   readonly openAlerts = this.openAlertsSignal.asReadonly();
   readonly loading = signal(false);
   readonly loadError = signal(false);
+  readonly metricsAvailable = signal(false);
 
   private generation = 0;
   private request = 0;
@@ -200,8 +203,12 @@ export class HomeDashboardApiStoreService {
         role === "formateur"
       ) {
         await this.loadStaff(cohortApiId, generation, request);
-      } else {
+      } else if (role === "stagiaire") {
         await this.loadSelf(cohortApiId, generation, request);
+      } else {
+        // Jury and other restricted roles have no learner-self dashboard.
+        // Do not preload personal reporting endpoints with their credentials.
+        this.resetDataOnly();
       }
       if (generation !== this.generation || request !== this.request)
         return false;
@@ -279,6 +286,9 @@ export class HomeDashboardApiStoreService {
         ? observationsResult.value.map((row) => this.observation(row))
         : [];
 
+    this.metricsAvailable.set(
+      dashboard !== null || (canViewLearners && learnerResult.status === "fulfilled"),
+    );
     this.studentsSignal.set(students);
     this.metricsSignal.set(this.staffMetrics(students, sessions, dashboard));
     this.agendaSignal.set(this.agenda(sessions, students));
@@ -293,7 +303,10 @@ export class HomeDashboardApiStoreService {
   ): Promise<void> {
     const [summaryResult, sessionsResult] = await Promise.allSettled([
       firstValueFrom(this.reporting.myLearnerDashboard(cohortApiId)),
-      this.delivery.list(cohortApiId),
+      (this.session.session()?.permissions ?? []).some(permission =>
+        /^(pedagora\.)?sessions\.view$/i.test(permission))
+        ? this.delivery.list(cohortApiId)
+        : Promise.resolve([]),
     ]);
     if (generation !== this.generation || request !== this.request) return;
 
@@ -313,6 +326,7 @@ export class HomeDashboardApiStoreService {
         ? sessionsResult.value.map((row) => this.sessionRow(row))
         : [];
 
+    this.metricsAvailable.set(summaryResult.status === "fulfilled");
     this.selfStudentSignal.set(student);
     this.studentsSignal.set(student.enrollmentId ? [student] : []);
     this.metricsSignal.set({
@@ -384,15 +398,25 @@ export class HomeDashboardApiStoreService {
       (max, row) => Math.max(max, row.totalSheets),
       0,
     );
+    // The cohort dashboard is the authoritative source for aggregate KPIs.
+    // Detailed learner rows can be unavailable under restricted permissions;
+    // never turn a valid dashboard summary into misleading zero values.
+    const deliveredHours = dashboard
+      ? this.round1(dashboard.deliveredMinutes / 60)
+      : completedHours;
+    const totalPlannedHours = dashboard
+      ? this.round1(dashboard.plannedMinutes / 60)
+      : plannedHours;
     return {
+      learners: dashboard ? dashboard.learners : students.length,
       trainers: trainerNames.size,
       attendanceRate: this.number(dashboard?.attendanceRate),
-      completedHours,
-      remainingHours: Math.max(0, this.round1(plannedHours - completedHours)),
+      completedHours: deliveredHours,
+      remainingHours: Math.max(0, this.round1(totalPlannedHours - deliveredHours)),
       catchupHours,
       progress,
-      totalPlannedHours: plannedHours,
-      volumeDone: this.percent(completedHours, plannedHours),
+      totalPlannedHours,
+      volumeDone: this.percent(deliveredHours, totalPlannedHours),
       sheetCount,
     };
   }
@@ -735,6 +759,7 @@ export class HomeDashboardApiStoreService {
 
   private resetDataOnly(): void {
     this.studentsSignal.set([]);
+    this.metricsAvailable.set(false);
     this.metricsSignal.set({ ...EMPTY_METRICS });
     this.agendaSignal.set([]);
     this.observationsSignal.set([]);
