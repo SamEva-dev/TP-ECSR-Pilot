@@ -232,7 +232,24 @@ export class StudentDetailComponent {
     return status === 'good' ? 'bg-[#d8f8df] text-[#18a547]' : status === 'warning' ? 'bg-[#fff0c9] text-[#8b5e00]' : 'bg-[#ffe1df] text-[#f22b2b]';
   }
   studentStatusKey(): string { return this.detail() ? `students.status.${this.student.status}` : ''; }
-  skillProgress(code: string): number { return this.student.skills[code.toUpperCase() as 'C1' | 'C2' | 'C3' | 'C4'] ?? 0; }
+  // Use the same criterion-level scoring as the Compétences screen. The
+  // reporting summary can lag behind a newly persisted driving evaluation.
+  // Do not treat an old summary value of zero as the actual criterion progress.
+  skillProgress(code: string): number {
+    const definition = this.skillDefinitions.find((item) =>
+      item.code.toUpperCase() === code.toUpperCase());
+    if (definition?.criteria.length) {
+      const levels = definition.criteria.map((criterion) => criterion.level);
+      if (levels.some((level) => level !== 'not_assessed')) {
+        const points = levels.map((level) =>
+          level === 'acquired' ? 100 :
+          level === 'in_progress' ? 60 :
+          level === 'rework' ? 25 : 0);
+        return Math.round(points.reduce<number>((sum, point) => sum + point, 0) / points.length);
+      }
+    }
+    return this.student.skills[code.toUpperCase() as 'C1' | 'C2' | 'C3' | 'C4'] ?? 0;
+  }
   skillCriterionLevel(code: string, index: number): SkillCriterionLevel {
     const skill = this.skillDefinitions.find((item) => item.code.toUpperCase() === code);
     return skill?.criteria[index]?.level ?? 'not_assessed';
@@ -277,18 +294,34 @@ export class StudentDetailComponent {
     const s = detail.summary;
     const hasEnrollment = this.text(detail.enrollmentId) !== '' && this.text(detail.enrollmentId) !== '00000000-0000-0000-0000-000000000000';
     const competencies = s?.competencies ?? {};
+    // The detailed skill criteria are the same source rendered by the Skills tab.
+    // Prefer their assessed levels over a stale reporting aggregate for the
+    // student's header and overview progress (task-47).
+    const skillDefinitions = this.mapSkills(detail);
+    const assessedSkills = skillDefinitions.filter((skill) =>
+      skill.criteria.some((criterion) => criterion.level !== 'not_assessed'));
+    const skillScore = (code: string): number => {
+      const skill = skillDefinitions.find((item) => item.code.toUpperCase() === code);
+      if (!skill?.criteria.length || !skill.criteria.some((criterion) => criterion.level !== 'not_assessed'))
+        return this.number(competencies[code]);
+      return Math.round(skill.criteria.reduce((sum, criterion) =>
+        sum + (criterion.level === 'acquired' ? 100 : criterion.level === 'in_progress' ? 60 : criterion.level === 'rework' ? 25 : 0), 0) / skill.criteria.length);
+    };
+    const overallProgress = assessedSkills.length
+      ? Math.round(skillDefinitions.reduce((sum, skill) => sum + skillScore(skill.code.toUpperCase()), 0) / skillDefinitions.length)
+      : this.number(s?.averageCompetencyProgress);
     const catchup = this.hours(s?.catchupMinutes);
     const status: StudentStatus = catchup >= 10 ? 'late' : catchup > 0 || (s?.reworkTopics ?? 0) > 0 ? 'warning' : 'good';
     const evaluations = this.mapEvaluations(detail);
     const timeline = this.mapTimeline(detail);
     return {
       id: this.text(detail.learnerProfileId), enrollmentId: this.text(detail.enrollmentId), firstName: this.text(detail.firstName), lastName: this.text(detail.lastName),
-      promotionId: this.text(detail.cohortKey), promotionName: this.text(detail.cohortName), progress: this.number(s?.averageCompetencyProgress),
+      promotionId: this.text(detail.cohortKey), promotionName: this.text(detail.cohortName), progress: overallProgress,
       completedHours: this.hours(s?.completedMinutes), catchupHours: catchup, preparedSheets: this.number(s?.preparedTopics), presentedSheets: this.number(s?.presentedTopics),
       validatedSheets: this.number(s?.validatedTopics), status, enrollmentStatus: hasEnrollment ? this.enrollmentStatus(detail.enrollmentStatus) : 'pending', email: this.text(detail.email),
       startDate: hasEnrollment ? this.date(detail.cohortStartDate) : '', expectedEndDate: hasEnrollment ? this.date(detail.cohortEndDate) : '', plannedHours: this.hours(s?.plannedMinutes), absences: this.number(s?.absentCount),
       delays: this.number(s?.lateCount), reworkSheets: this.number(s?.reworkTopics), totalSheets: this.number(s?.totalTopics),
-      skills: { C1: this.number(competencies['C1']), C2: this.number(competencies['C2']), C3: this.number(competencies['C3']), C4: this.number(competencies['C4']) },
+      skills: { C1: skillScore('C1'), C2: skillScore('C2'), C3: skillScore('C3'), C4: skillScore('C4') },
       hours: [
         { key: 'classroom', planned: 0, completed: this.hours(s?.classroomMinutes), catchup: 0 },
         { key: 'driving', planned: 0, completed: this.hours(s?.drivingMinutes), catchup: 0 },

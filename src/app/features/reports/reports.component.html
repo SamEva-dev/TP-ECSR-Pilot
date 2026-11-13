@@ -68,7 +68,7 @@
         class="h-[39px] w-full appearance-none rounded-[11px] border border-[#dbe3eb] bg-white pl-3 pr-9 text-[13px] text-[#475569] outline-none shadow-sm"
       >
         @for (promotion of promotions; track promotion.id) {
-          <option [value]="promotion.id">{{ promotion.name }}</option>
+          <option [value]="promotion.id" [selected]="promotion.id === promotionId()">{{ promotion.name }}</option>
         }
       </select>
       <i

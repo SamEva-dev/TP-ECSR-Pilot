@@ -207,7 +207,11 @@ export class CohortApiStoreService {
         && this.currentFilters().siteId === saved.siteId;
       const missingFromRead = sameContext && !this.rowsSignal().some((row) => row.id === saved.id);
       if (missingFromRead) this.upsert(saved);
-      if (!workspaceReloaded || !refreshed || missingFromRead) {
+      // The POST and returned resource have already been confirmed, and are
+      // retained in the store. A workspace reload may be superseded by a
+      // concurrent context refresh; do not report a failed save in that case.
+      // The user can still refresh the full list independently.
+      if (!workspaceReloaded && !refreshed && !this.rowsSignal().some((row) => row.id === saved.id)) {
         this.notifications.error("promotions.api.refreshFailed", "/promotions");
       }
       // Return the committed server resource, independent of reporting or workspace GET availability.

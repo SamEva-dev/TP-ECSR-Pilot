@@ -37,6 +37,7 @@ export class ReportsApiStoreService {
   private readonly translate = inject(TranslateService);
 
   private readonly promotionIdSignal = signal("");
+  private readonly promotionOrganizationSignal = signal("");
   private readonly studentsSignal = signal<ReportStudentRow[]>([]);
   private readonly auditSignal = signal<AuditLogItem[]>([]);
   private readonly internshipPeriodsSignal = signal<WorkplacePeriodDto[]>([]);
@@ -54,7 +55,9 @@ export class ReportsApiStoreService {
   // uses a stale cohort ID (task-45).
   readonly promotionId = computed(() => {
     const options = this.promotions();
-    const requested = this.promotionIdSignal();
+    const organizationId = this.organizationStorageId();
+    const requested = this.promotionOrganizationSignal() === organizationId
+      ? this.promotionIdSignal() : "";
     if (options.some((row) => row.id === requested)) return requested;
     const restored = this.restoredPromotion();
     if (options.some((row) => row.id === restored)) return restored;
@@ -134,7 +137,6 @@ export class ReportsApiStoreService {
 
     effect(() => {
       const ready = this.workspace.remoteWorkspaceLoaded();
-      const options = this.promotions();
       const resolved = this.promotionId();
       const generation = ++this.generation;
       this.studentsSignal.set([]);
@@ -176,13 +178,21 @@ export class ReportsApiStoreService {
   selectPromotion(id: string): void {
     const selected = this.text(id);
     if (!this.promotions().some(row => row.id === selected)) return;
+    this.promotionOrganizationSignal.set(this.organizationStorageId());
     this.promotionIdSignal.set(selected);
     const key = this.promotionStorageKey();
     if (key && typeof sessionStorage !== "undefined") sessionStorage.setItem(key, selected);
   }
 
+  private organizationStorageId(): string {
+    // Workspace organization is the canonical context of the cohort list. OIDC
+    // session identifiers can be transient while the workspace is restored.
+    return this.text(this.workspace.organization()?.apiId) ||
+      this.text(this.workspace.organization()?.id);
+  }
+
   private promotionStorageKey(): string {
-    const organization = this.text(this.session.session()?.organizationId);
+    const organization = this.organizationStorageId();
     return organization ? `pedagora.reports.selectedPromotion.${organization}` : "";
   }
 
