@@ -1,5 +1,6 @@
 import { Injectable, effect, inject, signal, untracked } from "@angular/core";
 import { firstValueFrom } from "rxjs";
+import { AccessPolicyService } from "../access/access-policy.service";
 import type { StudentStatus } from "../models/app.models";
 import type { StudentDirectoryItem } from "../models/students.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
@@ -23,6 +24,7 @@ export interface StudentInvitationResult {
 @Injectable({ providedIn: "root" })
 export class StudentApiStoreService {
   private readonly profiles = inject(StudentProfileApiService);
+  private readonly access = inject(AccessPolicyService);
   private readonly workspace = inject(WorkspaceContextService);
   private readonly realtime = inject(RealtimeService);
   private readonly reporting = inject(ReportingApiService);
@@ -42,7 +44,7 @@ export class StudentApiStoreService {
       const generation = ++this.generation;
       this.itemsSignal.set([]);
       this.loadError.set(false);
-      if (ready) void this.reload(generation, cohortIds);
+      if (ready && this.access.can("students.view")) void this.reload(generation, cohortIds);
     });
 
     effect(() => {
@@ -59,6 +61,12 @@ export class StudentApiStoreService {
     cohortApiId = this.workspace.contextCohorts().map((item) => item.apiId).join("|"),
   ): Promise<boolean> {
     const request = ++this.request;
+    if (!this.access.can("students.view")) {
+      this.itemsSignal.set([]);
+      this.loadError.set(false);
+      this.loading.set(false);
+      return false;
+    }
     this.loading.set(true);
     try {
       const rows = await firstValueFrom(this.profiles.directory());

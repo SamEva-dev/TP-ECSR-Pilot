@@ -441,7 +441,7 @@ export class CertificationApiStoreService {
     const sessionSchemeId = this.text(this.currentSessionApi()?.schemeId);
     return (
       this.schemesSignal().find((item) => item.id === sessionSchemeId) ??
-      this.schemesSignal()[0] ??
+      this.schemesSignal().find((item) => this.text(item.status).toLowerCase() === "published") ??
       null
     );
   }

@@ -352,7 +352,8 @@
       "formateur": "Formateur",
       "stagiaire": "Stagiaire",
       "secretariat": "Secrétariat",
-      "jury": "Jury"
+      "jury": "Jury",
+      "pedagogical_manager": "Responsable pédagogique"
     },
     "studentStatus": {
       "good": "En bonne voie",
@@ -945,7 +946,25 @@
         "inProgress": "En cours",
         "review": "À revoir"
       },
-      "synthesisTitle": "Synthèse"
+      "synthesisTitle": "Synthèse",
+      "criteria": {
+        "structure": "Structure",
+        "introduction": "Introduction",
+        "hook": "Accroche",
+        "objectives": "Objectifs",
+        "content": "Contenu",
+        "regulation": "Réglementation",
+        "questioningMethod": "Méthode interrogative",
+        "animation": "Animation pédagogique",
+        "timeManagement": "Gestion du temps",
+        "rip": "Risque / Influence / Pression",
+        "review": "Bilan"
+      },
+      "level": {
+        "acquired": "Acquis",
+        "in_progress": "En cours",
+        "review": "À revoir"
+      }
     },
     "titles": {
       "verticalSigns": "La signalisation verticale",
@@ -1020,6 +1039,20 @@
       "invalid": "Choisissez un statut et renseignez une date et une durée valides pour une fiche présentée.",
       "saveFailed": "Échec de l’enregistrement. Vérifiez vos droits et réessayez.",
       "saving": "Enregistrement…"
+    },
+    "preparation": {
+      "action": "Préparation",
+      "open": "Préparer / consulter",
+      "view": "Voir la préparation",
+      "title": "Préparation de la fiche",
+      "close": "Fermer",
+      "content": "Votre préparation pédagogique",
+      "placeholder": "Rédigez votre accroche, vos objectifs, votre déroulement et votre bilan…",
+      "draft": "Enregistrer le brouillon",
+      "submit": "Soumettre au formateur",
+      "submitted": "Préparation soumise — en attente de présentation ou évaluation.",
+      "invalid": "Préparation invalide.",
+      "saveFailed": "Impossible d’enregistrer la préparation."
     }
   },
   "skills": {
@@ -2099,7 +2132,8 @@
       "latestDriving": "Dernières séances",
       "nextGoals": "Prochains objectifs",
       "catchupGoal": "Rattraper {{hours}} h avant la fin du trimestre.",
-      "timelineTitle": "Timeline pédagogique"
+      "timelineTitle": "Timeline pédagogique",
+      "hoursPercent": "{{value}} % des heures prévues réalisées"
     },
     "hours": {
       "planned": "Prévues",
@@ -2663,6 +2697,41 @@
       "saveDecision": "Enregistrer la décision",
       "noCandidates": "Aucun candidat inscrit",
       "success": "Opération enregistrée"
+    },
+    "schemeSetup": {
+      "title": "Configuration des schémas de certification",
+      "help": "Configurez les unités et les épreuves conformément au référentiel applicable. Aucune épreuve n’est créée automatiquement.",
+      "error": "Impossible de terminer l’opération",
+      "select": "Schéma de certification",
+      "none": "Aucun schéma configuré pour cette version du référentiel.",
+      "code": "Code du schéma",
+      "name": "Nom du schéma",
+      "create": "Créer un schéma brouillon",
+      "units": "unités",
+      "steps": "épreuves",
+      "unitCode": "Code unité",
+      "unitTitle": "Titre de l’unité",
+      "addUnit": "Ajouter l’unité",
+      "stepCode": "Code épreuve",
+      "stepTitle": "Titre de l’épreuve",
+      "noUnit": "Sans unité",
+      "duration": "Durée (minutes)",
+      "addStep": "Ajouter l’épreuve",
+      "effectiveFrom": "Applicable à partir du",
+      "effectiveTo": "Applicable jusqu’au (facultatif)",
+      "publish": "Publier le schéma",
+      "published": "Schéma publié : disponible pour la création des sessions.",
+      "blocked": "La création de session nécessite un schéma publié pour la version du référentiel de cette promotion.",
+      "openReferentials": "Configurer le référentiel",
+      "kinds": {
+        "Practical": "Pratique",
+        "TechnicalInterview": "Entretien technique",
+        "ProfessionalQuestionnaire": "Questionnaire professionnel",
+        "Presentation": "Présentation",
+        "ProductionQuestioning": "Questionnement sur production",
+        "FinalInterview": "Entretien final",
+        "Other": "Autre"
+      }
     }
   },
   "jury": {
@@ -4376,7 +4445,11 @@
     "WORKPLACE_DELETE_HAS_EVIDENCE": "Cette période contient des traces pédagogiques et ne peut pas être supprimée.",
     "WORKPLACE_LIFECYCLE_INVALID": "Transition de statut non autorisée.",
     "WORKPLACE_LIFECYCLE_REASON_INVALID": "Un motif de 1 à 500 caractères est obligatoire.",
-    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Historique des notes complet, opération impossible."
+    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Historique des notes complet, opération impossible.",
+    "CERTIFICATION_SCHEME_ALREADY_EXISTS": "Un schéma de certification utilise déjà ce code pour cette version.",
+    "CERTIFICATION_SCHEME_INCOMPLETE": "Ajoutez au moins une unité et une épreuve avant de publier.",
+    "CERTIFICATION_STEP_KIND_INVALID": "Type d’épreuve inconnu. Sélectionnez un type valide.",
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -4641,7 +4714,11 @@
     "SIGNATURE_DUPLICATE_SOURCE": "Une demande existe déjà pour cette version du document ; actualisez la liste.",
     "SIGNATURE_TIME_INVALID": "La chronologie de la demande de signature est invalide.",
     "SIGNATURE_ATTENDANCE_CHANGED": "La feuille ou la séance a été modifiée. Préparez une nouvelle demande à partir du relevé enregistré.",
-    "SIGNATURE_ATTENDANCE_SESSION_NOT_FINISHED": "La séance doit être terminée avant l’envoi d’un émargement."
+    "SIGNATURE_ATTENDANCE_SESSION_NOT_FINISHED": "La séance doit être terminée avant l’envoi d’un émargement.",
+    "CERTIFICATION_SCHEME_ALREADY_EXISTS": "Un schéma de certification utilise déjà ce code pour cette version.",
+    "CERTIFICATION_SCHEME_INCOMPLETE": "Ajoutez au moins une unité et une épreuve avant de publier.",
+    "CERTIFICATION_STEP_KIND_INVALID": "Type d’épreuve inconnu. Sélectionnez un type valide.",
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma."
   },
   "accessPolicy": {
     "readOnly": "Accès en lecture seule"

@@ -352,7 +352,8 @@
       "formateur": "Trainer",
       "stagiaire": "Trainee",
       "secretariat": "Administration",
-      "jury": "Jury member"
+      "jury": "Jury member",
+      "pedagogical_manager": "Pedagogical Manager"
     },
     "studentStatus": {
       "good": "On track",
@@ -945,7 +946,25 @@
         "inProgress": "In progress",
         "review": "Review"
       },
-      "synthesisTitle": "Summary"
+      "synthesisTitle": "Summary",
+      "criteria": {
+        "structure": "Structure",
+        "introduction": "Introduction",
+        "hook": "Opening hook",
+        "objectives": "Objectives",
+        "content": "Content",
+        "regulation": "Regulations",
+        "questioningMethod": "Questioning technique",
+        "animation": "Teaching facilitation",
+        "timeManagement": "Time management",
+        "rip": "Risk / Influence / Pressure",
+        "review": "Review"
+      },
+      "level": {
+        "acquired": "Acquired",
+        "in_progress": "In progress",
+        "review": "Needs review"
+      }
     },
     "titles": {
       "verticalSigns": "Vertical road signs",
@@ -1020,6 +1039,20 @@
       "invalid": "Choose a status and provide a valid date and duration for a presented topic.",
       "saveFailed": "Could not save. Check your access and try again.",
       "saving": "Saving…"
+    },
+    "preparation": {
+      "action": "Preparation",
+      "open": "Prepare / view",
+      "view": "View preparation",
+      "title": "Sheet preparation",
+      "close": "Close",
+      "content": "Your lesson preparation",
+      "placeholder": "Write your opening, objectives, lesson sequence and review…",
+      "draft": "Save draft",
+      "submit": "Submit to trainer",
+      "submitted": "Preparation submitted — awaiting presentation or evaluation.",
+      "invalid": "Invalid preparation.",
+      "saveFailed": "Unable to save preparation."
     }
   },
   "skills": {
@@ -2099,7 +2132,8 @@
       "latestDriving": "Latest sessions",
       "nextGoals": "Next objectives",
       "catchupGoal": "Make up {{hours}} h before the end of the term.",
-      "timelineTitle": "Pedagogical timeline"
+      "timelineTitle": "Pedagogical timeline",
+      "hoursPercent": "{{value}}% of planned hours completed"
     },
     "hours": {
       "planned": "Planned",
@@ -2663,6 +2697,41 @@
       "saveDecision": "Save decision",
       "noCandidates": "No registered candidates",
       "success": "Operation saved"
+    },
+    "schemeSetup": {
+      "title": "Certification scheme setup",
+      "help": "Configure units and assessment steps according to the applicable official framework. No steps are generated automatically.",
+      "error": "The operation could not be completed",
+      "select": "Certification scheme",
+      "none": "No certification scheme configured for this framework version.",
+      "code": "Scheme code",
+      "name": "Scheme name",
+      "create": "Create draft scheme",
+      "units": "units",
+      "steps": "assessment steps",
+      "unitCode": "Unit code",
+      "unitTitle": "Unit title",
+      "addUnit": "Add unit",
+      "stepCode": "Step code",
+      "stepTitle": "Step title",
+      "noUnit": "No unit",
+      "duration": "Duration (minutes)",
+      "addStep": "Add step",
+      "effectiveFrom": "Effective from",
+      "effectiveTo": "Effective to (optional)",
+      "publish": "Publish scheme",
+      "published": "Published scheme: available when creating exam sessions.",
+      "blocked": "Creating a session requires a published scheme for this cohort’s framework version.",
+      "openReferentials": "Configure framework",
+      "kinds": {
+        "Practical": "Practical",
+        "TechnicalInterview": "Technical interview",
+        "ProfessionalQuestionnaire": "Professional questionnaire",
+        "Presentation": "Presentation",
+        "ProductionQuestioning": "Production questioning",
+        "FinalInterview": "Final interview",
+        "Other": "Other"
+      }
     }
   },
   "jury": {
@@ -4376,7 +4445,11 @@
     "WORKPLACE_DELETE_HAS_EVIDENCE": "This placement contains learning evidence and cannot be deleted.",
     "WORKPLACE_LIFECYCLE_INVALID": "Invalid status transition.",
     "WORKPLACE_LIFECYCLE_REASON_INVALID": "A reason of 1 to 500 characters is required.",
-    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Notes history is full; operation rejected."
+    "WORKPLACE_LIFECYCLE_NOTES_FULL": "Notes history is full; operation rejected.",
+    "CERTIFICATION_SCHEME_ALREADY_EXISTS": "A certification scheme with this code already exists for this version.",
+    "CERTIFICATION_SCHEME_INCOMPLETE": "Add at least one unit and one assessment step before publishing.",
+    "CERTIFICATION_STEP_KIND_INVALID": "Unknown assessment step type. Select a valid type.",
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -4641,7 +4714,11 @@
     "SIGNATURE_DUPLICATE_SOURCE": "A request already exists for this document revision; refresh the list.",
     "SIGNATURE_TIME_INVALID": "The signature request timestamps are inconsistent.",
     "SIGNATURE_ATTENDANCE_CHANGED": "The attendance sheet or session has changed. Prepare a new request from the saved record.",
-    "SIGNATURE_ATTENDANCE_SESSION_NOT_FINISHED": "The session must be finished before requesting attendance acknowledgement."
+    "SIGNATURE_ATTENDANCE_SESSION_NOT_FINISHED": "The session must be finished before requesting attendance acknowledgement.",
+    "CERTIFICATION_SCHEME_ALREADY_EXISTS": "A certification scheme with this code already exists for this version.",
+    "CERTIFICATION_SCHEME_INCOMPLETE": "Add at least one unit and one assessment step before publishing.",
+    "CERTIFICATION_STEP_KIND_INVALID": "Unknown assessment step type. Select a valid type.",
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date."
   },
   "accessPolicy": {
     "readOnly": "Read-only access"

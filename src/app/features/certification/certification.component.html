@@ -41,6 +41,13 @@
     }
   </div>
 
+  @if (canManage() && workspace.cohort()?.apiId && !scheme().id) {
+    <aside role="status" class="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+      {{ "certification.schemeSetup.blocked" | t }}
+      <a routerLink="/referentiels" class="ml-2 font-semibold underline">{{ "certification.schemeSetup.openReferentials" | t }}</a>
+    </aside>
+  }
+
   @if (canManage()) {
     <article class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
       <h2 class="text-lg font-bold">{{ "certification.management.createTitle" | t }}</h2>

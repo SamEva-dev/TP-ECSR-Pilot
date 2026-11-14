@@ -460,6 +460,59 @@
     }
 
     @if (activeTab() === "certification") {
+      <article class="mt-4 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+        <h2 class="text-base font-bold">{{ "certification.schemeSetup.title" | t }}</h2>
+        <p class="mt-1 text-sm text-[#64748b]">{{ "certification.schemeSetup.help" | t }}</p>
+        @if (certificationError()) { <p role="alert" class="mt-2 text-sm text-red-700">{{ "certification.schemeSetup.error" | t }} ({{ certificationError() }})</p> }
+        @if (certificationSchemes().length) {
+          <label class="mt-3 block text-sm">{{ "certification.schemeSetup.select" | t }}
+            <select class="mt-1 w-full rounded-lg border p-2" [value]="selectedCertificationId()" (change)="selectedCertificationId.set($any($event.target).value)">
+              @for (scheme of certificationSchemes(); track scheme.id) { <option [value]="scheme.id">{{ scheme.code }} — {{ scheme.name }} ({{ scheme.status }})</option> }
+            </select>
+          </label>
+        } @else {
+          <p class="mt-3 text-sm text-amber-700">{{ "certification.schemeSetup.none" | t }}</p>
+        }
+        @if (canManageCertification()) {
+          <form class="mt-4 grid gap-2 md:grid-cols-3" (ngSubmit)="createCertificationScheme()">
+            <input name="schemeCode" [(ngModel)]="newSchemeCode" required maxlength="80" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.code' | t" />
+            <input name="schemeName" [(ngModel)]="newSchemeName" required maxlength="240" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.name' | t" />
+            <button type="submit" [disabled]="certificationBusy()" class="rounded-lg bg-[#2b66a4] p-2 text-sm font-semibold text-white disabled:opacity-50">{{ "certification.schemeSetup.create" | t }}</button>
+          </form>
+          @if (selectedCertificationScheme(); as scheme) {
+            <div class="mt-4 space-y-3 border-t pt-4">
+              <p class="text-sm font-semibold">{{ scheme.name }} — {{ scheme.units.length }} {{ "certification.schemeSetup.units" | t }}, {{ scheme.steps.length }} {{ "certification.schemeSetup.steps" | t }}</p>
+              @if (scheme.status.toLowerCase() === 'draft') {
+                <form class="grid gap-2 md:grid-cols-3" (ngSubmit)="addCertificationUnit()">
+                  <input name="unitCode" [(ngModel)]="newUnitCode" required maxlength="80" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.unitCode' | t" />
+                  <input name="unitTitle" [(ngModel)]="newUnitTitle" required maxlength="300" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.unitTitle' | t" />
+                  <button type="submit" [disabled]="certificationBusy()" class="rounded-lg border p-2 text-sm font-semibold disabled:opacity-50">{{ "certification.schemeSetup.addUnit" | t }}</button>
+                </form>
+                <form class="grid gap-2 md:grid-cols-3" (ngSubmit)="addCertificationStep()">
+                  <input name="stepCode" [(ngModel)]="newStepCode" required maxlength="100" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.stepCode' | t" />
+                  <input name="stepTitle" [(ngModel)]="newStepTitle" required maxlength="300" class="rounded-lg border p-2 text-sm" [placeholder]="'certification.schemeSetup.stepTitle' | t" />
+                  <select name="stepKind" [(ngModel)]="newStepKind" class="rounded-lg border p-2 text-sm">
+                    @for (kind of ['Practical','TechnicalInterview','ProfessionalQuestionnaire','Presentation','ProductionQuestioning','FinalInterview','Other']; track kind) { <option [value]="kind">{{ 'certification.schemeSetup.kinds.' + kind | t }}</option> }
+                  </select>
+                  <select name="stepUnit" [(ngModel)]="newStepUnitId" class="rounded-lg border p-2 text-sm">
+                    <option value="">{{ "certification.schemeSetup.noUnit" | t }}</option>
+                    @for (unit of scheme.units; track unit.id) { <option [value]="unit.id">{{ unit.code }} — {{ unit.title }}</option> }
+                  </select>
+                  <label class="text-sm">{{ "certification.schemeSetup.duration" | t }} <input type="number" name="stepDuration" [(ngModel)]="newStepDuration" min="1" max="10080" class="w-full rounded-lg border p-2 text-sm" /></label>
+                  <button type="submit" [disabled]="certificationBusy()" class="rounded-lg border p-2 text-sm font-semibold disabled:opacity-50">{{ "certification.schemeSetup.addStep" | t }}</button>
+                </form>
+                <form class="grid gap-2 md:grid-cols-3" (ngSubmit)="publishCertificationScheme()">
+                  <label class="text-sm">{{ "certification.schemeSetup.effectiveFrom" | t }} <input name="effectiveFrom" type="date" [(ngModel)]="effectiveFrom" required class="w-full rounded-lg border p-2 text-sm" /></label>
+                  <label class="text-sm">{{ "certification.schemeSetup.effectiveTo" | t }} <input name="effectiveTo" type="date" [(ngModel)]="effectiveTo" class="w-full rounded-lg border p-2 text-sm" /></label>
+                  <button type="submit" [disabled]="certificationBusy() || !scheme.units.length || !scheme.steps.length" class="rounded-lg bg-[#218653] p-2 text-sm font-semibold text-white disabled:opacity-50">{{ "certification.schemeSetup.publish" | t }}</button>
+                </form>
+              } @else {
+                <p class="text-sm text-emerald-700">{{ "certification.schemeSetup.published" | t }}</p>
+              }
+            </div>
+          }
+        }
+      </article>
       <div class="mt-4 grid gap-4 xl:grid-cols-[.8fr_1.2fr]">
         <article
           class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm"

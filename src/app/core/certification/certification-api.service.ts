@@ -17,6 +17,18 @@ export class CertificationApiService {
       : "";
     return this.http.get<CertificationScheme[]>(`${this.base}/schemes${p}`);
   }
+  createScheme(body: { referentialVersionId: string; code: string; name: string }) {
+    return this.http.post<CertificationScheme>(`${this.base}/schemes`, body);
+  }
+  addSchemeUnit(id: string, body: { code: string; title: string; sortOrder: number }) {
+    return this.http.post<CertificationScheme>(`${this.base}/schemes/${encodeURIComponent(id)}/units`, body);
+  }
+  addSchemeStep(id: string, body: { unitId: string | null; code: string; title: string; kind: string; durationMinutes: number; sortOrder: number }) {
+    return this.http.post<CertificationScheme>(`${this.base}/schemes/${encodeURIComponent(id)}/steps`, body);
+  }
+  publishScheme(id: string, body: { effectiveFrom: string; effectiveTo: string | null }) {
+    return this.http.post<CertificationScheme>(`${this.base}/schemes/${encodeURIComponent(id)}/publish`, body);
+  }
   getSessions(cohortId?: string) {
     const p = cohortId ? `?cohortId=${encodeURIComponent(cohortId)}` : "";
     return this.http.get<CertificationExamSession[]>(
