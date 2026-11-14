@@ -47,6 +47,10 @@ export class CertificationApiService {
       {},
     );
   }
+  assignJury(id: string, body: {authGateUserId: string; displayName: string; role: string}) {
+    return this.http.post<CertificationJuryAssignment>(
+      `${this.base}/sessions/${encodeURIComponent(id)}/jury`, body);
+  }
   getJuryAssignments(id: string) {
     return this.http.get<CertificationJuryAssignment[]>(
       `${this.base}/sessions/${encodeURIComponent(id)}/jury`,

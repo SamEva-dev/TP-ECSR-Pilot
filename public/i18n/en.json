@@ -945,25 +945,7 @@
         "inProgress": "In progress",
         "review": "Review"
       },
-      "synthesisTitle": "Summary",
-      "criteria": {
-        "structure": "Structure",
-        "introduction": "Introduction",
-        "hook": "Opening hook",
-        "objectives": "Objectives",
-        "content": "Content",
-        "regulation": "Regulations",
-        "questioningMethod": "Questioning technique",
-        "animation": "Teaching facilitation",
-        "timeManagement": "Time management",
-        "rip": "Risk / Influence / Pressure",
-        "review": "Review"
-      },
-      "level": {
-        "acquired": "Acquired",
-        "in_progress": "In progress",
-        "review": "Needs review"
-      }
+      "synthesisTitle": "Summary"
     },
     "titles": {
       "verticalSigns": "Vertical road signs",
@@ -1038,20 +1020,6 @@
       "invalid": "Choose a status and provide a valid date and duration for a presented topic.",
       "saveFailed": "Could not save. Check your access and try again.",
       "saving": "Saving…"
-    },
-    "preparation": {
-      "action": "Preparation",
-      "open": "Prepare / view",
-      "view": "View preparation",
-      "title": "Sheet preparation",
-      "close": "Close",
-      "content": "Your lesson preparation",
-      "placeholder": "Write your opening, objectives, lesson sequence and review…",
-      "draft": "Save draft",
-      "submit": "Submit to trainer",
-      "submitted": "Preparation submitted — awaiting presentation or evaluation.",
-      "invalid": "Invalid preparation.",
-      "saveFailed": "Unable to save preparation."
     }
   },
   "skills": {
@@ -2131,8 +2099,7 @@
       "latestDriving": "Latest sessions",
       "nextGoals": "Next objectives",
       "catchupGoal": "Make up {{hours}} h before the end of the term.",
-      "timelineTitle": "Pedagogical timeline",
-      "hoursPercent": "{{value}}% of planned hours completed"
+      "timelineTitle": "Pedagogical timeline"
     },
     "hours": {
       "planned": "Planned",
@@ -2187,7 +2154,7 @@
       }
     },
     "sheets": {
-      "title": "Configured pedagogical sheets",
+      "title": "58 pedagogical sheets",
       "subtitle": "{{prepared}} prepared · {{validated}} validated",
       "columns": {
         "title": "Title",
@@ -2668,6 +2635,34 @@
       "title": "Jury workspace",
       "refresh": "Refresh",
       "empty": "No certification session available."
+    },
+    "management": {
+      "createTitle": "Create certification session",
+      "createHelp": "The session will use the active cohort and published certification scheme.",
+      "title": "Session title",
+      "venue": "Exam venue",
+      "start": "Session start",
+      "end": "Session end",
+      "create": "Create session",
+      "error": "Operation failed",
+      "workflow": "Certification session management",
+      "plan": "Plan session",
+      "registerCandidates": "Register cohort candidates",
+      "publishResults": "Publish results",
+      "juryUser": "Jury AuthGate user ID",
+      "juryRole": "Jury role",
+      "assignJury": "Assign jury",
+      "juryHint": "The user must be an active member of this organization with Jury role.",
+      "candidateManagement": "Candidate eligibility and decisions",
+      "eligible": "Eligible",
+      "ineligible": "Ineligible",
+      "obtained": "Obtained",
+      "failed": "Failed",
+      "partial": "Partial",
+      "absent": "Absent",
+      "saveDecision": "Save decision",
+      "noCandidates": "No registered candidates",
+      "success": "Operation saved"
     }
   },
   "jury": {

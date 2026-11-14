@@ -47,6 +47,57 @@
     </div>
   </div>
 
+  @if (canManageSession() && store.hasSession(routeSessionId)) {
+    <section class="mt-4 rounded-2xl border bg-white p-5" aria-label="Certification management">
+      <h2 class="text-lg font-bold">{{ "certification.management.workflow" | t }}</h2>
+      <div class="mt-3 flex flex-wrap gap-2">
+        @if (canPlan()) {
+          <button type="button" [disabled]="actionBusy()" (click)="plan()" class="rounded-lg bg-[#2b66a4] px-4 py-2 text-white disabled:opacity-50">{{ "certification.management.plan" | t }}</button>
+        }
+        @if (exam().status === "preparation" || exam().status === "ready") {
+          <button type="button" [disabled]="actionBusy()" (click)="registerCandidates()" class="rounded-lg border px-4 py-2 disabled:opacity-50">{{ "certification.management.registerCandidates" | t }}</button>
+        }
+        @if (canManageResults() && (exam().status === "running" || exam().status === "deliberation")) {
+          <button type="button" [disabled]="actionBusy()" (click)="publishResults()" class="rounded-lg border px-4 py-2 disabled:opacity-50">{{ "certification.management.publishResults" | t }}</button>
+        }
+      </div>
+      <form class="mt-4 flex flex-wrap items-end gap-3" (ngSubmit)="assignJury()">
+        <label class="text-sm font-semibold">{{ "certification.management.juryUser" | t }}
+          <input name="juryUser" [(ngModel)]="juryUserId" required placeholder="AuthGate UUID" class="mt-1 block rounded-lg border p-2" />
+        </label>
+        <label class="text-sm font-semibold">{{ "certification.management.juryRole" | t }}
+          <input name="juryRole" [(ngModel)]="juryRole" required maxlength="80" class="mt-1 block rounded-lg border p-2" />
+        </label>
+        <button type="submit" [disabled]="actionBusy()" class="rounded-lg border px-4 py-2 disabled:opacity-50">{{ "certification.management.assignJury" | t }}</button>
+      </form>
+      <p class="mt-1 text-xs text-[#64748b]">{{ "certification.management.juryHint" | t }}</p>
+      <div class="mt-4">
+        <h3 class="font-semibold">{{ "certification.management.candidateManagement" | t }}</h3>
+        @for (candidate of apiCandidates(); track candidate.id) {
+          <div class="mt-2 flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm">
+            <span class="font-semibold">{{ candidate.firstName }} {{ candidate.lastName }} — {{ candidate.candidateNumber }}</span>
+            <span>{{ candidate.status }} · {{ candidate.decision }}</span>
+            <button type="button" [disabled]="actionBusy()" (click)="eligibility(candidate, true)" class="rounded-lg border px-2 py-1 disabled:opacity-50">{{ "certification.management.eligible" | t }}</button>
+            <button type="button" [disabled]="actionBusy()" (click)="eligibility(candidate, false)" class="rounded-lg border px-2 py-1 disabled:opacity-50">{{ "certification.management.ineligible" | t }}</button>
+            @if (canManageResults() && exam().status === "running") {
+              <select #decisionSelect class="rounded-lg border p-1" [disabled]="actionBusy()">
+                <option value="Obtained">{{ "certification.management.obtained" | t }}</option>
+                <option value="Failed">{{ "certification.management.failed" | t }}</option>
+                <option value="Partial">{{ "certification.management.partial" | t }}</option>
+                <option value="Absent">{{ "certification.management.absent" | t }}</option>
+              </select>
+              <button type="button" [disabled]="actionBusy()" (click)="decision(candidate, decisionSelect.value)" class="rounded-lg bg-[#2b66a4] px-2 py-1 text-white disabled:opacity-50">{{ "certification.management.saveDecision" | t }}</button>
+            }
+          </div>
+        } @empty {
+          <p class="mt-2 text-sm text-[#64748b]">{{ "certification.management.noCandidates" | t }}</p>
+        }
+      </div>
+      @if (actionError()) { <p role="alert" class="mt-3 text-sm text-red-700">{{ "certification.management.error" | t }} ({{ actionError() }})</p> }
+      @if (actionInfo()) { <p role="status" class="mt-3 text-sm text-green-700">{{ "certification.management.success" | t }}</p> }
+    </section>
+  }
+
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
     <article
       class="rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"

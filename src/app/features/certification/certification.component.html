@@ -21,7 +21,7 @@
         }}
       </p>
     </div>
-    @if (isManagement()) {
+    @if (canManage()) {
       <div class="flex flex-wrap gap-2">
         <a
           routerLink="/resultats"
@@ -40,6 +40,34 @@
       </div>
     }
   </div>
+
+  @if (canManage()) {
+    <article class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
+      <h2 class="text-lg font-bold">{{ "certification.management.createTitle" | t }}</h2>
+      <p class="mt-1 text-sm text-[#64748b]">{{ "certification.management.createHelp" | t }}</p>
+      <form class="mt-4 grid gap-3 md:grid-cols-2" (ngSubmit)="createExamSession()">
+        <label class="text-sm font-semibold">{{ "certification.management.title" | t }}
+          <input name="sessionTitle" [(ngModel)]="sessionTitle" required maxlength="200" class="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label class="text-sm font-semibold">{{ "certification.management.venue" | t }}
+          <input name="venue" [(ngModel)]="venue" maxlength="300" class="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label class="text-sm font-semibold">{{ "certification.management.start" | t }}
+          <input name="start" [(ngModel)]="startsAt" type="datetime-local" required class="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label class="text-sm font-semibold">{{ "certification.management.end" | t }}
+          <input name="end" [(ngModel)]="endsAt" type="datetime-local" required class="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <div class="md:col-span-2 flex items-center gap-3">
+          <button type="submit" [disabled]="createBusy() || !workspace.cohort()?.apiId || !scheme().id"
+                  class="rounded-lg bg-[#2b66a4] px-4 py-2 font-semibold text-white disabled:opacity-50">
+            {{ "certification.management.create" | t }}
+          </button>
+          @if (createError()) { <span role="alert" class="text-sm text-red-700">{{ "certification.management.error" | t }} ({{ createError() }})</span> }
+        </div>
+      </form>
+    </article>
+  }
 
   <article
     class="mt-5 rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"

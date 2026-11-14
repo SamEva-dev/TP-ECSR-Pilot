@@ -945,25 +945,7 @@
         "inProgress": "En cours",
         "review": "À revoir"
       },
-      "synthesisTitle": "Synthèse",
-      "criteria": {
-        "structure": "Structure",
-        "introduction": "Introduction",
-        "hook": "Accroche",
-        "objectives": "Objectifs",
-        "content": "Contenu",
-        "regulation": "Réglementation",
-        "questioningMethod": "Méthode interrogative",
-        "animation": "Animation pédagogique",
-        "timeManagement": "Gestion du temps",
-        "rip": "Risque / Influence / Pression",
-        "review": "Bilan"
-      },
-      "level": {
-        "acquired": "Acquis",
-        "in_progress": "En cours",
-        "review": "À revoir"
-      }
+      "synthesisTitle": "Synthèse"
     },
     "titles": {
       "verticalSigns": "La signalisation verticale",
@@ -1038,20 +1020,6 @@
       "invalid": "Choisissez un statut et renseignez une date et une durée valides pour une fiche présentée.",
       "saveFailed": "Échec de l’enregistrement. Vérifiez vos droits et réessayez.",
       "saving": "Enregistrement…"
-    },
-    "preparation": {
-      "action": "Préparation",
-      "open": "Préparer / consulter",
-      "view": "Voir la préparation",
-      "title": "Préparation de la fiche",
-      "close": "Fermer",
-      "content": "Votre préparation pédagogique",
-      "placeholder": "Rédigez votre accroche, vos objectifs, votre déroulement et votre bilan…",
-      "draft": "Enregistrer le brouillon",
-      "submit": "Soumettre au formateur",
-      "submitted": "Préparation soumise — en attente de présentation ou évaluation.",
-      "invalid": "Préparation invalide.",
-      "saveFailed": "Impossible d’enregistrer la préparation."
     }
   },
   "skills": {
@@ -2131,8 +2099,7 @@
       "latestDriving": "Dernières séances",
       "nextGoals": "Prochains objectifs",
       "catchupGoal": "Rattraper {{hours}} h avant la fin du trimestre.",
-      "timelineTitle": "Timeline pédagogique",
-      "hoursPercent": "{{value}} % des heures prévues réalisées"
+      "timelineTitle": "Timeline pédagogique"
     },
     "hours": {
       "planned": "Prévues",
@@ -2187,7 +2154,7 @@
       }
     },
     "sheets": {
-      "title": "Fiches pédagogiques configurées",
+      "title": "58 fiches pédagogiques",
       "subtitle": "{{prepared}} préparées · {{validated}} validées",
       "columns": {
         "title": "Titre",
@@ -2668,6 +2635,34 @@
       "title": "Espace jury",
       "refresh": "Actualiser",
       "empty": "Aucune session de certification disponible."
+    },
+    "management": {
+      "createTitle": "Créer une session de certification",
+      "createHelp": "La session sera liée à la promotion active et au référentiel de certification publié.",
+      "title": "Intitulé de la session",
+      "venue": "Lieu de l’examen",
+      "start": "Début de session",
+      "end": "Fin de session",
+      "create": "Créer la session",
+      "error": "Opération impossible",
+      "workflow": "Gestion de la session de certification",
+      "plan": "Planifier la session",
+      "registerCandidates": "Inscrire les candidats de la promotion",
+      "publishResults": "Publier les résultats",
+      "juryUser": "Identifiant AuthGate du jury",
+      "juryRole": "Fonction du jury",
+      "assignJury": "Affecter le jury",
+      "juryHint": "L’utilisateur doit être un membre actif de cette organisation avec le rôle Jury.",
+      "candidateManagement": "Éligibilité et décisions des candidats",
+      "eligible": "Éligible",
+      "ineligible": "Non éligible",
+      "obtained": "Obtenu",
+      "failed": "Non obtenu",
+      "partial": "Partiel",
+      "absent": "Absent",
+      "saveDecision": "Enregistrer la décision",
+      "noCandidates": "Aucun candidat inscrit",
+      "success": "Opération enregistrée"
     }
   },
   "jury": {

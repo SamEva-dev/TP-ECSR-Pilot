@@ -3,8 +3,13 @@ import {
   Component,
   computed,
   inject,
+  signal,
 } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { firstValueFrom } from "rxjs";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
+import { CertificationApiService } from "../../core/certification/certification-api.service";
 import { CertificationApiStoreService } from "../../core/api-data/certification-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type {
@@ -17,11 +22,21 @@ import { ProgressBarComponent } from "../../shared/ui/progress-bar.component";
 
 @Component({
   selector: "app-certification",
-  imports: [RouterLink, TranslatePipe, ProgressBarComponent],
+  imports: [RouterLink, FormsModule, TranslatePipe, ProgressBarComponent],
   templateUrl: "./certification.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CertificationComponent {
+  private readonly api = inject(CertificationApiService);
+  private readonly access = inject(AccessPolicyService);
+  private readonly router = inject(Router);
+  readonly canManage = computed(() => this.access.can("certification.manage"));
+  readonly createBusy = signal(false);
+  readonly createError = signal("");
+  sessionTitle = "";
+  startsAt = "";
+  endsAt = "";
+  venue = "";
   readonly sessionService = inject(SessionService);
   readonly store = inject(CertificationApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
@@ -54,6 +69,39 @@ export class CertificationComponent {
     }
     return candidates[0] ?? null;
   });
+
+  async createExamSession(): Promise<void> {
+    if (!this.canManage() || this.createBusy()) return;
+    const cohortId = this.workspace.cohort()?.apiId;
+    const schemeId = this.scheme().id;
+    const title = this.sessionTitle.trim();
+    const start = Date.parse(this.startsAt);
+    const end = Date.parse(this.endsAt);
+    if (!cohortId || !schemeId || !title || !Number.isFinite(start) ||
+        !Number.isFinite(end) || end <= start) {
+      this.createError.set("validation");
+      return;
+    }
+    this.createBusy.set(true);
+    this.createError.set("");
+    try {
+      const session = await firstValueFrom(this.api.createSession({
+        cohortId, schemeId, title,
+        startsAtUtc: new Date(start).toISOString(),
+        endsAtUtc: new Date(end).toISOString(),
+        venue: this.venue.trim() || null,
+      }));
+      if (this.workspace.cohort()?.apiId !== cohortId) return;
+      if (!session?.id || session.cohortId !== cohortId) throw new Error("INVALID_SESSION_RESPONSE");
+      await this.store.reload(false);
+      await this.store.selectSession(session.id);
+      await this.router.navigate(['/certification/sessions', session.id]);
+    } catch (error: unknown) {
+      this.createError.set(String((error as {error?: {code?:string}})?.error?.code || "request"));
+    } finally {
+      this.createBusy.set(false);
+    }
+  }
 
   get examSession() {
     return this.store.examSession();
