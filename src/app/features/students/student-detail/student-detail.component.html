@@ -94,8 +94,8 @@
               </p>
               <p class="mt-1 text-[12px] text-[#748094]">
                 {{
-                  "studentDetail.overview.pathPercent"
-                    | t: { value: s.progress }
+                  "studentDetail.overview.hoursPercent"
+                    | t: { value: hoursCompletionPercent(s.completedHours, s.plannedHours) }
                 }}
               </p>
             </article>

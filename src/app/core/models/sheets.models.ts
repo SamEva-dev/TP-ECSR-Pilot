@@ -40,6 +40,7 @@ export interface PedagogicalSheet {
   titleKey: string;
   status: SheetStatus;
   preparationDate: string;
+  preparationContent: string;
   presentationDate: string;
   durationMinutes: number;
   evaluator: string;

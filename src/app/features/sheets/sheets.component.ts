@@ -34,6 +34,12 @@ export class SheetsComponent {
   readonly statusFilter = signal<"all" | SheetStatus>("all");
   readonly selectedStudentId = signal("");
   readonly evaluationOpen = signal(false);
+  readonly preparationTopicId = signal("");
+  readonly preparationContent = signal("");
+  readonly preparationSaving = signal(false);
+  readonly preparationTopic = computed(() => this.allSheets().find(item => item.topicId === this.preparationTopicId()));
+  readonly preparationEditable = computed(() => this.isStudent() &&
+    ["not_started", "in_progress", "rework"].includes(this.preparationTopic()?.status ?? ""));
   readonly sheetTotal = this.store.sheetTotal;
 
   constructor() {
@@ -141,6 +147,30 @@ export class SheetsComponent {
       default:
         return "bg-[#f0f3f7] text-[#687589]";
     }
+  }
+
+  openPreparation(topicId: string): void {
+    const topic = this.allSheets().find(item => item.topicId === topicId);
+    if (!topic) return;
+    this.preparationTopicId.set(topicId);
+    this.preparationContent.set(topic.preparationContent);
+  }
+
+  closePreparation(): void {
+    this.preparationTopicId.set("");
+  }
+
+  updatePreparation(event: Event): void {
+    this.preparationContent.set((event.target as HTMLTextAreaElement).value);
+  }
+
+  async savePreparation(submit: boolean): Promise<void> {
+    const topicId = this.preparationTopicId();
+    if (!topicId || this.preparationSaving()) return;
+    this.preparationSaving.set(true);
+    try {
+      if (await this.store.savePreparation(topicId, this.preparationContent(), submit)) this.closePreparation();
+    } finally { this.preparationSaving.set(false); }
   }
 
   openEvaluation(): void {

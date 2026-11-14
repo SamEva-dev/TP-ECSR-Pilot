@@ -650,7 +650,7 @@ export class AdministrationComponent {
     window.setTimeout(() => target.set(false), 1800);
   }
   private mapAudit(x: AuditEntry): OrganizationAuditEntry {
-    const actor = x?.userDisplayName?.trim() || "";
+    const actor = x?.userDisplayName?.trim() || x?.userId?.trim() || "";
     const initials = actor
       .split(/\s+/)
       .filter(Boolean)

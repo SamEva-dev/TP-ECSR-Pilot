@@ -95,6 +95,7 @@ export class StudentDetailComponent {
   readonly isSelfView = computed(() => this.sessionService.role() === 'stagiaire');
   readonly completedHours = computed(() => this.student?.completedHours ?? 0);
   readonly remainingHours = computed(() => Math.max((this.student?.plannedHours ?? 0) - this.completedHours(), 0));
+  hoursCompletionPercent(completed: number, planned: number): number { return planned > 0 ? Math.min(100, Math.round(completed / planned * 100)) : 0; }
 
   get student(): StudentDetailProfile { return this.mapStudent(this.detail()); }
   get skillDefinitions(): SkillDefinition[] { return this.mapSkills(this.detail()); }
@@ -320,7 +321,7 @@ export class StudentDetailComponent {
       completedHours: this.hours(s?.completedMinutes), catchupHours: catchup, preparedSheets: this.number(s?.preparedTopics), presentedSheets: this.number(s?.presentedTopics),
       validatedSheets: this.number(s?.validatedTopics), status, enrollmentStatus: hasEnrollment ? this.enrollmentStatus(detail.enrollmentStatus) : 'pending', email: this.text(detail.email),
       startDate: hasEnrollment ? this.date(detail.cohortStartDate) : '', expectedEndDate: hasEnrollment ? this.date(detail.cohortEndDate) : '', plannedHours: this.hours(s?.plannedMinutes), absences: this.number(s?.absentCount),
-      delays: this.number(s?.lateCount), reworkSheets: this.number(s?.reworkTopics), totalSheets: this.number(s?.totalTopics),
+      delays: this.number(s?.lateCount), reworkSheets: this.number(s?.reworkTopics), totalSheets: detail.topics ? detail.topics.length : this.number(s?.totalTopics),
       skills: { C1: skillScore('C1'), C2: skillScore('C2'), C3: skillScore('C3'), C4: skillScore('C4') },
       hours: [
         { key: 'classroom', planned: 0, completed: this.hours(s?.classroomMinutes), catchup: 0 },
@@ -346,7 +347,7 @@ export class StudentDetailComponent {
     return [...map.entries()].map(([id, labelKey]) => ({ id, labelKey }));
   }
   private mapSheets(detail: LearnerDetailReport | null): PedagogicalSheet[] {
-    return (detail?.topics ?? []).map((topic) => ({ topicId: this.text(topic.id), number: this.number(topic.number), titleKey: this.text(topic.title), status: this.sheetStatus(topic.status), preparationDate: this.text(topic.preparationDate), presentationDate: this.text(topic.presentationDate), durationMinutes: 0, evaluator: '', commentKey: '', positivePoints: '', improvements: '', generalComment: '', nextObjective: '', evaluationLevels: {} }));
+    return (detail?.topics ?? []).map((topic) => ({ topicId: this.text(topic.id), number: this.number(topic.number), titleKey: this.text(topic.title), status: this.sheetStatus(topic.status), preparationDate: this.text(topic.preparationDate), preparationContent: this.text((topic as { preparationContent?: unknown }).preparationContent), presentationDate: this.text(topic.presentationDate), durationMinutes: 0, evaluator: '', commentKey: '', positivePoints: '', improvements: '', generalComment: '', nextObjective: '', evaluationLevels: {} }));
   }
   private mapDriving(detail: LearnerDetailReport | null): DrivingHistoryItem[] {
     const studentName = `${this.text(detail?.firstName)} ${this.text(detail?.lastName)}`.trim();

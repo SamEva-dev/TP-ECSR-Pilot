@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <h1 class="ecsr-page-title">
-        {{ "sheets.title" | t }}
+        {{ "sheets.title" | t }} ({{ sheetTotal() }})
       </h1>
       <p class="ecsr-page-subtitle">
         {{
@@ -188,6 +188,7 @@
               {{ "sheets.table.evaluator" | t }}
             </th>
             <th class="w-[125px] pb-2">{{ "sheets.table.status" | t }}</th>
+            <th class="pb-2">{{ "sheets.preparation.action" | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -227,6 +228,12 @@
                   >{{ statusLabelKey(sheet.status) | t }}</span
                 >
               </td>
+              <td class="py-3">
+                <button type="button" (click)="openPreparation(sheet.topicId)"
+                  class="rounded-lg border border-[#cbd5e1] px-3 py-1.5 font-semibold text-[#245783] hover:bg-[#eff6ff]">
+                  {{ (isStudent() ? "sheets.preparation.open" : "sheets.preparation.view") | t }}
+                </button>
+              </td>
             </tr>
           }
         </tbody>
@@ -252,4 +259,38 @@
     [initialStudentId]="selectedStudentId()"
     (closed)="closeEvaluation()"
   />
+}
+
+@if (preparationTopic(); as selected) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#172033]/55 p-4" role="dialog" aria-modal="true"
+       [attr.aria-label]="'sheets.preparation.title' | t">
+    <section class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold">{{ 'sheets.preparation.title' | t }}</h2>
+          <p class="mt-1 text-sm text-[#64748b]">{{ selected.titleKey | t }}</p>
+        </div>
+        <button type="button" (click)="closePreparation()" class="rounded-lg p-2" [attr.aria-label]="'sheets.preparation.close' | t">✕</button>
+      </div>
+      <label class="mt-5 block text-sm font-semibold" for="sheet-preparation-content">{{ 'sheets.preparation.content' | t }}</label>
+      <textarea id="sheet-preparation-content" rows="12" maxlength="8000"
+        class="mt-2 w-full rounded-xl border border-[#cbd5e1] p-3 text-sm outline-none focus:border-[#3979bd]"
+        [value]="preparationContent()" (input)="updatePreparation($event)"
+        [readonly]="!preparationEditable()"
+        [placeholder]="'sheets.preparation.placeholder' | t"></textarea>
+      <p class="mt-1 text-right text-xs text-[#64748b]">{{ preparationContent().length }} / 8000</p>
+      @if (selected.status === 'ready') {
+        <p class="mt-2 text-sm text-[#245783]">{{ 'sheets.preparation.submitted' | t }}</p>
+      }
+      <div class="mt-5 flex flex-wrap justify-end gap-2">
+        <button type="button" (click)="closePreparation()" class="rounded-xl border px-4 py-2">{{ 'sheets.preparation.close' | t }}</button>
+        @if (preparationEditable()) {
+          <button type="button" (click)="savePreparation(false)" [disabled]="preparationSaving()"
+            class="rounded-xl border border-[#3979bd] px-4 py-2 text-[#245783] disabled:opacity-50">{{ 'sheets.preparation.draft' | t }}</button>
+          <button type="button" (click)="savePreparation(true)" [disabled]="preparationSaving() || !preparationContent().trim()"
+            class="rounded-xl bg-[#245783] px-4 py-2 font-semibold text-white disabled:opacity-50">{{ 'sheets.preparation.submit' | t }}</button>
+        }
+      </div>
+    </section>
+  </div>
 }

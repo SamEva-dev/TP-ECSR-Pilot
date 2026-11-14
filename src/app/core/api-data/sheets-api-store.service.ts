@@ -164,6 +164,31 @@ export class SheetsApiStoreService {
     );
   }
 
+  async savePreparation(topicId: string, content: string, submit: boolean): Promise<boolean> {
+    const enrollmentId = this.selectedEnrollmentSignal();
+    if (this.session.role() !== "stagiaire" || !enrollmentId || !topicId ||
+        !this.topicById(topicId) || content.length > 8000 || (submit && !content.trim())) {
+      this.notifications.error("sheets.preparation.invalid", "/fiches");
+      return false;
+    }
+    try {
+      const updated = await firstValueFrom(this.api.saveTopicPreparation(enrollmentId, topicId, content, submit));
+      const mapped = this.mapTopic(updated);
+      ++this.topicsGeneration;
+      this.topicsLoading.set(false);
+      this.topicsSignal.update(items => items.map(item => item.topicId === topicId ? mapped : item));
+      this.topicsError.set(false);
+      return true;
+    } catch {
+      this.notifications.error("sheets.preparation.saveFailed", "/fiches");
+      return false;
+    }
+  }
+
+  private topicById(id: string): PedagogicalSheet | undefined {
+    return this.topicsSignal().find(item => item.topicId === id);
+  }
+
   async saveEvaluation(
     value: SaveSheetEvaluationValue,
   ): Promise<PedagogicalSheet | null> {
@@ -356,6 +381,7 @@ export class SheetsApiStoreService {
       titleKey: this.text(row?.title),
       status: this.status(row?.status),
       preparationDate: this.text(row?.preparationDate),
+      preparationContent: this.text(row?.preparationContent),
       presentationDate: this.text(row?.presentationDate),
       durationMinutes: this.number(row?.presentationDurationMinutes),
       evaluator: this.text(row?.evaluatorDisplayName),

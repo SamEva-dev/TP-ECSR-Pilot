@@ -66,6 +66,7 @@ export interface TopicProgressApi {
   category: string;
   status: string;
   preparationDate: string | null;
+  preparationContent?: string | null;
   presentationDate: string | null;
   presentationDurationMinutes: number | null;
   evaluatorDisplayName: string | null;
@@ -79,6 +80,7 @@ export interface TopicProgressApi {
 export interface UpdateTopicProgressApiRequest {
   status: string;
   preparationDate: string | null;
+  preparationContent?: string | null;
   presentationDate: string | null;
   presentationDurationMinutes: number | null;
   evaluatorDisplayName: null;
@@ -192,6 +194,12 @@ export class StudentProfileApiService {
   cohortLearners(cohortId: string) {
     return this.http.get<LearnerProfileApi[]>(
       `${this.base}/api/v1/cohorts/${encodeURIComponent(cohortId)}/learners`,
+    );
+  }
+  saveTopicPreparation(enrollmentId: string, topicId: string, content: string, submit: boolean) {
+    return this.http.put<TopicProgressApi>(
+      `${this.base}/api/v1/learning/enrollments/${encodeURIComponent(enrollmentId)}/topics/${encodeURIComponent(topicId)}/preparation`,
+      { content, submit },
     );
   }
   updateTopic(

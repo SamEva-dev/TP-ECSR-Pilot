@@ -945,7 +945,25 @@
         "inProgress": "In progress",
         "review": "Review"
       },
-      "synthesisTitle": "Summary"
+      "synthesisTitle": "Summary",
+      "criteria": {
+        "structure": "Structure",
+        "introduction": "Introduction",
+        "hook": "Opening hook",
+        "objectives": "Objectives",
+        "content": "Content",
+        "regulation": "Regulations",
+        "questioningMethod": "Questioning technique",
+        "animation": "Teaching facilitation",
+        "timeManagement": "Time management",
+        "rip": "Risk / Influence / Pressure",
+        "review": "Review"
+      },
+      "level": {
+        "acquired": "Acquired",
+        "in_progress": "In progress",
+        "review": "Needs review"
+      }
     },
     "titles": {
       "verticalSigns": "Vertical road signs",
@@ -1020,6 +1038,20 @@
       "invalid": "Choose a status and provide a valid date and duration for a presented topic.",
       "saveFailed": "Could not save. Check your access and try again.",
       "saving": "Saving…"
+    },
+    "preparation": {
+      "action": "Preparation",
+      "open": "Prepare / view",
+      "view": "View preparation",
+      "title": "Sheet preparation",
+      "close": "Close",
+      "content": "Your lesson preparation",
+      "placeholder": "Write your opening, objectives, lesson sequence and review…",
+      "draft": "Save draft",
+      "submit": "Submit to trainer",
+      "submitted": "Preparation submitted — awaiting presentation or evaluation.",
+      "invalid": "Invalid preparation.",
+      "saveFailed": "Unable to save preparation."
     }
   },
   "skills": {
@@ -2099,7 +2131,8 @@
       "latestDriving": "Latest sessions",
       "nextGoals": "Next objectives",
       "catchupGoal": "Make up {{hours}} h before the end of the term.",
-      "timelineTitle": "Pedagogical timeline"
+      "timelineTitle": "Pedagogical timeline",
+      "hoursPercent": "{{value}}% of planned hours completed"
     },
     "hours": {
       "planned": "Planned",
@@ -2154,7 +2187,7 @@
       }
     },
     "sheets": {
-      "title": "58 pedagogical sheets",
+      "title": "Configured pedagogical sheets",
       "subtitle": "{{prepared}} prepared · {{validated}} validated",
       "columns": {
         "title": "Title",

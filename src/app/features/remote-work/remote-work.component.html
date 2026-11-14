@@ -120,12 +120,11 @@
               <option value="all">
                 {{ "remoteWork.filters.allSites" | t }}
               </option>
-              <option [value]="siteFilterOptions()[0]?.id ?? ''">
-                {{ siteFilterOptions()[0]?.name ?? "" }}
-              </option>
-              <option [value]="siteFilterOptions()[1]?.id ?? ''">
-                {{ siteFilterOptions()[1]?.name ?? "" }}
-              </option></select
+              @for (site of siteFilterOptions(); track site.id) {
+                @if (site.id && site.name?.trim()) {
+                  <option [value]="site.id">{{ site.name }}</option>
+                }
+              }</select
             ><select
               [value]="statusFilter()"
               (change)="setStatusFilter($event)"
