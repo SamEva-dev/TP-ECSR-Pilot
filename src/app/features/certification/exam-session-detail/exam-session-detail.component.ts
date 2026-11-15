@@ -33,6 +33,7 @@ export class ExamSessionDetailComponent {
   readonly actionError = signal("");
   readonly actionInfo = signal("");
   readonly apiCandidates = signal<ApiCandidate[]>([]);
+  private apiCandidateLoadEpoch = 0;
   juryUserId = "";
   juryRole = "Examiner";
   decisionComment = "";
@@ -68,8 +69,18 @@ export class ExamSessionDetailComponent {
   constructor() {
     if (this.routeSessionId && this.canManageJury()) {
       this.loadJuryAssignments();
-      void this.loadApiCandidates();
     }
+    // The route is constructed before the asynchronous workspace/session GET completes.
+    // Load persisted candidate management data once the requested session is hydrated,
+    // and again after a context reload rather than relying on the constructor timing.
+    effect(() => {
+      const loaded = !this.store.loading();
+      const selected = this.exam().id === this.routeSessionId;
+      const authorized = this.canManageSession();
+      if (loaded && selected && authorized && this.store.hasSession(this.routeSessionId)) {
+        void this.loadApiCandidates();
+      }
+    });
     // Route activation may precede asynchronous loading of the cohort sessions.
     effect(() => {
       if (
@@ -98,12 +109,18 @@ export class ExamSessionDetailComponent {
 
   async loadApiCandidates(): Promise<void> {
     if (!this.routeSessionId || !this.canManageSession()) return;
+    const epoch = ++this.apiCandidateLoadEpoch;
+    const cohortId = this.workspace.cohort()?.apiId;
     try {
       const result = await firstValueFrom(this.certificationApi.getCandidates(this.routeSessionId));
-      if (this.workspace.cohort()?.apiId && this.store.hasSession(this.routeSessionId)) {
+      if (epoch === this.apiCandidateLoadEpoch && cohortId &&
+          cohortId === this.workspace.cohort()?.apiId &&
+          this.store.hasSession(this.routeSessionId)) {
         this.apiCandidates.set(result.filter(x => x.examSessionId === this.routeSessionId));
       }
-    } catch { this.actionError.set("load"); }
+    } catch {
+      if (epoch === this.apiCandidateLoadEpoch) this.actionError.set("load");
+    }
   }
 
   private async runAction(action: () => Promise<unknown>, infoKey: string): Promise<void> {

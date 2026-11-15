@@ -229,12 +229,20 @@ export class CertificationApiStoreService {
       return true;
     } catch (error: unknown) {
       if (this.text(this.workspace.cohort()?.apiId) === cohortId) {
-        const status = (error as { status?: number } | null)?.status;
+        const response = error as { status?: number; error?: { code?: string } } | null;
+        const status = response?.status;
+        const code = response?.error?.code;
         const key = status === 403
           ? "certification.api.startForbidden"
-          : status === 409
-            ? "certification.api.startConflict"
-            : "certification.api.startFailed";
+          : status === 409 && code === "CERTIFICATION_JURY_REQUIRED_TO_START"
+            ? "certification.api.startJuryRequired"
+            : status === 409 && code === "CERTIFICATION_CANDIDATES_REQUIRED_TO_START"
+              ? "certification.api.startCandidatesRequired"
+              : status === 409 && code === "CERTIFICATION_CANDIDATES_NOT_READY_TO_START"
+                ? "certification.api.startCandidatesNotReady"
+                : status === 409
+                  ? "certification.api.startConflict"
+                  : "certification.api.startFailed";
         this.notifications.error(key, `/certification/sessions/${encodeURIComponent(id)}`);
         if (status === 409) void this.reload(false);
       }
