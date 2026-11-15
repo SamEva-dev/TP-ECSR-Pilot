@@ -2755,7 +2755,9 @@
     },
     "multiSubtitle": "{{program}} session · {{scheme}}. Only candidates and criteria for this certification are shown.",
     "examSteps": "Exams",
-    "schemeTitle": "Assessment scheme"
+    "schemeTitle": "Assessment scheme",
+    "mySessions": "My assigned sessions",
+    "noCandidates": "No candidates registered for this session."
   },
   "results": {
     "title": "Certification results",
@@ -5074,6 +5076,7 @@
     "sessionTrainer": "No active trainer selected. Assign a trainer before creating the session.",
     "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
     "sessionTime": "End time must be later than start time.",
-    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version."
+    "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
+    "juryNoAssignment": "No certification session is assigned to you."
   }
 }

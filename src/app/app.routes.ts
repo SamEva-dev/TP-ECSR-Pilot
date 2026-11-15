@@ -310,6 +310,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "jury/candidats/:id",
+        canActivate: [roleGuard],
+        data: { permission: "jury.view", membershipRoles: ["jury"] },
+        loadComponent: () =>
+          import("./features/certification/candidate-certification/candidate-certification.component").then(
+            (m) => m.CandidateCertificationComponent,
+          ),
+      },
+      {
         path: "jury",
         canActivate: [roleGuard],
         data: { permission: "jury.view", membershipRoles: ["jury"] },

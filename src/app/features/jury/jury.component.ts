@@ -1,12 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, computed } from "@angular/core";
 import { RouterLink } from "@angular/router";
+import { CertificationApiStoreService } from "../../core/api-data/certification-api-store.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
-import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 
 @Component({
   selector: "app-jury",
@@ -15,15 +10,15 @@ import { ContextualTrainingDataService } from "../../core/workspace/contextual-t
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JuryComponent {
-  readonly contextData = inject(ContextualTrainingDataService);
-  readonly exam = this.contextData.examSession;
-  readonly candidates = this.contextData.certificationCandidates;
-  readonly scheme = this.contextData.certificationScheme;
-  readonly program = this.contextData.program;
-  readonly juryMembers = this.contextData.juryMembers;
-  readonly jury = computed(() => this.juryMembers()[0]);
+  readonly store = inject(CertificationApiStoreService);
+  readonly sessions = this.store.jurySessions;
+  readonly selectedId = this.store.selectedJurySessionId;
+  readonly session = this.store.examSession;
+  readonly candidates = this.store.candidates;
+  readonly scheme = this.store.scheme;
+  readonly hasAssignment = computed(() => this.sessions().length > 0);
 
-  initials(item: { firstName: string; lastName: string }): string {
-    return `${item.firstName[0] ?? ""}${item.lastName[0] ?? ""}`.toUpperCase();
+  async selectSession(id: string): Promise<void> {
+    await this.store.selectSession(id);
   }
 }

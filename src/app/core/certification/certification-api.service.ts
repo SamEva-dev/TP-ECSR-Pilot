@@ -35,6 +35,15 @@ export class CertificationApiService {
       `${this.base}/sessions${p}`,
     );
   }
+  getMyJurySessions() {
+    return this.http.get<CertificationExamSession[]>(`${this.base}/jury/sessions`);
+  }
+  getMyJurySchemes() {
+    return this.http.get<CertificationScheme[]>(`${this.base}/jury/schemes`);
+  }
+  getMyJuryCandidates(id: string) {
+    return this.http.get<CertificationCandidate[]>(`${this.base}/jury/sessions/${encodeURIComponent(id)}/candidates`);
+  }
   createSession(body: unknown) {
     return this.http.post<CertificationExamSession>(
       `${this.base}/sessions`,

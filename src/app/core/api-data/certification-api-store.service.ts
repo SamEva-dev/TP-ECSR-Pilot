@@ -130,6 +130,8 @@ export class CertificationApiStoreService {
     })),
   );
 
+  readonly jurySessions = computed(() => this.sessionsSignal().map(x => this.mapSession(x)));
+  readonly selectedJurySessionId = this.selectedSessionIdSignal.asReadonly();
   readonly selfEnrollmentId = this.selfEnrollmentIdSignal.asReadonly();
 
   constructor() {
@@ -150,7 +152,9 @@ export class CertificationApiStoreService {
       this.selfEnrollmentIdSignal.set("");
       this.loadError.set(false);
       this.loading.set(false);
-      if (ready && cohortApiId)
+      if (ready && this.session.role() === "jury")
+        void this.loadJuryContext();
+      else if (ready && cohortApiId)
         void this.loadContext(cohortApiId, referentialVersionId);
     });
 
@@ -162,6 +166,7 @@ export class CertificationApiStoreService {
   }
 
   async reload(notify = true): Promise<boolean> {
+    if (this.session.role() === "jury") return this.loadJuryContext(notify);
     const cohortApiId = this.text(this.workspace.cohort()?.apiId);
     const referentialVersionId = this.text(
       this.workspace.cohort()?.referentialVersionId,
@@ -185,11 +190,9 @@ export class CertificationApiStoreService {
     this.selectedSessionIdSignal.set(id);
     this.candidateLoadSequence++;
     this.candidatesSignal.set([]);
-    if (
-      id &&
-      this.sessionsSignal().some((item) => this.text(item?.id) === id)
-    ) {
-      await this.loadCandidates(id, true);
+    if (id && this.sessionsSignal().some((item) => this.text(item?.id) === id)) {
+      if (this.session.role() === "jury") await this.loadMyJuryCandidates(id);
+      else await this.loadCandidates(id, true);
     }
   }
 
@@ -264,7 +267,8 @@ export class CertificationApiStoreService {
     );
     const sessionId = this.text(candidate?.examSessionId);
     const cohortId = this.text(this.workspace.cohort()?.apiId);
-    if (!candidate || !sessionId || !cohortId || sessionId !== this.selectedSessionIdSignal()) {
+    if (!candidate || !sessionId || (this.session.role() !== "jury" && !cohortId)
+        || sessionId !== this.selectedSessionIdSignal()) {
       this.notifications.error("certification.api.saveFailed", "/certification");
       return false;
     }
@@ -300,18 +304,19 @@ export class CertificationApiStoreService {
       if (this.text(updated?.id) !== this.text(candidateId))
         throw new Error("CERTIFICATION_BATCH_RESPONSE_INVALID");
       // Late responses must never overwrite a different workspace/session.
-      if (this.text(this.workspace.cohort()?.apiId) !== cohortId || this.selectedSessionIdSignal() !== sessionId)
-        return true;
+      if ((this.session.role() !== "jury" && this.text(this.workspace.cohort()?.apiId) !== cohortId)
+          || this.selectedSessionIdSignal() !== sessionId) return true;
       this.replaceCandidate(this.normalizeCandidate(updated));
       // The API response is authoritative, even if reloading the list subsequently fails.
-      await this.loadCandidates(sessionId, false, true);
+      if (this.session.role() === "jury") await this.loadMyJuryCandidates(sessionId);
+      else await this.loadCandidates(sessionId, false, true);
       return true;
     } catch (error: unknown) {
-      if (this.text(this.workspace.cohort()?.apiId) === cohortId) {
+      if (this.session.role() === "jury" || this.text(this.workspace.cohort()?.apiId) === cohortId) {
         const status = (error as { status?: number } | null)?.status;
         this.notifications.error(
           status === 409 ? "certification.api.saveConflict" : "certification.api.saveFailed",
-          "/certification",
+          this.session.role() === "jury" ? "/jury" : "/certification",
         );
       }
       return false;
@@ -336,6 +341,55 @@ export class CertificationApiStoreService {
         (item) => this.text(item?.id) === this.text(candidateId),
       ) ?? null
     );
+  }
+
+  private async loadJuryContext(notify = true): Promise<boolean> {
+    const seq = ++this.contextLoadSequence;
+    ++this.candidateLoadSequence;
+    const organizationId = this.text(this.session.session()?.organizationId);
+    this.loading.set(true);
+    try {
+      const [sessions, schemes] = await Promise.all([
+        firstValueFrom(this.api.getMyJurySessions()),
+        firstValueFrom(this.api.getMyJurySchemes()),
+      ]);
+      if (seq !== this.contextLoadSequence ||
+          organizationId !== this.text(this.session.session()?.organizationId)) return false;
+      this.sessionsSignal.set((sessions ?? []).map(x => this.normalizeSession(x)));
+      this.schemesSignal.set((schemes ?? []).map(x => this.normalizeScheme(x)));
+      const last = this.selectedSessionIdSignal();
+      const selected = this.sessionsSignal().some(x => x.id === last)
+        ? last : (this.sessionsSignal()[0]?.id ?? "");
+      this.selectedSessionIdSignal.set(selected);
+      await this.loadMyJuryCandidates(selected);
+      if (seq !== this.contextLoadSequence) return false;
+      this.loadError.set(false);
+      return true;
+    } catch {
+      if (seq !== this.contextLoadSequence) return false;
+      this.loadError.set(true);
+      if (notify) this.notifications.error("certification.api.loadFailed", "/jury");
+      return false;
+    } finally {
+      if (seq === this.contextLoadSequence) this.loading.set(false);
+    }
+  }
+
+  private async loadMyJuryCandidates(sessionId: string): Promise<void> {
+    const seq = ++this.candidateLoadSequence;
+    if (!sessionId) { this.candidatesSignal.set([]); return; }
+    const organizationId = this.text(this.session.session()?.organizationId);
+    try {
+      const items = await firstValueFrom(this.api.getMyJuryCandidates(sessionId));
+      if (seq !== this.candidateLoadSequence || this.selectedSessionIdSignal() !== sessionId ||
+          organizationId !== this.text(this.session.session()?.organizationId)) return;
+      this.candidatesSignal.set((items ?? []).map(x => this.normalizeCandidate(x)));
+    } catch {
+      if (seq === this.candidateLoadSequence) {
+        this.candidatesSignal.set([]);
+        this.notifications.error("certification.api.candidatesLoadFailed", "/jury");
+      }
+    }
   }
 
   private async loadContext(
@@ -555,8 +609,8 @@ export class CertificationApiStoreService {
     return {
       id: this.text(raw?.id),
       studentId: this.text(student?.id),
-      firstName: this.text(student?.firstName),
-      lastName: this.text(student?.lastName),
+      firstName: this.text(student?.firstName) || (this.session.role() === "jury" ? "Candidat" : ""),
+      lastName: this.text(student?.lastName) || (this.session.role() === "jury" ? this.text(raw?.enrollmentId).slice(0, 8) : ""),
       candidateNumber: "",
       promotionId: this.text(this.workspace.cohort()?.id),
       ready: raw?.eligible === true,
@@ -745,7 +799,7 @@ export class CertificationApiStoreService {
     return (
       `${this.text(user?.firstName)} ${this.text(user?.lastName)}`.trim() ||
       this.text(user?.email) ||
-      ""
+      this.text(user?.userId)
     );
   }
 

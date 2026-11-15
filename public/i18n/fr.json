@@ -2755,7 +2755,9 @@
     },
     "multiSubtitle": "Session {{program}} · {{scheme}}. Seuls les candidats et critères de cette certification sont affichés.",
     "examSteps": "Épreuves",
-    "schemeTitle": "Schéma d’évaluation"
+    "schemeTitle": "Schéma d’évaluation",
+    "mySessions": "Mes sessions affectées",
+    "noCandidates": "Aucun candidat inscrit dans cette session."
   },
   "results": {
     "title": "Résultats de certification",
@@ -5074,6 +5076,7 @@
     "sessionTrainer": "Aucun formateur actif sélectionné. Affectez un formateur avant de créer la séance.",
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
-    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel."
+    "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
+    "juryNoAssignment": "Aucune session de certification ne vous est affectée."
   }
 }
