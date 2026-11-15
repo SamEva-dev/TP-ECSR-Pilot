@@ -2552,6 +2552,7 @@
       "closed": "Archivage et statistiques finales."
     },
     "candidate": {
+      "unavailable": "Dossier indisponible ou non autorisé.",
       "back": "Retour",
       "missingTitle": "Éléments à régulariser",
       "examPath": "Parcours d’examen",
@@ -2674,6 +2675,7 @@
       "empty": "Aucune session de certification disponible."
     },
     "management": {
+      "selectDecision": "Sélectionner une décision",
       "createTitle": "Créer une session de certification",
       "createHelp": "La session sera liée à la promotion active et au référentiel de certification publié.",
       "title": "Intitulé de la session",

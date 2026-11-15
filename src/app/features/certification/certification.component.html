@@ -378,7 +378,7 @@
                 </td>
                 <td class="py-3 text-right">
                   <a
-                    [routerLink]="['/certification/candidats', candidate.id]"
+                    [routerLink]="['/certification/candidats', candidate.id]" [queryParams]="{ sessionId: examSession.id }"
                     class="inline-flex h-[31px] items-center rounded-[9px] border border-[#d9e0e9] px-3 text-[10.5px] font-semibold shadow-sm"
                     >{{ "common.open" | t }}</a
                   >
@@ -427,7 +427,7 @@
         <div class="mt-4 grid gap-2 sm:grid-cols-2">
           @for (candidate of candidates; track candidate.id) {
             <a
-              [routerLink]="['/certification/candidats', candidate.id]"
+              [routerLink]="['/certification/candidats', candidate.id]" [queryParams]="{ sessionId: examSession.id }"
               class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3 hover:border-[#a9bfd5]"
               ><span
                 class="grid size-[36px] place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white"
@@ -524,8 +524,13 @@
               </div>
             }
           </div>
+          @if (candidate.published) {
+            <p class="mt-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold">
+              {{ "results.result" | t }} : {{ "results.status." + candidate.result | t }}
+            </p>
+          }
           <a
-            [routerLink]="['/certification/candidats', candidate.id]"
+            [routerLink]="['/certification/candidats', candidate.id]" [queryParams]="{ sessionId: examSession.id }"
             class="mt-4 inline-flex h-[38px] items-center gap-2 rounded-[10px] bg-[#2b66a4] px-4 text-[12px] font-semibold text-white"
             ><i class="ph ph-file-text text-[15px]"></i
             >{{ "certification.student.openFile" | t }}</a

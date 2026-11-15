@@ -420,9 +420,12 @@ export class CertificationApiStoreService {
         ),
       );
       const current = this.text(this.selectedSessionIdSignal());
+      const publishedForStudent = this.session.role() === "stagiaire"
+        ? this.sessionsSignal().find(item => this.text(item.status).toLowerCase() === "published")?.id
+        : undefined;
       const selected = this.sessionsSignal().some((item) => item.id === current)
         ? current
-        : this.text(this.sessionsSignal()[0]?.id);
+        : this.text(publishedForStudent ?? this.sessionsSignal()[0]?.id);
       this.selectedSessionIdSignal.set(selected);
       await this.loadCandidates(selected, notify);
       if (!isCurrent()) return false;
@@ -621,8 +624,9 @@ export class CertificationApiStoreService {
       documentsTotal: 0,
       ccp1: first,
       ccp2: second,
-      result: this.result(raw?.decision),
-      published: this.text(raw?.status).toLowerCase() === "published",
+      result: this.session.role() === "stagiaire" && this.text(session?.status).toLowerCase() !== "published"
+        ? "pending" : this.result(raw?.decision),
+      published: this.text(session?.status).toLowerCase() === "published",
       examTime: this.displayTime(session?.startsAtUtc),
       steps,
       programId: this.text(this.workspace.program()?.id),

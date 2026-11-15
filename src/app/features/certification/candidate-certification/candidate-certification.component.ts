@@ -61,6 +61,12 @@ export class CandidateCertificationComponent {
 
   private readonly requestedCandidateId =
     this.route.snapshot.paramMap.get("id") ?? "";
+  private readonly requestedSessionId =
+    this.route.snapshot.queryParamMap.get("sessionId") ?? "";
+  readonly dossierNotAvailable = computed(() =>
+    !this.store.loading() &&
+    (!this.requestedSessionId || !this.store.hasSession(this.requestedSessionId))
+  );
 
   readonly candidate = computed<CertificationCandidate>(() => {
     const candidates = this.store.candidates();
@@ -74,13 +80,15 @@ export class CandidateCertificationComponent {
         ) ?? EMPTY_CANDIDATE
       );
     }
-    // An unknown route parameter must not silently select the first dossier.
-    if (!this.requestedCandidateId) return EMPTY_CANDIDATE;
+    // Never use a candidate from a different session if the route was reloaded.
+    if (!this.requestedCandidateId || !this.requestedSessionId ||
+        this.exam().id !== this.requestedSessionId) return EMPTY_CANDIDATE;
     return (
       candidates.find(
         (item) =>
-          item.id === this.requestedCandidateId ||
-          item.studentId === this.requestedCandidateId,
+          (item.id === this.requestedCandidateId ||
+          item.studentId === this.requestedCandidateId) &&
+          this.store.rawCandidate(item.id)?.examSessionId === this.requestedSessionId,
       ) ?? EMPTY_CANDIDATE
     );
   });
@@ -102,6 +110,14 @@ export class CandidateCertificationComponent {
   juryNotes = "";
 
   constructor() {
+    // A full page refresh resets the store's default session. Restore the exact
+    // session from the URL only after its authorized list has loaded.
+    effect(() => {
+      if (this.sessionService.role() === "stagiaire" || !this.requestedSessionId ||
+          this.store.loading() || !this.store.hasSession(this.requestedSessionId) ||
+          this.store.selectedJurySessionId() === this.requestedSessionId) return;
+      void this.store.selectSession(this.requestedSessionId);
+    });
     effect(
       () => {
         const candidate = this.candidate();

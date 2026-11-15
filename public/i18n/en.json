@@ -2552,6 +2552,7 @@
       "closed": "Archive and final statistics."
     },
     "candidate": {
+      "unavailable": "Candidate dossier unavailable or not authorized.",
       "back": "Back",
       "missingTitle": "Items to complete",
       "examPath": "Exam journey",
@@ -2674,6 +2675,7 @@
       "empty": "No certification session available."
     },
     "management": {
+      "selectDecision": "Select a decision",
       "createTitle": "Create certification session",
       "createHelp": "The session will use the active cohort and published certification scheme.",
       "title": "Session title",

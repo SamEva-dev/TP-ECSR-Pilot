@@ -7,7 +7,7 @@ import {
   signal,
   untracked,
 } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { CertificationApiService } from "../../core/certification/certification-api.service";
@@ -68,6 +68,11 @@ interface ResultCandidateRow {
 })
 export class ResultsComponent {
   readonly workspace = inject(WorkspaceContextService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly selectedSessionId = signal("");
+  readonly availableSessions = computed(() => [...this.sessions()].sort((a, b) =>
+    this.text(b?.startsAtUtc).localeCompare(this.text(a?.startsAtUtc))));
   private readonly certificationApi = inject(CertificationApiService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly realtime = inject(RealtimeService);
@@ -86,9 +91,7 @@ export class ResultsComponent {
   });
 
   readonly exam = computed<ResultExam>(() => {
-    const value = [...this.sessions()].sort((a, b) =>
-      this.text(b?.startsAtUtc).localeCompare(this.text(a?.startsAtUtc)),
-    )[0];
+    const value = this.availableSessions().find((item) => item.id === this.selectedSessionId());
     return {
       id: this.text(value?.id),
       name: this.text(value?.title),
@@ -101,7 +104,7 @@ export class ResultsComponent {
     const examSchemeId = this.exam().schemeId;
     const value =
       this.schemes().find((item) => this.text(item?.id) === examSchemeId) ??
-      this.schemes()[0];
+      null;
     return {
       id: this.text(value?.id),
       code: this.text(value?.code),
@@ -156,6 +159,7 @@ export class ResultsComponent {
       const cohortId = this.text(cohort?.apiId);
       const referentialVersionId = this.text(cohort?.referentialVersionId);
       this.publishConfirmed.set(false);
+      ++this.loadSequence; // Invalidate outstanding requests from the previous context.
       this.sessions.set([]);
       this.schemes.set([]);
       this.candidateSource.set([]);
@@ -172,6 +176,38 @@ export class ResultsComponent {
       const referentialVersionId = this.text(cohort?.referentialVersionId);
       untracked(() => void this.load(cohortId, referentialVersionId));
     });
+  }
+
+  async selectSession(id: string): Promise<void> {
+    const selected = this.availableSessions().find((session) => session.id === id);
+    if (!selected) return;
+    this.selectedSessionId.set(id);
+    this.publishConfirmed.set(false);
+    this.candidateSource.set([]);
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { sessionId: id },
+      queryParamsHandling: "merge",
+      replaceUrl: true,
+    });
+    await this.loadSelectedCandidates(id);
+  }
+
+  private async loadSelectedCandidates(id: string): Promise<void> {
+    const sequence = ++this.loadSequence;
+    this.candidateSource.set([]);
+    const cohortId = this.text(this.workspace.cohort()?.apiId);
+    try {
+      const candidates = await firstValueFrom(this.certificationApi.getCandidates(id));
+      if (sequence !== this.loadSequence || this.selectedSessionId() !== id ||
+          cohortId !== this.text(this.workspace.cohort()?.apiId)) return;
+      this.candidateSource.set((Array.isArray(candidates) ? candidates : []).filter(
+        (candidate) => candidate.examSessionId === id,
+      ));
+    } catch {
+      if (sequence === this.loadSequence && this.selectedSessionId() === id)
+        this.notifications.error("results.api.loadFailed", "/resultats");
+    }
   }
 
   async publish(): Promise<void> {
@@ -307,18 +343,25 @@ export class ResultsComponent {
       this.sessions.set(normalizedSessions);
       this.schemes.set(normalizedSchemes);
 
-      const session = [...normalizedSessions].sort((a, b) =>
-        this.text(b?.startsAtUtc).localeCompare(this.text(a?.startsAtUtc)),
-      )[0];
-      if (!session?.id) {
-        this.candidateSource.set([]);
-        return;
-      }
-      const candidates = await firstValueFrom(
-        this.certificationApi.getCandidates(session.id),
-      );
-      if (sequence !== this.loadSequence) return;
-      this.candidateSource.set(Array.isArray(candidates) ? candidates : []);
+      const fromUrl = this.text(this.route.snapshot.queryParamMap.get("sessionId"));
+      const previouslySelected = this.selectedSessionId();
+      const available = [...normalizedSessions].sort((a, b) =>
+        this.text(b?.startsAtUtc).localeCompare(this.text(a?.startsAtUtc)));
+      // Explicit URL / persisted selection wins. Otherwise prefer published
+      // results, not whichever session happens to have the latest date.
+      const selected = [fromUrl, previouslySelected]
+        .map(id => available.find(item => item.id === id))
+        .find(Boolean) ??
+        available.find(item => this.text(item.status).toLowerCase() === "published") ??
+        available[0];
+      this.selectedSessionId.set(selected?.id ?? "");
+      this.candidateSource.set([]);
+      if (!selected?.id) return;
+      const candidates = await firstValueFrom(this.certificationApi.getCandidates(selected.id));
+      if (sequence !== this.loadSequence || this.selectedSessionId() !== selected.id) return;
+      this.candidateSource.set((Array.isArray(candidates) ? candidates : []).filter(
+        candidate => candidate.examSessionId === selected.id,
+      ));
     } catch {
       if (sequence !== this.loadSequence) return;
       this.sessions.set([]);

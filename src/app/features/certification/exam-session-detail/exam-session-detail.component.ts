@@ -173,6 +173,18 @@ export class ExamSessionDetailComponent {
     await this.runAction(() => firstValueFrom(this.certificationApi.publishResults(this.routeSessionId)), "published");
   }
 
+  /** Never default a persisted decision to Obtained on a reload. */
+  persistedDecision(value: string | null | undefined): string {
+    const normalized = (value ?? "").trim().toLowerCase();
+    switch (normalized) {
+      case "obtained": return "Obtained";
+      case "failed": return "Failed";
+      case "partial": return "Partial";
+      case "absent": return "Absent";
+      default: return "";
+    }
+  }
+
   initials(item: { firstName: string; lastName: string }): string {
     return `${item.firstName?.[0] ?? ""}${item.lastName?.[0] ?? ""}`.toUpperCase();
   }

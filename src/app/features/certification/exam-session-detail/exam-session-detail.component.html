@@ -80,13 +80,14 @@
             <button type="button" [disabled]="actionBusy()" (click)="eligibility(candidate, true)" class="rounded-lg border px-2 py-1 disabled:opacity-50">{{ "certification.management.eligible" | t }}</button>
             <button type="button" [disabled]="actionBusy()" (click)="eligibility(candidate, false)" class="rounded-lg border px-2 py-1 disabled:opacity-50">{{ "certification.management.ineligible" | t }}</button>
             @if (canManageResults() && exam().status === "running") {
-              <select #decisionSelect class="rounded-lg border p-1" [disabled]="actionBusy()">
+              <select #decisionSelect class="rounded-lg border p-1" [value]="persistedDecision(candidate.decision)" [disabled]="actionBusy()">
+                <option value="" disabled>{{ "certification.management.selectDecision" | t }}</option>
                 <option value="Obtained">{{ "certification.management.obtained" | t }}</option>
                 <option value="Failed">{{ "certification.management.failed" | t }}</option>
                 <option value="Partial">{{ "certification.management.partial" | t }}</option>
                 <option value="Absent">{{ "certification.management.absent" | t }}</option>
               </select>
-              <button type="button" [disabled]="actionBusy()" (click)="decision(candidate, decisionSelect.value)" class="rounded-lg bg-[#2b66a4] px-2 py-1 text-white disabled:opacity-50">{{ "certification.management.saveDecision" | t }}</button>
+              <button type="button" [disabled]="actionBusy() || !decisionSelect.value" (click)="decision(candidate, decisionSelect.value)" class="rounded-lg bg-[#2b66a4] px-2 py-1 text-white disabled:opacity-50">{{ "certification.management.saveDecision" | t }}</button>
             }
           </div>
         } @empty {
@@ -249,7 +250,7 @@
     <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
       @for (candidate of candidates(); track candidate.id) {
         <a
-          [routerLink]="['/certification/candidats', candidate.id]"
+          [routerLink]="['/certification/candidats', candidate.id]" [queryParams]="{ sessionId: routeSessionId }"
           class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3 transition hover:border-[#a9bfd5] hover:shadow-sm"
           ><span
             class="grid size-[37px] place-items-center rounded-full bg-[#2a64a2] text-[10.5px] font-bold text-white"
