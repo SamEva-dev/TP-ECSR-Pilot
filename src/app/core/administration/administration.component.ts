@@ -10,6 +10,7 @@ import {
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { HttpErrorResponse } from "@angular/common/http";
+import { apiErrorCode } from "../errors/api-error-code";
 import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
@@ -616,14 +617,14 @@ export class AdministrationComponent {
       } catch (error: unknown) {
         if (this.workspace.organization()?.apiId !== organizationId) return false;
         const status = error instanceof HttpErrorResponse ? error.status : 0;
-        if (status === 409) {
+        const code = apiErrorCode(error);
+        if (status === 400 && code === "ORGANIZATION_LEGAL_NAME_REQUIRED") {
+          this.notifications.error("organizationAdmin.api.legalNameRequired", "/administration");
+        } else if (status === 409) {
           this.conflictOrganizationId = organizationId;
           this.notifications.error("organizationAdmin.api.conflictError", "/administration");
         } else if (status === 403) {
           this.notifications.error("organizationAdmin.api.forbiddenError", "/administration");
-        } else if (status === 400 && error instanceof HttpErrorResponse &&
-          JSON.stringify(error.error ?? {}).includes("ORGANIZATION_LEGAL_NAME_REQUIRED")) {
-          this.notifications.error("organizationAdmin.api.legalNameRequired", "/administration");
         } else {
           this.notifications.error(errorKey, "/administration");
         }

@@ -7,6 +7,7 @@ import {
   untracked,
 } from "@angular/core";
 import { firstValueFrom } from "rxjs";
+import { apiErrorCode } from "../errors/api-error-code";
 import type {
   CertificationCandidate as CertificationCandidateApi,
   CertificationExamSession as CertificationExamSessionApi,
@@ -232,9 +233,9 @@ export class CertificationApiStoreService {
       return true;
     } catch (error: unknown) {
       if (this.text(this.workspace.cohort()?.apiId) === cohortId) {
-        const response = error as { status?: number; error?: { code?: string } } | null;
+        const response = error as { status?: number } | null;
         const status = response?.status;
-        const code = response?.error?.code;
+        const code = apiErrorCode(error);
         const key = status === 403
           ? "certification.api.startForbidden"
           : status === 409 && code === "CERTIFICATION_JURY_REQUIRED_TO_START"

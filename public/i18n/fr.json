@@ -2083,9 +2083,9 @@
     },
     "sheets": {
       "title": "Fiches pédagogiques",
-      "count": "58 fiches configurables",
+      "count": "Fiches configurables",
       "description": "Le nombre de fiches, leur numérotation et leurs intitulés sont paramétrables pour correspondre au référentiel de votre centre.",
-      "configure": "Configurer les 58 fiches",
+      "configure": "Configurer les fiches",
       "hint": "La configuration détaillée des fiches sera ajoutée dans un écran dédié."
     },
     "access": {
@@ -2195,7 +2195,7 @@
       }
     },
     "sheets": {
-      "title": "58 fiches pédagogiques",
+      "title": "Fiches pédagogiques",
       "subtitle": "{{prepared}} préparées · {{validated}} validées",
       "columns": {
         "title": "Titre",
@@ -2337,8 +2337,8 @@
   "sheetConfig": {
     "back": "Retour à l’administration",
     "title": "Configurer les fiches pédagogiques",
-    "subtitle": "Gérez les 58 fiches du centre : intitulés, catégories, durée, références et exemples corrigés.",
-    "reset": "Réinitialiser les 58 fiches",
+    "subtitle": "Gérez les {{count}} fiches de la formation : intitulés, catégories, durées, références et exemples corrigés.",
+    "reset": "Réinitialiser les fiches",
     "add": "Ajouter une fiche",
     "kpi": {
       "total": "Fiches configurées",

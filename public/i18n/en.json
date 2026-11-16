@@ -2083,9 +2083,9 @@
     },
     "sheets": {
       "title": "Teaching sheets",
-      "count": "58 configurable sheets",
+      "count": "Configurable sheets",
       "description": "The number of sheets, numbering and titles can be configured to match your centre framework.",
-      "configure": "Configure the 58 sheets",
+      "configure": "Configure sheets",
       "hint": "Detailed sheet configuration will be added in a dedicated screen."
     },
     "access": {
@@ -2195,7 +2195,7 @@
       }
     },
     "sheets": {
-      "title": "58 pedagogical sheets",
+      "title": "Pedagogical sheets",
       "subtitle": "{{prepared}} prepared · {{validated}} validated",
       "columns": {
         "title": "Title",
@@ -2337,8 +2337,8 @@
   "sheetConfig": {
     "back": "Back to administration",
     "title": "Configure pedagogical sheets",
-    "subtitle": "Manage the centre’s 58 sheets: titles, categories, duration, references and corrected examples.",
-    "reset": "Reset the 58 sheets",
+    "subtitle": "Manage the {{count}} sheets for this program: titles, categories, duration, references and corrected examples.",
+    "reset": "Reset sheets",
     "add": "Add a sheet",
     "kpi": {
       "total": "Configured sheets",

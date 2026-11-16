@@ -21,7 +21,7 @@
         {{ "sheetConfig.title" | t }}
       </h1>
       <p class="mt-0.5 text-[14px] text-[#6c788b]">
-        {{ "sheetConfig.subtitle" | t }}
+        {{ "sheetConfig.subtitle" | t: { count: items().length } }}
       </p>
     </div>
     <div class="flex flex-wrap gap-2">

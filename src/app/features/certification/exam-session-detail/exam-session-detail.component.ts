@@ -17,6 +17,7 @@ import { WorkspaceContextService } from "../../../core/workspace/workspace-conte
 import { CertificationApiService } from "../../../core/certification/certification-api.service";
 import { CertificationCandidate as ApiCandidate, CertificationJuryAssignment } from "../../../core/certification/certification.models";
 import { ProgressBarComponent } from "../../../shared/ui/progress-bar.component";
+import { apiErrorCode } from "../../../core/errors/api-error-code";
 
 @Component({
   selector: "app-exam-session-detail",
@@ -138,8 +139,8 @@ export class ExamSessionDetailComponent {
       this.loadJuryAssignments();
       this.actionInfo.set(infoKey);
     } catch (error: unknown) {
-      const response = error as { status?: number; error?: { code?: string; errorCode?: string; extensions?: { code?: string } } } | null;
-      const code = response?.error?.code ?? response?.error?.errorCode ?? response?.error?.extensions?.code ?? "";
+      const response = error as { status?: number } | null;
+      const code = apiErrorCode(error);
       const supported = new Set([
         "CERTIFICATION_JURY_REQUIRED_TO_START",
         "CERTIFICATION_CANDIDATES_REQUIRED_TO_START",
