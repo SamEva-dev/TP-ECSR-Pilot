@@ -46,6 +46,7 @@ export class AddPlanningDrawerComponent {
   readonly sessions = inject(TrainingSessionApiStoreService);
   readonly trainers = this.sessions.trainers;
   readonly open = input(false);
+  readonly saving = input(false);
   readonly closed = output<void>();
   readonly eventCreated = output<AddPlanningPayload>();
   readonly submitted = signal(false);
@@ -134,6 +135,7 @@ export class AddPlanningDrawerComponent {
   }
 
   submit(): void {
+    if (this.saving()) return;
     this.submitted.set(true);
     if (this.form.invalid || this.invalidPeriod() || !this.dayFromDate() ||
         !this.promotions.some((item) => item.id === this.form.controls.promotionId.value)) {

@@ -22,7 +22,7 @@
       <select id="results-session" class="rounded-lg border border-[#d9e0e9] p-2 text-xs"
         [value]="selectedSessionId()" (change)="selectSession($any($event.target).value)">
         @for (item of availableSessions(); track item.id) {
-          <option [value]="item.id">{{ item.title }}</option>
+          <option [value]="item.id" [selected]="item.id === selectedSessionId()">{{ item.title }}</option>
         }
       </select>
       <a

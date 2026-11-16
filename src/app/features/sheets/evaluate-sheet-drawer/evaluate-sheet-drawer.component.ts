@@ -111,9 +111,10 @@ export class EvaluateSheetDrawerComponent implements OnInit {
     effect(() => {
       const students = this.store.students();
       const current = this.studentId();
-      const selected = students.some((student) => student.id === current)
-        ? current
-        : (students[0]?.id ?? "");
+      const requested = this.initialStudentId();
+      const selected = requested && students.some(student => student.id === requested)
+        ? requested : students.some((student) => student.id === current)
+          ? current : (students[0]?.id ?? "");
       if (selected !== current) {
         this.studentId.set(selected);
         this.store.selectStudent(selected);
@@ -145,14 +146,14 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   ngOnInit(): void {
     const requested = this.initialStudentId() ?? "";
     const selected = this.students.some((student) => student.id === requested)
-      ? requested
-      : (this.students[0]?.id ?? "");
+      ? requested : (this.students[0]?.id ?? "");
     this.studentId.set(selected);
     this.store.selectStudent(selected);
   }
 
   updateStudent(event: Event): void {
     const selected = (event.target as HTMLSelectElement).value ?? "";
+    if (this.initialStudentId() && selected !== this.initialStudentId()) return;
     this.studentId.set(selected);
     this.sheetNumber.set(0);
     this.hydratedSelection = "";
@@ -227,7 +228,7 @@ export class EvaluateSheetDrawerComponent implements OnInit {
 
   async save(): Promise<void> {
     if (this.saving()) return;
-    if (this.prerequisite()) return;
+    if (this.prerequisite() || (this.initialStudentId() && this.studentId() !== this.initialStudentId())) return;
     this.saving.set(true);
     try {
     const updated = await this.store.saveEvaluation({

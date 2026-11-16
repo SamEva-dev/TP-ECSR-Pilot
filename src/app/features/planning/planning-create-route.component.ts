@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
 import {
@@ -11,6 +11,7 @@ import {
   imports: [AddPlanningDrawerComponent],
   template: `<app-add-planning-drawer
     [open]="true"
+    [saving]="creating()"
     (closed)="close()"
     (eventCreated)="create($event)"
   />`,
@@ -19,12 +20,16 @@ import {
 export class PlanningCreateRouteComponent {
   private readonly router = inject(Router);
   private readonly sessions = inject(TrainingSessionApiStoreService);
+  readonly creating = signal(false);
 
   close(): void {
     void this.router.navigateByUrl("/planning");
   }
 
   async create(payload: AddPlanningPayload): Promise<void> {
+    if (this.creating()) return;
+    this.creating.set(true);
+    try {
     const created = await this.sessions.create(
       {
         cohortId: payload.promotionId ?? "",
@@ -50,5 +55,8 @@ export class PlanningCreateRouteComponent {
     );
     if (!created) return;
     void this.router.navigateByUrl("/planning");
+    } finally {
+      this.creating.set(false);
+    }
   }
 }

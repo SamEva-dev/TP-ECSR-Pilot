@@ -355,6 +355,16 @@ export class ResultsComponent {
         available.find(item => this.text(item.status).toLowerCase() === "published") ??
         available[0];
       this.selectedSessionId.set(selected?.id ?? "");
+      // Keep URL and selector bound to the same session. Angular can otherwise
+      // restore an old query parameter after selecting a fallback published session.
+      if ((selected?.id ?? "") !== fromUrl) {
+        void this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { sessionId: selected?.id ?? null },
+          queryParamsHandling: "merge",
+          replaceUrl: true,
+        });
+      }
       this.candidateSource.set([]);
       if (!selected?.id) return;
       const candidates = await firstValueFrom(this.certificationApi.getCandidates(selected.id));

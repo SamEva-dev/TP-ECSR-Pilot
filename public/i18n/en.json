@@ -4162,7 +4162,9 @@
     "WORKPLACE_TUTOR_MEMBER_INACTIVE": "This member is suspended or inactive and cannot be assigned as a placement tutor.",
     "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "The account already exists but its current role is not eligible for direct placement tutor assignment.",
     "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "This tutor is already assigned to the placement.",
-    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned."
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "This invitation was revoked after the placement tutor was reassigned.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "Legal name is required.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4459,7 +4461,9 @@
     "CERTIFICATION_SCHEME_ALREADY_EXISTS": "A certification scheme with this code already exists for this version.",
     "CERTIFICATION_SCHEME_INCOMPLETE": "Add at least one unit and one assessment step before publishing.",
     "CERTIFICATION_STEP_KIND_INVALID": "Unknown assessment step type. Select a valid type.",
-    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date."
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "Legal name is required.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",
@@ -4728,7 +4732,9 @@
     "CERTIFICATION_SCHEME_ALREADY_EXISTS": "A certification scheme with this code already exists for this version.",
     "CERTIFICATION_SCHEME_INCOMPLETE": "Add at least one unit and one assessment step before publishing.",
     "CERTIFICATION_STEP_KIND_INVALID": "Unknown assessment step type. Select a valid type.",
-    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date."
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "Legal name is required.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long."
   },
   "accessPolicy": {
     "readOnly": "Read-only access"

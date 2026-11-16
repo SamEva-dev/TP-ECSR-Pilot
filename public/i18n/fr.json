@@ -4162,7 +4162,9 @@
     "WORKPLACE_TUTOR_MEMBER_INACTIVE": "Ce membre est suspendu ou inactif et ne peut pas être affecté comme maître de stage.",
     "WORKPLACE_TUTOR_EXISTING_ROLE_INCOMPATIBLE": "Le compte existe déjà mais son rôle actuel n’est pas compatible avec une affectation directe de maître de stage.",
     "WORKPLACE_TUTOR_ALREADY_ASSIGNED": "Ce maître de stage est déjà affecté à cette période.",
-    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage."
+    "WORKPLACE_TUTOR_INVITATION_REVOKED": "Cette invitation a été révoquée après la réattribution du stage.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "La raison sociale est obligatoire.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue."
   },
   "platformBrand": {
     "name": "Pedagora Pilot",
@@ -4459,7 +4461,9 @@
     "CERTIFICATION_SCHEME_ALREADY_EXISTS": "Un schéma de certification utilise déjà ce code pour cette version.",
     "CERTIFICATION_SCHEME_INCOMPLETE": "Ajoutez au moins une unité et une épreuve avant de publier.",
     "CERTIFICATION_STEP_KIND_INVALID": "Type d’épreuve inconnu. Sélectionnez un type valide.",
-    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma."
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "La raison sociale est obligatoire.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
@@ -4728,7 +4732,9 @@
     "CERTIFICATION_SCHEME_ALREADY_EXISTS": "Un schéma de certification utilise déjà ce code pour cette version.",
     "CERTIFICATION_SCHEME_INCOMPLETE": "Ajoutez au moins une unité et une épreuve avant de publier.",
     "CERTIFICATION_STEP_KIND_INVALID": "Type d’épreuve inconnu. Sélectionnez un type valide.",
-    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma."
+    "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma.",
+    "ORGANIZATION_LEGAL_NAME_REQUIRED": "La raison sociale est obligatoire.",
+    "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue."
   },
   "accessPolicy": {
     "readOnly": "Accès en lecture seule"
