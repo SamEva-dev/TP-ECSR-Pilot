@@ -2,7 +2,6 @@ import { Routes } from "@angular/router";
 import { environment } from "./environments/environment";
 import { authGuard } from "./core/session/auth.guard";
 import { roleGuard, tutorWorkspaceGuard } from "./core/session/role.guard";
-import { statisticsModuleGuard } from "./core/session/statistics-module.guard";
 
 export const routes: Routes = [
   { path: 'auth/logout', loadComponent: () => import('./core/oidc/oidc-signout.component').then(m => m.OidcSignoutComponent) },
@@ -169,7 +168,7 @@ export const routes: Routes = [
       {
         path: "planning/nouveau",
         canActivate: [roleGuard],
-        data: { permission: "planning.view" },
+        data: { permission: "sessions.manage" },
         loadComponent: () =>
           import("./features/planning/planning-create-route.component").then(
             (m) => m.PlanningCreateRouteComponent,
@@ -311,15 +310,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: "jury/candidats/:id",
-        canActivate: [roleGuard],
-        data: { permission: "jury.view", membershipRoles: ["jury"] },
-        loadComponent: () =>
-          import("./features/certification/candidate-certification/candidate-certification.component").then(
-            (m) => m.CandidateCertificationComponent,
-          ),
-      },
-      {
         path: "jury",
         canActivate: [roleGuard],
         data: { permission: "jury.view", membershipRoles: ["jury"] },
@@ -364,7 +354,7 @@ export const routes: Routes = [
       },
       {
         path: "statistiques",
-        canActivate: [roleGuard, statisticsModuleGuard],
+        canActivate: [roleGuard],
         data: { permission: "statistics.view" },
         loadComponent: () =>
           import("./features/statistics/statistics.component").then(

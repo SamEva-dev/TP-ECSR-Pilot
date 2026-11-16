@@ -2586,7 +2586,12 @@
       "juryNotes": "Observations du jury",
       "saveDraft": "Enregistrer le brouillon",
       "validateEvaluation": "Valider mon évaluation",
-      "draftSaved": "Brouillon enregistré."
+      "draftSaved": "Brouillon enregistré.",
+      "errors": {
+        "missingCriteria": "Tous les critères du jury doivent être évalués avant validation.",
+        "missingCandidate": "Aucun candidat valide n’est sélectionné.",
+        "saveFailed": "Enregistrement impossible. Vérifiez les données et réessayez."
+      }
     },
     "multi": {
       "subtitle": "Certification {{program}} · schéma {{scheme}}. Les épreuves, unités et grilles s’adaptent automatiquement à la formation active.",

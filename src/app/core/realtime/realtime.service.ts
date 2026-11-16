@@ -125,7 +125,9 @@ export class RealtimeService {
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(
-        environment.production ? LogLevel.Warning : LogLevel.Information,
+        // SignalR may include the access_token query in connection diagnostics.
+        // Suppress SDK logs; transport URLs can still appear in browser Network tools.
+        LogLevel.None,
       )
       .build();
     this.connection = connection;

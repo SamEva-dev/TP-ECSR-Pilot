@@ -8,6 +8,7 @@
         {{ "planning.subtitle" | t }}
       </p>
     </div>
+    @if (canManageSessions()) {
     <a
       routerLink="/planning/nouveau"
       class="ecsr-primary-action self-start sm:self-auto"
@@ -15,6 +16,7 @@
       <i class="ph ph-plus text-[17px]"></i>
       {{ "planning.add" | t }}
     </a>
+    }
   </div>
 
   <article

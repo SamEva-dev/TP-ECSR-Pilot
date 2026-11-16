@@ -61,12 +61,6 @@ export class CandidateCertificationComponent {
 
   private readonly requestedCandidateId =
     this.route.snapshot.paramMap.get("id") ?? "";
-  private readonly requestedSessionId =
-    this.route.snapshot.queryParamMap.get("sessionId") ?? "";
-  readonly dossierNotAvailable = computed(() =>
-    !this.store.loading() &&
-    (!this.requestedSessionId || !this.store.hasSession(this.requestedSessionId))
-  );
 
   readonly candidate = computed<CertificationCandidate>(() => {
     const candidates = this.store.candidates();
@@ -80,15 +74,13 @@ export class CandidateCertificationComponent {
         ) ?? EMPTY_CANDIDATE
       );
     }
-    // Never use a candidate from a different session if the route was reloaded.
-    if (!this.requestedCandidateId || !this.requestedSessionId ||
-        this.exam().id !== this.requestedSessionId) return EMPTY_CANDIDATE;
+    // An unknown route parameter must not silently select the first dossier.
+    if (!this.requestedCandidateId) return EMPTY_CANDIDATE;
     return (
       candidates.find(
         (item) =>
-          (item.id === this.requestedCandidateId ||
-          item.studentId === this.requestedCandidateId) &&
-          this.store.rawCandidate(item.id)?.examSessionId === this.requestedSessionId,
+          item.id === this.requestedCandidateId ||
+          item.studentId === this.requestedCandidateId,
       ) ?? EMPTY_CANDIDATE
     );
   });
@@ -102,6 +94,7 @@ export class CandidateCertificationComponent {
     );
   });
   readonly evaluationSaved = signal(false);
+  readonly evaluationError = signal<"" | "missingCriteria" | "missingCandidate" | "saveFailed">("");
   readonly juryLevels = signal<Record<string, JuryLevel>>({});
   readonly evaluationLocked = computed(() => {
     const status = (this.store.rawCandidate(this.candidate().id)?.status ?? "").toLowerCase();
@@ -110,14 +103,6 @@ export class CandidateCertificationComponent {
   juryNotes = "";
 
   constructor() {
-    // A full page refresh resets the store's default session. Restore the exact
-    // session from the URL only after its authorized list has loaded.
-    effect(() => {
-      if (this.sessionService.role() === "stagiaire" || !this.requestedSessionId ||
-          this.store.loading() || !this.store.hasSession(this.requestedSessionId) ||
-          this.store.selectedJurySessionId() === this.requestedSessionId) return;
-      void this.store.selectSession(this.requestedSessionId);
-    });
     effect(
       () => {
         const candidate = this.candidate();
@@ -145,6 +130,7 @@ export class CandidateCertificationComponent {
     if (this.evaluationLocked()) return;
     this.juryLevels.update((value) => ({ ...value, [id ?? ""]: level }));
     this.evaluationSaved.set(false);
+    this.evaluationError.set("");
   }
 
   selected(id: string, level: JuryLevel): boolean {
@@ -154,23 +140,29 @@ export class CandidateCertificationComponent {
   async saveDraft(): Promise<void> {
     const candidate = this.candidate();
     if (!candidate.id || this.store.saving() || this.evaluationLocked()) return;
+    this.evaluationError.set("");
     const saved = await this.store.saveAssessments(
       candidate.id,
       this.juryLevels(),
       this.juryNotes ?? "",
     );
     this.evaluationSaved.set(saved);
+    if (!saved) this.evaluationError.set("saveFailed");
   }
 
   async validateEvaluation(): Promise<void> {
     const candidate = this.candidate();
-    if (!candidate.id || this.store.saving() || this.evaluationLocked()) return;
+    if (this.store.saving() || this.evaluationLocked()) return;
+    this.evaluationError.set("");
+    if (!candidate.id) { this.evaluationError.set("missingCandidate"); return; }
     const criteria = this.scheme().juryCriteria;
     if (
-      criteria.length &&
+      !criteria.length ||
       !criteria.every((criterion) => Boolean(this.juryLevels()[criterion.id]))
-    )
+    ) {
+      this.evaluationError.set("missingCriteria");
       return;
+    }
     const saved = await this.store.saveAssessments(
       candidate.id,
       this.juryLevels(),
@@ -178,6 +170,7 @@ export class CandidateCertificationComponent {
       true,
     );
     this.evaluationSaved.set(saved);
+    if (!saved) this.evaluationError.set("saveFailed");
   }
 
   unitStatus(unitId: string): CertificationUnitStatus {

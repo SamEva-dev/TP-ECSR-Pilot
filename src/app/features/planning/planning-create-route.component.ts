@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { Router } from "@angular/router";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
 import {
   AddPlanningDrawerComponent,
@@ -11,7 +12,6 @@ import {
   imports: [AddPlanningDrawerComponent],
   template: `<app-add-planning-drawer
     [open]="true"
-    [saving]="creating()"
     (closed)="close()"
     (eventCreated)="create($event)"
   />`,
@@ -19,17 +19,18 @@ import {
 })
 export class PlanningCreateRouteComponent {
   private readonly router = inject(Router);
+  private readonly access = inject(AccessPolicyService);
   private readonly sessions = inject(TrainingSessionApiStoreService);
-  readonly creating = signal(false);
 
   close(): void {
     void this.router.navigateByUrl("/planning");
   }
 
   async create(payload: AddPlanningPayload): Promise<void> {
-    if (this.creating()) return;
-    this.creating.set(true);
-    try {
+    if (!this.access.can("sessions.manage")) {
+      void this.router.navigateByUrl("/planning");
+      return;
+    }
     const created = await this.sessions.create(
       {
         cohortId: payload.promotionId ?? "",
@@ -55,8 +56,5 @@ export class PlanningCreateRouteComponent {
     );
     if (!created) return;
     void this.router.navigateByUrl("/planning");
-    } finally {
-      this.creating.set(false);
-    }
   }
 }

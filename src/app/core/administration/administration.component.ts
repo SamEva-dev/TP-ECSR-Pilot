@@ -573,6 +573,10 @@ export class AdministrationComponent {
     const organizationId = this.workspace.organization()?.apiId ?? "";
     // Capture the complete draft at click time; the queue serializes writes, not user edits.
     const draft = this.request();
+    if (!draft.legalName?.trim()) {
+      this.notifications.error("organizationAdmin.api.legalNameRequired", "/administration");
+      return Promise.resolve(false);
+    }
     const revisionAtEnqueue = this.editRevision;
     if (!organizationId || !this.lastDto || this.lastDto.organizationId !== organizationId) {
       this.notifications.error("organizationAdmin.api.contextError", "/administration");

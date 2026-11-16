@@ -16,6 +16,7 @@ import type {
 } from "../../core/models/planning.models";
 import type { WorkMode } from "../../core/models/remote-work.models";
 import { SessionService } from "../../core/session/session.service";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { ContextualTrainingDataService } from "../../core/workspace/contextual-training-data.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 
@@ -40,6 +41,8 @@ export class PlanningComponent {
   private readonly workspace = inject(WorkspaceContextService);
   readonly sessions = inject(TrainingSessionApiStoreService);
   readonly session = inject(SessionService);
+  private readonly access = inject(AccessPolicyService);
+  readonly canManageSessions = computed(() => this.access.can("sessions.manage"));
   private readonly translate = inject(TranslateService);
   readonly teamWorkModes = computed(() =>
     TEAM_WORK_MODE_WEEK.filter(
@@ -55,7 +58,7 @@ export class PlanningComponent {
 
   canDrag(event: PlanningEvent): boolean {
     const row = this.sessions.apiSessions().find(item => item.id === event.id);
-    return !this.moving() && row?.status === "planned";
+    return this.canManageSessions() && !this.moving() && row?.status === "planned";
   }
 
   beginDrag(event: DragEvent, item: PlanningEvent): void {
@@ -68,7 +71,7 @@ export class PlanningComponent {
   endDrag(): void { this.draggingId.set(null); this.dragTarget.set(null); }
 
   dragOver(event: DragEvent, target: string): void {
-    if (!this.draggingId() || this.moving()) return;
+    if (!this.canManageSessions() || !this.draggingId() || this.moving()) return;
     event.preventDefault();
     if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
     this.dragTarget.set(target);
@@ -78,7 +81,7 @@ export class PlanningComponent {
     event.preventDefault();
     const id = this.draggingId();
     this.endDrag();
-    if (!id || this.moving()) return;
+    if (!this.canManageSessions() || !id || this.moving()) return;
     const row = this.sessions.apiSessions().find(item => item.id === id);
     if (!row || row.status !== "planned") return;
     this.moving.set(true);
@@ -92,7 +95,7 @@ export class PlanningComponent {
     const id = this.draggingId();
     const row = this.sessions.apiSessions().find(item => item.id === id);
     this.endDrag();
-    if (!id || !row || row.status !== "planned" || this.moving()) return;
+    if (!this.canManageSessions() || !id || !row || row.status !== "planned" || this.moving()) return;
     const source = new Intl.DateTimeFormat("en-CA", {
       timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit",
     }).formatToParts(new Date(row.startsAtUtc));

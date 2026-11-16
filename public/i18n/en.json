@@ -2586,7 +2586,12 @@
       "juryNotes": "Jury notes",
       "saveDraft": "Save draft",
       "validateEvaluation": "Validate my assessment",
-      "draftSaved": "Draft saved."
+      "draftSaved": "Draft saved.",
+      "errors": {
+        "missingCriteria": "Evaluate every jury criterion before validation.",
+        "missingCandidate": "No valid candidate is selected.",
+        "saveFailed": "Unable to save the assessment. Check the information and retry."
+      }
     },
     "multi": {
       "subtitle": "{{program}} certification · {{scheme}} scheme. Exams, units and assessment grids automatically adapt to the active training program.",
