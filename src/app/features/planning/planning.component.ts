@@ -49,6 +49,69 @@ export class PlanningComponent {
   readonly canSeeWorkModes = computed(() =>
     ["direction", "formateur", "secretariat"].includes(this.session.role()),
   );
+  readonly draggingId = signal<string | null>(null);
+  readonly moving = signal(false);
+  readonly dragTarget = signal<string | null>(null);
+
+  canDrag(event: PlanningEvent): boolean {
+    const row = this.sessions.apiSessions().find(item => item.id === event.id);
+    return !this.moving() && row?.status === "planned";
+  }
+
+  beginDrag(event: DragEvent, item: PlanningEvent): void {
+    if (!this.canDrag(item) || !event.dataTransfer) { event.preventDefault(); return; }
+    this.draggingId.set(item.id);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", item.id);
+  }
+
+  endDrag(): void { this.draggingId.set(null); this.dragTarget.set(null); }
+
+  dragOver(event: DragEvent, target: string): void {
+    if (!this.draggingId() || this.moving()) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+    this.dragTarget.set(target);
+  }
+
+  async dropOnDay(event: DragEvent, targetIso: string): Promise<void> {
+    event.preventDefault();
+    const id = this.draggingId();
+    this.endDrag();
+    if (!id || this.moving()) return;
+    const row = this.sessions.apiSessions().find(item => item.id === id);
+    if (!row || row.status !== "planned") return;
+    this.moving.set(true);
+    try { await this.sessions.moveToDate(id, targetIso); }
+    finally { this.moving.set(false); }
+  }
+
+  /** Drop on period arrows: keep the source weekday/day when moving weeks/months. */
+  async dropOnPeriod(event: DragEvent, direction: -1 | 1): Promise<void> {
+    event.preventDefault();
+    const id = this.draggingId();
+    const row = this.sessions.apiSessions().find(item => item.id === id);
+    this.endDrag();
+    if (!id || !row || row.status !== "planned" || this.moving()) return;
+    const source = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(new Date(row.startsAtUtc));
+    const parts = Object.fromEntries(source.map(part => [part.type, part.value]));
+    const date = this.parseIsoDate(`${parts["year"]}-${parts["month"]}-${parts["day"]}`);
+    if (this.view() === "month") {
+      const day = date.getUTCDate();
+      date.setUTCDate(1);
+      date.setUTCMonth(date.getUTCMonth() + direction);
+      const lastDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+      date.setUTCDate(Math.min(day, lastDay));
+    } else date.setUTCDate(date.getUTCDate() + direction * (this.view() === "week" ? 7 : 1));
+    this.moving.set(true);
+    try {
+      const success = await this.sessions.moveToDate(id, this.isoDate(date));
+      if (success) this.selectedDate.set(this.isoDate(date));
+    } finally { this.moving.set(false); }
+  }
+
   readonly days = PLANNING_DAYS;
   readonly promotionId = signal("all");
   readonly type = signal<"all" | PlanningType>("all");

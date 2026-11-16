@@ -60,6 +60,7 @@ export class HomeComponent {
     good: this.students().filter((s) => s.status === "good").length,
     warning: this.students().filter((s) => s.status === "warning").length,
     late: this.students().filter((s) => s.status === "late").length,
+    unclassified: Math.max(0, this.metrics().learners - this.students().filter(s => ["good", "warning", "late"].includes(s.status)).length),
   }));
 
   get alerts(): HomeAlert[] {

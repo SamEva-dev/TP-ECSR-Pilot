@@ -149,7 +149,9 @@
       },
       "progress": {
         "title": "Progression de la promotion",
-        "subtitle": "Moyenne des progressions individuelles"
+        "subtitle": "Moyenne des progressions individuelles",
+        "unclassified": "Stagiaires non classés",
+        "classificationHint": "La moyenne pédagogique et la répartition par situation sont deux indicateurs distincts. Les stagiaires non classés ne sont pas inclus dans les trois compteurs."
       },
       "hours": {
         "title": "Heures",
@@ -594,6 +596,11 @@
     "days": {
       "saturday": "Samedi",
       "sunday": "Dimanche"
+    },
+    "drag": {
+      "hint": "Glissez une séance planifiée sur une autre date ou sur une flèche pour changer de jour, semaine ou mois. La durée et l’heure locale de début sont conservées.",
+      "invalidTime": "Heure locale ambiguë ou inexistante lors du changement d’heure : choisissez une autre date ou modifiez la séance.",
+      "saveError": "Impossible de déplacer la séance. Vérifiez les conflits, les droits ou son statut."
     }
   },
   "promotions": {
@@ -2680,16 +2687,16 @@
     },
     "management": {
       "errors": {
-            "request": "Impossible de terminer cette opération. Réessayez ou consultez les détails.",
-            "forbidden": "Vous ne disposez pas des autorisations nécessaires.",
-            "conflict": "La session a été modifiée ou les prérequis ne sont pas satisfaits. Actualisez la page.",
-            "load": "Impossible de charger les candidats de cette session.",
-            "validation": "Saisissez un identifiant AuthGate valide.",
-            "CERTIFICATION_JURY_REQUIRED_TO_START": "Affectez au moins un membre du jury avant de démarrer la session.",
-            "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Inscrivez au moins un candidat avant de démarrer la session.",
-            "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "Tous les candidats doivent être déclarés éligibles avant le démarrage.",
-            "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les évaluations obligatoires doivent être finalisées avant la décision.",
-            "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Toutes les décisions des candidats doivent être terminées avant la publication."
+        "request": "Impossible de terminer cette opération. Réessayez ou consultez les détails.",
+        "forbidden": "Vous ne disposez pas des autorisations nécessaires.",
+        "conflict": "La session a été modifiée ou les prérequis ne sont pas satisfaits. Actualisez la page.",
+        "load": "Impossible de charger les candidats de cette session.",
+        "validation": "Saisissez un identifiant AuthGate valide.",
+        "CERTIFICATION_JURY_REQUIRED_TO_START": "Affectez au moins un membre du jury avant de démarrer la session.",
+        "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Inscrivez au moins un candidat avant de démarrer la session.",
+        "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "Tous les candidats doivent être déclarés éligibles avant le démarrage.",
+        "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les évaluations obligatoires doivent être finalisées avant la décision.",
+        "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Toutes les décisions des candidats doivent être terminées avant la publication."
       },
       "selectDecision": "Sélectionner une décision",
       "createTitle": "Créer une session de certification",
@@ -3304,6 +3311,13 @@
       "empty": "Aucune formation disponible à rattacher à cet établissement.",
       "cancel": "Annuler",
       "confirm": "Rattacher la formation"
+    },
+    "lifecycle": {
+      "title": "Cycle de vie de la formation",
+      "hint": "Activez la formation pour autoriser son utilisation dans les parcours pédagogiques.",
+      "activate": "Activer la formation",
+      "deactivate": "Désactiver la formation",
+      "responsibleRequired": "Un responsable doit être affecté avant l’activation."
     }
   },
   "referentials": {
@@ -5104,5 +5118,10 @@
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
     "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
     "juryNoAssignment": "Aucune session de certification ne vous est affectée."
+  },
+  "qaFixAttendance": {
+    "selectSession": "Séance à émarger",
+    "chooseSession": "Choisir une séance",
+    "noSession": "Aucune séance disponible pour la sélection actuelle."
   }
 }

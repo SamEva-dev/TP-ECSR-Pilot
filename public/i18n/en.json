@@ -149,7 +149,9 @@
       },
       "progress": {
         "title": "Cohort progress",
-        "subtitle": "Average individual progress"
+        "subtitle": "Average individual progress",
+        "unclassified": "Unclassified learners",
+        "classificationHint": "Average learning progress and learner status are different measures. Unclassified learners are not included in the three counters."
       },
       "hours": {
         "title": "Hours",
@@ -594,6 +596,11 @@
     "days": {
       "saturday": "Saturday",
       "sunday": "Sunday"
+    },
+    "drag": {
+      "hint": "Drag a planned session to another date or onto an arrow to move it by a day, week or month. Its duration and local start time are preserved.",
+      "invalidTime": "Ambiguous or nonexistent local time during daylight saving transition. Choose another date or edit the session.",
+      "saveError": "Could not move the session. Check conflicts, permissions, or session status."
     }
   },
   "promotions": {
@@ -2680,16 +2687,16 @@
     },
     "management": {
       "errors": {
-            "request": "Unable to complete this operation. Try again or review the details.",
-            "forbidden": "You do not have permission to perform this operation.",
-            "conflict": "The session changed or its prerequisites are not satisfied. Refresh the page.",
-            "load": "Unable to load this session’s candidates.",
-            "validation": "Enter a valid AuthGate user ID.",
-            "CERTIFICATION_JURY_REQUIRED_TO_START": "Assign at least one jury member before starting the session.",
-            "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Register at least one candidate before starting the session.",
-            "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "All candidates must be eligible before starting the session.",
-            "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Complete all mandatory assessments before recording the decision.",
-            "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Complete all candidate decisions before publishing results."
+        "request": "Unable to complete this operation. Try again or review the details.",
+        "forbidden": "You do not have permission to perform this operation.",
+        "conflict": "The session changed or its prerequisites are not satisfied. Refresh the page.",
+        "load": "Unable to load this session’s candidates.",
+        "validation": "Enter a valid AuthGate user ID.",
+        "CERTIFICATION_JURY_REQUIRED_TO_START": "Assign at least one jury member before starting the session.",
+        "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Register at least one candidate before starting the session.",
+        "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "All candidates must be eligible before starting the session.",
+        "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Complete all mandatory assessments before recording the decision.",
+        "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Complete all candidate decisions before publishing results."
       },
       "selectDecision": "Select a decision",
       "createTitle": "Create certification session",
@@ -3304,6 +3311,13 @@
       "empty": "No program is available to attach to this site.",
       "cancel": "Cancel",
       "confirm": "Attach program"
+    },
+    "lifecycle": {
+      "title": "Program lifecycle",
+      "hint": "Activate this program to make it available for training activities.",
+      "activate": "Activate program",
+      "deactivate": "Deactivate program",
+      "responsibleRequired": "A program manager must be assigned before activation."
     }
   },
   "referentials": {
@@ -5104,5 +5118,10 @@
     "sessionTime": "End time must be later than start time.",
     "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
     "juryNoAssignment": "No certification session is assigned to you."
+  },
+  "qaFixAttendance": {
+    "selectSession": "Attendance session",
+    "chooseSession": "Choose a session",
+    "noSession": "No session is available for the current selection."
   }
 }

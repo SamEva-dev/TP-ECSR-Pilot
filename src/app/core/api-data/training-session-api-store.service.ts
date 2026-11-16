@@ -62,6 +62,45 @@ export class TrainingSessionApiStoreService {
   );
   readonly trainers = this.trainersSignal.asReadonly();
 
+  /** Reschedule an existing planned session; never replace it with a new row. */
+  async moveToDate(id: string, targetDate: string): Promise<boolean> {
+    const source = this.rowsSignal().find(row => row.id === id);
+    if (!source || source.status !== "planned" || !/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) return false;
+    if (!this.visibleCohortApiIds().includes(source.cohortId)) return false;
+    const start = new Date(source.startsAtUtc);
+    const end = new Date(source.endsAtUtc);
+    const duration = end.getTime() - start.getTime();
+    if (!Number.isFinite(duration) || duration <= 0) return false;
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
+      timeZone: PARIS_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).formatToParts(start).map(item => [item.type, item.value]));
+    const targetStart = parisInstant(targetDate, `${parts["hour"]}:${parts["minute"]}`);
+    // An ambiguous or nonexistent local time (DST transition) must be resolved explicitly.
+    if (!targetStart) { this.notifications.error("planning.drag.invalidTime", "/planning"); return false; }
+    const targetEnd = new Date(new Date(targetStart).getTime() + duration).toISOString();
+    const generation = this.generation;
+    try {
+      const updated = this.normalize(await this.api.update(id, {
+        type: source.type, modality: source.modality, title: source.title,
+        startsAtUtc: targetStart, endsAtUtc: targetEnd, timeZoneId: PARIS_ZONE,
+        trainerAuthGateUserId: source.trainerAuthGateUserId,
+        trainerDisplayName: source.trainerDisplayName,
+        location: source.location, objective: source.objective,
+        supports: source.supports, comments: source.comments,
+        audienceMode: source.audienceMode,
+        participantEnrollmentIds: source.participantEnrollmentIds,
+      }));
+      if (generation !== this.generation || !this.visibleCohortApiIds().includes(updated.cohortId)) return false;
+      this.upsert(updated);
+      await this.reload();
+      if (generation === this.generation && this.visibleCohortApiIds().includes(updated.cohortId)) this.upsert(updated);
+      return true;
+    } catch {
+      this.notifications.error("planning.drag.saveError", "/planning");
+      return false;
+    }
+  }
+
   async complete(id: string): Promise<boolean> {
     try {
       const before = this.rowsSignal().find(row => row.id === id);
