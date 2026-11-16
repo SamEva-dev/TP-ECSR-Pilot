@@ -618,6 +618,9 @@ export class AdministrationComponent {
           this.notifications.error("organizationAdmin.api.conflictError", "/administration");
         } else if (status === 403) {
           this.notifications.error("organizationAdmin.api.forbiddenError", "/administration");
+        } else if (status === 400 && error instanceof HttpErrorResponse &&
+          JSON.stringify(error.error ?? {}).includes("ORGANIZATION_LEGAL_NAME_REQUIRED")) {
+          this.notifications.error("organizationAdmin.api.legalNameRequired", "/administration");
         } else {
           this.notifications.error(errorKey, "/administration");
         }

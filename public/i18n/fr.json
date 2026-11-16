@@ -2701,7 +2701,8 @@
       "absent": "Absent",
       "saveDecision": "Enregistrer la décision",
       "noCandidates": "Aucun candidat inscrit",
-      "success": "Opération enregistrée"
+      "success": "Opération enregistrée",
+      "session": "Session de certification"
     },
     "schemeSetup": {
       "title": "Configuration des schémas de certification",
@@ -3772,7 +3773,8 @@
       "conflictError": "Une modification concurrente a été détectée. Vos changements sont conservés dans le formulaire : copiez-les avant de recharger la page pour obtenir la dernière version.",
       "forbiddenError": "Vous ne disposez pas des droits nécessaires pour modifier cette organisation.",
       "refreshError": "Modification enregistrée, mais certaines données n’ont pas pu être actualisées. Rechargez la page.",
-      "invalidResponse": "La réponse de sauvegarde est incomplète. Vérifiez les données avant de poursuivre."
+      "invalidResponse": "La réponse de sauvegarde est incomplète. Vérifiez les données avant de poursuivre.",
+      "legalNameRequired": "Le nom légal de l’organisation est obligatoire."
     },
     "pedagogicalSheets": {
       "title": "Fiches pédagogiques",

@@ -354,7 +354,7 @@ export class ReportsApiStoreService {
     return {
       id: this.text(row?.id),
       dateTime: this.formatDateTime(row?.occurredAtUtc),
-      author: this.text(row?.userDisplayName),
+      author: this.text(row?.userDisplayName) || this.text(row?.userId),
       actionKey: this.text(row?.action),
       oldValue: "",
       newValue: "",

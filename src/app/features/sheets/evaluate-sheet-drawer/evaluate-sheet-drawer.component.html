@@ -59,9 +59,14 @@
             "sheets.evaluation.student" | t
           }}</span>
           <div class="relative">
+            @if (initialStudentId()) {
+              <div class="flex min-h-[42px] items-center rounded-[11px] border border-[#dce3eb] bg-[#f8fafc] px-3 text-[13px] text-[#334155]" aria-readonly="true">
+                {{ selectedStudent().firstName }} {{ selectedStudent().lastName }}
+              </div>
+            } @else {
             <select
               [value]="studentId()"
-              [disabled]="!!initialStudentId()"
+              
               (change)="updateStudent($event)"
               class="h-[42px] w-full appearance-none rounded-[11px] border border-[#dce3eb] bg-white pl-3 pr-9 text-[13px] text-[#334155] outline-none focus:border-[#9ab8d7] focus:ring-2 focus:ring-blue-100"
             >
@@ -71,6 +76,7 @@
                 </option>
               }
             </select>
+            }
             <i
               class="ph ph-caret-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#64748b]"
             ></i>

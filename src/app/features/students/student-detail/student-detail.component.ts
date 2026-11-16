@@ -246,7 +246,7 @@ export class StudentDetailComponent {
           level === 'acquired' ? 100 :
           level === 'in_progress' ? 60 :
           level === 'rework' ? 25 : 0);
-        return Math.round(points.reduce<number>((sum, point) => sum + point, 0) / points.length);
+        return Math.round(points.reduce<number>((sum, point) => sum + point, 0) / points.length * 100) / 100;
       }
     }
     return this.student.skills[code.toUpperCase() as 'C1' | 'C2' | 'C3' | 'C4'] ?? 0;
@@ -305,12 +305,18 @@ export class StudentDetailComponent {
       const skill = skillDefinitions.find((item) => item.code.toUpperCase() === code);
       if (!skill?.criteria.length || !skill.criteria.some((criterion) => criterion.level !== 'not_assessed'))
         return this.number(competencies[code]);
-      return Math.round(skill.criteria.reduce((sum, criterion) =>
-        sum + (criterion.level === 'acquired' ? 100 : criterion.level === 'in_progress' ? 60 : criterion.level === 'rework' ? 25 : 0), 0) / skill.criteria.length);
+      return skill.criteria.reduce((sum, criterion) =>
+        sum + (criterion.level === 'acquired' ? 100 : criterion.level === 'in_progress' ? 60 : criterion.level === 'rework' ? 25 : 0), 0) / skill.criteria.length;
     };
-    const overallProgress = assessedSkills.length
-      ? Math.round(skillDefinitions.reduce((sum, skill) => sum + skillScore(skill.code.toUpperCase()), 0) / skillDefinitions.length)
-      : this.number(s?.averageCompetencyProgress);
+    // The backend reporting aggregate is authoritative after the projection fix.
+    // Its rounding policy is shared by Rapports; avoid recomputing an independently
+    // rounded average in the Dossier (QA20 task-53).
+    const persistedProgress = Number(s?.averageCompetencyProgress);
+    const overallProgress = Number.isFinite(persistedProgress) && s?.averageCompetencyProgress != null
+      ? persistedProgress
+      : assessedSkills.length
+        ? Math.round(skillDefinitions.reduce((sum, skill) => sum + skillScore(skill.code.toUpperCase()), 0) / skillDefinitions.length * 100) / 100
+        : 0;
     const catchup = this.hours(s?.catchupMinutes);
     const status: StudentStatus = catchup >= 10 ? 'late' : catchup > 0 || (s?.reworkTopics ?? 0) > 0 ? 'warning' : 'good';
     const evaluations = this.mapEvaluations(detail);
@@ -347,7 +353,7 @@ export class StudentDetailComponent {
     return [...map.entries()].map(([id, labelKey]) => ({ id, labelKey }));
   }
   private mapSheets(detail: LearnerDetailReport | null): PedagogicalSheet[] {
-    return (detail?.topics ?? []).map((topic) => ({ topicId: this.text(topic.id), number: this.number(topic.number), titleKey: this.text(topic.title), status: this.sheetStatus(topic.status), preparationDate: this.text(topic.preparationDate), preparationContent: this.text((topic as { preparationContent?: unknown }).preparationContent), presentationDate: this.text(topic.presentationDate), durationMinutes: 0, evaluator: '', commentKey: '', positivePoints: '', improvements: '', generalComment: '', nextObjective: '', evaluationLevels: {} }));
+    return (detail?.topics ?? []).map((topic) => ({ topicId: this.text(topic.id), number: this.number(topic.number), titleKey: this.text(topic.title), status: this.sheetStatus(topic.status), preparationDate: this.text(topic.preparationDate), preparationContent: '', presentationDate: this.text(topic.presentationDate), durationMinutes: 0, evaluator: '', commentKey: '', positivePoints: '', improvements: '', generalComment: '', nextObjective: '', evaluationLevels: {} }));
   }
   private mapDriving(detail: LearnerDetailReport | null): DrivingHistoryItem[] {
     const studentName = `${this.text(detail?.firstName)} ${this.text(detail?.lastName)}`.trim();

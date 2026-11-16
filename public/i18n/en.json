@@ -2701,7 +2701,8 @@
       "absent": "Absent",
       "saveDecision": "Save decision",
       "noCandidates": "No registered candidates",
-      "success": "Operation saved"
+      "success": "Operation saved",
+      "session": "Certification session"
     },
     "schemeSetup": {
       "title": "Certification scheme setup",
@@ -3772,7 +3773,8 @@
       "conflictError": "A concurrent change was detected. Your changes remain in the form: copy them before reloading the page to obtain the latest version.",
       "forbiddenError": "You do not have permission to change this organization.",
       "refreshError": "Changes were saved, but some data could not be refreshed. Reload the page.",
-      "invalidResponse": "The save response was incomplete. Verify the data before continuing."
+      "invalidResponse": "The save response was incomplete. Verify the data before continuing.",
+      "legalNameRequired": "The organization legal name is required."
     },
     "pedagogicalSheets": {
       "title": "Pedagogical sheets",

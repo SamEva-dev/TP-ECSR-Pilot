@@ -107,34 +107,32 @@ export class EvaluateSheetDrawerComponent implements OnInit {
         .length,
   );
 
+  // A locked evaluation must never fall back to another learner while the
+  // current cohort is loading. The parent owns the learner selection.
   constructor() {
     effect(() => {
       const students = this.store.students();
-      const current = this.studentId();
       const requested = this.initialStudentId();
-      const selected = requested && students.some(student => student.id === requested)
-        ? requested : students.some((student) => student.id === current)
-          ? current : (students[0]?.id ?? "");
-      if (selected !== current) {
-        this.studentId.set(selected);
-        this.store.selectStudent(selected);
+      const current = this.studentId();
+      const next = requested || (students.some(student => student.id === current)
+        ? current : (students[0]?.id ?? ""));
+      if (next !== current) {
+        this.studentId.set(next);
+        this.hydratedSelection = "";
+        this.saved.set(false);
       }
+      // Do not mutate the shared student selection from this child: the
+      // Sheets screen already owns it, and effects must not race each other.
     });
 
     effect(() => {
       const available = this.sheets();
       const currentNumber = this.sheetNumber();
-      const selectedNumber = available.some(
-        (sheet) => sheet.number === currentNumber,
-      )
+      const selectedNumber = available.some(sheet => sheet.number === currentNumber)
         ? currentNumber
-        : (available.find((sheet) => sheet.number === 32)?.number ??
-          available[0]?.number ??
-          0);
-      if (selectedNumber !== currentNumber)
-        this.sheetNumber.set(selectedNumber);
-      const selectedSheet =
-        available.find((sheet) => sheet.number === selectedNumber) ?? null;
+        : (available.find(sheet => sheet.number === 32)?.number ?? available[0]?.number ?? 0);
+      if (selectedNumber !== currentNumber) this.sheetNumber.set(selectedNumber);
+      const selectedSheet = available.find(sheet => sheet.number === selectedNumber) ?? null;
       const selectionKey = `${this.studentId()}|${selectedSheet?.topicId ?? ""}`;
       if (selectionKey !== this.hydratedSelection) {
         this.hydratedSelection = selectionKey;
@@ -144,11 +142,10 @@ export class EvaluateSheetDrawerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const requested = this.initialStudentId() ?? "";
-    const selected = this.students.some((student) => student.id === requested)
-      ? requested : (this.students[0]?.id ?? "");
-    this.studentId.set(selected);
-    this.store.selectStudent(selected);
+    // ngOnInit previously overwrote the input with students[0] while the
+    // parent was switching learners. Selection is now input-driven.
+    const requested = this.initialStudentId();
+    if (requested) this.studentId.set(requested);
   }
 
   updateStudent(event: Event): void {
