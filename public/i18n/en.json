@@ -2672,9 +2672,25 @@
     "juryAccess": {
       "title": "Jury workspace",
       "refresh": "Refresh",
-      "empty": "No certification session available."
+      "empty": "No certification session available.",
+      "name": "Name",
+      "role": "Role",
+      "from": "From",
+      "until": "Until"
     },
     "management": {
+      "errors": {
+            "request": "Unable to complete this operation. Try again or review the details.",
+            "forbidden": "You do not have permission to perform this operation.",
+            "conflict": "The session changed or its prerequisites are not satisfied. Refresh the page.",
+            "load": "Unable to load this session’s candidates.",
+            "validation": "Enter a valid AuthGate user ID.",
+            "CERTIFICATION_JURY_REQUIRED_TO_START": "Assign at least one jury member before starting the session.",
+            "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Register at least one candidate before starting the session.",
+            "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "All candidates must be eligible before starting the session.",
+            "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Complete all mandatory assessments before recording the decision.",
+            "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Complete all candidate decisions before publishing results."
+      },
       "selectDecision": "Select a decision",
       "createTitle": "Create certification session",
       "createHelp": "The session will use the active cohort and published certification scheme.",

@@ -2672,9 +2672,25 @@
     "juryAccess": {
       "title": "Espace jury",
       "refresh": "Actualiser",
-      "empty": "Aucune session de certification disponible."
+      "empty": "Aucune session de certification disponible.",
+      "name": "Nom",
+      "role": "Rôle",
+      "from": "Du",
+      "until": "Au"
     },
     "management": {
+      "errors": {
+            "request": "Impossible de terminer cette opération. Réessayez ou consultez les détails.",
+            "forbidden": "Vous ne disposez pas des autorisations nécessaires.",
+            "conflict": "La session a été modifiée ou les prérequis ne sont pas satisfaits. Actualisez la page.",
+            "load": "Impossible de charger les candidats de cette session.",
+            "validation": "Saisissez un identifiant AuthGate valide.",
+            "CERTIFICATION_JURY_REQUIRED_TO_START": "Affectez au moins un membre du jury avant de démarrer la session.",
+            "CERTIFICATION_CANDIDATES_REQUIRED_TO_START": "Inscrivez au moins un candidat avant de démarrer la session.",
+            "CERTIFICATION_CANDIDATES_NOT_READY_TO_START": "Tous les candidats doivent être déclarés éligibles avant le démarrage.",
+            "CERTIFICATION_ASSESSMENTS_INCOMPLETE": "Toutes les évaluations obligatoires doivent être finalisées avant la décision.",
+            "CERTIFICATION_CANDIDATES_NOT_COMPLETED": "Toutes les décisions des candidats doivent être terminées avant la publication."
+      },
       "selectDecision": "Sélectionner une décision",
       "createTitle": "Créer une session de certification",
       "createHelp": "La session sera liée à la promotion active et au référentiel de certification publié.",

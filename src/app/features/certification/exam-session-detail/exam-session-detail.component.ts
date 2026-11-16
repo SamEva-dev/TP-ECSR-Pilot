@@ -138,7 +138,16 @@ export class ExamSessionDetailComponent {
       this.loadJuryAssignments();
       this.actionInfo.set(infoKey);
     } catch (error: unknown) {
-      this.actionError.set(String((error as {error?: {code?: string}})?.error?.code || "request"));
+      const response = error as { status?: number; error?: { code?: string; errorCode?: string; extensions?: { code?: string } } } | null;
+      const code = response?.error?.code ?? response?.error?.errorCode ?? response?.error?.extensions?.code ?? "";
+      const supported = new Set([
+        "CERTIFICATION_JURY_REQUIRED_TO_START",
+        "CERTIFICATION_CANDIDATES_REQUIRED_TO_START",
+        "CERTIFICATION_CANDIDATES_NOT_READY_TO_START",
+        "CERTIFICATION_ASSESSMENTS_INCOMPLETE",
+        "CERTIFICATION_CANDIDATES_NOT_COMPLETED",
+      ]);
+      this.actionError.set(supported.has(code) ? code : response?.status === 403 ? "forbidden" : response?.status === 409 ? "conflict" : "request");
     } finally { this.actionBusy.set(false); }
   }
 

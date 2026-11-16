@@ -18,6 +18,7 @@ import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { AttentionService } from "../../core/attention/attention.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import { APP_NAV_ITEMS } from "../../core/navigation/app-navigation.config";
+import { StatisticsModuleAvailabilityService } from "../../core/access/statistics-module-availability.service";
 import { GlobalSearchService } from "../../core/search/global-search.service";
 import { AuthGateService } from "../../core/session/auth-gate.service";
 import { SessionService } from "../../core/session/session.service";
@@ -57,6 +58,7 @@ export class AppShellComponent {
   readonly publishedBranding = inject(PublishedBrandingService);
   readonly publishedTheme = this.publishedBranding.configuration;
   readonly access = inject(AccessPolicyService);
+  readonly statisticsAvailability = inject(StatisticsModuleAvailabilityService);
   readonly attention = inject(AttentionService);
   private readonly globalSearch = inject(GlobalSearchService);
 
@@ -71,6 +73,7 @@ export class AppShellComponent {
     APP_NAV_ITEMS.filter(
       (item) =>
         this.access.can(item.permission) &&
+        (item.path !== "/statistiques" || this.statisticsAvailability.isEnabledForCurrentOrganization()) &&
         (item.path !== "/mes-stages-tuteur" || this.access.canOpenTutorWorkspace()) &&
         (!item.requiredRoles?.length ||
           this.access.hasAnyRole(...item.requiredRoles)),

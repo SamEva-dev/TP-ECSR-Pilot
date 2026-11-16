@@ -1,3 +1,4 @@
+import { StatisticsModuleAvailabilityService } from "../access/statistics-module-availability.service";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -165,6 +166,7 @@ const PREF_META: Omit<OrganizationPreference, "enabled">[] = [
 export class AdministrationComponent {
   readonly workspace = inject(WorkspaceContextService);
   private readonly api = inject(OrganizationAdministrationApiService);
+  private readonly statisticsAvailability = inject(StatisticsModuleAvailabilityService);
   private readonly reporting = inject(ReportingApiService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly referentials = inject(ReferentialApiStoreService);
@@ -601,6 +603,7 @@ export class AdministrationComponent {
         }
         // Update the revision even when the user is editing another field during the HTTP call.
         this.lastDto = dto;
+        await this.statisticsAvailability.refresh(organizationId);
         if (revisionAtEnqueue === this.editRevision) this.apply(dto);
         // A read-side refresh failure must not turn a committed PUT into a failed save.
         try {

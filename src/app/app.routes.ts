@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { environment } from "./environments/environment";
 import { authGuard } from "./core/session/auth.guard";
 import { roleGuard, tutorWorkspaceGuard } from "./core/session/role.guard";
+import { statisticsModuleGuard } from "./core/session/statistics-module.guard";
 
 export const routes: Routes = [
   { path: 'auth/logout', loadComponent: () => import('./core/oidc/oidc-signout.component').then(m => m.OidcSignoutComponent) },
@@ -363,7 +364,7 @@ export const routes: Routes = [
       },
       {
         path: "statistiques",
-        canActivate: [roleGuard],
+        canActivate: [roleGuard, statisticsModuleGuard],
         data: { permission: "statistics.view" },
         loadComponent: () =>
           import("./features/statistics/statistics.component").then(
