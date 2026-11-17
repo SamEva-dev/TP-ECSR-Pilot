@@ -2571,7 +2571,7 @@
       "ccp1Stage": "CCP1 requirements",
       "ccp2Stage": "CCP2 requirements",
       "juryEvaluation": "Jury assessment grid",
-      "juryEvaluationHelp": "Demo digital grid; official criteria will be configured from the exam framework.",
+      "juryEvaluationHelp": "Evaluation using configured certification criteria.",
       "locked": "Assessment locked",
       "juryCriteria": {
         "pedagogy": "Delivery and structure of the teaching performance",
@@ -2599,9 +2599,9 @@
       "activeScheme": "Active certification scheme",
       "schemeHelp": "Version {{version}} · {{steps}} exams · {{units}} validation units",
       "scheme": "Scheme",
-      "juryForProgram": "Demo jury authorized for {{program}}.",
+      "juryForProgram": "Jury assigned to program {{program}}.",
       "examPathSubtitle": "Exams configured by scheme {{scheme}}.",
-      "juryGridHelp": "Demo grid from scheme {{scheme}}; official criteria will be configured by framework.",
+      "juryGridHelp": "Criteria from certification framework {{scheme}}.",
       "examCount": "Exams",
       "schemeStructure": "Exam structure",
       "version": "Version {{version}}"

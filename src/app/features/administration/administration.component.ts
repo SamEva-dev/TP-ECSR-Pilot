@@ -8,7 +8,6 @@ import {
   untracked,
 } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { HttpErrorResponse } from "@angular/common/http";
 import { apiErrorCode } from "../../core/errors/api-error-code";
 import { firstValueFrom } from "rxjs";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
@@ -632,7 +631,7 @@ export class AdministrationComponent {
         return true;
       } catch (error: unknown) {
         if (this.workspace.organization()?.apiId !== organizationId) return false;
-        const status = error instanceof HttpErrorResponse ? error.status : 0;
+        const status = (error as { status?: number } | null)?.status ?? 0;
         if (status === 400 && apiErrorCode(error) === "ORGANIZATION_LEGAL_NAME_REQUIRED") {
           this.notifications.error("organizationAdmin.api.legalNameRequired", "/administration");
         } else if (status === 409) {

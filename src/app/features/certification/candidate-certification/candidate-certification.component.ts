@@ -60,7 +60,11 @@ export class CandidateCertificationComponent {
   readonly exam = this.store.examSession;
 
   private readonly requestedJurySessionId = this.route.snapshot.queryParamMap.get("sessionId") ?? "";
-  readonly juryContextReady = signal(false);
+  readonly juryContextReady = computed(() =>
+    !this.isJury() || (!!this.requestedJurySessionId &&
+      this.store.hasSession(this.requestedJurySessionId) &&
+      this.store.selectedJurySessionId() === this.requestedJurySessionId)
+  );
 
   private readonly requestedCandidateId =
     this.route.snapshot.paramMap.get("id") ?? "";
@@ -110,11 +114,7 @@ export class CandidateCertificationComponent {
   constructor() {
     if (this.sessionService.role() === "jury") {
       // A candidate URL must determine the session after F5. No first-session fallback.
-      void this.store.restoreJurySession(this.requestedJurySessionId)
-        .then(ok => this.juryContextReady.set(ok))
-        .catch(() => this.juryContextReady.set(false));
-    } else {
-      this.juryContextReady.set(true);
+      void this.store.restoreJurySession(this.requestedJurySessionId);
     }
     effect(
       () => {

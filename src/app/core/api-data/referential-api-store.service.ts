@@ -15,12 +15,14 @@ import type { ProgramModule } from "../models/workspace.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
+import { AccessPolicyService } from "../access/access-policy.service";
 
 @Injectable({ providedIn: "root" })
 export class ReferentialApiStoreService {
   private readonly api = inject(ReferentialApiService);
   private readonly realtime = inject(RealtimeService);
   private readonly session = inject(SessionService);
+  private readonly policy = inject(AccessPolicyService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly itemsSignal = signal<TrainingReferential[]>([]);
 
@@ -47,7 +49,8 @@ export class ReferentialApiStoreService {
       this.itemsSignal.set([]);
       this.remoteLoaded.set(false);
       this.loadError.set(false);
-      if (user) void this.reload(generation);
+      if (user && this.policy.can("referentials.view")) void this.reload(generation);
+      else if (user) this.remoteLoaded.set(true);
     });
 
     effect(() => {
@@ -60,12 +63,18 @@ export class ReferentialApiStoreService {
       )
         return;
       untracked(() => {
-        if (this.session.hasValidToken()) void this.reload();
+        if (this.session.hasValidToken() && this.policy.can("referentials.view")) void this.reload();
       });
     });
   }
 
   async reload(generation = this.generation): Promise<boolean> {
+    if (!this.policy.can("referentials.view")) {
+      this.itemsSignal.set([]);
+      this.remoteLoaded.set(true);
+      this.loading.set(false);
+      return false;
+    }
     const request = ++this.request;
     this.loading.set(true);
     try {

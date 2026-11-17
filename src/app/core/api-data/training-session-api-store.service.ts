@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from "@angular/common/http";
 import { apiErrorCode } from "../errors/api-error-code";
 import { Injectable, computed, effect, inject, signal, untracked } from "@angular/core";
 import type { PlanningEvent, PlanningType } from "../models/planning.models";
@@ -100,7 +99,7 @@ export class TrainingSessionApiStoreService {
       if (generation === this.generation && this.visibleCohortApiIds().includes(updated.cohortId)) this.upsert(updated);
       return true;
     } catch (error: unknown) {
-      const conflict = error instanceof HttpErrorResponse && error.status === 409 && apiErrorCode(error) === "SESSION_TRAINER_SCHEDULE_CONFLICT";
+      const conflict = (error as { status?: number } | null)?.status === 409 && apiErrorCode(error) === "SESSION_TRAINER_SCHEDULE_CONFLICT";
       this.notifications.error(conflict ? "planning.real.trainerScheduleConflict" : "planning.drag.saveError", "/planning");
       return false;
     }
@@ -294,7 +293,7 @@ export class TrainingSessionApiStoreService {
       }
       return created;
     } catch (error: unknown) {
-      const conflict = error instanceof HttpErrorResponse && error.status === 409
+      const conflict = (error as { status?: number } | null)?.status === 409
         && apiErrorCode(error) === "SESSION_TRAINER_SCHEDULE_CONFLICT";
       this.notifications.error(conflict ? "planning.real.trainerScheduleConflict" : "sessions.real.saveError", errorPath);
       return null;

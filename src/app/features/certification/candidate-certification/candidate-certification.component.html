@@ -303,6 +303,8 @@
       </article>
     }
     }
+  } @else if (isJury() && (!workspace.remoteWorkspaceLoaded() || store.loading())) {
+    <p role="status" class="rounded-xl border border-[#dfe5ec] bg-white p-5 text-sm text-[#6c788b]">{{ "common.loading" | t }}</p>
   } @else {
     <p role="alert" class="rounded-xl border border-[#dfe5ec] bg-white p-5 text-sm text-[#6c788b]">{{ (isJury() ? "qaFix.juryCandidateUnavailable" : "certification.api.candidatesLoadFailed") | t }}</p>
   }

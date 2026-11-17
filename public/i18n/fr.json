@@ -2571,7 +2571,7 @@
       "ccp1Stage": "Éléments CCP1",
       "ccp2Stage": "Éléments CCP2",
       "juryEvaluation": "Grille d’évaluation Jury",
-      "juryEvaluationHelp": "Grille numérique de démonstration ; les critères officiels seront configurés par référentiel.",
+      "juryEvaluationHelp": "Évaluation conformément aux critères de certification configurés.",
       "locked": "Évaluation verrouillée",
       "juryCriteria": {
         "pedagogy": "Conduite et structuration de la prestation pédagogique",
@@ -2599,9 +2599,9 @@
       "activeScheme": "Schéma de certification actif",
       "schemeHelp": "Version {{version}} · {{steps}} épreuves · {{units}} unités de validation",
       "scheme": "Schéma",
-      "juryForProgram": "Jury habilité pour {{program}} dans cette maquette.",
+      "juryForProgram": "Jury affecté au programme {{program}}.",
       "examPathSubtitle": "Épreuves configurées par le schéma {{scheme}}.",
-      "juryGridHelp": "Grille de démonstration issue du schéma {{scheme}} ; les critères officiels seront paramétrés par référentiel.",
+      "juryGridHelp": "Critères du référentiel de certification {{scheme}}.",
       "examCount": "Épreuves",
       "schemeStructure": "Structure des épreuves",
       "version": "Version {{version}}"

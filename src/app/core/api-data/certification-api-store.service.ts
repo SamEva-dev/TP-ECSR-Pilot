@@ -77,6 +77,8 @@ export class CertificationApiStoreService {
   private readonly selfEnrollmentIdSignal = signal("");
   private contextLoadSequence = 0;
   private candidateLoadSequence = 0;
+  // Kept across workspace initialization/reloads for a deep-linked jury dossier.
+  private readonly requestedJurySessionIdSignal = signal("");
 
   readonly loading = signal(false);
   readonly loadError = signal(false);
@@ -149,7 +151,7 @@ export class CertificationApiStoreService {
       this.schemesSignal.set([]);
       this.sessionsSignal.set([]);
       this.candidatesSignal.set([]);
-      this.selectedSessionIdSignal.set("");
+      this.selectedSessionIdSignal.set(this.session.role() === "jury" ? this.requestedJurySessionIdSignal() : "");
       this.selfEnrollmentIdSignal.set("");
       this.loadError.set(false);
       this.loading.set(false);
@@ -188,6 +190,7 @@ export class CertificationApiStoreService {
 
   async selectSession(sessionId: string): Promise<void> {
     const id = this.text(sessionId);
+    if (this.session.role() === "jury") this.requestedJurySessionIdSignal.set(id);
     this.selectedSessionIdSignal.set(id);
     this.candidateLoadSequence++;
     this.candidatesSignal.set([]);
@@ -197,20 +200,24 @@ export class CertificationApiStoreService {
     }
   }
 
-  /** Restore an assigned jury session from the candidate URL after a full page reload. */
+  /** Pin the deep-link session before asynchronous workspace initialization. */
   async restoreJurySession(sessionId: string): Promise<boolean> {
     const id = this.text(sessionId);
     if (this.session.role() !== "jury" || !id) return false;
-    // A concurrent initial context request may be running. Its result will
-    // preserve this selection only if it is present among assigned sessions.
-    this.selectedSessionIdSignal.set(id);
+    this.requestedJurySessionIdSignal.set(id);
+    if (this.selectedSessionIdSignal() !== id) {
+      this.selectedSessionIdSignal.set(id);
+      this.candidateLoadSequence++;
+      this.candidatesSignal.set([]);
+    }
+    // Workspace initialization will load the pinned session when ready.
+    if (!this.workspace.remoteWorkspaceLoaded()) return false;
     if (!this.hasSession(id)) {
       const loaded = await this.loadJuryContext(false);
-      if (!loaded || !this.hasSession(id)) return false;
+      return loaded && this.hasSession(id) && this.selectedSessionIdSignal() === id;
     }
-    if (this.selectedSessionIdSignal() !== id) await this.selectSession(id);
-    else if (!this.candidatesSignal().length) await this.loadMyJuryCandidates(id);
-    return this.selectedSessionIdSignal() === id && this.hasSession(id);
+    await this.loadMyJuryCandidates(id);
+    return this.hasSession(id) && this.selectedSessionIdSignal() === id;
   }
 
   /** Checks a real session loaded from the current API context. */
@@ -374,7 +381,9 @@ export class CertificationApiStoreService {
           organizationId !== this.text(this.session.session()?.organizationId)) return false;
       this.sessionsSignal.set((sessions ?? []).map(x => this.normalizeSession(x)));
       this.schemesSignal.set((schemes ?? []).map(x => this.normalizeScheme(x)));
-      const last = this.selectedSessionIdSignal();
+      const requested = this.requestedJurySessionIdSignal();
+      const last = requested || this.selectedSessionIdSignal();
+      // An explicit deep link must never fall back to an unrelated session.
       const selected = this.sessionsSignal().some(x => x.id === last)
         ? last : (last ? "" : (this.sessionsSignal()[0]?.id ?? ""));
       this.selectedSessionIdSignal.set(selected);
@@ -530,6 +539,8 @@ export class CertificationApiStoreService {
 
   private currentSessionApi(): CertificationExamSessionApi | null {
     const selected = this.selectedSessionIdSignal();
+    if (this.session.role() === "jury" && selected)
+      return this.sessionsSignal().find((item) => item.id === selected) ?? null;
     return (
       this.sessionsSignal().find((item) => item.id === selected) ??
       this.sessionsSignal()[0] ??

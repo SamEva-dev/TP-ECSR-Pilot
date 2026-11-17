@@ -47,6 +47,14 @@ export class HomeComponent {
     start: this.formatDate(this.workspace.cohort()?.start),
     end: this.formatDate(this.workspace.cohort()?.end),
   }));
+  readonly studentFormationSummary = computed(() => {
+    const program = this.workspace.program();
+    const cohort = this.workspace.cohort();
+    const parts = [this.text(program?.name), this.text(cohort?.name)].filter(Boolean);
+    const endDate = this.formatDate(cohort?.end);
+    if (endDate) parts.push(endDate);
+    return parts.join(" · ");
+  });
   readonly students = computed(() => this.dashboard.students());
   readonly metrics = computed(() => this.dashboard.metrics());
   readonly metricsAvailable = this.dashboard.metricsAvailable;

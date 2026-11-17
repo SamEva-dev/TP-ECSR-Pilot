@@ -1,6 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
 import { throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
+import { apiErrorCode } from "../errors/api-error-code";
 
 export interface PedagoraApiError {
   code: string;
@@ -16,12 +17,9 @@ export const apiErrorInterceptor: HttpInterceptorFn = (request, next) =>
       const body =
         error.error && typeof error.error === "object" ? error.error : {};
       const normalized: PedagoraApiError = {
-        code:
-          typeof body.code === "string"
-            ? body.code
-            : error.status === 0
-              ? "NETWORK_UNAVAILABLE"
-              : "UNEXPECTED_ERROR",
+        code: apiErrorCode(error) || (error.status === 0
+          ? "NETWORK_UNAVAILABLE"
+          : "UNEXPECTED_ERROR"),
         status: error.status,
         traceId: typeof body.traceId === "string" ? body.traceId : undefined,
         errors: body.errors,
