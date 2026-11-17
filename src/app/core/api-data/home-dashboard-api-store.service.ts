@@ -491,12 +491,15 @@ export class HomeDashboardApiStoreService {
       .join(" ")
       .trim()
       .toLowerCase();
-    const now = Date.now();
+    const parisDay = (instant: number) => new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date(instant));
+    const today = parisDay(Date.now());
     return sessions
       .filter((row) => {
         const start = Date.parse(this.text(row.startsAtUtc));
-        if (!Number.isFinite(start) || start < now - 6 * 60 * 60 * 1000)
-          return false;
+        if (!Number.isFinite(start) || parisDay(start) !== today ||
+            this.text(row.status).toLowerCase() === "cancelled") return false;
         const trainerId = this.text(row.trainerAuthGateUserId).toLowerCase();
         const trainerName = this.text(row.trainerDisplayName)
           .trim()
@@ -507,7 +510,6 @@ export class HomeDashboardApiStoreService {
         );
       })
       .sort((a, b) => Date.parse(a.startsAtUtc) - Date.parse(b.startsAtUtc))
-      .slice(0, 5)
       .map((row) => ({
         id: this.text(row.id),
         time: this.formatTime(row.startsAtUtc),

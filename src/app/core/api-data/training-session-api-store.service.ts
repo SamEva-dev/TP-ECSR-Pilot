@@ -4,6 +4,7 @@ import { Injectable, computed, effect, inject, signal, untracked } from "@angula
 import type { PlanningEvent, PlanningType } from "../models/planning.models";
 import type { PedagogicalSessionType, ProgrammedSession, SessionModality } from "../models/sessions.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
+import { AccessPolicyService } from "../access/access-policy.service";
 import { PedagoraAccessApiService } from "../access/pedagora-access-api.service";
 import { firstValueFrom } from "rxjs";
 import { RealtimeService } from "../realtime/realtime.service";
@@ -44,6 +45,7 @@ export class TrainingSessionApiStoreService {
   private readonly session = inject(SessionService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly accessApi = inject(PedagoraAccessApiService);
+  private readonly policy = inject(AccessPolicyService);
 
   private readonly rowsSignal = signal<TrainingSessionApi[]>([]);
   private readonly trainersSignal = signal<TrainerOption[]>([]);
@@ -97,8 +99,9 @@ export class TrainingSessionApiStoreService {
       await this.reload();
       if (generation === this.generation && this.visibleCohortApiIds().includes(updated.cohortId)) this.upsert(updated);
       return true;
-    } catch {
-      this.notifications.error("planning.drag.saveError", "/planning");
+    } catch (error: unknown) {
+      const conflict = error instanceof HttpErrorResponse && error.status === 409 && apiErrorCode(error) === "SESSION_TRAINER_SCHEDULE_CONFLICT";
+      this.notifications.error(conflict ? "planning.real.trainerScheduleConflict" : "planning.drag.saveError", "/planning");
       return false;
     }
   }
@@ -132,7 +135,9 @@ export class TrainingSessionApiStoreService {
       this.loadError.set(false);
       if (ready && cohortApiIds.length) {
         void this.reload(generation, cohortApiIds);
-        void this.loadEligibleTrainers(generation);
+        if (this.policy.can("sessions.assignTrainer") || this.policy.can("sessions.manage"))
+          void this.loadEligibleTrainers(generation);
+        else this.trainersSignal.set([]);
       } else {
         this.loading.set(false);
         this.trainersSignal.set([]);
@@ -291,7 +296,7 @@ export class TrainingSessionApiStoreService {
     } catch (error: unknown) {
       const conflict = error instanceof HttpErrorResponse && error.status === 409
         && apiErrorCode(error) === "SESSION_TRAINER_SCHEDULE_CONFLICT";
-      this.notifications.error(conflict ? "sessions.real.trainerScheduleConflict" : "sessions.real.saveError", errorPath);
+      this.notifications.error(conflict ? "planning.real.trainerScheduleConflict" : "sessions.real.saveError", errorPath);
       return null;
     }
   }

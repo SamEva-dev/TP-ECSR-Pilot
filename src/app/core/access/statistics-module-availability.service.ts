@@ -2,12 +2,14 @@ import { Injectable, effect, inject, signal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { environment } from "../../environments/environment";
+import { AccessPolicyService } from "./access-policy.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 
 @Injectable({ providedIn: "root" })
 export class StatisticsModuleAvailabilityService {
   private readonly http = inject(HttpClient);
   private readonly workspace = inject(WorkspaceContextService);
+  private readonly access = inject(AccessPolicyService);
   private readonly allowedOrganization = signal("");
   readonly available = this.allowedOrganization.asReadonly();
   private sequence = 0;
@@ -20,7 +22,7 @@ export class StatisticsModuleAvailabilityService {
   }
 
   async check(organizationId = this.workspace.organization()?.apiId ?? ""): Promise<boolean> {
-    if (!organizationId || this.workspace.organization()?.apiId !== organizationId) return false;
+    if (!organizationId || this.workspace.organization()?.apiId !== organizationId || !this.access.can("statistics.view")) return false;
     try {
       const status = await firstValueFrom(this.http.get<{ enabled: boolean }>(
         `${environment.apiBaseUrl}/api/v1/reporting/organizations/${encodeURIComponent(organizationId)}/modules/statistics/status`,

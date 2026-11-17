@@ -59,6 +59,9 @@ export class CandidateCertificationComponent {
   readonly program = this.workspace.program;
   readonly exam = this.store.examSession;
 
+  private readonly requestedJurySessionId = this.route.snapshot.queryParamMap.get("sessionId") ?? "";
+  readonly juryContextReady = signal(false);
+
   private readonly requestedCandidateId =
     this.route.snapshot.paramMap.get("id") ?? "";
 
@@ -74,8 +77,10 @@ export class CandidateCertificationComponent {
         ) ?? EMPTY_CANDIDATE
       );
     }
-    // An unknown route parameter must not silently select the first dossier.
-    if (!this.requestedCandidateId) return EMPTY_CANDIDATE;
+    // Never display or edit a dossier while a different jury session is active.
+    if (!this.requestedCandidateId ||
+        (this.isJury() && (!this.juryContextReady() || !this.requestedJurySessionId ||
+          this.store.selectedJurySessionId() !== this.requestedJurySessionId))) return EMPTY_CANDIDATE;
     return (
       candidates.find(
         (item) =>
@@ -103,6 +108,14 @@ export class CandidateCertificationComponent {
   juryNotes = "";
 
   constructor() {
+    if (this.sessionService.role() === "jury") {
+      // A candidate URL must determine the session after F5. No first-session fallback.
+      void this.store.restoreJurySession(this.requestedJurySessionId)
+        .then(ok => this.juryContextReady.set(ok))
+        .catch(() => this.juryContextReady.set(false));
+    } else {
+      this.juryContextReady.set(true);
+    }
     effect(
       () => {
         const candidate = this.candidate();

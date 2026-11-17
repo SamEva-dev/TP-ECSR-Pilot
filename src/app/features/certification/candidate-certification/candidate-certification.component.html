@@ -1,5 +1,6 @@
 <section class="mx-auto w-full max-w-[1450px]">
-  @if (candidate(); as candidate) {
+  @if (candidate().id && (!isJury() || juryContextReady())) {
+    @if (candidate(); as candidate) {
     <a
       [routerLink]="isJury() ? '/jury' : '/certification'"
       class="inline-flex items-center gap-2 text-[12px] font-semibold text-[#2a64a2]"
@@ -301,5 +302,8 @@
         }
       </article>
     }
+    }
+  } @else {
+    <p role="alert" class="rounded-xl border border-[#dfe5ec] bg-white p-5 text-sm text-[#6c788b]">{{ (isJury() ? "qaFix.juryCandidateUnavailable" : "certification.api.candidatesLoadFailed") | t }}</p>
   }
 </section>

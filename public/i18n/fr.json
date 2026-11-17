@@ -5123,7 +5123,9 @@
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
     "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
-    "juryNoAssignment": "Aucune session de certification ne vous est affectée."
+    "juryNoAssignment": "Aucune session de certification ne vous est affectée.",
+    "completeSession": "Clôturer la séance",
+    "juryCandidateUnavailable": "Dossier indisponible : candidat ou session non affecté(e) au jury."
   },
   "qaFixAttendance": {
     "selectSession": "Séance à émarger",

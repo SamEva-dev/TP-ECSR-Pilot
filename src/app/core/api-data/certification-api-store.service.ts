@@ -197,6 +197,22 @@ export class CertificationApiStoreService {
     }
   }
 
+  /** Restore an assigned jury session from the candidate URL after a full page reload. */
+  async restoreJurySession(sessionId: string): Promise<boolean> {
+    const id = this.text(sessionId);
+    if (this.session.role() !== "jury" || !id) return false;
+    // A concurrent initial context request may be running. Its result will
+    // preserve this selection only if it is present among assigned sessions.
+    this.selectedSessionIdSignal.set(id);
+    if (!this.hasSession(id)) {
+      const loaded = await this.loadJuryContext(false);
+      if (!loaded || !this.hasSession(id)) return false;
+    }
+    if (this.selectedSessionIdSignal() !== id) await this.selectSession(id);
+    else if (!this.candidatesSignal().length) await this.loadMyJuryCandidates(id);
+    return this.selectedSessionIdSignal() === id && this.hasSession(id);
+  }
+
   /** Checks a real session loaded from the current API context. */
   hasSession(sessionId: string): boolean {
     const id = this.text(sessionId);
@@ -360,7 +376,7 @@ export class CertificationApiStoreService {
       this.schemesSignal.set((schemes ?? []).map(x => this.normalizeScheme(x)));
       const last = this.selectedSessionIdSignal();
       const selected = this.sessionsSignal().some(x => x.id === last)
-        ? last : (this.sessionsSignal()[0]?.id ?? "");
+        ? last : (last ? "" : (this.sessionsSignal()[0]?.id ?? ""));
       this.selectedSessionIdSignal.set(selected);
       await this.loadMyJuryCandidates(selected);
       if (seq !== this.contextLoadSequence) return false;
