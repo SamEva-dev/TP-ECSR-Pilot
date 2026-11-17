@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { CertificationApiService } from "../../core/certification/certification-api.service";
 import { CertificationApiStoreService } from "../../core/api-data/certification-api-store.service";
@@ -60,13 +61,31 @@ export class CertificationComponent {
       (this.readyCount() / Math.max(candidates.length, 1)) * 100,
     );
   });
+  // Route query parameters are reactive. Reading snapshot only once allowed a
+  // previous sessionId to overwrite a later selection after unrelated updates.
+  private readonly routeParams = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
+  private readonly requestedSessionId = computed(() =>
+    this.routeParams().get("sessionId") ?? "",
+  );
+
+  readonly activeSessionId = this.store.selectedJurySessionId;
+  readonly consistentSession = computed(() => {
+    const selected = this.activeSessionId();
+    const model = this.store.examSession();
+    return selected !== "" && selected === model.id && this.store.hasSession(selected);
+  });
+
   constructor() {
-    // A deep link and F5 retain the chosen session within the same cohort.
+    // Track only URL and raw available IDs, not the mapped session list (which
+    // changes when the jury or candidate response arrives).
     effect(() => {
-      const sessions = this.store.jurySessions();
-      const desired = this.route.snapshot.queryParamMap.get("sessionId");
-      if (desired && sessions.some(item => item.id === desired) &&
-          this.store.selectedJurySessionId() !== desired) {
+      const desired = this.requestedSessionId();
+      const ids = this.store.availableSessionIds();
+      if (desired && ids.includes(desired)) {
+        // Don't track the selected value as a dependency: a pending router
+        // navigation must not cause this effect to restore the prior URL.
         untracked(() => void this.store.selectSession(desired));
       }
     });
@@ -122,15 +141,21 @@ export class CertificationComponent {
 
   async chooseExamSession(sessionId: string): Promise<void> {
     if (!sessionId || !this.store.hasSession(sessionId)) return;
-    await this.store.selectSession(sessionId);
-    await this.router.navigate([], { queryParams: { sessionId }, queryParamsHandling: "merge", replaceUrl: true });
+    // The URL is the selection intent; its reactive observer hydrates the
+    // store for this ID. Never wait for candidate loading before navigation.
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { sessionId },
+      queryParamsHandling: "merge",
+      replaceUrl: true,
+    });
   }
 
   get examSession() {
     return this.store.examSession();
   }
   // A synthetic empty session model must never be displayed as persisted data.
-  readonly hasExamSession = computed(() => this.store.hasSession(this.store.examSession().id));
+  readonly hasExamSession = computed(() => this.consistentSession());
 
 
   get candidates() {

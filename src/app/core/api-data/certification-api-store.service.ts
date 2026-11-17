@@ -121,6 +121,7 @@ export class CertificationApiStoreService {
   });
 
   readonly jurySessions = computed(() => this.sessionsSignal().map(x => this.mapSession(x)));
+  readonly availableSessionIds = computed(() => this.sessionsSignal().map(item => item.id));
   readonly selectedJurySessionId = this.selectedSessionIdSignal.asReadonly();
   readonly selfEnrollmentId = this.selfEnrollmentIdSignal.asReadonly();
 
@@ -556,13 +557,10 @@ export class CertificationApiStoreService {
 
   private currentSessionApi(): CertificationExamSessionApi | null {
     const selected = this.selectedSessionIdSignal();
-    if (this.session.role() === "jury" && selected)
-      return this.sessionsSignal().find((item) => item.id === selected) ?? null;
-    return (
-      this.sessionsSignal().find((item) => item.id === selected) ??
-      this.sessionsSignal()[0] ??
-      null
-    );
+    // A selected ID must never resolve to a different session while the
+    // matching API context is still loading (or after its removal).
+    if (selected) return this.sessionsSignal().find(item => item.id === selected) ?? null;
+    return this.sessionsSignal()[0] ?? null;
   }
 
   private mapScheme(raw: CertificationSchemeApi): CertificationScheme {

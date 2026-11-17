@@ -35,6 +35,7 @@ export class ExamSessionDetailComponent {
   readonly actionInfo = signal("");
   readonly apiCandidates = signal<ApiCandidate[]>([]);
   private apiCandidateLoadEpoch = 0;
+  private juryRequestEpoch = 0;
   juryUserId = "";
   juryRole = "Examiner";
   decisionComment = "";
@@ -67,9 +68,16 @@ export class ExamSessionDetailComponent {
   );
 
   constructor() {
-    if (this.routeSessionId && this.canManageJury()) {
-      this.loadJuryAssignments();
-    }
+    // Load only after the real session is authorized in the loaded context.
+    effect(() => {
+      const ready = !this.store.loading() && this.store.hasSession(this.routeSessionId);
+      const authorized = this.canManageJury();
+      if (ready && authorized) this.loadJuryAssignments();
+      else {
+        ++this.juryRequestEpoch;
+        this.juryAssignments.set([]);
+      }
+    });
     // The route is constructed before the asynchronous workspace/session GET completes.
     // Load persisted candidate management data once the requested session is hydrated,
     // and again after a context reload rather than relying on the constructor timing.
@@ -93,12 +101,27 @@ export class ExamSessionDetailComponent {
   }
 
   loadJuryAssignments(): void {
-    if (!this.routeSessionId || !this.canManageJury()) return;
+    if (!this.routeSessionId || !this.canManageJury() ||
+        !this.store.hasSession(this.routeSessionId)) return;
+    const requestEpoch = ++this.juryRequestEpoch;
+    const cohortId = this.workspace.cohort()?.apiId;
+    this.juryAssignments.set([]);
     this.juryLoading.set(true);
     this.juryError.set(false);
     this.certificationApi.getJuryAssignments(this.routeSessionId).subscribe({
-      next: assignments => { this.juryAssignments.set(assignments); this.juryLoading.set(false); },
-      error: () => { this.juryError.set(true); this.juryLoading.set(false); },
+      next: assignments => {
+        if (requestEpoch !== this.juryRequestEpoch ||
+            cohortId !== this.workspace.cohort()?.apiId ||
+            !this.store.hasSession(this.routeSessionId)) return;
+        this.juryAssignments.set(Array.isArray(assignments) ? assignments : []);
+        this.juryLoading.set(false);
+      },
+      error: () => {
+        if (requestEpoch !== this.juryRequestEpoch ||
+            cohortId !== this.workspace.cohort()?.apiId) return;
+        this.juryError.set(true);
+        this.juryLoading.set(false);
+      },
     });
   }
 
