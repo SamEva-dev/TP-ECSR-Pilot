@@ -531,6 +531,7 @@
     },
     "emptyDay": "No session matches these filters.",
     "real": {
+      "trainerScheduleConflict": "This trainer is already assigned to another session during this time slot.",
       "navigation": "Calendar navigation",
       "previous": "Previous period",
       "next": "Next period",

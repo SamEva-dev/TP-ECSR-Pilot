@@ -104,6 +104,12 @@ export class HomeComponent {
     return this.dashboard.trainerAgenda();
   }
 
+  todayFormatted(): string {
+    const locale = this.sessionService.role() === "formateur" && document.documentElement.lang === "en" ? "en-GB" : "fr-FR";
+    return new Intl.DateTimeFormat(locale, { timeZone: "Europe/Paris", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date());
+  }
+
+
   get observations() {
     return this.dashboard.observations();
   }

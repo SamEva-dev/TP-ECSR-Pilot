@@ -531,6 +531,7 @@
     },
     "emptyDay": "Aucune séance avec ces filtres.",
     "real": {
+      "trainerScheduleConflict": "Le formateur est déjà affecté à une autre séance sur ce créneau.",
       "navigation": "Navigation du calendrier",
       "previous": "Période précédente",
       "next": "Période suivante",
