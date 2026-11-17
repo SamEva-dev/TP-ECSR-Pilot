@@ -264,6 +264,9 @@
           }}
         </p>
         <div class="mt-4 space-y-2">
+          @if (juryMembers().length === 0) {
+            <p class="text-[12px] text-[#768295]">{{ "certification.multi.juryNoMembers" | t }}</p>
+          }
           @for (jury of juryMembers(); track jury.id) {
             <div
               class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { TrainingSessionApiStoreService } from "../../core/api-data/training-session-api-store.service";
+import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import {
   AddPlanningDrawerComponent,
   type AddPlanningPayload,
@@ -21,6 +22,7 @@ export class PlanningCreateRouteComponent {
   private readonly router = inject(Router);
   private readonly access = inject(AccessPolicyService);
   private readonly sessions = inject(TrainingSessionApiStoreService);
+  private readonly workspace = inject(WorkspaceContextService);
 
   close(): void {
     void this.router.navigateByUrl("/planning");
@@ -31,6 +33,9 @@ export class PlanningCreateRouteComponent {
       void this.router.navigateByUrl("/planning");
       return;
     }
+    // Do not submit a cohort that the current workspace cannot address.
+    // The drawer and the API store must agree on the same authorized scope.
+    if (!this.workspace.contextCohorts().some(cohort => cohort.id === payload.promotionId)) return;
     const created = await this.sessions.create(
       {
         cohortId: payload.promotionId ?? "",

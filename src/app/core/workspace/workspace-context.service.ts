@@ -528,6 +528,14 @@ export class WorkspaceContextService {
     const restored = this.restore(key);
     if (restored && this.isSelectionAccessible(restored)) return restored;
 
+    // A learner without an enrollment in this organization must not inherit
+    // the first arbitrary cohort; the server restricts student cohorts to
+    // their actual enrollments.
+    if (this.sessionService.role() === "stagiaire" && !this.cohortsSignal().length) {
+      const organization = this.organizationsSignal().find(item => this.canAccessOrganization(item.id));
+      return { organizationId: organization?.id ?? "", siteId: "", programId: "", cohortId: "", level: "organization" };
+    }
+
     const cohort = this.cohortsSignal().find((item) =>
       this.canAccessCohort(item.id),
     );

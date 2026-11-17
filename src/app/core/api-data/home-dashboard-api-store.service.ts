@@ -39,7 +39,7 @@ export interface HomeStudent {
   validatedSheets: number;
   totalSheets: number;
   status: StudentStatus;
-  skills: Record<"C1" | "C2" | "C3" | "C4", number>;
+  skills: Record<string, number>;
 }
 
 export interface HomeMetrics {
@@ -115,7 +115,7 @@ const EMPTY_STUDENT: HomeStudent = {
   validatedSheets: 0,
   totalSheets: 0,
   status: "good",
-  skills: { C1: 0, C2: 0, C3: 0, C4: 0 },
+  skills: {},
 };
 
 @Injectable({ providedIn: "root" })
@@ -438,12 +438,9 @@ export class HomeDashboardApiStoreService {
       validatedSheets: this.number(row?.validatedTopics),
       totalSheets: this.number(row?.totalTopics),
       status: this.status(this.text(row?.enrollmentStatus), catchupHours),
-      skills: {
-        C1: this.competency(row?.competencies, "C1"),
-        C2: this.competency(row?.competencies, "C2"),
-        C3: this.competency(row?.competencies, "C3"),
-        C4: this.competency(row?.competencies, "C4"),
-      },
+      // Do not invent the generic C1–C4 competencies: the backend sends the
+      // actual codes of the learner's referential (e.g. QA9-C1).
+      skills: this.competencies(row?.competencies),
     };
   }
 
@@ -670,12 +667,11 @@ export class HomeDashboardApiStoreService {
     return "good";
   }
 
-  private competency(
-    values: Record<string, number> | null | undefined,
-    code: "C1" | "C2" | "C3" | "C4",
-  ): number {
-    if (!values || typeof values !== "object") return 0;
-    return this.number(values[code]);
+  private competencies(values: Record<string, number> | null | undefined): Record<string, number> {
+    if (!values || typeof values !== "object" || Array.isArray(values)) return {};
+    return Object.fromEntries(Object.entries(values)
+      .filter(([code, value]) => !!code.trim() && typeof value === "number" && Number.isFinite(value))
+      .map(([code, value]) => [code, Math.min(100, Math.max(0, value))]));
   }
 
   private formatDate(value: unknown): string {

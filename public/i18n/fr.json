@@ -2474,8 +2474,8 @@
       "jury": "Jury"
     },
     "jury": {
-      "title": "Jury affecté",
-      "subtitle": "Professionnels habilités affectés à cette session.",
+      "title": "Jury",
+      "subtitle": "Professionnels habilités pour cette session.",
       "members": "membres",
       "active": "Actif",
       "professions": {
@@ -2599,7 +2599,8 @@
       "activeScheme": "Schéma de certification actif",
       "schemeHelp": "Version {{version}} · {{steps}} épreuves · {{units}} unités de validation",
       "scheme": "Schéma",
-      "juryForProgram": "Jury affecté au programme {{program}}.",
+      "juryForProgram": "Jury du programme {{program}}.",
+      "juryNoMembers": "Aucun membre de jury affecté.",
       "examPathSubtitle": "Épreuves configurées par le schéma {{scheme}}.",
       "juryGridHelp": "Critères du référentiel de certification {{scheme}}.",
       "examCount": "Épreuves",

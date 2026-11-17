@@ -2474,8 +2474,8 @@
       "jury": "Jury"
     },
     "jury": {
-      "title": "Assigned jury",
-      "subtitle": "Authorized professionals assigned to this session.",
+      "title": "Jury",
+      "subtitle": "Authorized professionals for this session.",
       "members": "members",
       "active": "Active",
       "professions": {
@@ -2599,7 +2599,8 @@
       "activeScheme": "Active certification scheme",
       "schemeHelp": "Version {{version}} · {{steps}} exams · {{units}} validation units",
       "scheme": "Scheme",
-      "juryForProgram": "Jury assigned to program {{program}}.",
+      "juryForProgram": "Jury for program {{program}}.",
+      "juryNoMembers": "No jury member assigned.",
       "examPathSubtitle": "Exams configured by scheme {{scheme}}.",
       "juryGridHelp": "Criteria from certification framework {{scheme}}.",
       "examCount": "Exams",
