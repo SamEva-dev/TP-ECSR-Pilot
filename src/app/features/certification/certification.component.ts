@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
+  untracked,
   signal,
 } from "@angular/core";
-import { Router, RouterLink } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { firstValueFrom } from "rxjs";
 import { AccessPolicyService } from "../../core/access/access-policy.service";
@@ -30,6 +32,7 @@ export class CertificationComponent {
   private readonly api = inject(CertificationApiService);
   private readonly access = inject(AccessPolicyService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly canManage = computed(() => this.access.can("certification.manage"));
   readonly createBusy = signal(false);
   readonly createError = signal("");
@@ -43,7 +46,10 @@ export class CertificationComponent {
 
   readonly role = computed(() => this.sessionService.role());
   readonly scheme = this.store.scheme;
-  readonly juryMembers = this.store.juryMembers;
+  readonly juryAssignments = this.store.sessionJuryAssignments;
+  readonly sessions = this.store.jurySessions;
+  readonly juryLoading = this.store.sessionJuryLoading;
+  readonly juryError = this.store.sessionJuryError;
   readonly program = this.workspace.program;
   readonly readyCount = computed(
     () => this.store.candidates().filter((item) => item.ready).length,
@@ -54,6 +60,17 @@ export class CertificationComponent {
       (this.readyCount() / Math.max(candidates.length, 1)) * 100,
     );
   });
+  constructor() {
+    // A deep link and F5 retain the chosen session within the same cohort.
+    effect(() => {
+      const sessions = this.store.jurySessions();
+      const desired = this.route.snapshot.queryParamMap.get("sessionId");
+      if (desired && sessions.some(item => item.id === desired) &&
+          this.store.selectedJurySessionId() !== desired) {
+        untracked(() => void this.store.selectSession(desired));
+      }
+    });
+  }
   readonly currentCandidate = computed(() => {
     const candidates = this.store.candidates();
     const selfEnrollmentId = this.store.selfEnrollmentId();
@@ -101,6 +118,12 @@ export class CertificationComponent {
     } finally {
       this.createBusy.set(false);
     }
+  }
+
+  async chooseExamSession(sessionId: string): Promise<void> {
+    if (!sessionId || !this.store.hasSession(sessionId)) return;
+    await this.store.selectSession(sessionId);
+    await this.router.navigate([], { queryParams: { sessionId }, queryParamsHandling: "merge", replaceUrl: true });
   }
 
   get examSession() {

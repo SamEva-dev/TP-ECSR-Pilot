@@ -259,7 +259,8 @@
         "validatedSheets": "Validated sheets"
       },
       "progress": {
-        "title": "My progress"
+        "title": "My progress",
+        "noCompetencies": "No competencies are defined in the current training referential."
       },
       "nextSession": {
         "title": "Next session",
@@ -2768,6 +2769,13 @@
         "FinalInterview": "Final interview",
         "Other": "Other"
       }
+    },
+    "qa30": {
+      "selectSession": "Certification session",
+      "noSessionInCohort": "No certification session is available in the selected cohort.",
+      "loadingJury": "Loading assigned jury members…",
+      "juryLoadError": "Unable to load assigned jury members.",
+      "assigned": "Assigned"
     }
   },
   "jury": {

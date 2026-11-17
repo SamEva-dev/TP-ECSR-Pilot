@@ -121,6 +121,17 @@
   </article>
 
   @if (isManagement()) {
+    @if (sessions().length > 1) {
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <label for="certification-session-select" class="text-[12px] font-semibold text-[#334155]">{{ "certification.qa30.selectSession" | t }}</label>
+        <select id="certification-session-select" class="rounded-lg border border-[#d9e0e9] bg-white p-2 text-[12px]"
+          [value]="examSession.id" (change)="chooseExamSession($any($event.target).value)">
+          @for (item of sessions(); track item.id) {
+            <option [value]="item.id">{{ item.name }}</option>
+          }
+        </select>
+      </div>
+    }
     <div class="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
       <article
         class="relative min-h-[96px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"
@@ -155,7 +166,7 @@
           {{ "certification.kpi.jury" | t }}
         </p>
         <p class="mt-2 text-[25px] font-extrabold">
-          {{ juryMembers().length }}
+          {{ hasExamSession() && !juryLoading() && !juryError() ? juryAssignments().length : "—" }}
         </p>
         <span
           class="absolute right-4 top-4 grid size-[40px] place-items-center rounded-full bg-[#fff0c9] text-[#8b5e00]"
@@ -234,7 +245,7 @@
               {{ "certification.sessionCards.jury" | t }}
             </p>
             <p class="mt-1 text-[12px] font-bold">
-              {{ juryMembers().length }} {{ "certification.jury.members" | t }}
+              {{ !juryLoading() && !juryError() ? juryAssignments().length : "—" }} {{ "certification.jury.members" | t }}
             </p>
           </div>
         </div>
@@ -247,7 +258,7 @@
       </article>
       } @else {
         <article class="rounded-[17px] border border-[#dfe5ec] bg-white p-5 shadow-sm">
-          <p class="text-[14px] font-semibold text-[#334155]">{{ "certification.emptySession" | t }}</p>
+          <p class="text-[14px] font-semibold text-[#334155]">{{ "certification.qa30.noSessionInCohort" | t }}</p>
         </article>
       }
 
@@ -264,28 +275,34 @@
           }}
         </p>
         <div class="mt-4 space-y-2">
-          @if (juryMembers().length === 0) {
+          @if (!hasExamSession()) {
+            <p class="text-[12px] text-[#768295]">{{ "certification.qa30.noSessionInCohort" | t }}</p>
+          } @else if (juryLoading()) {
+            <p class="text-[12px] text-[#768295]">{{ "certification.qa30.loadingJury" | t }}</p>
+          } @else if (juryError()) {
+            <p role="alert" class="text-[12px] text-red-700">{{ "certification.qa30.juryLoadError" | t }}</p>
+          } @else if (juryAssignments().length === 0) {
             <p class="text-[12px] text-[#768295]">{{ "certification.multi.juryNoMembers" | t }}</p>
           }
-          @for (jury of juryMembers(); track jury.id) {
+          @for (jury of juryAssignments(); track jury.id) {
             <div
               class="flex items-center gap-3 rounded-[14px] border border-[#e1e7ee] p-3"
             >
               <span
                 class="grid size-[38px] shrink-0 place-items-center rounded-full bg-[#2a64a2] text-[11px] font-bold text-white"
-                >{{ initials(jury) }}</span
+                >{{ jury.displayName.slice(0, 2).toUpperCase() }}</span
               >
               <div class="min-w-0 flex-1">
                 <p class="truncate text-[12.5px] font-bold">
-                  {{ jury.firstName }} {{ jury.lastName }}
+                  {{ jury.displayName }}
                 </p>
                 <p class="truncate text-[10.5px] text-[#748094]">
-                  {{ jury.professionKey | t }} · {{ jury.organisation }}
+                  {{ jury.role }}
                 </p>
               </div>
               <span
                 class="rounded-full bg-[#d8f8df] px-2.5 py-1 text-[10px] font-semibold text-[#18a547]"
-                >{{ "certification.jury.active" | t }}</span
+                >{{ "certification.qa30.assigned" | t }}</span
               >
             </div>
           }

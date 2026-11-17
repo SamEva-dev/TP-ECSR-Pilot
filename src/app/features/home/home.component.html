@@ -568,6 +568,9 @@
             [value]="sam.progress"
             heightClass="h-[12px]"
           />
+          @if ((sam.skills | keyvalue).length === 0) {
+            <p role="status" class="mt-4 text-[12px] text-[#64748b]">{{ "home.student.progress.noCompetencies" | t }}</p>
+          }
           <div class="mt-4 grid gap-3 sm:grid-cols-2">
             @for (e of sam.skills | keyvalue; track e.key) {
               <div class="rounded-[17px] bg-[#f0f3f7] p-3.5">

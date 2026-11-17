@@ -50,7 +50,6 @@ export class ExamSessionDetailComponent {
   readonly workspace = inject(WorkspaceContextService);
   readonly exam = this.store.examSession;
   readonly candidates = this.store.candidates;
-  readonly juryMembers = this.store.juryMembers;
   readonly scheme = this.store.scheme;
   readonly program = this.workspace.program;
   readonly ready = computed(

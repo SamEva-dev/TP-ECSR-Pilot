@@ -10,6 +10,7 @@ import { firstValueFrom } from "rxjs";
 import { apiErrorCode } from "../errors/api-error-code";
 import type {
   CertificationCandidate as CertificationCandidateApi,
+  CertificationJuryAssignment,
   CertificationExamSession as CertificationExamSessionApi,
   CertificationScheme as CertificationSchemeApi,
 } from "../certification/certification.models";
@@ -21,7 +22,6 @@ import type {
   ExamSession,
   ExamSessionStatus,
   ExamStep,
-  JuryMember,
 } from "../models/certification.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
@@ -29,7 +29,6 @@ import { SessionService } from "../session/session.service";
 import { StudentProfileApiService } from "../students/student-profile-api.service";
 import { WorkspaceContextService } from "../workspace/workspace-context.service";
 import { StudentApiStoreService } from "./student-api-store.service";
-import { ContextualTrainingDataService } from "../workspace/contextual-training-data.service";
 
 const EMPTY_SCHEME: CertificationScheme = {
   id: "",
@@ -68,13 +67,17 @@ export class CertificationApiStoreService {
   private readonly session = inject(SessionService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly realtime = inject(RealtimeService);
-  private readonly contextual = inject(ContextualTrainingDataService);
 
   private readonly schemesSignal = signal<CertificationSchemeApi[]>([]);
   private readonly sessionsSignal = signal<CertificationExamSessionApi[]>([]);
   private readonly candidatesSignal = signal<CertificationCandidateApi[]>([]);
   private readonly selectedSessionIdSignal = signal("");
   private readonly selfEnrollmentIdSignal = signal("");
+  private readonly sessionJuryAssignmentsSignal = signal<CertificationJuryAssignment[]>([]);
+  readonly sessionJuryAssignments = this.sessionJuryAssignmentsSignal.asReadonly();
+  readonly sessionJuryLoading = signal(false);
+  readonly sessionJuryError = signal(false);
+  private juryLoadSequence = 0;
   private contextLoadSequence = 0;
   private candidateLoadSequence = 0;
   // Kept across workspace initialization/reloads for a deep-linked jury dossier.
@@ -117,22 +120,6 @@ export class CertificationApiStoreService {
     );
   });
 
-  readonly juryMembers = computed<JuryMember[]>(() =>
-    (this.contextual.juryMembers() ?? []).map((member) => ({
-      id: this.text(member?.id),
-      firstName: this.text(member?.firstName),
-      lastName: this.text(member?.lastName),
-      professionKey: this.text(member?.professionKey),
-      organisation: this.text(member?.organisation),
-      habilitation: this.text(member?.habilitation),
-      validUntil: this.text(member?.validUntil),
-      active: Boolean(member?.active),
-      programIds: Array.isArray(member?.programIds)
-        ? member.programIds.map((x: unknown) => this.text(x))
-        : [],
-    })),
-  );
-
   readonly jurySessions = computed(() => this.sessionsSignal().map(x => this.mapSession(x)));
   readonly selectedJurySessionId = this.selectedSessionIdSignal.asReadonly();
   readonly selfEnrollmentId = this.selfEnrollmentIdSignal.asReadonly();
@@ -159,6 +146,36 @@ export class CertificationApiStoreService {
         void this.loadJuryContext();
       else if (ready && cohortApiId)
         void this.loadContext(cohortApiId, referentialVersionId);
+    });
+
+    // The certification overview must use the very same per-session API as
+    // the session detail. Program-level directory entries are not assignments.
+    effect(() => {
+      const sessionId = this.selectedSessionIdSignal();
+      const cohortId = this.text(this.workspace.cohort()?.apiId);
+      const available = this.sessionsSignal().some(item => item.id === sessionId);
+      const role = this.session.role();
+      const sequence = ++this.juryLoadSequence;
+      this.sessionJuryAssignmentsSignal.set([]);
+      this.sessionJuryError.set(false);
+      this.sessionJuryLoading.set(false);
+      if (!sessionId || !cohortId || !available ||
+          (role !== "direction" && role !== "secretariat")) return;
+      this.sessionJuryLoading.set(true);
+      untracked(() => {
+        void firstValueFrom(this.api.getJuryAssignments(sessionId))
+          .then(assignments => {
+            if (sequence !== this.juryLoadSequence) return;
+            this.sessionJuryAssignmentsSignal.set(Array.isArray(assignments) ? assignments : []);
+          })
+          .catch(() => {
+            if (sequence !== this.juryLoadSequence) return;
+            this.sessionJuryError.set(true);
+          })
+          .finally(() => {
+            if (sequence === this.juryLoadSequence) this.sessionJuryLoading.set(false);
+          });
+      });
     });
 
     effect(() => {
@@ -589,9 +606,9 @@ export class CertificationApiStoreService {
       candidateIds: this.candidatesSignal()
         .map((candidate) => this.text(candidate?.id))
         .filter(Boolean),
-      juryIds: this.juryMembers()
-        .map((member) => member.id)
-        .filter(Boolean),
+      juryIds: this.text(raw?.id) === this.selectedSessionIdSignal()
+        ? this.sessionJuryAssignmentsSignal().map(member => member.id)
+        : [],
       programId: this.text(this.workspace.program()?.id),
       schemeId: this.text(raw?.schemeId),
     };

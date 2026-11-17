@@ -259,7 +259,8 @@
         "validatedSheets": "Fiches validées"
       },
       "progress": {
-        "title": "Ma progression"
+        "title": "Ma progression",
+        "noCompetencies": "Aucune compétence n’est définie dans le référentiel de formation actuel."
       },
       "nextSession": {
         "title": "Prochaine séance",
@@ -2768,6 +2769,13 @@
         "FinalInterview": "Entretien final",
         "Other": "Autre"
       }
+    },
+    "qa30": {
+      "selectSession": "Session de certification",
+      "noSessionInCohort": "Aucune session de certification dans la promotion sélectionnée.",
+      "loadingJury": "Chargement des membres du jury affectés…",
+      "juryLoadError": "Impossible de charger les membres du jury affectés.",
+      "assigned": "Affecté"
     }
   },
   "jury": {
