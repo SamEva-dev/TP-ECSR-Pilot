@@ -5,6 +5,20 @@
     ><i class="ph ph-arrow-left"></i
     >{{ "certification.sessionDetail.back" | t }}</a
   >
+  @if (!workspace.remoteWorkspaceLoaded() || store.loading() ||
+       (store.hasSession(routeSessionId) && exam().id !== routeSessionId)) {
+    <div class="mt-4 rounded-2xl border border-[#dfe5ec] bg-white p-5" role="status">
+      {{ "common.loading" | t }}
+    </div>
+  } @else if (store.loadError()) {
+    <div class="mt-4 rounded-2xl border border-red-200 bg-white p-5 text-red-700" role="alert">
+      {{ "certification.api.loadFailed" | t }}
+    </div>
+  } @else if (!store.hasSession(routeSessionId) || exam().id !== routeSessionId) {
+    <div class="mt-4 rounded-2xl border border-[#dfe5ec] bg-white p-5" role="alert">
+      {{ "errors.CERTIFICATION_SESSION_NOT_FOUND" | t }}
+    </div>
+  } @else {
   <div
     class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
   >
@@ -322,5 +336,6 @@
         </div>
       }
     </article>
+  }
   }
 </section>
