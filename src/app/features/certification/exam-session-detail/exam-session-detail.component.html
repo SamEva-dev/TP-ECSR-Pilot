@@ -294,7 +294,7 @@
       @if (juryLoading()) {
         <p class="mt-3 text-sm text-[#6c788b]">{{ "certification.juryAccess.loading" | t }}</p>
       } @else if (juryError()) {
-        <p class="mt-3 text-sm text-red-700" role="alert">{{ "certification.juryAccess.error" | t }}</p>
+        <p class="mt-3 text-sm text-red-700" role="alert">{{ "certification.qa30.juryLoadError" | t }}</p>
       } @else if (!store.hasSession(routeSessionId) || exam().id !== routeSessionId) {
         <p class="mt-3 text-sm text-[#6c788b]">{{ "certification.qa30.noSessionInCohort" | t }}</p>
       } @else if (juryAssignments().length === 0) {
