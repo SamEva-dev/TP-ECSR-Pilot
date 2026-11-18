@@ -5,10 +5,12 @@ import {
   effect,
   signal,
   inject,
+  untracked,
 } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { CertificationApiStoreService } from "../../../core/api-data/certification-api-store.service";
 import { AccessPolicyService } from "../../../core/access/access-policy.service";
@@ -46,7 +48,13 @@ export class ExamSessionDetailComponent {
   readonly juryLoading = signal(false);
   readonly juryError = signal(false);
   readonly canManageJury = computed(() => this.access.can("certification.manage"));
-  readonly routeSessionId = this.route.snapshot.paramMap.get("id") ?? "";
+  // Angular reuses this component on history navigation between detail URLs.
+  // A snapshot freezes the first UUID and can expose data from another session.
+  private readonly routeSessionIdSignal = toSignal(
+    this.route.paramMap.pipe(map(params => params.get("id") ?? "")),
+    { initialValue: this.route.snapshot.paramMap.get("id") ?? "" },
+  );
+  get routeSessionId(): string { return this.routeSessionIdSignal(); }
   readonly store = inject(CertificationApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly exam = this.store.examSession;
@@ -68,14 +76,35 @@ export class ExamSessionDetailComponent {
   );
 
   constructor() {
+    // React to every URL UUID change, including Back/Forward on a reused component.
+    // Reset local state and invalidate in-flight responses synchronously, before
+    // an old request can paint data for the previous session.
+    effect(() => {
+      const sessionId = this.routeSessionId;
+      untracked(() => {
+        ++this.juryRequestEpoch;
+        ++this.apiCandidateLoadEpoch;
+        this.juryAssignments.set([]);
+        this.apiCandidates.set([]);
+        this.juryLoading.set(false);
+        this.juryError.set(false);
+        this.actionError.set("");
+        this.actionInfo.set("");
+        // selectSession also invalidates the store candidate request sequence.
+        // An unknown UUID must not fall back to a valid session.
+        void this.store.selectSession(sessionId);
+      });
+    });
     // Load only after the real session is authorized in the loaded context.
     effect(() => {
-      const ready = !this.store.loading() && this.store.hasSession(this.routeSessionId);
+      const ready = !this.store.loading() &&
+        this.store.hasSession(this.routeSessionId) && this.exam().id === this.routeSessionId;
       const authorized = this.canManageJury();
       if (ready && authorized) this.loadJuryAssignments();
       else {
         ++this.juryRequestEpoch;
         this.juryAssignments.set([]);
+        this.juryLoading.set(false);
       }
     });
     // The route is constructed before the asynchronous workspace/session GET completes.
@@ -87,6 +116,10 @@ export class ExamSessionDetailComponent {
       const authorized = this.canManageSession();
       if (loaded && selected && authorized && this.store.hasSession(this.routeSessionId)) {
         void this.loadApiCandidates();
+      } else {
+        // Prevent a previous session's management list from surviving navigation.
+        ++this.apiCandidateLoadEpoch;
+        this.apiCandidates.set([]);
       }
     });
     // Route activation may precede asynchronous loading of the cohort sessions.
@@ -96,28 +129,32 @@ export class ExamSessionDetailComponent {
         !this.store.hasSession(this.routeSessionId) ||
         this.exam().id === this.routeSessionId
       ) return;
-      void this.store.selectSession(this.routeSessionId);
+      const id = this.routeSessionId;
+      untracked(() => void this.store.selectSession(id));
     });
   }
 
   loadJuryAssignments(): void {
-    if (!this.routeSessionId || !this.canManageJury() ||
-        !this.store.hasSession(this.routeSessionId)) return;
+    const sessionId = this.routeSessionId;
+    if (!sessionId || !this.canManageJury() ||
+        !this.store.hasSession(sessionId) || this.exam().id !== sessionId) return;
     const requestEpoch = ++this.juryRequestEpoch;
     const cohortId = this.workspace.cohort()?.apiId;
     this.juryAssignments.set([]);
     this.juryLoading.set(true);
     this.juryError.set(false);
-    this.certificationApi.getJuryAssignments(this.routeSessionId).subscribe({
+    this.certificationApi.getJuryAssignments(sessionId).subscribe({
       next: assignments => {
         if (requestEpoch !== this.juryRequestEpoch ||
+            sessionId !== this.routeSessionId || this.exam().id !== sessionId ||
             cohortId !== this.workspace.cohort()?.apiId ||
-            !this.store.hasSession(this.routeSessionId)) return;
+            !this.store.hasSession(sessionId)) return;
         this.juryAssignments.set(Array.isArray(assignments) ? assignments : []);
         this.juryLoading.set(false);
       },
       error: () => {
         if (requestEpoch !== this.juryRequestEpoch ||
+            sessionId !== this.routeSessionId ||
             cohortId !== this.workspace.cohort()?.apiId) return;
         this.juryError.set(true);
         this.juryLoading.set(false);
@@ -131,36 +168,46 @@ export class ExamSessionDetailComponent {
   }
 
   async loadApiCandidates(): Promise<void> {
-    if (!this.routeSessionId || !this.canManageSession()) return;
+    const sessionId = this.routeSessionId;
+    if (!sessionId || !this.canManageSession() ||
+        !this.store.hasSession(sessionId) || this.exam().id !== sessionId) return;
     const epoch = ++this.apiCandidateLoadEpoch;
     const cohortId = this.workspace.cohort()?.apiId;
     try {
-      const result = await firstValueFrom(this.certificationApi.getCandidates(this.routeSessionId));
-      if (epoch === this.apiCandidateLoadEpoch && cohortId &&
+      const result = await firstValueFrom(this.certificationApi.getCandidates(sessionId));
+      if (epoch === this.apiCandidateLoadEpoch && sessionId === this.routeSessionId &&
+          this.exam().id === sessionId && cohortId &&
           cohortId === this.workspace.cohort()?.apiId &&
-          this.store.hasSession(this.routeSessionId)) {
-        this.apiCandidates.set(result.filter(x => x.examSessionId === this.routeSessionId));
+          this.store.hasSession(sessionId)) {
+        this.apiCandidates.set(result.filter(x => x.examSessionId === sessionId));
       }
     } catch {
-      if (epoch === this.apiCandidateLoadEpoch) this.actionError.set("load");
+      if (epoch === this.apiCandidateLoadEpoch && sessionId === this.routeSessionId)
+        this.actionError.set("load");
     }
   }
 
   private async runAction(action: () => Promise<unknown>, infoKey: string): Promise<void> {
-    if (this.actionBusy() || !this.canManageSession() || !this.store.hasSession(this.routeSessionId)) return;
+    const sessionId = this.routeSessionId;
+    if (this.actionBusy() || !this.canManageSession() ||
+        this.exam().id !== sessionId || !this.store.hasSession(sessionId)) return;
     const cohortId = this.workspace.cohort()?.apiId;
     this.actionBusy.set(true);
     this.actionError.set("");
     this.actionInfo.set("");
     try {
       await action();
-      if (cohortId !== this.workspace.cohort()?.apiId) return;
+      if (cohortId !== this.workspace.cohort()?.apiId || sessionId !== this.routeSessionId) return;
       await this.store.reload(false);
-      await this.store.selectSession(this.routeSessionId);
+      if (sessionId !== this.routeSessionId) return;
+      await this.store.selectSession(sessionId);
+      if (sessionId !== this.routeSessionId) return;
       await this.loadApiCandidates();
+      if (sessionId !== this.routeSessionId) return;
       this.loadJuryAssignments();
       this.actionInfo.set(infoKey);
     } catch (error: unknown) {
+      if (sessionId !== this.routeSessionId) return;
       const response = error as { status?: number } | null;
       const code = apiErrorCode(error);
       const supported = new Set([
