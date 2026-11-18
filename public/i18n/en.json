@@ -259,8 +259,7 @@
         "validatedSheets": "Validated sheets"
       },
       "progress": {
-        "title": "My progress",
-        "noCompetencies": "No competencies are defined in the current training referential."
+        "title": "My progress"
       },
       "nextSession": {
         "title": "Next session",
@@ -484,6 +483,9 @@
       "loadFailed": "Unable to load students. Check your connection and permissions, then try again.",
       "metricsFailed": "Learners were loaded, but their metrics could not be retrieved.",
       "invitationConflict": "An invitation is already pending for this email in the organization. Check Access.",
+      "cohortCapacityReached": "The cohort has reached its maximum capacity. No invitation was created.",
+      "memberAlreadyExists": "This person is already a member of the organization. Check Access Management; no new invitation was created.",
+      "invitationConflictGeneric": "The invitation could not be created because of a conflict. Check enrollments and access before trying again.",
       "invitationForbidden": "You cannot invite a learner to this cohort.",
       "invitationFailed": "The invitation could not be saved. Check the details and try again.",
       "invitationReceiptInvalid": "Invalid invitation confirmation. Check Access before trying again.",
@@ -532,7 +534,6 @@
     },
     "emptyDay": "No session matches these filters.",
     "real": {
-      "trainerScheduleConflict": "This trainer is already assigned to another session during this time slot.",
       "navigation": "Calendar navigation",
       "previous": "Previous period",
       "next": "Next period",
@@ -2475,8 +2476,8 @@
       "jury": "Jury"
     },
     "jury": {
-      "title": "Jury",
-      "subtitle": "Authorized professionals for this session.",
+      "title": "Assigned jury",
+      "subtitle": "Authorized professionals assigned to this session.",
       "members": "members",
       "active": "Active",
       "professions": {
@@ -2572,7 +2573,7 @@
       "ccp1Stage": "CCP1 requirements",
       "ccp2Stage": "CCP2 requirements",
       "juryEvaluation": "Jury assessment grid",
-      "juryEvaluationHelp": "Evaluation using configured certification criteria.",
+      "juryEvaluationHelp": "Demo digital grid; official criteria will be configured from the exam framework.",
       "locked": "Assessment locked",
       "juryCriteria": {
         "pedagogy": "Delivery and structure of the teaching performance",
@@ -2600,10 +2601,9 @@
       "activeScheme": "Active certification scheme",
       "schemeHelp": "Version {{version}} · {{steps}} exams · {{units}} validation units",
       "scheme": "Scheme",
-      "juryForProgram": "Jury for program {{program}}.",
-      "juryNoMembers": "No jury member assigned.",
+      "juryForProgram": "Demo jury authorized for {{program}}.",
       "examPathSubtitle": "Exams configured by scheme {{scheme}}.",
-      "juryGridHelp": "Criteria from certification framework {{scheme}}.",
+      "juryGridHelp": "Demo grid from scheme {{scheme}}; official criteria will be configured by framework.",
       "examCount": "Exams",
       "schemeStructure": "Exam structure",
       "version": "Version {{version}}"
@@ -2769,13 +2769,6 @@
         "FinalInterview": "Final interview",
         "Other": "Other"
       }
-    },
-    "qa30": {
-      "selectSession": "Certification session",
-      "noSessionInCohort": "No certification session is available in the selected cohort.",
-      "loadingJury": "Loading assigned jury members…",
-      "juryLoadError": "Unable to load assigned jury members.",
-      "assigned": "Assigned"
     }
   },
   "jury": {
@@ -5132,9 +5125,7 @@
     "sessionRequired": "Select a cohort and enter a session topic, date and start/end times.",
     "sessionTime": "End time must be later than start time.",
     "referentialSkillsEmpty": "No competencies have been defined for this curriculum version.",
-    "juryNoAssignment": "No certification session is assigned to you.",
-    "completeSession": "Complete session",
-    "juryCandidateUnavailable": "Candidate unavailable: this candidate or session is not assigned to the jury."
+    "juryNoAssignment": "No certification session is assigned to you."
   },
   "qaFixAttendance": {
     "selectSession": "Attendance session",

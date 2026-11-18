@@ -259,8 +259,7 @@
         "validatedSheets": "Fiches validées"
       },
       "progress": {
-        "title": "Ma progression",
-        "noCompetencies": "Aucune compétence n’est définie dans le référentiel de formation actuel."
+        "title": "Ma progression"
       },
       "nextSession": {
         "title": "Prochaine séance",
@@ -484,6 +483,9 @@
       "loadFailed": "Impossible de charger les stagiaires. Vérifiez votre connexion et vos droits, puis réessayez.",
       "metricsFailed": "Les stagiaires ont été chargés, mais leurs indicateurs n'ont pas pu être récupérés.",
       "invitationConflict": "Une invitation est déjà en attente pour cette adresse dans l'organisation. Consultez l'espace Accès.",
+      "cohortCapacityReached": "La promotion a atteint sa capacité maximale. Aucune invitation n’a été créée.",
+      "memberAlreadyExists": "Cette personne est déjà membre de l’organisation. Consultez la gestion des accès ; aucune nouvelle invitation n’a été créée.",
+      "invitationConflictGeneric": "L’invitation n’a pas pu être créée en raison d’un conflit. Vérifiez les inscriptions et les accès avant de réessayer.",
       "invitationForbidden": "Vous n'êtes pas autorisé à inviter un stagiaire dans cette promotion.",
       "invitationFailed": "L'invitation n'a pas pu être enregistrée. Vérifiez les informations et réessayez.",
       "invitationReceiptInvalid": "La confirmation de l'invitation est invalide. Vérifiez l'espace Accès avant de renouveler la demande.",
@@ -532,7 +534,6 @@
     },
     "emptyDay": "Aucune séance avec ces filtres.",
     "real": {
-      "trainerScheduleConflict": "Le formateur est déjà affecté à une autre séance sur ce créneau.",
       "navigation": "Navigation du calendrier",
       "previous": "Période précédente",
       "next": "Période suivante",
@@ -2475,8 +2476,8 @@
       "jury": "Jury"
     },
     "jury": {
-      "title": "Jury",
-      "subtitle": "Professionnels habilités pour cette session.",
+      "title": "Jury affecté",
+      "subtitle": "Professionnels habilités affectés à cette session.",
       "members": "membres",
       "active": "Actif",
       "professions": {
@@ -2572,7 +2573,7 @@
       "ccp1Stage": "Éléments CCP1",
       "ccp2Stage": "Éléments CCP2",
       "juryEvaluation": "Grille d’évaluation Jury",
-      "juryEvaluationHelp": "Évaluation conformément aux critères de certification configurés.",
+      "juryEvaluationHelp": "Grille numérique de démonstration ; les critères officiels seront configurés par référentiel.",
       "locked": "Évaluation verrouillée",
       "juryCriteria": {
         "pedagogy": "Conduite et structuration de la prestation pédagogique",
@@ -2600,10 +2601,9 @@
       "activeScheme": "Schéma de certification actif",
       "schemeHelp": "Version {{version}} · {{steps}} épreuves · {{units}} unités de validation",
       "scheme": "Schéma",
-      "juryForProgram": "Jury du programme {{program}}.",
-      "juryNoMembers": "Aucun membre de jury affecté.",
+      "juryForProgram": "Jury habilité pour {{program}} dans cette maquette.",
       "examPathSubtitle": "Épreuves configurées par le schéma {{scheme}}.",
-      "juryGridHelp": "Critères du référentiel de certification {{scheme}}.",
+      "juryGridHelp": "Grille de démonstration issue du schéma {{scheme}} ; les critères officiels seront paramétrés par référentiel.",
       "examCount": "Épreuves",
       "schemeStructure": "Structure des épreuves",
       "version": "Version {{version}}"
@@ -2769,13 +2769,6 @@
         "FinalInterview": "Entretien final",
         "Other": "Autre"
       }
-    },
-    "qa30": {
-      "selectSession": "Session de certification",
-      "noSessionInCohort": "Aucune session de certification dans la promotion sélectionnée.",
-      "loadingJury": "Chargement des membres du jury affectés…",
-      "juryLoadError": "Impossible de charger les membres du jury affectés.",
-      "assigned": "Affecté"
     }
   },
   "jury": {
@@ -5132,9 +5125,7 @@
     "sessionRequired": "Renseignez une promotion, un thème, une date et les horaires de la séance.",
     "sessionTime": "L’heure de fin doit être postérieure à l’heure de début.",
     "referentialSkillsEmpty": "Aucune compétence n’est définie dans cette version du référentiel.",
-    "juryNoAssignment": "Aucune session de certification ne vous est affectée.",
-    "completeSession": "Clôturer la séance",
-    "juryCandidateUnavailable": "Dossier indisponible : candidat ou session non affecté(e) au jury."
+    "juryNoAssignment": "Aucune session de certification ne vous est affectée."
   },
   "qaFixAttendance": {
     "selectSession": "Séance à émarger",

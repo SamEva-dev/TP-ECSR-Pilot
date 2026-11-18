@@ -151,9 +151,18 @@ export class StudentApiStoreService {
     } catch (error: unknown) {
       const status = this.httpStatus(error);
       const code = this.httpErrorCode(error);
-      const key = status === 409 && code === "LEARNER_ALREADY_ENROLLED"
+      // Do not interpret every 409 as a pending invitation: the API returns
+      // distinct business codes for a full cohort, an existing member, etc.
+      // Unknown conflicts must use a neutral message, never a false diagnosis.
+      const key = status === 409 && code === "COHORT_CAPACITY_REACHED"
+        ? "students.api.cohortCapacityReached"
+        : status === 409 && code === "ACCESS_MEMBER_ALREADY_EXISTS"
+        ? "students.api.memberAlreadyExists"
+        : status === 409 && code === "LEARNER_ALREADY_ENROLLED"
         ? "students.api.alreadyEnrolled"
-        : status === 409 ? "students.api.invitationConflict"
+        : status === 409 && code === "ACCESS_INVITATION_ALREADY_EXISTS"
+        ? "students.api.invitationConflict"
+        : status === 409 ? "students.api.invitationConflictGeneric"
         : status === 403 ? "students.api.invitationForbidden" : "students.api.invitationFailed";
       this.notifications.error(key, "/stagiaires");
       return null;
