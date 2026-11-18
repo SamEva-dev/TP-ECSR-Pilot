@@ -549,7 +549,8 @@
         "remote-live": "Live remote",
         "remote-async": "Self-paced remote",
         "practical": "Practical"
-      }
+      },
+      "trainerScheduleConflict": "This trainer already has a session during this time slot. Choose another time or trainer."
     },
     "drawer": {
       "title": "Add to schedule",

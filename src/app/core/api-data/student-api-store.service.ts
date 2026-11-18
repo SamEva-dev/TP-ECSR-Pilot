@@ -1,4 +1,5 @@
 import { Injectable, effect, inject, signal, untracked } from "@angular/core";
+import { apiErrorCode } from "../errors/api-error-code";
 import { firstValueFrom } from "rxjs";
 import { AccessPolicyService } from "../access/access-policy.service";
 import type { StudentStatus } from "../models/app.models";
@@ -150,7 +151,7 @@ export class StudentApiStoreService {
       };
     } catch (error: unknown) {
       const status = this.httpStatus(error);
-      const code = this.httpErrorCode(error);
+      const code = apiErrorCode(error);
       // Do not interpret every 409 as a pending invitation: the API returns
       // distinct business codes for a full cohort, an existing member, etc.
       // Unknown conflicts must use a neutral message, never a false diagnosis.
@@ -173,13 +174,6 @@ export class StudentApiStoreService {
     if (typeof error !== "object" || error === null || !("status" in error)) return 0;
     const status = (error as { status: unknown }).status;
     return typeof status === "number" ? status : 0;
-  }
-
-  private httpErrorCode(error: unknown): string {
-    if (typeof error !== "object" || error === null || !("error" in error)) return "";
-    const payload = (error as { error: unknown }).error;
-    if (typeof payload !== "object" || payload === null || !("code" in payload)) return "";
-    return this.text((payload as { code: unknown }).code);
   }
 
   private mapDirectory(row: LearnerDirectoryApi, summary?: CohortLearnerDashboard): StudentDirectoryItem {

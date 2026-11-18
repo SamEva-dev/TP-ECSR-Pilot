@@ -549,7 +549,8 @@
         "remote-live": "À distance en direct",
         "remote-async": "À distance en autonomie",
         "practical": "Pratique"
-      }
+      },
+      "trainerScheduleConflict": "Ce formateur possède déjà une séance sur ce créneau. Choisissez un autre horaire ou un autre formateur."
     },
     "drawer": {
       "title": "Ajouter au planning",
