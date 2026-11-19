@@ -157,45 +157,69 @@ export class ReferentialDetailComponent {
   readonly deaDocument = signal<DeaStructureDocument | null>(null);
   readonly deaUpdatedAt = signal<string | null>(null);
   readonly deaBusy = signal(false);
+  readonly deaState = signal<"idle" | "loading" | "empty" | "ready" | "error">("idle");
   readonly deaErrorKey = signal("");
   private deaRequestId = 0;
+  private deaLoadedKey = "";
+  private deaLoadingVersion = "";
 
   constructor() {
     effect(() => {
       const versionId = this.referential()?.apiId ?? "";
-      const isDea = this.isDea();
+      const key = this.isDea() && versionId ? versionId : "";
+      // Do not repeat the initial GET when unrelated reactive state changes.
+      if (key === this.deaLoadedKey) return;
+      this.deaLoadedKey = key;
       ++this.deaRequestId;
       this.deaDocument.set(null);
       this.deaUpdatedAt.set(null);
       this.deaErrorKey.set("");
-      if (versionId && isDea) void this.loadDeaStructure();
+      this.deaState.set("idle");
+      this.deaBusy.set(false);
+      if (key) void this.loadDeaStructure();
     });
   }
 
   async loadDeaStructure(): Promise<void> {
     const versionId = this.referential()?.apiId;
-    if (!versionId || !this.isDea()) return;
+    if (!versionId || !this.isDea() || this.deaLoadingVersion === versionId) return;
     const requestId = ++this.deaRequestId;
+    this.deaLoadingVersion = versionId;
     this.deaBusy.set(true);
+    this.deaState.set("loading");
     this.deaErrorKey.set("");
     try {
       const result = await this.deaApi.get(versionId);
       if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
       this.deaDocument.set(result.content);
       this.deaUpdatedAt.set(result.updatedAtUtc);
+      this.deaState.set("ready");
     } catch (error: unknown) {
-      if (requestId !== this.deaRequestId) return;
-      const status = (error as { status?: number })?.status;
+      if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
+      const status = (error as { status?: number; original?: { status?: number } })?.status
+        ?? (error as { original?: { status?: number } })?.original?.status;
       if (status === 404) {
-        // No structure has been imported for this version yet.
+        // The version exists, but its DEA document has not yet been initialized.
         this.deaDocument.set(null);
         this.deaUpdatedAt.set(null);
+        this.deaState.set("empty");
       } else {
+        this.deaState.set("error");
         this.deaErrorKey.set("qa41b4.errors.load");
       }
     } finally {
+      if (this.deaLoadingVersion === versionId) this.deaLoadingVersion = "";
       if (requestId === this.deaRequestId) this.deaBusy.set(false);
     }
+  }
+
+  /** Empty sections are an authoring scaffold, not regulatory DEA content. */
+  async initializeDeaStructure(): Promise<void> {
+    if (this.deaState() !== "empty") return;
+    await this.saveDeaStructure({
+      blocks: [], competencies: [], modules: [], stages: [], assessmentByBlock: [],
+      totalHours: 801, instituteHours: 556, internshipHours: 245, pedagogicalFollowupHours: 3,
+    });
   }
 
   async saveDeaStructure(document: DeaStructureDocument): Promise<void> {
@@ -210,8 +234,13 @@ export class ReferentialDetailComponent {
       if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
       this.deaDocument.set(result.content);
       this.deaUpdatedAt.set(result.updatedAtUtc);
+      this.deaState.set("ready");
     } catch {
-      if (requestId === this.deaRequestId) this.deaErrorKey.set("qa41b4.errors.save");
+      if (requestId === this.deaRequestId) {
+        this.deaErrorKey.set("qa41b4.errors.save");
+        // An unsuccessful initialization remains empty and retryable.
+        if (this.deaState() !== "empty") this.deaState.set("ready");
+      }
     } finally {
       if (requestId === this.deaRequestId) this.deaBusy.set(false);
     }

@@ -9,8 +9,22 @@
     </button>
   </header>
   @if (errorKey) { <p role="alert" class="mt-3 text-sm text-red-700">{{ errorKey | t }}</p> }
-  @if (busy) { <p role="status" class="mt-3 text-sm">{{ 'qa41b4.loading' | t }}</p> }
-  @if (source(); as doc) {
+  @if (loadState === 'loading') { <p role="status" class="mt-3 text-sm">{{ 'qa41b4.loading' | t }}</p> }
+  @if (loadState === 'error') {
+    <div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+      <button type="button" class="mt-2 rounded-lg border border-red-300 px-3 py-2 text-sm" (click)="refreshRequested.emit()" [disabled]="busy">{{ 'qa41b6.retry' | t }}</button>
+    </div>
+  }
+  @if (loadState === 'empty') {
+    <div class="mt-4 rounded-lg bg-slate-50 p-4">
+      <p class="text-sm text-slate-600">{{ 'qa41b4.noDocument' | t }}</p>
+      @if (isDraft && canManage) {
+        <p class="mt-2 text-xs text-slate-600">{{ 'qa41b6.initializationNote' | t }}</p>
+        <button type="button" class="mt-3 rounded-lg bg-blue-700 px-3 py-2 text-sm text-white disabled:opacity-50" (click)="initializeRequested.emit()" [disabled]="busy">{{ 'qa41b6.initialize' | t }}</button>
+      }
+    </div>
+  }
+  @if (loadState === 'ready' && source(); as doc) {
     <p class="mt-3 text-xs text-slate-500">{{ 'qa41b4.draftOnly' | t }}</p>
     <div role="tablist" class="mt-4 flex flex-wrap gap-2" [attr.aria-label]="'qa41b4.sections' | t">
       @for (section of sections; track section) {
@@ -44,7 +58,5 @@
         } @empty { <p class="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">{{ 'qa41b4.empty' | t }}</p> }
       </div>
     }
-  } @else if (!busy) {
-    <p class="mt-4 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">{{ 'qa41b4.noDocument' | t }}</p>
   }
 </section>

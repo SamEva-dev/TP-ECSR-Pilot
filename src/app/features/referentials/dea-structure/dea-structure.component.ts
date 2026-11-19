@@ -17,6 +17,8 @@ export class DeaStructureComponent {
   @Input() canManage = false;
   @Input() busy = false;
   @Input() errorKey = '';
+  @Input() loadState: "idle" | "loading" | "empty" | "ready" | "error" = "idle";
+  @Output() initializeRequested = new EventEmitter<void>();
   @Output() saveRequested = new EventEmitter<DeaStructureDocument>();
   @Output() refreshRequested = new EventEmitter<void>();
 

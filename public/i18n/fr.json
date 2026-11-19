@@ -5159,5 +5159,10 @@
       "save": "Impossible d’enregistrer la structure DEA.",
       "unavailable": "Service DEA indisponible ou non configuré."
     }
+  },
+  "qa41b6": {
+    "initialize": "Initialiser le brouillon DEA",
+    "initializationNote": "Crée un document de travail vide (5 sections). Aucun contenu pédagogique ni conformité réglementaire ne sont présumés.",
+    "retry": "Réessayer"
   }
 }

@@ -5159,5 +5159,10 @@
       "save": "Unable to save the DEA structure.",
       "unavailable": "DEA service unavailable or not configured."
     }
+  },
+  "qa41b6": {
+    "initialize": "Initialize DEA draft",
+    "initializationNote": "Creates an empty working document (5 sections). No instructional content or regulatory approval is assumed.",
+    "retry": "Retry"
   }
 }

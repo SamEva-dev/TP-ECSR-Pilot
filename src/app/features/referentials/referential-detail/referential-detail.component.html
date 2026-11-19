@@ -84,10 +84,12 @@
           [isDraft]="current.status === 'draft'"
           [canManage]="canManage()"
           [busy]="deaBusy()"
+          [loadState]="deaState()"
           [errorKey]="deaErrorKey()"
           [document]="deaDocument()"
           [lastUpdatedAt]="deaUpdatedAt()"
           (refreshRequested)="loadDeaStructure()"
+          (initializeRequested)="initializeDeaStructure()"
           (saveRequested)="saveDeaStructure($event)"
         />
       </div>
