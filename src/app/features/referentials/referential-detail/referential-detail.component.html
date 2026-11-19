@@ -77,6 +77,22 @@
       </div>
     </div>
 
+    @if (isDea()) {
+      <div class="mt-6">
+        <app-dea-structure
+          [versionId]="current.apiId"
+          [isDraft]="current.status === 'draft'"
+          [canManage]="canManage()"
+          [busy]="deaBusy()"
+          [errorKey]="deaErrorKey()"
+          [document]="deaDocument()"
+          [lastUpdatedAt]="deaUpdatedAt()"
+          (refreshRequested)="loadDeaStructure()"
+          (saveRequested)="saveDeaStructure($event)"
+        />
+      </div>
+    }
+
     <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
       <article
         class="relative min-h-[101px] rounded-[17px] border border-[#dfe5ec] bg-white p-4 shadow-sm"

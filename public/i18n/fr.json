@@ -5130,5 +5130,34 @@
     "selectSession": "Séance à émarger",
     "chooseSession": "Choisir une séance",
     "noSession": "Aucune séance disponible pour la sélection actuelle."
+  },
+  "qa41b4": {
+    "title": "Structure pédagogique DEA",
+    "description": "Blocs, compétences, modules, stages et évaluations liés à cette version.",
+    "refresh": "Actualiser",
+    "loading": "Chargement de la structure DEA…",
+    "draftOnly": "Modifications autorisées uniquement sur une version brouillon, avec la permission de gestion des référentiels.",
+    "sections": "Sections du référentiel DEA",
+    "section": {
+      "blocks": "Blocs",
+      "competencies": "Compétences",
+      "modules": "Modules",
+      "stages": "Stages",
+      "assessments": "Évaluations"
+    },
+    "entries": "éléments",
+    "edit": "Modifier la section",
+    "jsonLabel": "Éditer les éléments au format JSON (tableau)",
+    "save": "Enregistrer le brouillon",
+    "cancel": "Annuler",
+    "empty": "Cette section est vide.",
+    "noDocument": "Aucune structure DEA enregistrée pour cette version.",
+    "errors": {
+      "invalidArray": "Saisissez un tableau JSON d’objets.",
+      "invalidJson": "Le JSON est invalide. Corrigez sa syntaxe avant enregistrement.",
+      "load": "Impossible de charger la structure DEA.",
+      "save": "Impossible d’enregistrer la structure DEA.",
+      "unavailable": "Service DEA indisponible ou non configuré."
+    }
   }
 }

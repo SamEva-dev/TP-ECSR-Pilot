@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -19,6 +20,9 @@ import type {
   ReferentialVersionFormValue,
   VolumeCategory,
 } from "../../../core/models/referentials.models";
+import { DeaStructureComponent } from "../dea-structure/dea-structure.component";
+import { DeaStructureApiService } from "../dea-structure/dea-structure-api.service";
+import type { DeaStructureDocument } from "../dea-structure/dea-structure.models";
 import { ReferentialCompareDrawerComponent } from "../referential-compare-drawer/referential-compare-drawer.component";
 import { ReferentialVersionDrawerComponent } from "../referential-version-drawer/referential-version-drawer.component";
 
@@ -32,6 +36,7 @@ type DetailTab = "overview" | "skills" | "hours" | "stages" | "certification";
     TranslatePipe,
     ReferentialCompareDrawerComponent,
     ReferentialVersionDrawerComponent,
+    DeaStructureComponent,
   ],
   templateUrl: "./referential-detail.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -146,6 +151,72 @@ export class ReferentialDetailComponent {
   readonly compareOpen = signal(false);
   readonly versionDrawerOpen = signal(false);
   readonly compareWithId = signal("");
+
+  private readonly deaApi = inject(DeaStructureApiService);
+  readonly isDea = computed(() => this.program()?.familyCode?.toUpperCase() === "EMERGENCY_MEDICAL");
+  readonly deaDocument = signal<DeaStructureDocument | null>(null);
+  readonly deaUpdatedAt = signal<string | null>(null);
+  readonly deaBusy = signal(false);
+  readonly deaErrorKey = signal("");
+  private deaRequestId = 0;
+
+  constructor() {
+    effect(() => {
+      const versionId = this.referential()?.apiId ?? "";
+      const isDea = this.isDea();
+      ++this.deaRequestId;
+      this.deaDocument.set(null);
+      this.deaUpdatedAt.set(null);
+      this.deaErrorKey.set("");
+      if (versionId && isDea) void this.loadDeaStructure();
+    });
+  }
+
+  async loadDeaStructure(): Promise<void> {
+    const versionId = this.referential()?.apiId;
+    if (!versionId || !this.isDea()) return;
+    const requestId = ++this.deaRequestId;
+    this.deaBusy.set(true);
+    this.deaErrorKey.set("");
+    try {
+      const result = await this.deaApi.get(versionId);
+      if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
+      this.deaDocument.set(result.content);
+      this.deaUpdatedAt.set(result.updatedAtUtc);
+    } catch (error: unknown) {
+      if (requestId !== this.deaRequestId) return;
+      const status = (error as { status?: number })?.status;
+      if (status === 404) {
+        // No structure has been imported for this version yet.
+        this.deaDocument.set(null);
+        this.deaUpdatedAt.set(null);
+      } else {
+        this.deaErrorKey.set("qa41b4.errors.load");
+      }
+    } finally {
+      if (requestId === this.deaRequestId) this.deaBusy.set(false);
+    }
+  }
+
+  async saveDeaStructure(document: DeaStructureDocument): Promise<void> {
+    const current = this.referential();
+    if (!current?.apiId || !this.isDea() || current.status !== "draft" || !this.canManage() || this.deaBusy()) return;
+    const versionId = current.apiId;
+    const requestId = ++this.deaRequestId;
+    this.deaBusy.set(true);
+    this.deaErrorKey.set("");
+    try {
+      const result = await this.deaApi.save(versionId, document);
+      if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
+      this.deaDocument.set(result.content);
+      this.deaUpdatedAt.set(result.updatedAtUtc);
+    } catch {
+      if (requestId === this.deaRequestId) this.deaErrorKey.set("qa41b4.errors.save");
+    } finally {
+      if (requestId === this.deaRequestId) this.deaBusy.set(false);
+    }
+  }
+
 
   readonly referential = computed(
     () =>

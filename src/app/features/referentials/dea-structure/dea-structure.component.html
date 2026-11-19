@@ -1,0 +1,50 @@
+<section class="rounded-2xl border border-slate-200 bg-white p-5" [attr.aria-label]="'qa41b4.title' | t">
+  <header class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900">{{ 'qa41b4.title' | t }}</h2>
+      <p class="text-sm text-slate-600">{{ 'qa41b4.description' | t }}</p>
+    </div>
+    <button type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm" (click)="refreshRequested.emit()" [disabled]="busy">
+      {{ 'qa41b4.refresh' | t }}
+    </button>
+  </header>
+  @if (errorKey) { <p role="alert" class="mt-3 text-sm text-red-700">{{ errorKey | t }}</p> }
+  @if (busy) { <p role="status" class="mt-3 text-sm">{{ 'qa41b4.loading' | t }}</p> }
+  @if (source(); as doc) {
+    <p class="mt-3 text-xs text-slate-500">{{ 'qa41b4.draftOnly' | t }}</p>
+    <div role="tablist" class="mt-4 flex flex-wrap gap-2" [attr.aria-label]="'qa41b4.sections' | t">
+      @for (section of sections; track section) {
+        <button type="button" role="tab" [attr.aria-selected]="activeSection() === section" (click)="selectSection(section)"
+          [class]="activeSection() === section ? 'rounded-lg bg-blue-700 px-3 py-2 text-sm text-white' : 'rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700'">
+          {{ 'qa41b4.section.' + section | t }}
+        </button>
+      }
+    </div>
+    <div class="mt-4 flex items-center justify-between">
+      <p class="text-sm text-slate-600">{{ sectionRows().length }} {{ 'qa41b4.entries' | t }}</p>
+      @if (isDraft && canManage && !editing()) {
+        <button type="button" class="rounded-lg bg-blue-700 px-3 py-2 text-sm text-white disabled:opacity-50" (click)="startEdit()" [disabled]="busy">
+          {{ 'qa41b4.edit' | t }}
+        </button>
+      }
+    </div>
+    @if (editing()) {
+      <label class="mt-3 block text-sm font-medium" for="dea-section-editor">{{ 'qa41b4.jsonLabel' | t }}</label>
+      <textarea id="dea-section-editor" [ngModel]="editor()" (ngModelChange)="editor.set($event)"
+        spellcheck="false" rows="16" class="mt-2 w-full rounded-lg border border-slate-300 p-3 font-mono text-xs"></textarea>
+      @if (validationError()) { <p role="alert" class="mt-2 text-sm text-red-700">{{ validationError() | t }}</p> }
+      <div class="mt-3 flex gap-2">
+        <button type="button" class="rounded-lg bg-blue-700 px-3 py-2 text-sm text-white disabled:opacity-50" (click)="submit()" [disabled]="busy">{{ 'qa41b4.save' | t }}</button>
+        <button type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm" (click)="cancel()">{{ 'qa41b4.cancel' | t }}</button>
+      </div>
+    } @else {
+      <div class="mt-3 grid gap-2">
+        @for (row of sectionRows(); track $index) {
+          <pre class="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-xs text-slate-800">{{ stringify(row) }}</pre>
+        } @empty { <p class="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">{{ 'qa41b4.empty' | t }}</p> }
+      </div>
+    }
+  } @else if (!busy) {
+    <p class="mt-4 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">{{ 'qa41b4.noDocument' | t }}</p>
+  }
+</section>

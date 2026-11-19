@@ -5130,5 +5130,34 @@
     "selectSession": "Attendance session",
     "chooseSession": "Choose a session",
     "noSession": "No session is available for the current selection."
+  },
+  "qa41b4": {
+    "title": "DEA training structure",
+    "description": "Blocks, competencies, modules, placements and assessments for this version.",
+    "refresh": "Refresh",
+    "loading": "Loading DEA structure…",
+    "draftOnly": "Changes are only allowed for draft versions with referential management permission.",
+    "sections": "DEA referential sections",
+    "section": {
+      "blocks": "Blocks",
+      "competencies": "Competencies",
+      "modules": "Modules",
+      "stages": "Placements",
+      "assessments": "Assessments"
+    },
+    "entries": "items",
+    "edit": "Edit section",
+    "jsonLabel": "Edit items as a JSON array",
+    "save": "Save draft",
+    "cancel": "Cancel",
+    "empty": "This section has no entries.",
+    "noDocument": "No DEA structure has been saved for this version.",
+    "errors": {
+      "invalidArray": "Enter a JSON array of objects.",
+      "invalidJson": "Invalid JSON. Correct the syntax before saving.",
+      "load": "Unable to load the DEA structure.",
+      "save": "Unable to save the DEA structure.",
+      "unavailable": "DEA service unavailable or not configured."
+    }
   }
 }
