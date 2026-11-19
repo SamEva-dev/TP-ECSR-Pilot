@@ -310,7 +310,7 @@ export class ProgramApiStoreService {
       code: this.text(item?.code),
       name: this.text(item?.name),
       familyCode: this.text(item?.familyCode),
-      category: this.text(item?.category),
+      category: this.categoryForApi(item),
       icon: this.text(item?.icon),
       description: this.text(item?.descriptionKey),
       referenceVersion: this.text(item?.referenceVersion),
@@ -331,6 +331,17 @@ export class ProgramApiStoreService {
       responsibleTrainerDisplayName: this.text(item?.responsibleTrainerDisplayName),
       responsibleTrainerActive: !!item?.responsibleTrainerActive,
     };
+  }
+
+  /** Keep historic API family codes compatible with the form's category values. */
+  private categoryForApi(item: ProgramApiDto): string {
+    const familyCode = this.text(item?.familyCode).trim().toUpperCase();
+    if (familyCode === "EMERGENCY_MEDICAL") return "ambulance";
+    if (familyCode === "FIRST_AID") return "first-aid";
+    const category = this.text(item?.category);
+    if (category === "emergency-medical") return "ambulance";
+    if (category === "first_aid") return "first-aid";
+    return category;
   }
 
   private familyFor(category: string): string {
