@@ -3441,7 +3441,8 @@
         "sheets": "Fiches pédagogiques",
         "documents": "Documents requis",
         "examSteps": "Épreuves de certification"
-      }
+      },
+      "selectVersion": "Choisir une version à comparer"
     },
     "demo": {
       "ecsr": {

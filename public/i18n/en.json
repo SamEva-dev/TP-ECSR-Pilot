@@ -3441,7 +3441,8 @@
         "sheets": "Learning sheets",
         "documents": "Required documents",
         "examSteps": "Certification assessments"
-      }
+      },
+      "selectVersion": "Select a version to compare"
     },
     "demo": {
       "ecsr": {

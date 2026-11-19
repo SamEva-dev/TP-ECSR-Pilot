@@ -45,9 +45,11 @@
           <label class="relative"
             ><select
               [value]="compareWith()?.id ?? ''"
+              [attr.aria-label]="'referentials.compare.selectVersion' | t"
               (change)="setComparison($event)"
               class="h-[39px] min-w-[190px] appearance-none rounded-[11px] border border-[#d8e0e9] bg-white pl-3 pr-9 text-[12px] outline-none"
             >
+              <option value="">{{ 'referentials.compare.selectVersion' | t }}</option>
               @for (item of comparisonCandidates(); track item.id) {
                 <option [value]="item.id">{{ item.version }}</option>
               }</select
@@ -57,7 +59,8 @@
           ><button
             type="button"
             (click)="openCompare()"
-            class="inline-flex h-[39px] items-center gap-2 rounded-[11px] border border-[#d8e0e9] bg-white px-4 text-[12px] font-semibold text-[#526075] shadow-sm"
+            [disabled]="!compareWith()"
+            class="inline-flex disabled:cursor-not-allowed disabled:opacity-50 h-[39px] items-center gap-2 rounded-[11px] border border-[#d8e0e9] bg-white px-4 text-[12px] font-semibold text-[#526075] shadow-sm"
           >
             <i class="ph ph-arrows-left-right text-[15px]"></i
             >{{ "referentials.compare.button" | t }}

@@ -175,9 +175,7 @@ export class ReferentialDetailComponent {
     () =>
       this.comparisonCandidates().find(
         (item) => item.id === this.compareWithId(),
-      ) ??
-      this.comparisonCandidates().at(0) ??
-      null,
+      ) ?? null,
   );
   readonly linkedCohorts = computed(
     () => this.referential()?.linkedCohorts ?? [],

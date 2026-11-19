@@ -1,4 +1,5 @@
 import { Injectable, effect, inject, signal, untracked } from "@angular/core";
+import { apiErrorCode } from "../errors/api-error-code";
 import {
   ReferentialApiService,
   type ReferentialApiDto,
@@ -15,14 +16,12 @@ import type { ProgramModule } from "../models/workspace.models";
 import { ApplicationNotificationService } from "../notifications/application-notification.service";
 import { RealtimeService } from "../realtime/realtime.service";
 import { SessionService } from "../session/session.service";
-import { AccessPolicyService } from "../access/access-policy.service";
 
 @Injectable({ providedIn: "root" })
 export class ReferentialApiStoreService {
   private readonly api = inject(ReferentialApiService);
   private readonly realtime = inject(RealtimeService);
   private readonly session = inject(SessionService);
-  private readonly policy = inject(AccessPolicyService);
   private readonly notifications = inject(ApplicationNotificationService);
   private readonly itemsSignal = signal<TrainingReferential[]>([]);
 
@@ -49,8 +48,7 @@ export class ReferentialApiStoreService {
       this.itemsSignal.set([]);
       this.remoteLoaded.set(false);
       this.loadError.set(false);
-      if (user && this.policy.can("referentials.view")) void this.reload(generation);
-      else if (user) this.remoteLoaded.set(true);
+      if (user) void this.reload(generation);
     });
 
     effect(() => {
@@ -63,18 +61,12 @@ export class ReferentialApiStoreService {
       )
         return;
       untracked(() => {
-        if (this.session.hasValidToken() && this.policy.can("referentials.view")) void this.reload();
+        if (this.session.hasValidToken()) void this.reload();
       });
     });
   }
 
   async reload(generation = this.generation): Promise<boolean> {
-    if (!this.policy.can("referentials.view")) {
-      this.itemsSignal.set([]);
-      this.remoteLoaded.set(true);
-      this.loading.set(false);
-      return false;
-    }
     const request = ++this.request;
     this.loading.set(true);
     try {
@@ -174,8 +166,12 @@ export class ReferentialApiStoreService {
       ));
       await this.reload();
       return true;
-    } catch {
-      this.notifications.error("referentials.api.publishError", `/referentiels/${current.id}`);
+    } catch (error: unknown) {
+      const code = apiErrorCode(error);
+      const detailKey = code === "DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE"
+        ? "errors.DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE"
+        : "referentials.api.publishError";
+      this.notifications.error(detailKey, `/referentiels/${current.id}`);
       return false;
     }
   }
