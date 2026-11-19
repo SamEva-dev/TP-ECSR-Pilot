@@ -3421,8 +3421,8 @@
         "stepsTitle": "Certification flow"
       },
       "notFound": {
-        "title": "Framework not found",
-        "subtitle": "This version does not exist in the demo data."
+        "title": "Framework unavailable",
+        "subtitle": "This framework could not be found or you do not have permission to view it."
       },
       "publish": "Publish referential"
     },
@@ -5157,7 +5157,8 @@
       "invalidJson": "Invalid JSON. Correct the syntax before saving.",
       "load": "Unable to load the DEA structure.",
       "save": "Unable to save the DEA structure.",
-      "unavailable": "DEA service unavailable or not configured."
+      "unavailable": "DEA service unavailable or not configured.",
+      "invalidStructure": "The DEA structure contains inconsistent references (for example, a link to a missing block). Check the links between sections before saving again."
     }
   },
   "qa41b6": {

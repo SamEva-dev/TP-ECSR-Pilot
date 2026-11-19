@@ -15,6 +15,7 @@ import { AccessPolicyService } from "../../../core/access/access-policy.service"
 import { ReferentialApiStoreService } from "../../../core/api-data/referential-api-store.service";
 import { ProgramApiStoreService } from "../../../core/api-data/program-api-store.service";
 import { TranslatePipe } from "../../../core/i18n/translate.pipe";
+import { apiErrorCode } from "../../../core/errors/api-error-code";
 import type {
   ReferentialStatus,
   ReferentialVersionFormValue,
@@ -235,9 +236,14 @@ export class ReferentialDetailComponent {
       this.deaDocument.set(result.content);
       this.deaUpdatedAt.set(result.updatedAtUtc);
       this.deaState.set("ready");
-    } catch {
+    } catch (error: unknown) {
       if (requestId === this.deaRequestId) {
-        this.deaErrorKey.set("qa41b4.errors.save");
+        const errorCode = apiErrorCode(error);
+        this.deaErrorKey.set(
+          errorCode === "DEA_STRUCTURE_INVALID"
+            ? "qa41b4.errors.invalidStructure"
+            : "qa41b4.errors.save",
+        );
         // An unsuccessful initialization remains empty and retryable.
         if (this.deaState() !== "empty") this.deaState.set("ready");
       }
