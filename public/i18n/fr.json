@@ -483,9 +483,6 @@
       "loadFailed": "Impossible de charger les stagiaires. Vérifiez votre connexion et vos droits, puis réessayez.",
       "metricsFailed": "Les stagiaires ont été chargés, mais leurs indicateurs n'ont pas pu être récupérés.",
       "invitationConflict": "Une invitation est déjà en attente pour cette adresse dans l'organisation. Consultez l'espace Accès.",
-      "cohortCapacityReached": "La promotion a atteint sa capacité maximale. Aucune invitation n’a été créée.",
-      "memberAlreadyExists": "Cette personne est déjà membre de l’organisation. Consultez la gestion des accès ; aucune nouvelle invitation n’a été créée.",
-      "invitationConflictGeneric": "L’invitation n’a pas pu être créée en raison d’un conflit. Vérifiez les inscriptions et les accès avant de réessayer.",
       "invitationForbidden": "Vous n'êtes pas autorisé à inviter un stagiaire dans cette promotion.",
       "invitationFailed": "L'invitation n'a pas pu être enregistrée. Vérifiez les informations et réessayez.",
       "invitationReceiptInvalid": "La confirmation de l'invitation est invalide. Vérifiez l'espace Accès avant de renouveler la demande.",
@@ -549,8 +546,7 @@
         "remote-live": "À distance en direct",
         "remote-async": "À distance en autonomie",
         "practical": "Pratique"
-      },
-      "trainerScheduleConflict": "Ce formateur possède déjà une séance sur ce créneau. Choisissez un autre horaire ou un autre formateur."
+      }
     },
     "drawer": {
       "title": "Ajouter au planning",
@@ -4232,6 +4228,7 @@
     "REFERENTIAL_TOTAL_HOURS_INVALID": "Le volume horaire du référentiel doit être supérieur à zéro.",
     "PROGRAM_OFFERING_NOT_FOUND": "L’offre de formation est introuvable.",
     "PROGRAM_OFFERING_INACTIVE": "Cette offre de formation est inactive.",
+    "DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE": "Le référentiel de transport sanitaire doit comporter les 11 compétences professionnelles du DEA avant publication. Vérifiez également les blocs, modules et évaluations.",
     "REFERENTIAL_VERSION_NOT_ACTIVE": "La version du référentiel sélectionnée n’est pas active.",
     "COHORT_REFERENTIAL_PROGRAM_MISMATCH": "Le référentiel sélectionné ne correspond pas à la formation de cette promotion.",
     "COHORT_NOT_FOUND": "La promotion est introuvable.",
@@ -5117,7 +5114,6 @@
     "history": "Historique des évaluations"
   },
   "qaFix": {
-    "completeSession": "Terminer la séance",
     "inviteRequired": "Renseignez le prénom, le nom et l’adresse email avant d’envoyer l’invitation.",
     "inviteEmail": "Saisissez une adresse email valide.",
     "assignmentAfterAcceptance": "Après acceptation de l’invitation et activation du compte, vous pourrez définir les affectations depuis « Gestion des accès ».",

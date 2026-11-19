@@ -483,9 +483,6 @@
       "loadFailed": "Unable to load students. Check your connection and permissions, then try again.",
       "metricsFailed": "Learners were loaded, but their metrics could not be retrieved.",
       "invitationConflict": "An invitation is already pending for this email in the organization. Check Access.",
-      "cohortCapacityReached": "The cohort has reached its maximum capacity. No invitation was created.",
-      "memberAlreadyExists": "This person is already a member of the organization. Check Access Management; no new invitation was created.",
-      "invitationConflictGeneric": "The invitation could not be created because of a conflict. Check enrollments and access before trying again.",
       "invitationForbidden": "You cannot invite a learner to this cohort.",
       "invitationFailed": "The invitation could not be saved. Check the details and try again.",
       "invitationReceiptInvalid": "Invalid invitation confirmation. Check Access before trying again.",
@@ -549,8 +546,7 @@
         "remote-live": "Live remote",
         "remote-async": "Self-paced remote",
         "practical": "Practical"
-      },
-      "trainerScheduleConflict": "This trainer already has a session during this time slot. Choose another time or trainer."
+      }
     },
     "drawer": {
       "title": "Add to schedule",
@@ -4232,6 +4228,7 @@
     "REFERENTIAL_TOTAL_HOURS_INVALID": "The referential total hours must be greater than zero.",
     "PROGRAM_OFFERING_NOT_FOUND": "The training offering could not be found.",
     "PROGRAM_OFFERING_INACTIVE": "This training offering is inactive.",
+    "DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE": "The emergency medical transport referential must include all 11 DEA professional competencies before publication. Also verify blocks, modules, and assessments.",
     "REFERENTIAL_VERSION_NOT_ACTIVE": "The selected referential version is not active.",
     "COHORT_REFERENTIAL_PROGRAM_MISMATCH": "The selected referential does not match the cohort training program.",
     "COHORT_NOT_FOUND": "The cohort could not be found.",
@@ -5117,7 +5114,6 @@
     "history": "Evaluation history"
   },
   "qaFix": {
-    "completeSession": "Complete session",
     "inviteRequired": "Enter a first name, last name and email address before sending the invitation.",
     "inviteEmail": "Enter a valid email address.",
     "assignmentAfterAcceptance": "Once the invitation is accepted and the account is active, you can define assignments in Access Management.",
