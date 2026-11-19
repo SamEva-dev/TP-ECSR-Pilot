@@ -5117,6 +5117,7 @@
     "history": "Evaluation history"
   },
   "qaFix": {
+    "completeSession": "Complete session",
     "inviteRequired": "Enter a first name, last name and email address before sending the invitation.",
     "inviteEmail": "Enter a valid email address.",
     "assignmentAfterAcceptance": "Once the invitation is accepted and the account is active, you can define assignments in Access Management.",

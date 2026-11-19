@@ -5117,6 +5117,7 @@
     "history": "Historique des évaluations"
   },
   "qaFix": {
+    "completeSession": "Terminer la séance",
     "inviteRequired": "Renseignez le prénom, le nom et l’adresse email avant d’envoyer l’invitation.",
     "inviteEmail": "Saisissez une adresse email valide.",
     "assignmentAfterAcceptance": "Après acceptation de l’invitation et activation du compte, vous pourrez définir les affectations depuis « Gestion des accès ».",
