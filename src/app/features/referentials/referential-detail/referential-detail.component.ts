@@ -245,9 +245,13 @@ export class ReferentialDetailComponent {
       if (requestId === this.deaRequestId) {
         const errorCode = apiErrorCode(error);
         this.deaErrorKey.set(
-          errorCode === "DEA_STRUCTURE_INVALID"
-            ? "qa41b4.errors.invalidStructure"
-            : "qa41b4.errors.save",
+          errorCode === "DEA_STRUCTURE_MODULE_HOURS_REQUIRED"
+            ? "qa41b4.errors.moduleHoursRequired"
+            : errorCode === "DEA_STRUCTURE_HOURS_INVALID"
+              ? "qa41b4.errors.invalidHours"
+              : errorCode === "DEA_STRUCTURE_INVALID"
+                ? "qa41b4.errors.invalidStructure"
+                : "qa41b4.errors.save",
         );
         // An unsuccessful initialization remains empty and retryable.
         if (this.deaState() !== "empty") this.deaState.set("ready");

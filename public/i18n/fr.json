@@ -5158,7 +5158,9 @@
       "load": "Impossible de charger la structure DEA.",
       "save": "Impossible d’enregistrer la structure DEA.",
       "unavailable": "Service DEA indisponible ou non configuré.",
-      "invalidStructure": "La structure DEA contient une incohérence (par exemple une référence à un bloc inexistant). Corrigez les liens entre les sections avant de réenregistrer."
+      "invalidStructure": "La structure DEA comporte une erreur : vérifiez les champs obligatoires, les codes et les références entre sections.",
+      "moduleHoursRequired": "Le champ « hours » est obligatoire pour chaque module. Saisissez un nombre entier d’heures supérieur à zéro.",
+      "invalidHours": "Les volumes horaires DEA sont incohérents. Vérifiez les totaux (801 h, 556 h, 245 h), les 3 h de suivi et la somme des modules et stages."
     }
   },
   "qa41b6": {

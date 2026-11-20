@@ -5158,7 +5158,9 @@
       "load": "Unable to load the DEA structure.",
       "save": "Unable to save the DEA structure.",
       "unavailable": "DEA service unavailable or not configured.",
-      "invalidStructure": "The DEA structure contains inconsistent references (for example, a link to a missing block). Check the links between sections before saving again."
+      "invalidStructure": "The DEA structure is invalid: check required fields, codes and cross-section references.",
+      "moduleHoursRequired": "The \"hours\" field is required for every module. Enter a positive whole number of hours.",
+      "invalidHours": "The DEA training hours are inconsistent. Check the totals (801, 556, 245 hours), 3 follow-up hours, and module and placement sums."
     }
   },
   "qa41b6": {
