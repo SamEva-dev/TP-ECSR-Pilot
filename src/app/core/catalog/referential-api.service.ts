@@ -8,6 +8,7 @@ export interface ReferentialApiDto {
   referentialId: string;
   programId: string;
   programKey: string;
+  familyCode?: string | null;
   code: string;
   name: string;
   version: string;

@@ -82,7 +82,7 @@
         <app-dea-structure
           [versionId]="current.apiId"
           [isDraft]="current.status === 'draft'"
-          [canManage]="canManage()"
+          [canManage]="canManageDea()"
           [busy]="deaBusy()"
           [loadState]="deaState()"
           [errorKey]="deaErrorKey()"

@@ -57,6 +57,8 @@ export interface TrainingReferential {
   referentialId: string;
   programId: string;
   programApiId: string;
+  /** Public program family supplied with the referential (no programs.view required). */
+  familyCode: string | null;
   code: string;
   name: string;
   version: string;

@@ -10,6 +10,7 @@ export type AppPermission =
   | "programs.manage"
   | "programs.delete"
   | "referentials.view"
+  | "referentials.manage"
   | "planning.view"
   | "remoteWork.view"
   | "distanceLearning.view"

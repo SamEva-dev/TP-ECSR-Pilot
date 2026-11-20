@@ -234,6 +234,7 @@ export class ReferentialApiStoreService {
       referentialId: this.text(row?.referentialId),
       programId: this.text(row?.programKey) || this.text(row?.programId),
       programApiId: this.text(row?.programId),
+      familyCode: this.text(row?.familyCode) || null,
       code: this.text(row?.code),
       name: this.text(row?.name),
       version: this.text(row?.version),

@@ -46,6 +46,7 @@ export class ReferentialDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly accessPolicy = inject(AccessPolicyService);
   readonly canManage = computed(() => this.accessPolicy.can("administration.manage"));
+  readonly canManageDea = computed(() => this.accessPolicy.can("referentials.manage"));
   readonly canManageCertification = computed(() => this.accessPolicy.can("certification.manage"));
   private readonly certificationApi = inject(CertificationApiService);
   readonly certificationSchemes = signal<CertificationScheme[]>([]);
@@ -154,7 +155,11 @@ export class ReferentialDetailComponent {
   readonly compareWithId = signal("");
 
   private readonly deaApi = inject(DeaStructureApiService);
-  readonly isDea = computed(() => this.program()?.familyCode?.toUpperCase() === "EMERGENCY_MEDICAL");
+  // The programs endpoint may return 403 to referentials.view-only users.
+  // Use the family code from the permitted referential payload first.
+  readonly isDea = computed(() =>
+    (this.referential()?.familyCode || this.program()?.familyCode || "").toUpperCase() === "EMERGENCY_MEDICAL"
+  );
   readonly deaDocument = signal<DeaStructureDocument | null>(null);
   readonly deaUpdatedAt = signal<string | null>(null);
   readonly deaBusy = signal(false);
@@ -225,7 +230,7 @@ export class ReferentialDetailComponent {
 
   async saveDeaStructure(document: DeaStructureDocument): Promise<void> {
     const current = this.referential();
-    if (!current?.apiId || !this.isDea() || current.status !== "draft" || !this.canManage() || this.deaBusy()) return;
+    if (!current?.apiId || !this.isDea() || current.status !== "draft" || !this.canManageDea() || this.deaBusy()) return;
     const versionId = current.apiId;
     const requestId = ++this.deaRequestId;
     this.deaBusy.set(true);
