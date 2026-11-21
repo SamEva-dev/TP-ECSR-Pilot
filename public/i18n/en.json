@@ -5167,5 +5167,8 @@
     "initialize": "Initialize DEA draft",
     "initializationNote": "Creates an empty working document (5 sections). No instructional content or regulatory approval is assumed.",
     "retry": "Retry"
+  },
+  "qa41c3": {
+    "saveSuccess": "DEA section saved successfully."
   }
 }

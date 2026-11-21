@@ -5167,5 +5167,8 @@
     "initialize": "Initialiser le brouillon DEA",
     "initializationNote": "Crée un document de travail vide (5 sections). Aucun contenu pédagogique ni conformité réglementaire ne sont présumés.",
     "retry": "Réessayer"
+  },
+  "qa41c3": {
+    "saveSuccess": "Section DEA enregistrée avec succès."
   }
 }

@@ -165,6 +165,7 @@ export class ReferentialDetailComponent {
   readonly deaBusy = signal(false);
   readonly deaState = signal<"idle" | "loading" | "empty" | "ready" | "error">("idle");
   readonly deaErrorKey = signal("");
+  readonly deaSuccessKey = signal("");
   private deaRequestId = 0;
   private deaLoadedKey = "";
   private deaLoadingVersion = "";
@@ -180,6 +181,7 @@ export class ReferentialDetailComponent {
       this.deaDocument.set(null);
       this.deaUpdatedAt.set(null);
       this.deaErrorKey.set("");
+      this.deaSuccessKey.set("");
       this.deaState.set("idle");
       this.deaBusy.set(false);
       if (key) void this.loadDeaStructure();
@@ -194,6 +196,7 @@ export class ReferentialDetailComponent {
     this.deaBusy.set(true);
     this.deaState.set("loading");
     this.deaErrorKey.set("");
+    this.deaSuccessKey.set("");
     try {
       const result = await this.deaApi.get(versionId);
       if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
@@ -235,12 +238,14 @@ export class ReferentialDetailComponent {
     const requestId = ++this.deaRequestId;
     this.deaBusy.set(true);
     this.deaErrorKey.set("");
+    this.deaSuccessKey.set("");
     try {
       const result = await this.deaApi.save(versionId, document);
       if (requestId !== this.deaRequestId || this.referential()?.apiId !== versionId) return;
       this.deaDocument.set(result.content);
       this.deaUpdatedAt.set(result.updatedAtUtc);
       this.deaState.set("ready");
+      this.deaSuccessKey.set("qa41c3.saveSuccess");
     } catch (error: unknown) {
       if (requestId === this.deaRequestId) {
         const errorCode = apiErrorCode(error);
