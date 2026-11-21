@@ -250,7 +250,11 @@ export class ReferentialDetailComponent {
       if (requestId === this.deaRequestId) {
         const errorCode = apiErrorCode(error);
         this.deaErrorKey.set(
-          errorCode === "DEA_STRUCTURE_MODULE_HOURS_REQUIRED"
+          errorCode === "DEA_STRUCTURE_COMPETENCY_REFERENCE_INVALID"
+            ? "qa41b4.errors.invalidCompetencyReference"
+            : errorCode === "DEA_STRUCTURE_MODULE_CODE_DUPLICATE"
+              ? "qa41b4.errors.duplicateModuleCode"
+              : errorCode === "DEA_STRUCTURE_MODULE_HOURS_REQUIRED"
             ? "qa41b4.errors.moduleHoursRequired"
             : errorCode === "DEA_STRUCTURE_HOURS_INVALID"
               ? "qa41b4.errors.invalidHours"

@@ -5160,7 +5160,9 @@
       "unavailable": "Service DEA indisponible ou non configuré.",
       "invalidStructure": "La structure DEA comporte une erreur : vérifiez les champs obligatoires, les codes et les références entre sections.",
       "moduleHoursRequired": "Le champ « hours » est obligatoire pour chaque module. Saisissez un nombre entier d’heures supérieur à zéro.",
-      "invalidHours": "Les volumes horaires DEA sont incohérents. Vérifiez les totaux (801 h, 556 h, 245 h), les 3 h de suivi et la somme des modules et stages."
+      "invalidHours": "Les volumes horaires DEA sont incohérents. Vérifiez les totaux (801 h, 556 h, 245 h), les 3 h de suivi et la somme des modules et stages.",
+      "invalidCompetencyReference": "Une compétence référencée par un bloc n’existe pas dans ce référentiel. Vérifiez le numéro de compétence.",
+      "duplicateModuleCode": "Ce code de module est déjà utilisé. Chaque module doit avoir un code unique."
     }
   },
   "qa41b6": {

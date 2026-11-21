@@ -5160,7 +5160,9 @@
       "unavailable": "DEA service unavailable or not configured.",
       "invalidStructure": "The DEA structure is invalid: check required fields, codes and cross-section references.",
       "moduleHoursRequired": "The \"hours\" field is required for every module. Enter a positive whole number of hours.",
-      "invalidHours": "The DEA training hours are inconsistent. Check the totals (801, 556, 245 hours), 3 follow-up hours, and module and placement sums."
+      "invalidHours": "The DEA training hours are inconsistent. Check the totals (801, 556, 245 hours), 3 follow-up hours, and module and placement sums.",
+      "invalidCompetencyReference": "A competency referenced by a block does not exist in this referential. Check the competency number.",
+      "duplicateModuleCode": "This module code is already in use. Each module must have a unique code."
     }
   },
   "qa41b6": {
