@@ -66,6 +66,7 @@
             >{{ "referentials.compare.button" | t }}
           </button>
         }
+        @if (canManageDea()) {
         <button
           type="button"
           (click)="versionDrawerOpen.set(true)"
@@ -74,6 +75,7 @@
           <i class="ph ph-copy text-[15px]"></i
           >{{ "referentials.detail.duplicate" | t }}
         </button>
+        }
       </div>
     </div>
 
@@ -92,12 +94,6 @@
           (initializeRequested)="initializeDeaStructure()"
           (saveRequested)="saveDeaStructure($event)"
         />
-        @if (deaSuccessKey()) {
-          <p role="status" aria-live="polite" class="mt-3 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-            <i class="ph ph-check-circle text-lg" aria-hidden="true"></i>
-            {{ deaSuccessKey() | t }}
-          </p>
-        }
       </div>
     }
 
@@ -607,7 +603,7 @@
       (closed)="compareOpen.set(false)"
     />
     <app-referential-version-drawer
-      [open]="versionDrawerOpen()"
+      [open]="versionDrawerOpen() && canManageDea()"
       [referentials]="store.items()"
       [defaultSourceId]="current.id"
       (closed)="versionDrawerOpen.set(false)"

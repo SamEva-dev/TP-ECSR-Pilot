@@ -4502,7 +4502,8 @@
     "CERTIFICATION_STEP_KIND_INVALID": "Unknown assessment step type. Select a valid type.",
     "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date.",
     "ORGANIZATION_LEGAL_NAME_REQUIRED": "Legal name is required.",
-    "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long."
+    "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long.",
+    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "Cannot publish: complete the DEA referential with 5 blocks, 11 competencies, 10 modules, 3 placements and 5 assessments, then verify their relationships and hours."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",

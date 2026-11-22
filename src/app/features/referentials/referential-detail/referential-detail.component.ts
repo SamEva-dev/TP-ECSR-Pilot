@@ -335,6 +335,7 @@ export class ReferentialDetailComponent {
     if (tab === "certification") void this.refreshCertificationSchemes();
   }
   async saveVersion(value: ReferentialVersionFormValue): Promise<void> {
+    if (!this.canManageDea()) return;
     const saved = await this.store.createVersion(value);
     if (saved) this.versionDrawerOpen.set(false);
   }

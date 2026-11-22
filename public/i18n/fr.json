@@ -4502,7 +4502,8 @@
     "CERTIFICATION_STEP_KIND_INVALID": "Type d’épreuve inconnu. Sélectionnez un type valide.",
     "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma.",
     "ORGANIZATION_LEGAL_NAME_REQUIRED": "La raison sociale est obligatoire.",
-    "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue."
+    "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue.",
+    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "La publication est impossible : complétez les 5 blocs, 11 compétences, 10 modules, 3 stages et 5 évaluations du référentiel DEA, puis vérifiez leurs liens et les volumes horaires."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",

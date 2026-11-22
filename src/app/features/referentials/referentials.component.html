@@ -15,6 +15,7 @@
         {{ "referentials.subtitle" | t }}
       </p>
     </div>
+    @if (canManage()) {
     <button
       type="button"
       (click)="drawerOpen.set(true)"
@@ -22,6 +23,7 @@
     >
       <i class="ph ph-plus text-[16px]"></i>{{ "referentials.newVersion" | t }}
     </button>
+    }
   </div>
 
   <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -221,7 +223,7 @@
     }
   </div>
   <app-referential-version-drawer
-    [open]="drawerOpen()"
+    [open]="drawerOpen() && canManage()"
     [referentials]="store.items()"
     (closed)="drawerOpen.set(false)"
     (saved)="saveVersion($event)"

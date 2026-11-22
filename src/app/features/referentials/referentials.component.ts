@@ -8,6 +8,7 @@ import {
 import { RouterLink } from "@angular/router";
 import { ReferentialApiStoreService } from "../../core/api-data/referential-api-store.service";
 import { ProgramApiStoreService } from "../../core/api-data/program-api-store.service";
+import { AccessPolicyService } from "../../core/access/access-policy.service";
 import { WorkspaceContextService } from "../../core/workspace/workspace-context.service";
 import { TranslatePipe } from "../../core/i18n/translate.pipe";
 import type {
@@ -24,6 +25,8 @@ import { ReferentialVersionDrawerComponent } from "./referential-version-drawer/
 })
 export class ReferentialsComponent {
   readonly store = inject(ReferentialApiStoreService);
+  private readonly accessPolicy = inject(AccessPolicyService);
+  readonly canManage = computed(() => this.accessPolicy.can("referentials.manage"));
   private readonly programStore = inject(ProgramApiStoreService);
   readonly workspace = inject(WorkspaceContextService);
   readonly scopeProgramIds = computed(() => {
@@ -80,6 +83,7 @@ export class ReferentialsComponent {
   );
 
   async saveVersion(value: ReferentialVersionFormValue): Promise<void> {
+    if (!this.canManage()) return;
     const saved = await this.store.createVersion(value);
     if (saved) this.drawerOpen.set(false);
   }
