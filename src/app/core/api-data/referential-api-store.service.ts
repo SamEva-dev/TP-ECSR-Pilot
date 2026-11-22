@@ -145,8 +145,14 @@ export class ReferentialApiStoreService {
       this.itemsSignal.update((items) => [mapped, ...items.filter((item) => item.apiId !== mapped.apiId)]);
       await this.reload();
       return this.itemsSignal().find((item) => item.apiId === mapped.apiId) ?? mapped;
-    } catch {
-      this.notifications.error("referentials.api.saveError", "/referentiels");
+    } catch (error: unknown) {
+      // A version can also be created with publish=true. Preserve a precise DEA
+      // publication validation error instead of reporting an unrelated access issue.
+      const code = apiErrorCode(error);
+      const key = value.status === "active" && code === "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE"
+        ? "errors.DEA_REFERENTIAL_STRUCTURE_INCOMPLETE"
+        : "referentials.api.saveError";
+      this.notifications.error(key, "/referentiels");
       return null;
     }
   }
@@ -168,10 +174,12 @@ export class ReferentialApiStoreService {
       return true;
     } catch (error: unknown) {
       const code = apiErrorCode(error);
-      const detailKey = code === "DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE"
-        ? "errors.DEA_REFERENTIAL_COMPETENCIES_INCOMPLETE"
+      // Only map this known DEA validation to the DEA message. Permissions,
+      // dates and unexpected failures retain their existing generic fallback.
+      const key = code === "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE"
+        ? "errors.DEA_REFERENTIAL_STRUCTURE_INCOMPLETE"
         : "referentials.api.publishError";
-      this.notifications.error(detailKey, `/referentiels/${current.id}`);
+      this.notifications.error(key, `/referentiels/${current.id}`);
       return false;
     }
   }
