@@ -4503,7 +4503,13 @@
     "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Enter the certification scheme effective start date.",
     "ORGANIZATION_LEGAL_NAME_REQUIRED": "Legal name is required.",
     "ORGANIZATION_LEGAL_NAME_INVALID": "Legal name is too long.",
-    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "Cannot publish: complete the DEA referential with 5 blocks, 11 competencies, 10 modules, 3 placements and 5 assessments, then verify their relationships and hours."
+    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "Cannot publish: complete the DEA referential with 5 blocks, 11 competencies, 10 modules, 3 placements and 5 assessments, then verify their relationships and hours.",
+    "REFERENTIAL_ARCHIVE_ADMIN_ONLY": "Only a platform administrator may remediate a version.",
+    "REFERENTIAL_ARCHIVE_REASON_REQUIRED": "Provide the exact version label and a reason of at least 20 characters.",
+    "REFERENTIAL_ARCHIVE_LABEL_MISMATCH": "Version label does not match the confirmation.",
+    "REFERENTIAL_ARCHIVE_NOT_ACTIVE": "Only an active version can be archived by this operation.",
+    "REFERENTIAL_ARCHIVE_DATE_INVALID": "Invalid end date.",
+    "REFERENTIAL_ARCHIVE_DEPENDENCIES_PRESENT": "Archiving denied: business records reference this version."
   },
   "reporting": {
     "liveData": "Data from the Pedagora Pilot database",

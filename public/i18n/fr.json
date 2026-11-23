@@ -4503,7 +4503,13 @@
     "CERTIFICATION_EFFECTIVE_DATE_REQUIRED": "Renseignez la date de début d’application du schéma.",
     "ORGANIZATION_LEGAL_NAME_REQUIRED": "La raison sociale est obligatoire.",
     "ORGANIZATION_LEGAL_NAME_INVALID": "La raison sociale est trop longue.",
-    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "La publication est impossible : complétez les 5 blocs, 11 compétences, 10 modules, 3 stages et 5 évaluations du référentiel DEA, puis vérifiez leurs liens et les volumes horaires."
+    "DEA_REFERENTIAL_STRUCTURE_INCOMPLETE": "La publication est impossible : complétez les 5 blocs, 11 compétences, 10 modules, 3 stages et 5 évaluations du référentiel DEA, puis vérifiez leurs liens et les volumes horaires.",
+    "REFERENTIAL_ARCHIVE_ADMIN_ONLY": "Seul un administrateur de plateforme peut régulariser une version.",
+    "REFERENTIAL_ARCHIVE_REASON_REQUIRED": "Indiquez la version exacte et un motif de régularisation d’au moins 20 caractères.",
+    "REFERENTIAL_ARCHIVE_LABEL_MISMATCH": "Le libellé de version ne correspond pas à la confirmation.",
+    "REFERENTIAL_ARCHIVE_NOT_ACTIVE": "Seule une version active peut être archivée via cette opération.",
+    "REFERENTIAL_ARCHIVE_DATE_INVALID": "La date de fin est invalide.",
+    "REFERENTIAL_ARCHIVE_DEPENDENCIES_PRESENT": "Archivage refusé : des données métier référencent cette version."
   },
   "reporting": {
     "liveData": "Données issues de la base Pedagora Pilot",
